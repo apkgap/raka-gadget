@@ -156,6 +156,7 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 			'qty'              => $qty,
 			'shipping'         => $shipping,
 			'total'            => $total,
+			'estimate_days'    => $get_meta( '_preorder_estimate_days' ) ?: '7-14 วัน',
 			'address'          => $get_meta( '_preorder_address' ),
 			'courier'          => $get_meta( '_preorder_courier' ) ?: 'kerry',
 			'tracking_no'      => $get_meta( '_preorder_tracking' ),
@@ -193,6 +194,7 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	$price         = intval( $request->get_param( 'price' ) );
 	$qty           = intval( $request->get_param( 'qty' ) ) ?: 1;
 	$shipping      = intval( $request->get_param( 'shipping' ) );
+	$estimate_days = sanitize_text_field( (string) $request->get_param( 'estimate_days' ) ) ?: '7-14 วัน';
 	$address       = sanitize_textarea_field( (string) $request->get_param( 'address' ) );
 	$courier       = sanitize_text_field( (string) $request->get_param( 'courier' ) ) ?: 'kerry';
 	$tracking_no   = sanitize_text_field( (string) $request->get_param( 'tracking_no' ) );
@@ -233,6 +235,7 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	update_post_meta( $post_id, '_preorder_price', $price );
 	update_post_meta( $post_id, '_preorder_qty', $qty );
 	update_post_meta( $post_id, '_preorder_shipping', $shipping );
+	update_post_meta( $post_id, '_preorder_estimate_days', $estimate_days );
 	update_post_meta( $post_id, '_preorder_address', $address );
 	update_post_meta( $post_id, '_preorder_courier', $courier );
 	update_post_meta( $post_id, '_preorder_tracking', $tracking_no );

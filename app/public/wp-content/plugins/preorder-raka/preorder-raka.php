@@ -352,6 +352,13 @@ function preorder_raka_render_details_metabox( $post ) {
 				<td><input id="preorder_raka_shipping" class="small-text" type="number" name="preorder_raka_shipping" value="<?php echo esc_attr( $shipping ); ?>"></td>
 			</tr>
 			<tr>
+				<th scope="row"><label for="preorder_raka_estimate_days"><?php esc_html_e( 'ระยะเวลาจัดส่งโดยประมาณ', 'preorder-raka' ); ?></label></th>
+				<td>
+					<?php $est_days = get_post_meta( $post->ID, '_preorder_estimate_days', true ) ?: '7-14 วัน'; ?>
+					<input id="preorder_raka_estimate_days" class="regular-text" type="text" name="preorder_raka_estimate_days" value="<?php echo esc_attr( $est_days ); ?>" placeholder="e.g. 7-14 วัน">
+				</td>
+			</tr>
+			<tr>
 				<th scope="row"><label for="preorder_raka_address"><?php esc_html_e( 'ที่อยู่จัดส่ง', 'preorder-raka' ); ?></label></th>
 				<td><textarea id="preorder_raka_address" class="large-text" name="preorder_raka_address" rows="3"><?php echo esc_textarea( $address ); ?></textarea></td>
 			</tr>
@@ -572,6 +579,7 @@ function preorder_raka_save_post( $post_id ) {
 		'preorder_raka_price'           => '_preorder_price',
 		'preorder_raka_qty'             => '_preorder_qty',
 		'preorder_raka_shipping'        => '_preorder_shipping',
+		'preorder_raka_estimate_days'   => '_preorder_estimate_days',
 		'preorder_raka_address'         => '_preorder_address',
 		'preorder_raka_courier'         => '_preorder_courier',
 		'preorder_raka_tracking'        => '_preorder_tracking',

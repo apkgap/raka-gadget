@@ -607,6 +607,7 @@ const PreOrderApp = ({ postId }) => {
 								{ id: 'qty',   icon: 'ri-box-3-line',        label: 'จำนวน',      val: `${preorderData.qty} ชิ้น`,                       accent: false },
 								{ id: 'price', icon: 'ri-price-tag-3-line',  label: 'ราคาสินค้า', val: `${preorderData.price.toLocaleString()} บาท`,       accent: false },
 								{ id: 'ship',  icon: 'ri-truck-line',         label: 'ค่าส่ง',    val: `${preorderData.shipping.toLocaleString()} บาท`,    accent: false },
+								{ id: 'est',   icon: 'ri-time-line',          label: 'ระยะเวลาจัดส่งโดยประมาณ', val: preorderData.estimate_days || '7-14 วัน', accent: false },
 								{ id: 'step',  icon: 'ri-route-line',         label: 'ขั้นตอน',   val: `${preorderData.current_step_idx + 1} / ${preorderData.steps.length}`, accent: true },
 							].map(s => (
 								<div id={`preorder-raka-stat-${s.id}`} key={s.id} style={{

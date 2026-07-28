@@ -22,6 +22,7 @@ const AdminAddPreorder = () => {
 		price: '',
 		qty: 1,
 		shipping: 0,
+		estimate_days: '7-14 วัน',
 		address: '',
 		courier: 'kerry',
 		tracking_no: '',
@@ -122,10 +123,13 @@ const AdminAddPreorder = () => {
 				price: '',
 				qty: 1,
 				shipping: 0,
+				estimate_days: '7-14 วัน',
 				address: '',
 				courier: 'kerry',
 				tracking_no: '',
 				tracking_link: '',
+				facebook: '',
+				line: '',
 			});
 		} catch (err) {
 			setResultMsg({ type: 'error', text: err.message });
@@ -348,6 +352,24 @@ const AdminAddPreorder = () => {
 								onChange={(e) => handleChange('shipping', e.target.value)}
 								style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db' }}
 							/>
+						</div>
+
+						{/* Estimate Days */}
+						<div>
+							<label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#374151', marginBottom: 6 }}>
+								ระยะเวลาจัดส่งโดยประมาณ
+							</label>
+							<select
+								value={formData.estimate_days}
+								onChange={(e) => handleChange('estimate_days', e.target.value)}
+								style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db', background: '#ffffff' }}
+							>
+								<option value="3-5 วัน">3-5 วัน</option>
+								<option value="7-14 วัน">7-14 วัน (มาตรฐาน)</option>
+								<option value="15-20 วัน">15-20 วัน</option>
+								<option value="20-30 วัน">20-30 วัน</option>
+								<option value="30-45 วัน">30-45 วัน</option>
+							</select>
 						</div>
 
 						{/* Total Calculated Preview */}
