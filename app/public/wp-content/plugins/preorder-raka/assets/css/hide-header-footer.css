@@ -1,0 +1,25 @@
+#raka-site-header,
+#raka-site-footer {
+	display: none !important;
+}
+
+#raka-site-main,
+#preorder-raka-primary-main {
+	min-height: 100vh !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding-top: 40px !important;
+	padding-bottom: 40px !important;
+	box-sizing: border-box !important;
+}
+
+@media (max-width: 640px) {
+	#raka-site-main,
+	#preorder-raka-primary-main {
+		padding-top: 24px !important;
+		padding-bottom: 24px !important;
+	}
+}
+
+

@@ -1,0 +1,16 @@
+[28-Jul-2026 01:26:46 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, function "preorder_raka_create_dummy_data" not found or invalid function name in C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#1 C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\Users\akega\Local Sites\raka-gadget\app\public\wp-admin\admin-ajax.php(45): do_action('admin_init')
+#3 {main}
+  thrown in C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\class-wp-hook.php on line 341
+[28-Jul-2026 01:27:24 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, function "preorder_raka_create_dummy_data" not found or invalid function name in C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#1 C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\Users\akega\Local Sites\raka-gadget\app\public\wp-admin\admin.php(180): do_action('admin_init')
+#3 C:\Users\akega\Local Sites\raka-gadget\app\public\wp-admin\post-new.php(10): require_once('C:\\Users\\akega\\...')
+#4 {main}
+  thrown in C:\Users\akega\Local Sites\raka-gadget\app\public\wp-includes\class-wp-hook.php on line 341
+[28-Jul-2026 01:42:22 UTC] PHP Parse error:  Unmatched '}' in C:\Users\akega\Local Sites\raka-gadget\app\public\wp-content\plugins\preorder-raka\preorder-raka.php on line 554

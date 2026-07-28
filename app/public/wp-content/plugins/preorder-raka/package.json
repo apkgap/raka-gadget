@@ -1,0 +1,19 @@
+{
+  "name": "preorder-raka",
+  "version": "1.0.0",
+  "description": "Pre-order Status System for Raka",
+  "author": "raka gadget",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "dev": "wp-scripts start",
+    "build": "wp-scripts build"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^26.0.0"
+  }
+}
