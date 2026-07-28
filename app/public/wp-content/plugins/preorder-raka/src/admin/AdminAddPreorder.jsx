@@ -41,12 +41,14 @@ const AdminAddPreorder = () => {
 		const fetchProducts = async () => {
 			setLoadingProds(true);
 			try {
-				const res = await fetch(`${settings.root}wp/v2/preorder_product?per_page=100`, {
+				const res = await fetch(`${settings.root}preorder-raka/v1/products`, {
 					headers: { 'X-WP-Nonce': settings.nonce }
 				});
 				if (res.ok) {
-					const data = await res.json();
-					setProducts(data);
+					const json = await res.json();
+					if (json.success && Array.isArray(json.data)) {
+						setProducts(json.data);
+					}
 				}
 			} catch (e) {
 				console.error('Failed to load products', e);
@@ -69,7 +71,8 @@ const AdminAddPreorder = () => {
 			setFormData(prev => ({
 				...prev,
 				product_id: prod.id,
-				product_name: prod.title.rendered || '',
+				product_name: prod.title || '',
+				price: prod.price ? parseInt(prod.price, 10) : prev.price,
 			}));
 		}
 	};
@@ -281,7 +284,7 @@ const AdminAddPreorder = () => {
 							>
 								<option value="">-- กำหนดชื่อสินค้าเอง / ไม่เลือกจากระบบ --</option>
 								{products.map(p => (
-									<option key={p.id} value={p.id}>{p.title.rendered}</option>
+									<option key={p.id} value={p.id}>{p.title}</option>
 								))}
 							</select>
 						</div>

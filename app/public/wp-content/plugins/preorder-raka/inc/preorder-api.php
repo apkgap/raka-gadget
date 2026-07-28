@@ -30,6 +30,16 @@ function preorder_raka_register_rest_routes() {
 			},
 		]
 	] );
+
+	register_rest_route( 'preorder-raka/v1', '/products', [
+		[
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => 'preorder_raka_get_products',
+			'permission_callback' => function () {
+				return current_user_can( 'edit_posts' );
+			},
+		]
+	] );
 }
 add_action( 'rest_api_init', 'preorder_raka_register_rest_routes' );
 
@@ -254,4 +264,32 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 		]
 	];
 }
+
+/**
+ * Get List of Pre-order Products for Admin dropdown.
+ */
+function preorder_raka_get_products() {
+	$posts = get_posts([
+		'post_type'   => 'preorder_product',
+		'post_status' => 'publish',
+		'numberposts' => -1,
+		'orderby'     => 'title',
+		'order'       => 'ASC',
+	]);
+
+	$data = [];
+	foreach ( $posts as $p ) {
+		$data[] = [
+			'id'    => $p->ID,
+			'title' => $p->post_title,
+			'price' => get_post_meta( $p->ID, '_preorder_price', true ),
+		];
+	}
+
+	return [
+		'success' => true,
+		'data'    => $data,
+	];
+}
+
 
