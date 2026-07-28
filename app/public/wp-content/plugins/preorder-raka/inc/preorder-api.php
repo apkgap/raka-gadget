@@ -188,8 +188,11 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 		$post_title .= ' (' . $product_name . ')';
 	}
 
+	$post_name = sanitize_title( strtolower( $order_no ) );
+
 	$post_id = wp_insert_post([
 		'post_title'  => $post_title,
+		'post_name'   => $post_name,
 		'post_type'   => 'preorder',
 		'post_status' => 'publish',
 	]);

@@ -1,0 +1,46 @@
+name: Deploy to Production (FTP)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Dependencies & Build Plugin (preorder-raka)
+        run: |
+          if [ -d "app/public/wp-content/plugins/preorder-raka" ]; then
+            cd app/public/wp-content/plugins/preorder-raka
+            npm ci || npm install
+            npm run build
+          fi
+
+      - name: 🚀 FTP Deploy Plugin (preorder-raka)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./app/public/wp-content/plugins/preorder-raka/
+          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/preorder-raka/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/src/**
+            **/package.json
+            **/package-lock.json
+            **/AGENTS.md
+            **/.windsurf/**
