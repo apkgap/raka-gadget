@@ -15,6 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 function raka_preorder_theme_setup() {
 	// Enable support for Post Thumbnails on posts and pages.
 	add_theme_support( 'post-thumbnails' );
+
+	// Enable support for Custom Logo.
+	add_theme_support( 'custom-logo', [
+		'height'      => 100,
+		'width'       => 300,
+		'flex-height' => true,
+		'flex-width'  => true,
+	] );
 }
 add_action( 'after_setup_theme', 'raka_preorder_theme_setup' );
 
