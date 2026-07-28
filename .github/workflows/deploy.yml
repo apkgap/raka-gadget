@@ -35,8 +35,9 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          passive: true
-          timeout: 60000
+          security: loose
+          security-mode: loose
+          log-level: verbose
           local-dir: ./app/public/wp-content/plugins/preorder-raka/
           server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/preorder-raka/
           exclude: |
@@ -65,8 +66,9 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          passive: true
-          timeout: 60000
+          security: loose
+          security-mode: loose
+          log-level: verbose
           local-dir: ./app/public/wp-content/themes/raka-preorder-theme/
           server-dir: ${{ secrets.FTP_THEME_DIR }}/raka-preorder-theme/
           exclude: |
