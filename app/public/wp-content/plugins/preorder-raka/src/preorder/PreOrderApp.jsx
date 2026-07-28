@@ -271,16 +271,32 @@ const PreOrderApp = ({ postId }) => {
 
 		setLoading(true); setError(null);
 		try {
-			const baseUrl = `${settings.root.replace(/\/$/, '')}/status`;
-			const params = new URLSearchParams();
-			if (pId || (postId && screen === 'verify-direct')) params.append('post_id', pId || postId);
-			else params.append('order_no', targetOrderNo);
+			let url = '';
+			const rootUrl = settings.root;
+			if (rootUrl.includes('rest_route=')) {
+				// Plain Permalinks e.g. https://site.com/index.php?rest_route=/preorder-raka/v1/
+				const urlObj = new URL(rootUrl, window.location.origin);
+				const currentRestRoute = urlObj.searchParams.get('rest_route') || '/preorder-raka/v1/';
+				const targetRoute = currentRestRoute.replace(/\/$/, '') + '/status';
+				urlObj.searchParams.set('rest_route', targetRoute);
+				if (pId || (postId && screen === 'verify-direct')) urlObj.searchParams.set('post_id', pId || postId);
+				else urlObj.searchParams.set('order_no', targetOrderNo);
 
-			if (targetType === 'phone') params.append('phone', targetPhone);
-			else params.append('citizen_id', targetCitizen);
+				if (targetType === 'phone') urlObj.searchParams.set('phone', targetPhone);
+				else urlObj.searchParams.set('citizen_id', targetCitizen);
+				url = urlObj.toString();
+			} else {
+				// Pretty Permalinks e.g. https://site.com/wp-json/preorder-raka/v1/
+				const baseUrl = `${rootUrl.replace(/\/$/, '')}/status`;
+				const params = new URLSearchParams();
+				if (pId || (postId && screen === 'verify-direct')) params.append('post_id', pId || postId);
+				else params.append('order_no', targetOrderNo);
 
-			const delimiter = baseUrl.includes('?') ? '&' : '?';
-			const url = `${baseUrl}${delimiter}${params.toString()}`;
+				if (targetType === 'phone') params.append('phone', targetPhone);
+				else params.append('citizen_id', targetCitizen);
+
+				url = `${baseUrl}?${params.toString()}`;
+			}
 
 			const res  = await fetch(url, { headers: { 'X-WP-Nonce': settings.nonce } });
 			const data = await res.json();

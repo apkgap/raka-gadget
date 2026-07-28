@@ -153,7 +153,7 @@ function preorder_raka_enqueue_admin_assets( $hook ) {
 		'preorder-raka-admin-app',
 		'preorderRakaAdminSettings',
 		[
-			'root'     => esc_url_raw( rest_url( 'preorder-raka/v1' ) ),
+			'root'     => esc_url_raw( rest_url( 'preorder-raka/v1/' ) ),
 			'nonce'    => wp_create_nonce( 'wp_rest' ),
 			'adminUrl' => esc_url( admin_url( 'edit.php?post_type=preorder' ) ),
 		]
@@ -678,7 +678,7 @@ function preorder_raka_enqueue_assets() {
 			'preorder-raka-app',
 			'preorderRakaSettings',
 			[
-				'root'  => esc_url_raw( rest_url( 'preorder-raka/v1' ) ),
+				'root'  => esc_url_raw( rest_url( 'preorder-raka/v1/' ) ),
 				'nonce' => wp_create_nonce( 'wp_rest' ),
 				'home'  => esc_url( home_url() ),
 			]
