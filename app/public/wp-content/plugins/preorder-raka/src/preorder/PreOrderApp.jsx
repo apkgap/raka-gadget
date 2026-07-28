@@ -272,12 +272,15 @@ const PreOrderApp = ({ postId }) => {
 		setLoading(true); setError(null);
 		try {
 			let url = '';
-			const rootUrl = settings.root;
-			if (rootUrl.includes('rest_route=')) {
+			const rootUrl = settings.root || '/wp-json/preorder-raka/v1';
+
+			if (rootUrl.includes('rest_route=') || rootUrl.includes('index.php')) {
 				// Plain Permalinks e.g. https://site.com/index.php?rest_route=/preorder-raka/v1
 				const urlObj = new URL(rootUrl, window.location.origin);
-				const currentRestRoute = (urlObj.searchParams.get('rest_route') || '/preorder-raka/v1').replace(/\/$/, '');
-				urlObj.searchParams.set('rest_route', `${currentRestRoute}/status`);
+				const rawRoute = urlObj.searchParams.get('rest_route') || '/preorder-raka/v1';
+				const cleanRoute = rawRoute.split('?')[0].replace(/\/$/, '');
+				
+				urlObj.searchParams.set('rest_route', `${cleanRoute}/status`);
 				if (pId || (postId && screen === 'verify-direct')) urlObj.searchParams.set('post_id', pId || postId);
 				else urlObj.searchParams.set('order_no', targetOrderNo);
 
