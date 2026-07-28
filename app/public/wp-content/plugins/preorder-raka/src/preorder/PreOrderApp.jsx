@@ -469,15 +469,24 @@ const PreOrderApp = ({ postId }) => {
 				<div id="preorder-raka-nav-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, position: 'relative' }}>
 					{/* Logo */}
 					<div id="preorder-raka-logo-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-						<div id="preorder-raka-logo-badge" style={{
-							width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-							background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-							fontWeight: 500, fontSize: 20, color: '#dc2626',
-							boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
-						}}>R</div>
+						{settings.logoUrl ? (
+							<img
+								id="preorder-raka-site-logo-img"
+								src={settings.logoUrl}
+								alt={settings.siteName || 'Logo'}
+								style={{ height: 44, width: 'auto', maxHeight: 44, objectFit: 'contain', borderRadius: 8 }}
+							/>
+						) : (
+							<div id="preorder-raka-logo-badge" style={{
+								width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+								background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+								fontWeight: 500, fontSize: 20, color: '#dc2626',
+								boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
+							}}>{(settings.siteName || 'R')[0]}</div>
+						)}
 						<div id="preorder-raka-logo-text-block">
 							<div id="preorder-raka-logo-name" style={{ fontSize: 18, fontWeight: 500, letterSpacing: '-0.3px', color: '#ffffff', lineHeight: 1.15 }}>
-								RAKA GADGET
+								{settings.siteName || 'RAKA GADGET'}
 							</div>
 							<div id="preorder-raka-logo-sub" style={{ fontSize: 11, fontWeight: 400, letterSpacing: '1.1px', color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase' }}>
 								Pre-Order Tracker

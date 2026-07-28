@@ -674,13 +674,19 @@ function preorder_raka_enqueue_assets() {
 			$version,
 			true
 		);
+		$custom_logo_id  = get_theme_mod( 'custom_logo' );
+		$custom_logo_url = $custom_logo_id ? wp_get_attachment_image_url( $custom_logo_id, 'full' ) : '';
+
 		wp_localize_script(
 			'preorder-raka-app',
 			'preorderRakaSettings',
 			[
-				'root'  => esc_url_raw( rest_url( 'preorder-raka/v1' ) ),
-				'nonce' => wp_create_nonce( 'wp_rest' ),
-				'home'  => esc_url( home_url() ),
+				'root'       => esc_url_raw( rest_url( 'preorder-raka/v1' ) ),
+				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'home'       => esc_url( home_url() ),
+				'logoUrl'    => esc_url( $custom_logo_url ),
+				'siteName'   => esc_html( get_bloginfo( 'name' ) ),
+				'siteDesc'   => esc_html( get_bloginfo( 'description' ) ),
 			]
 		);
 
