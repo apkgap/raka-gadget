@@ -271,11 +271,17 @@ const PreOrderApp = ({ postId }) => {
 
 		setLoading(true); setError(null);
 		try {
-			let url = `${settings.root}preorder-raka/v1/status?`;
-			if (pId || (postId && screen === 'verify-direct')) url += `post_id=${pId || postId}`;
-			else url += `order_no=${encodeURIComponent(targetOrderNo)}`;
+			const baseUrl = `${settings.root.replace(/\/$/, '')}/status`;
+			const params = new URLSearchParams();
+			if (pId || (postId && screen === 'verify-direct')) params.append('post_id', pId || postId);
+			else params.append('order_no', targetOrderNo);
 
-			url += targetType === 'phone' ? `&phone=${encodeURIComponent(targetPhone)}` : `&citizen_id=${encodeURIComponent(targetCitizen)}`;
+			if (targetType === 'phone') params.append('phone', targetPhone);
+			else params.append('citizen_id', targetCitizen);
+
+			const delimiter = baseUrl.includes('?') ? '&' : '?';
+			const url = `${baseUrl}${delimiter}${params.toString()}`;
+
 			const res  = await fetch(url, { headers: { 'X-WP-Nonce': settings.nonce } });
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.message || 'ไม่สามารถดึงข้อมูลได้');

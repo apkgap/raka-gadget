@@ -41,7 +41,8 @@ const AdminAddPreorder = () => {
 		const fetchProducts = async () => {
 			setLoadingProds(true);
 			try {
-				const res = await fetch(`${settings.root}preorder-raka/v1/products`, {
+				const baseUrl = `${settings.root.replace(/\/$/, '')}/products`;
+				const res = await fetch(baseUrl, {
 					headers: { 'X-WP-Nonce': settings.nonce }
 				});
 				if (res.ok) {
@@ -92,7 +93,8 @@ const AdminAddPreorder = () => {
 		setCreatedData(null);
 
 		try {
-			const res = await fetch(`${settings.root}preorder-raka/v1/create`, {
+			const baseUrl = `${settings.root.replace(/\/$/, '')}/create`;
+			const res = await fetch(baseUrl, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
