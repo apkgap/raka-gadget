@@ -274,19 +274,19 @@ const PreOrderApp = ({ postId }) => {
 			let url = '';
 			const rootUrl = settings.root || '/wp-json/preorder-raka/v1';
 
-			if (rootUrl.includes('rest_route=') || rootUrl.includes('index.php')) {
-				// Plain Permalinks e.g. https://site.com/index.php?rest_route=/preorder-raka/v1
-				const urlObj = new URL(rootUrl, window.location.origin);
-				const rawRoute = urlObj.searchParams.get('rest_route') || '/preorder-raka/v1';
-				const cleanRoute = rawRoute.split('?')[0].replace(/\/$/, '');
+			if (rootUrl.includes('rest_route=')) {
+				// Extract origin and base path e.g. https://site.com/index.php
+				const [basePath] = rootUrl.split('?');
+				const params = new URLSearchParams();
+				params.set('rest_route', '/preorder-raka/v1/status');
 				
-				urlObj.searchParams.set('rest_route', `${cleanRoute}/status`);
-				if (pId || (postId && screen === 'verify-direct')) urlObj.searchParams.set('post_id', pId || postId);
-				else urlObj.searchParams.set('order_no', targetOrderNo);
+				if (pId || (postId && screen === 'verify-direct')) params.set('post_id', pId || postId);
+				else params.set('order_no', targetOrderNo);
 
-				if (targetType === 'phone') urlObj.searchParams.set('phone', targetPhone);
-				else urlObj.searchParams.set('citizen_id', targetCitizen);
-				url = urlObj.toString();
+				if (targetType === 'phone') params.set('phone', targetPhone);
+				else params.set('citizen_id', targetCitizen);
+
+				url = `${basePath}?${params.toString()}`;
 			} else {
 				// Pretty Permalinks e.g. https://site.com/wp-json/preorder-raka/v1
 				const baseUrl = `${rootUrl.replace(/\/$/, '')}/status`;
