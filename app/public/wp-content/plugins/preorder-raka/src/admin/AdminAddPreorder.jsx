@@ -26,6 +26,8 @@ const AdminAddPreorder = () => {
 		courier: 'kerry',
 		tracking_no: '',
 		tracking_link: '',
+		facebook: '',
+		line: '',
 	});
 
 	const [products, setProducts] = useState([]);
@@ -404,6 +406,34 @@ const AdminAddPreorder = () => {
 								placeholder="https://th.kerryexpress.com/th/track/?track=..."
 								value={formData.tracking_link}
 								onChange={(e) => handleChange('tracking_link', e.target.value)}
+								style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db' }}
+							/>
+						</div>
+
+						{/* Facebook Link */}
+						<div>
+							<label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#374151', marginBottom: 6 }}>
+								ลิงก์ Facebook / Messenger
+							</label>
+							<input
+								type="url"
+								placeholder="https://m.me/yourfanpage"
+								value={formData.facebook}
+								onChange={(e) => handleChange('facebook', e.target.value)}
+								style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db' }}
+							/>
+						</div>
+
+						{/* LINE Link */}
+						<div>
+							<label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#374151', marginBottom: 6 }}>
+								ลิงก์ LINE Official / LINE ID
+							</label>
+							<input
+								type="url"
+								placeholder="https://line.me/ti/p/@yourlineid"
+								value={formData.line}
+								onChange={(e) => handleChange('line', e.target.value)}
 								style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db' }}
 							/>
 						</div>

@@ -141,6 +141,8 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 			'courier'          => get_post_meta( $pid, '_preorder_courier', true ) ?: 'kerry',
 			'tracking_no'      => get_post_meta( $pid, '_preorder_tracking', true ),
 			'tracking_link'    => get_post_meta( $pid, '_preorder_tracking_link', true ),
+			'facebook'         => get_post_meta( $pid, '_preorder_facebook', true ),
+			'line'             => get_post_meta( $pid, '_preorder_line', true ),
 			'steps'            => array_map( function( $s ) {
 				if ( ! empty( $s['date'] ) && strpos( $s['date'], 'T' ) !== false ) {
 					$time = strtotime( $s['date'] );
@@ -176,6 +178,8 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	$courier       = sanitize_text_field( (string) $request->get_param( 'courier' ) ) ?: 'kerry';
 	$tracking_no   = sanitize_text_field( (string) $request->get_param( 'tracking_no' ) );
 	$tracking_link = esc_url_raw( (string) $request->get_param( 'tracking_link' ) );
+	$facebook      = esc_url_raw( (string) $request->get_param( 'facebook' ) );
+	$line          = esc_url_raw( (string) $request->get_param( 'line' ) );
 
 	if ( empty( $order_no ) ) {
 		$order_no = 'RAKA-PRE-' . wp_rand( 100000, 999999 );
@@ -214,6 +218,8 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	update_post_meta( $post_id, '_preorder_courier', $courier );
 	update_post_meta( $post_id, '_preorder_tracking', $tracking_no );
 	update_post_meta( $post_id, '_preorder_tracking_link', $tracking_link );
+	update_post_meta( $post_id, '_preorder_facebook', $facebook );
+	update_post_meta( $post_id, '_preorder_line', $line );
 	update_post_meta( $post_id, '_preorder_current_step_idx', 0 );
 
 	// Default steps setup

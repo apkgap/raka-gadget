@@ -382,6 +382,20 @@ function preorder_raka_render_details_metabox( $post ) {
 					<p class="description" style="margin-top: 5px;"><?php esc_html_e( 'หากระบุลิงก์ ปุ่มเช็คพัสดุจะเปิดลิงก์ไปยังเว็บขนส่งโดยตรง', 'preorder-raka' ); ?></p>
 				</td>
 			</tr>
+			<tr>
+				<th scope="row"><label for="preorder_raka_facebook"><?php esc_html_e( 'ลิงก์ Facebook / Messenger', 'preorder-raka' ); ?></label></th>
+				<td>
+					<?php $facebook = get_post_meta( $post->ID, '_preorder_facebook', true ); ?>
+					<input id="preorder_raka_facebook" class="large-text" type="url" name="preorder_raka_facebook" value="<?php echo esc_attr( $facebook ); ?>" placeholder="https://m.me/yourfanpage หรือ https://facebook.com/yourpage">
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="preorder_raka_line"><?php esc_html_e( 'ลิงก์ LINE Official / LINE ID', 'preorder-raka' ); ?></label></th>
+				<td>
+					<?php $line = get_post_meta( $post->ID, '_preorder_line', true ); ?>
+					<input id="preorder_raka_line" class="large-text" type="url" name="preorder_raka_line" value="<?php echo esc_attr( $line ); ?>" placeholder="https://line.me/ti/p/@yourlineid หรือ https://lin.ee/xxxx">
+				</td>
+			</tr>
 		</tbody>
 	</table>
 	<?php
@@ -562,6 +576,8 @@ function preorder_raka_save_post( $post_id ) {
 		'preorder_raka_courier'         => '_preorder_courier',
 		'preorder_raka_tracking'        => '_preorder_tracking',
 		'preorder_raka_tracking_link'   => '_preorder_tracking_link',
+		'preorder_raka_facebook'        => '_preorder_facebook',
+		'preorder_raka_line'            => '_preorder_line',
 		'preorder_raka_current_step_idx' => '_preorder_current_step_idx',
 		'preorder_raka_product_id'      => '_preorder_product_id',
 	];

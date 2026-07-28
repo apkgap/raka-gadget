@@ -773,6 +773,53 @@ const PreOrderApp = ({ postId }) => {
 									</div>
 								)}
 
+								{/* Social Contact Card (Facebook & LINE) */}
+								{(preorderData.facebook || preorderData.line) && (
+									<div id="preorder-raka-social-card" style={S.card}>
+										<span style={S.sectionLabel}>
+											<i className="ri-customer-service-2-line" style={{ marginRight: 4 }}/>สอบถามและช่วยเหลือ
+										</span>
+										<div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+											{preorderData.facebook && (
+												<a
+													id="preorder-raka-facebook-btn"
+													href={preorderData.facebook}
+													target="_blank"
+													rel="noopener noreferrer"
+													style={{
+														display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+														padding: '10px 16px', borderRadius: 9999,
+														background: 'linear-gradient(135deg, #1877f2, #0056b3)',
+														color: '#ffffff', fontSize: 13, fontWeight: 500, textDecoration: 'none',
+														boxShadow: '0 4px 14px rgba(24, 119, 242, 0.3)', transition: 'all 0.25s',
+													}}
+												>
+													<i className="ri-facebook-circle-fill" style={{ fontSize: 18 }}/>
+													<span>ติดต่อผ่าน Facebook / Messenger</span>
+												</a>
+											)}
+											{preorderData.line && (
+												<a
+													id="preorder-raka-line-btn"
+													href={preorderData.line}
+													target="_blank"
+													rel="noopener noreferrer"
+													style={{
+														display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+														padding: '10px 16px', borderRadius: 9999,
+														background: 'linear-gradient(135deg, #06c755, #05a044)',
+														color: '#ffffff', fontSize: 13, fontWeight: 500, textDecoration: 'none',
+														boxShadow: '0 4px 14px rgba(6, 199, 85, 0.3)', transition: 'all 0.25s',
+													}}
+												>
+													<i className="ri-line-fill" style={{ fontSize: 18 }}/>
+													<span>สอบถามแอดมินทาง LINE Official</span>
+												</a>
+											)}
+										</div>
+									</div>
+								)}
+
 								{/* Summary totals */}
 								<div id="preorder-raka-summary-card" style={S.card}>
 									<span style={S.sectionLabel}><i className="ri-receipt-line" style={{ marginRight: 4 }}/>สรุปค่าใช้จ่าย</span>
