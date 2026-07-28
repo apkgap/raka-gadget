@@ -43,9 +43,11 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	$citizen_id = sanitize_text_field( (string) $request->get_param( 'citizen_id' ) );
 
 	$args = [
-		'post_type'   => 'preorder',
-		'post_status' => 'publish',
-		'numberposts' => 1,
+		'post_type'              => 'preorder',
+		'post_status'            => 'publish',
+		'numberposts'            => 1,
+		'no_found_rows'          => true,
+		'update_post_term_cache' => false,
 	];
 
 	if ( ! empty( $post_id ) ) {
@@ -71,9 +73,15 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	$preorder = $posts[0];
 	$pid      = $preorder->ID;
 
+	// Fetch all post meta at once in 1 SQL query for maximum performance
+	$all_meta = get_post_meta( $pid );
+	$get_meta = function( $key, $default = '' ) use ( $all_meta ) {
+		return isset( $all_meta[ $key ][0] ) ? maybe_unserialize( $all_meta[ $key ][0] ) : $default;
+	};
+
 	// Security Verification
-	$db_phone      = get_post_meta( $pid, '_preorder_phone', true );
-	$db_citizen_id = get_post_meta( $pid, '_preorder_citizen_id_last4', true );
+	$db_phone      = $get_meta( '_preorder_phone' );
+	$db_citizen_id = $get_meta( '_preorder_citizen_id_last4' );
 
 	// Clean inputs for comparison
 	$phone_clean   = preg_replace( '/[^0-9]/', '', $phone );
@@ -95,15 +103,16 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	if ( ! $validated ) {
 		return new WP_Error( 'verification_required', 'กรุณายืนยันเบอร์โทรศัพท์หรือเลขบัตรประชาชน 4 ตัวท้ายให้ถูกต้อง เพื่อดูสถานะ', [ 'status' => 403 ] );
 	}
-	$steps       = get_post_meta( $pid, '_preorder_steps', true );
-	$current_idx = get_post_meta( $pid, '_preorder_current_step_idx', true );
+
+	$steps       = $get_meta( '_preorder_steps', [] );
+	$current_idx = $get_meta( '_preorder_current_step_idx', 0 );
 
 	if ( ! is_array( $steps ) ) {
 		$steps = [];
 	}
-	$product_id         = get_post_meta( $pid, '_preorder_product_id', true );
-	$product_name       = get_post_meta( $pid, '_preorder_product', true );
-	$price              = get_post_meta( $pid, '_preorder_price', true );
+	$product_id         = $get_meta( '_preorder_product_id' );
+	$product_name       = $get_meta( '_preorder_product' );
+	$price              = $get_meta( '_preorder_price' );
 	$featured_image_url = get_the_post_thumbnail_url( $pid, 'large' );
 
 	if ( ! empty( $product_id ) ) {
@@ -122,27 +131,27 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	}
 
 	$price    = intval( $price );
-	$qty      = intval( get_post_meta( $pid, '_preorder_qty', true ) ) ?: 1;
-	$shipping = intval( get_post_meta( $pid, '_preorder_shipping', true ) );
+	$qty      = intval( $get_meta( '_preorder_qty', 1 ) ) ?: 1;
+	$shipping = intval( $get_meta( '_preorder_shipping', 0 ) );
 	$total    = ( $price * $qty ) + $shipping;
 
 	return [
 		'success' => true,
 		'data'    => [
 			'id'               => $pid,
-			'order_no'         => get_post_meta( $pid, '_preorder_no', true ) ?: 'PRE-' . $pid,
+			'order_no'         => $get_meta( '_preorder_no' ) ?: 'PRE-' . $pid,
 			'product_name'     => $product_name ?: $preorder->post_title,
 			'image_url'        => $featured_image_url ? esc_url_raw( $featured_image_url ) : '',
 			'price'            => $price,
 			'qty'              => $qty,
 			'shipping'         => $shipping,
 			'total'            => $total,
-			'address'          => get_post_meta( $pid, '_preorder_address', true ),
-			'courier'          => get_post_meta( $pid, '_preorder_courier', true ) ?: 'kerry',
-			'tracking_no'      => get_post_meta( $pid, '_preorder_tracking', true ),
-			'tracking_link'    => get_post_meta( $pid, '_preorder_tracking_link', true ),
-			'facebook'         => get_post_meta( $pid, '_preorder_facebook', true ),
-			'line'             => get_post_meta( $pid, '_preorder_line', true ),
+			'address'          => $get_meta( '_preorder_address' ),
+			'courier'          => $get_meta( '_preorder_courier' ) ?: 'kerry',
+			'tracking_no'      => $get_meta( '_preorder_tracking' ),
+			'tracking_link'    => $get_meta( '_preorder_tracking_link' ),
+			'facebook'         => $get_meta( '_preorder_facebook' ),
+			'line'             => $get_meta( '_preorder_line' ),
 			'steps'            => array_map( function( $s ) {
 				if ( ! empty( $s['date'] ) && strpos( $s['date'], 'T' ) !== false ) {
 					$time = strtotime( $s['date'] );
