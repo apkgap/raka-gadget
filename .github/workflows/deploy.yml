@@ -17,7 +17,7 @@ jobs:
       - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: 📦 Install Dependencies & Build Plugin (preorder-raka)
         run: |
@@ -33,6 +33,10 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          passive: true
+          timeout: 60000
           local-dir: ./app/public/wp-content/plugins/preorder-raka/
           server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/preorder-raka/
           exclude: |
@@ -59,6 +63,10 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          passive: true
+          timeout: 60000
           local-dir: ./app/public/wp-content/themes/raka-preorder-theme/
           server-dir: ${{ secrets.FTP_THEME_DIR }}/raka-preorder-theme/
           exclude: |
