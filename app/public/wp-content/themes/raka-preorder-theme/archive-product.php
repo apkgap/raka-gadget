@@ -26,7 +26,7 @@ $all_cats = get_terms( [
 
 		<!-- ── Archive Header ── -->
 		<div id="archive-header-block" class="mb-12 md:mb-16 space-y-4 border-b border-black/10 dark:border-white/10 pb-8 md:pb-12">
-			<span id="archive-sub-tag" class="text-xs uppercase tracking-[0.3em] font-mono text-neutral-400 dark:text-neutral-500">// CATALOGUE</span>
+			<?php raka_render_breadcrumbs( 'archive-breadcrumbs', 'mb-2' ); ?>
 			<div id="archive-title-wrap" class="flex flex-col md:flex-row md:items-end justify-between gap-6">
 				<h1 id="archive-title-heading" class="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-neutral-900 dark:text-white font-hn">
 					<?php echo esc_html( $archive_title ); ?>

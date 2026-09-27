@@ -47,13 +47,7 @@ while ( have_posts() ) :
 	<div id="single-product-container" class="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
 
 		<!-- ── Breadcrumbs ── -->
-		<nav id="product-breadcrumbs-nav" class="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 mb-8 md:mb-12 font-mono">
-			<a id="crumb-home" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-black dark:hover:text-white transition-colors">HOME</a>
-			<span id="crumb-sep-1" class="opacity-40">/</span>
-			<a id="crumb-cat" href="<?php echo esc_url( $cat_link ); ?>" class="hover:text-black dark:hover:text-white transition-colors"><?php echo esc_html( $cat_name ); ?></a>
-			<span id="crumb-sep-2" class="opacity-40">/</span>
-			<span id="crumb-current" class="text-neutral-900 dark:text-neutral-200 truncate max-w-[200px] sm:max-w-xs"><?php echo esc_html( $product_title ); ?></span>
-		</nav>
+		<?php raka_render_breadcrumbs( 'product-breadcrumbs', 'mb-8 md:mb-12' ); ?>
 
 		<!-- ── Product Hero Grid (2 Columns) ── -->
 		<div id="product-hero-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">

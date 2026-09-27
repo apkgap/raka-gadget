@@ -20,7 +20,7 @@ $archive_desc  = get_the_archive_description();
 
 		<!-- ── Archive Header ── -->
 		<div id="blog-archive-header" class="mb-12 md:mb-16 space-y-4 border-b border-black/10 dark:border-white/10 pb-8">
-			<span id="blog-sub-tag" class="text-xs uppercase tracking-[0.3em] font-mono text-neutral-400 dark:text-neutral-500">// JOURNAL & ARCHIVES</span>
+			<?php raka_render_breadcrumbs( 'blog-breadcrumbs', 'mb-2' ); ?>
 			<h1 id="blog-title-heading" class="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-neutral-900 dark:text-white font-hn">
 				<?php echo wp_kses_post( $archive_title ); ?>
 			</h1>

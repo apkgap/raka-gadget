@@ -21,20 +21,14 @@ while ( have_posts() ) :
 	<div id="single-post-container" class="max-w-4xl mx-auto px-6 sm:px-8">
 
 		<!-- ── Breadcrumbs ── -->
-		<nav id="post-breadcrumbs-nav" class="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 mb-8 font-mono">
-			<a id="crumb-blog-home" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-black dark:hover:text-white transition-colors">HOME</a>
-			<span id="crumb-blog-sep-1" class="opacity-40">/</span>
-			<a id="crumb-blog-archive" href="<?php echo esc_url( get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/blog' ) ); ?>" class="hover:text-black dark:hover:text-white transition-colors">JOURNAL</a>
-			<span id="crumb-blog-sep-2" class="opacity-40">/</span>
-			<span id="crumb-blog-current" class="text-neutral-900 dark:text-neutral-200 truncate max-w-xs"><?php the_title(); ?></span>
-		</nav>
+		<?php raka_render_breadcrumbs( 'post-breadcrumbs', 'mb-8' ); ?>
 
 		<article id="post-article-<?php echo esc_attr( (string) $p_id ); ?>" class="space-y-8">
 			<!-- Header -->
 			<header id="post-article-header-<?php echo esc_attr( (string) $p_id ); ?>" class="space-y-4 border-b border-black/10 dark:border-white/10 pb-8">
 				<div id="post-meta-tag-<?php echo esc_attr( (string) $p_id ); ?>" class="flex items-center gap-3 text-xs font-mono text-neutral-400 dark:text-neutral-500">
 					<span><?php echo esc_html( $p_date ); ?></span>
-					<span>//</span>
+					<span class="opacity-40">/</span>
 					<span><?php echo esc_html( get_the_author() ); ?></span>
 				</div>
 				<h1 id="post-title-<?php echo esc_attr( (string) $p_id ); ?>" class="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-neutral-900 dark:text-white leading-tight">
