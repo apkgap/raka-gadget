@@ -121,6 +121,179 @@ function raka_get_wc_brands(): array {
 }
 
 /**
+ * Get all product categories with images and links for hero modal popup.
+ *
+ * @return array
+ */
+function raka_get_featured_categories(): array {
+	if ( ! taxonomy_exists( 'product_cat' ) ) {
+		return [];
+	}
+
+	$terms = get_terms( [
+		'taxonomy'   => 'product_cat',
+		'hide_empty' => false,
+		'orderby'    => 'count',
+		'order'      => 'DESC',
+	] );
+
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return [];
+	}
+
+	$list = [];
+	foreach ( $terms as $term ) {
+		// Skip 'Uncategorized'
+		if ( 'uncategorized' === $term->slug ) {
+			continue;
+		}
+
+		$image_url = '';
+		$thumb_id  = get_term_meta( $term->term_id, 'thumbnail_id', true );
+		if ( $thumb_id ) {
+			$img = wp_get_attachment_image_src( (int) $thumb_id, 'medium' );
+			if ( $img ) {
+				$image_url = $img[0];
+			}
+		}
+
+		// Fallback: If no category thumbnail, grab first product image in category
+		if ( empty( $image_url ) ) {
+			$prods = get_posts( [
+				'post_type'      => 'product',
+				'posts_per_page' => 1,
+				'tax_query'      => [
+					[
+						'taxonomy' => 'product_cat',
+						'field'    => 'term_id',
+						'terms'    => $term->term_id,
+					],
+				],
+			] );
+			if ( ! empty( $prods ) ) {
+				$image_url = get_the_post_thumbnail_url( $prods[0]->ID, 'medium' ) ?: '';
+			}
+		}
+
+		$term_link = get_term_link( $term );
+
+		$list[] = [
+			'id'          => $term->term_id,
+			'name'        => $term->name,
+			'slug'        => $term->slug,
+			'count'       => $term->count,
+			'description' => $term->description,
+			'url'         => ! is_wp_error( $term_link ) ? $term_link : '#',
+			'image_url'   => $image_url,
+		];
+	}
+
+	return $list;
+}
+
+/**
+ * Get all product brands with images and links for hero modal popup.
+ *
+ * @return array
+ */
+function raka_get_featured_brands(): array {
+	$brand_taxonomies = [ 'product_brand', 'pwb-brand', 'brand', 'pa_brand' ];
+	$list = [];
+
+	foreach ( $brand_taxonomies as $tax ) {
+		if ( ! taxonomy_exists( $tax ) ) {
+			continue;
+		}
+
+		$terms = get_terms( [
+			'taxonomy'   => $tax,
+			'hide_empty' => false,
+			'orderby'    => 'count',
+			'order'      => 'DESC',
+		] );
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			continue;
+		}
+
+		foreach ( $terms as $term ) {
+			$image_url = '';
+			$thumb_id  = get_term_meta( $term->term_id, 'thumbnail_id', true )
+				?: ( get_term_meta( $term->term_id, 'pwb_brand_image', true )
+				?: get_term_meta( $term->term_id, 'brand_image_id', true ) );
+
+			if ( $thumb_id ) {
+				if ( is_numeric( $thumb_id ) ) {
+					$img = wp_get_attachment_image_src( (int) $thumb_id, 'medium' );
+					if ( $img ) {
+						$image_url = $img[0];
+					}
+				} elseif ( filter_var( $thumb_id, FILTER_VALIDATE_URL ) ) {
+					$image_url = $thumb_id;
+				}
+			}
+
+			// Fallback: If no brand thumbnail, grab first product image with this brand
+			if ( empty( $image_url ) ) {
+				$prods = get_posts( [
+					'post_type'      => 'product',
+					'posts_per_page' => 1,
+					'tax_query'      => [
+						[
+							'taxonomy' => $tax,
+							'field'    => 'term_id',
+							'terms'    => $term->term_id,
+						],
+					],
+				] );
+				if ( ! empty( $prods ) ) {
+					$image_url = get_the_post_thumbnail_url( $prods[0]->ID, 'medium' ) ?: '';
+				}
+			}
+
+			$term_link = get_term_link( $term );
+
+			$list[] = [
+				'id'          => $term->term_id,
+				'taxonomy'    => $tax,
+				'name'        => $term->name,
+				'slug'        => $term->slug,
+				'count'       => $term->count,
+				'description' => $term->description,
+				'url'         => ! is_wp_error( $term_link ) ? $term_link : '#',
+				'image_url'   => $image_url,
+			];
+		}
+
+		if ( ! empty( $list ) ) {
+			break; // Found primary brand taxonomy
+		}
+	}
+
+	return $list;
+}
+
+/**
+ * Get contact settings with safe defaults.
+ *
+ * @return array
+ */
+function raka_get_contact_options(): array {
+	return [
+		'title'        => raka_get_option( 'contact_title', __( 'Contact Raka Gadget', 'raka-preorder-theme' ) ),
+		'subtitle'     => raka_get_option( 'contact_subtitle', __( 'Pre-order inquiry, warranty service & support', 'raka-preorder-theme' ) ),
+		'line_id'      => raka_get_option( 'contact_line_id', '@rakagadget' ),
+		'line_url'     => raka_get_option( 'contact_line_url', 'https://line.me/R/ti/p/@rakagadget' ),
+		'facebook_url' => raka_get_option( 'contact_facebook_url', 'https://facebook.com/rakagadget' ),
+		'phone'        => raka_get_option( 'contact_phone', '081-234-5678' ),
+		'email'        => raka_get_option( 'contact_email', 'support@raka-gadget.com' ),
+		'hours'        => raka_get_option( 'contact_hours', 'Mon - Sun: 09:00 - 22:00 (GMT+7)' ),
+		'address'      => raka_get_option( 'contact_address', 'Bangkok, Thailand' ),
+		'note'         => raka_get_option( 'contact_note', 'ยินดีให้คำปรึกษาและสอบถามข้อมูลสินค้าพรีออเดอร์ทุกรุ่นได้ตลอด 24 ชั่วโมง' ),
+	];
+}
+
+/**
  * Get WooCommerce products for select dropdowns.
  *
  * @param int $limit Number of products to fetch.

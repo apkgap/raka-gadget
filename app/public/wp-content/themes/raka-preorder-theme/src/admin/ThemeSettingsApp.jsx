@@ -325,6 +325,16 @@ export default function ThemeSettingsApp() {
 		hero_video_url: '',
 		hero_overlay_url: '',
 		hero_cards: [],
+		contact_title: 'CONTACT & STORE',
+		contact_subtitle: 'Get in touch with our team for consultations, orders, and inquiries.',
+		contact_line_id: '@rakagadget',
+		contact_line_url: 'https://line.me/ti/p/@rakagadget',
+		contact_facebook_url: 'https://facebook.com/rakagadget',
+		contact_phone: '081-234-5678',
+		contact_email: 'contact@raka-gadget.com',
+		contact_hours: 'Mon - Sun: 10:00 - 20:00 (Daily)',
+		contact_address: '123/45 Gadget District, Bangkok 10110',
+		contact_note: 'For custom inquiries, private showroom sessions, or pre-order status, message us directly via LINE Official 24/7.',
 	} );
 	const [ wcData, setWcData ] = useState( {
 		categories: [],
@@ -526,6 +536,15 @@ export default function ThemeSettingsApp() {
 				</span>
 			),
 		},
+		{
+			name: 'hero_contact',
+			title: (
+				<span style={ { display: 'inline-flex', alignItems: 'center', gap: '6px' } }>
+					<i className="ri-customer-service-2-line" style={ { fontSize: '16px' } } />
+					{ __( 'Contact & Store Info', 'raka-preorder-theme' ) }
+				</span>
+			),
+		},
 	];
 
 	return (
@@ -692,6 +711,179 @@ export default function ThemeSettingsApp() {
 												onChange={ ( val ) => handleOptionChange( 'hero_overlay_url', val ) }
 												placeholder="https://.../character-overlay.png"
 											/>
+										</div>
+									</div>
+								</CardBody>
+							);
+						}
+
+						// Contact & Store Settings Tab
+						if ( tab.name === 'hero_contact' ) {
+							return (
+								<CardBody style={ { padding: '28px 32px' } }>
+									<div style={ { marginBottom: '24px' } }>
+										<h2 style={ { margin: '0 0 4px 0', fontSize: '17px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' } }>
+											<i className="ri-customer-service-2-line" style={ { color: '#10b981' } } />
+											{ __( 'Contact & Store Information Settings', 'raka-preorder-theme' ) }
+										</h2>
+										<p style={ { color: '#64748b', fontSize: '13px', margin: 0 } }>
+											{ __( 'Configure the bottom-left contact popup content: LINE Official, Facebook, hotline phone, studio hours, and address.', 'raka-preorder-theme' ) }
+										</p>
+									</div>
+
+									{ /* 2-Column: Form Controls on Left, Live Preview Card on Right */ }
+									<div style={ { display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '28px', alignItems: 'start' } }>
+										{ /* Form Fields */ }
+										<div style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }>
+											<div style={ { padding: '18px 20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' } }>
+												<h3 style={ { margin: '0 0 14px 0', fontSize: '14px', fontWeight: 700, color: '#1e293b' } }>
+													{ __( 'Modal Header Texts', 'raka-preorder-theme' ) }
+												</h3>
+												<TextControl
+													label={ __( 'Modal Title / Button Label', 'raka-preorder-theme' ) }
+													value={ options.contact_title ?? 'CONTACT & STORE' }
+													onChange={ ( val ) => handleOptionChange( 'contact_title', val ) }
+													help={ __( 'Title displayed on the bottom-left hero button and modal header.', 'raka-preorder-theme' ) }
+												/>
+												<TextControl
+													label={ __( 'Modal Subtitle', 'raka-preorder-theme' ) }
+													value={ options.contact_subtitle ?? 'Get in touch with our team for consultations, orders, and inquiries.' }
+													onChange={ ( val ) => handleOptionChange( 'contact_subtitle', val ) }
+												/>
+											</div>
+
+											<div style={ { padding: '18px 20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' } }>
+												<h3 style={ { margin: '0 0 14px 0', fontSize: '14px', fontWeight: 700, color: '#1e293b' } }>
+													{ __( 'Social & Direct Channels', 'raka-preorder-theme' ) }
+												</h3>
+												<div style={ { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' } }>
+													<TextControl
+														label={ __( 'LINE Official ID', 'raka-preorder-theme' ) }
+														value={ options.contact_line_id ?? '@rakagadget' }
+														onChange={ ( val ) => handleOptionChange( 'contact_line_id', val ) }
+														placeholder="@rakagadget"
+													/>
+													<TextControl
+														label={ __( 'LINE Add Friend URL', 'raka-preorder-theme' ) }
+														value={ options.contact_line_url ?? 'https://line.me/ti/p/@rakagadget' }
+														onChange={ ( val ) => handleOptionChange( 'contact_line_url', val ) }
+														placeholder="https://line.me/ti/p/..."
+													/>
+												</div>
+												<div style={ { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' } }>
+													<TextControl
+														label={ __( 'Facebook Page URL', 'raka-preorder-theme' ) }
+														value={ options.contact_facebook_url ?? 'https://facebook.com/rakagadget' }
+														onChange={ ( val ) => handleOptionChange( 'contact_facebook_url', val ) }
+														placeholder="https://facebook.com/..."
+													/>
+													<TextControl
+														label={ __( 'Customer Hotline Phone', 'raka-preorder-theme' ) }
+														value={ options.contact_phone ?? '081-234-5678' }
+														onChange={ ( val ) => handleOptionChange( 'contact_phone', val ) }
+														placeholder="081-234-5678"
+													/>
+												</div>
+												<div style={ { marginTop: '12px' } }>
+													<TextControl
+														label={ __( 'Support Email Address', 'raka-preorder-theme' ) }
+														value={ options.contact_email ?? 'contact@raka-gadget.com' }
+														onChange={ ( val ) => handleOptionChange( 'contact_email', val ) }
+														placeholder="contact@domain.com"
+													/>
+												</div>
+											</div>
+
+											<div style={ { padding: '18px 20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' } }>
+												<h3 style={ { margin: '0 0 14px 0', fontSize: '14px', fontWeight: 700, color: '#1e293b' } }>
+													{ __( 'Studio Location & Hours', 'raka-preorder-theme' ) }
+												</h3>
+												<TextControl
+													label={ __( 'Service & Opening Hours', 'raka-preorder-theme' ) }
+													value={ options.contact_hours ?? 'Mon - Sun: 10:00 - 20:00 (Daily)' }
+													onChange={ ( val ) => handleOptionChange( 'contact_hours', val ) }
+												/>
+												<TextControl
+													label={ __( 'Store Physical Address', 'raka-preorder-theme' ) }
+													value={ options.contact_address ?? '123/45 Gadget District, Bangkok 10110' }
+													onChange={ ( val ) => handleOptionChange( 'contact_address', val ) }
+												/>
+												<TextareaControl
+													label={ __( 'Special Instructions / Notice Note', 'raka-preorder-theme' ) }
+													rows={ 2 }
+													value={ options.contact_note ?? 'For custom inquiries, private showroom sessions, or pre-order status, message us directly via LINE Official 24/7.' }
+													onChange={ ( val ) => handleOptionChange( 'contact_note', val ) }
+												/>
+											</div>
+										</div>
+
+										{ /* Live Preview Card */ }
+										<div style={ { position: 'sticky', top: '20px' } }>
+											<div style={ { background: '#09090b', color: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' } }>
+												<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)' } }>
+													<div style={ { display: 'flex', alignItems: 'center', gap: '8px' } }>
+														<span style={ { width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' } } />
+														<span style={ { fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94a3b8' } }>
+															{ __( 'Live Modal Preview', 'raka-preorder-theme' ) }
+														</span>
+													</div>
+													<span style={ { fontSize: '11px', color: '#64748b' } }>OBSIDIAN UI</span>
+												</div>
+
+												<h3 style={ { margin: '0 0 4px 0', fontSize: '18px', fontWeight: 700, color: '#fff' } }>
+													{ options.contact_title || 'CONTACT & STORE' }
+												</h3>
+												<p style={ { margin: '0 0 16px 0', fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 } }>
+													{ options.contact_subtitle || 'Get in touch with our team for consultations and orders.' }
+												</p>
+
+												<div style={ { display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' } }>
+													{ options.contact_line_id && (
+														<div style={ { padding: '10px 12px', borderRadius: '10px', background: 'rgba(6, 199, 85, 0.12)', border: '1px solid rgba(6, 199, 85, 0.3)', display: 'flex', alignItems: 'center', gap: '10px' } }>
+															<i className="ri-line-fill" style={ { fontSize: '20px', color: '#06C755' } } />
+															<div style={ { flex: 1, minWidth: 0 } }>
+																<div style={ { fontSize: '9px', fontWeight: 700, color: '#06C755', textTransform: 'uppercase' } }>LINE Official</div>
+																<div style={ { fontSize: '12px', fontWeight: 600, color: '#fff' } }>{ options.contact_line_id }</div>
+															</div>
+														</div>
+													) }
+													{ options.contact_phone && (
+														<div style={ { padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '10px' } }>
+															<i className="ri-phone-fill" style={ { fontSize: '18px', color: '#fff' } } />
+															<div style={ { flex: 1, minWidth: 0 } }>
+																<div style={ { fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' } }>Customer Hotline</div>
+																<div style={ { fontSize: '12px', fontWeight: 600, color: '#fff' } }>{ options.contact_phone }</div>
+															</div>
+														</div>
+													) }
+													{ options.contact_email && (
+														<div style={ { padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '10px' } }>
+															<i className="ri-mail-fill" style={ { fontSize: '18px', color: '#fff' } } />
+															<div style={ { flex: 1, minWidth: 0 } }>
+																<div style={ { fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' } }>Support Email</div>
+																<div style={ { fontSize: '12px', fontWeight: 600, color: '#fff' } }>{ options.contact_email }</div>
+															</div>
+														</div>
+													) }
+												</div>
+
+												{ ( options.contact_hours || options.contact_address ) && (
+													<div style={ { padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '11px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 } }>
+														{ options.contact_hours && (
+															<div style={ { display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' } }>
+																<i className="ri-time-line" style={ { color: '#94a3b8' } } />
+																<span>{ options.contact_hours }</span>
+															</div>
+														) }
+														{ options.contact_address && (
+															<div style={ { display: 'flex', alignItems: 'center', gap: '6px' } }>
+																<i className="ri-map-pin-2-line" style={ { color: '#94a3b8' } } />
+																<span>{ options.contact_address }</span>
+															</div>
+														) }
+													</div>
+												) }
+											</div>
 										</div>
 									</div>
 								</CardBody>

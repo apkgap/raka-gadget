@@ -26,6 +26,10 @@ $hero_card_quads     = array_chunk( $hero_cards, 4 );
 $total_quads         = count( $hero_card_quads );
 $hero_section_height = max( 280, ( $total_quads * 90 ) + 100 ) . 'vh';
 
+$featured_categories = raka_get_featured_categories();
+$featured_brands     = raka_get_featured_brands();
+$contact_options     = raka_get_contact_options();
+
 if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 	/**
 	 * Render a single full-sized card inside the hero quad layout.
@@ -168,16 +172,57 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		</div>
 
 		<!-- 4. Hero Content (Section 1) -->
-		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col pointer-events-none gpu-accel">
-			<div class="flex justify-center mt-12 md:mt-14">
+		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col justify-between pointer-events-none gpu-accel p-6 md:p-10 pb-8 md:pb-10">
+			<!-- Centered Main Title -->
+			<div id="hero-title-container" class="flex justify-center mt-12 md:mt-14">
 				<h1 id="hero-main-title" class="text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition">
 					<?php echo esc_html( $hero_main_title ); ?>
 				</h1>
 			</div>
-			<div class="absolute bottom-6 left-6 md:left-10 md:bottom-8">
-				<p class="text-[9px] md:text-[10px] tracking-[0.15em] uppercase leading-[1.8] text-black/80 dark:text-white/80 font-hn theme-transition">
-					<?php echo nl2br( esc_html( $hero_caption ) ); ?>
-				</p>
+
+			<!-- Bottom Hero Action Bar (Left: Caption & Contact | Right: Categories & Brands) -->
+			<div id="hero-bottom-bar" class="w-full flex flex-col md:flex-row items-start md:items-end justify-between gap-6 pointer-events-none mt-auto">
+				<!-- Bottom Left: Caption & Contact Popup Button -->
+				<div id="hero-bottom-left-panel" class="pointer-events-auto flex flex-col items-start gap-3.5 max-w-sm">
+					<p id="hero-caption-text" class="text-[9px] md:text-[10px] tracking-[0.15em] uppercase leading-[1.8] text-black/80 dark:text-white/80 font-hn theme-transition">
+						<?php echo nl2br( esc_html( $hero_caption ) ); ?>
+					</p>
+					<button
+						id="hero-contact-trigger-btn"
+						type="button"
+						onclick="window.rakaOpenModal('contact')"
+						class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+					>
+						<span id="hero-contact-btn-pulse" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+						<span id="hero-contact-btn-text"><?php echo esc_html( ! empty( $contact_options['contact_title'] ) ? $contact_options['contact_title'] : __( 'Contact & Store', 'raka-preorder-theme' ) ); ?></span>
+						<i id="hero-contact-btn-icon" class="ri-arrow-right-up-line text-sm opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+					</button>
+				</div>
+
+				<!-- Bottom Right: Categories & Brands Popup Buttons -->
+				<div id="hero-bottom-right-panel" class="pointer-events-auto flex items-center flex-wrap gap-2.5 sm:gap-3.5 self-start md:self-end">
+					<button
+						id="hero-categories-trigger-btn"
+						type="button"
+						onclick="window.rakaOpenModal('categories')"
+						class="group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+					>
+						<i id="hero-categories-btn-icon" class="ri-grid-fill text-sm opacity-75 group-hover:opacity-100 group-hover:rotate-12 transition-transform"></i>
+						<span id="hero-categories-btn-text"><?php esc_html_e( 'Categories', 'raka-preorder-theme' ); ?></span>
+						<span id="hero-categories-btn-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/10 dark:bg-white/15 text-neutral-800 dark:text-white font-mono"><?php echo esc_html( count( $featured_categories ) ); ?></span>
+					</button>
+
+					<button
+						id="hero-brands-trigger-btn"
+						type="button"
+						onclick="window.rakaOpenModal('brands')"
+						class="group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+					>
+						<i id="hero-brands-btn-icon" class="ri-fire-fill text-sm text-amber-500 group-hover:scale-125 transition-transform"></i>
+						<span id="hero-brands-btn-text"><?php esc_html_e( 'Brands', 'raka-preorder-theme' ); ?></span>
+						<span id="hero-brands-btn-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/10 dark:bg-white/15 text-neutral-800 dark:text-white font-mono"><?php echo esc_html( count( $featured_brands ) ); ?></span>
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -186,7 +231,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			<div id="hero-card-quad-<?php echo esc_attr( $quad_idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel pointer-events-none p-6 md:p-8 lg:p-12 pt-20 md:pt-24 lg:pt-28 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 md:gap-8 lg:gap-12 overflow-y-auto md:overflow-visible" style="opacity: 0; visibility: hidden; transform: translate3d(0, 20px, 0);">
 				
 				<!-- Left Flank: Card 0 + Card 2 (if present) -->
-				<div class="flex flex-col gap-4 md:gap-5 w-full max-w-md lg:max-w-[420px]">
+				<div id="hero-quad-left-<?php echo esc_attr( $quad_idx ); ?>" class="flex flex-col gap-4 md:gap-5 w-full max-w-md lg:max-w-[420px]">
 					<?php if ( isset( $quad[0] ) ) : ?>
 						<?php raka_render_hero_card_item( $quad[0] ); ?>
 					<?php endif; ?>
@@ -196,7 +241,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 				</div>
 
 				<!-- Right Flank: Card 1 + Card 3 (if present) -->
-				<div class="flex flex-col gap-4 md:gap-5 w-full max-w-md lg:max-w-[420px] md:mt-4 lg:mt-6">
+				<div id="hero-quad-right-<?php echo esc_attr( $quad_idx ); ?>" class="flex flex-col gap-4 md:gap-5 w-full max-w-md lg:max-w-[420px] md:mt-4 lg:mt-6">
 					<?php if ( isset( $quad[1] ) ) : ?>
 						<?php raka_render_hero_card_item( $quad[1] ); ?>
 					<?php endif; ?>
@@ -209,6 +254,313 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<?php endforeach; ?>
 	</div>
 </section>
+
+<!-- ── POPUP MODALS: Categories, Brands, Contact ── -->
+
+<!-- 1. Categories Modal -->
+<div id="raka-categories-modal" class="raka-popup-modal fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/80 backdrop-blur-2xl transition-all duration-300 opacity-0 pointer-events-none">
+	<div id="raka-categories-modal-backdrop" class="absolute inset-0" onclick="window.rakaCloseModal('categories')"></div>
+	<div id="raka-categories-modal-dialog" class="raka-modal-dialog relative z-10 w-full max-w-5xl max-h-[85vh] flex flex-col rounded-3xl bg-neutral-900/95 border border-white/15 shadow-2xl text-white overflow-hidden transform scale-95 transition-all duration-300">
+		<!-- Header -->
+		<div id="raka-categories-modal-header" class="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-white/10 shrink-0">
+			<div id="raka-categories-header-left" class="flex items-center gap-3">
+				<div id="raka-categories-icon-badge" class="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center">
+					<i id="raka-cat-modal-ico" class="ri-grid-fill text-lg"></i>
+				</div>
+				<div>
+					<h3 id="raka-categories-modal-title" class="text-lg sm:text-xl font-bold font-hn leading-tight text-white"><?php esc_html_e( 'Product Categories', 'raka-preorder-theme' ); ?></h3>
+					<p id="raka-categories-modal-subtitle" class="text-xs text-white/50 font-hn mt-0.5"><?php esc_html_e( 'Discover all available gadget categories and collections', 'raka-preorder-theme' ); ?></p>
+				</div>
+			</div>
+			<button id="raka-categories-modal-close" type="button" onclick="window.rakaCloseModal('categories')" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="<?php esc_attr_e( 'Close', 'raka-preorder-theme' ); ?>">
+				<i id="raka-categories-close-icon" class="ri-close-line text-xl"></i>
+			</button>
+		</div>
+		<!-- Grid Content -->
+		<div id="raka-categories-modal-body" class="overflow-y-auto p-6 sm:p-8">
+			<?php if ( ! empty( $featured_categories ) ) : ?>
+				<div id="raka-categories-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-5">
+					<?php foreach ( $featured_categories as $cat ) : ?>
+						<a
+							id="raka-cat-item-<?php echo esc_attr( $cat['id'] ); ?>"
+							href="<?php echo esc_url( $cat['url'] ); ?>"
+							class="group relative flex flex-col justify-end aspect-[4/5] rounded-2xl overflow-hidden bg-neutral-800 border border-white/10 hover:border-blue-500/50 shadow-lg hover:shadow-2xl transition-all duration-300 p-4 sm:p-5"
+						>
+							<img
+								id="raka-cat-img-<?php echo esc_attr( $cat['id'] ); ?>"
+								src="<?php echo esc_url( $cat['image_url'] ); ?>"
+								alt="<?php echo esc_attr( $cat['name'] ); ?>"
+								class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-70 group-hover:opacity-95"
+							/>
+							<div id="raka-cat-grad-<?php echo esc_attr( $cat['id'] ); ?>" class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent"></div>
+							<div id="raka-cat-meta-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex flex-col">
+								<span id="raka-cat-count-<?php echo esc_attr( $cat['id'] ); ?>" class="text-[10px] tracking-widest uppercase text-white/60 font-mono mb-1">
+									<?php echo esc_html( sprintf( _n( '%s Product', '%s Products', $cat['count'], 'raka-preorder-theme' ), number_format_i18n( $cat['count'] ) ) ); ?>
+								</span>
+								<h4 id="raka-cat-title-<?php echo esc_attr( $cat['id'] ); ?>" class="text-sm sm:text-base font-bold text-white font-hn group-hover:text-blue-400 transition-colors flex items-center justify-between">
+									<span><?php echo esc_html( $cat['name'] ); ?></span>
+									<i id="raka-cat-arr-<?php echo esc_attr( $cat['id'] ); ?>" class="ri-arrow-right-line text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+								</h4>
+							</div>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			<?php else : ?>
+				<div id="raka-categories-empty" class="text-center py-12 text-white/50 text-sm font-hn">
+					<?php esc_html_e( 'No product categories found.', 'raka-preorder-theme' ); ?>
+				</div>
+			<?php endif; ?>
+		</div>
+	</div>
+</div>
+
+<!-- 2. Brands Modal -->
+<div id="raka-brands-modal" class="raka-popup-modal fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/80 backdrop-blur-2xl transition-all duration-300 opacity-0 pointer-events-none">
+	<div id="raka-brands-modal-backdrop" class="absolute inset-0" onclick="window.rakaCloseModal('brands')"></div>
+	<div id="raka-brands-modal-dialog" class="raka-modal-dialog relative z-10 w-full max-w-5xl max-h-[85vh] flex flex-col rounded-3xl bg-neutral-900/95 border border-white/15 shadow-2xl text-white overflow-hidden transform scale-95 transition-all duration-300">
+		<!-- Header -->
+		<div id="raka-brands-modal-header" class="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-white/10 shrink-0">
+			<div id="raka-brands-header-left" class="flex items-center gap-3">
+				<div id="raka-brands-icon-badge" class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+					<i id="raka-brand-modal-ico" class="ri-fire-fill text-lg"></i>
+				</div>
+				<div>
+					<h3 id="raka-brands-modal-title" class="text-lg sm:text-xl font-bold font-hn leading-tight text-white"><?php esc_html_e( 'Official Brands', 'raka-preorder-theme' ); ?></h3>
+					<p id="raka-brands-modal-subtitle" class="text-xs text-white/50 font-hn mt-0.5"><?php esc_html_e( 'Authorized and premium gadget partners', 'raka-preorder-theme' ); ?></p>
+				</div>
+			</div>
+			<button id="raka-brands-modal-close" type="button" onclick="window.rakaCloseModal('brands')" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="<?php esc_attr_e( 'Close', 'raka-preorder-theme' ); ?>">
+				<i id="raka-brands-close-icon" class="ri-close-line text-xl"></i>
+			</button>
+		</div>
+		<!-- Grid Content -->
+		<div id="raka-brands-modal-body" class="overflow-y-auto p-6 sm:p-8">
+			<?php if ( ! empty( $featured_brands ) ) : ?>
+				<div id="raka-brands-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-5">
+					<?php foreach ( $featured_brands as $brand ) : ?>
+						<a
+							id="raka-brand-item-<?php echo esc_attr( $brand['id'] ); ?>"
+							href="<?php echo esc_url( $brand['url'] ); ?>"
+							class="group relative flex flex-col items-center justify-center text-center rounded-2xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 hover:border-amber-500/50 shadow-lg hover:shadow-2xl transition-all duration-300 p-5 sm:p-6"
+						>
+							<?php if ( ! empty( $brand['image_url'] ) ) : ?>
+								<div id="raka-brand-img-wrap-<?php echo esc_attr( $brand['id'] ); ?>" class="w-16 h-16 sm:w-20 sm:h-20 mb-3 flex items-center justify-center overflow-hidden rounded-xl bg-white/10 p-2">
+									<img
+										id="raka-brand-img-<?php echo esc_attr( $brand['id'] ); ?>"
+										src="<?php echo esc_url( $brand['image_url'] ); ?>"
+										alt="<?php echo esc_attr( $brand['name'] ); ?>"
+										class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
+									/>
+								</div>
+							<?php else : ?>
+								<div id="raka-brand-icon-wrap-<?php echo esc_attr( $brand['id'] ); ?>" class="w-14 h-14 mb-3 flex items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+									<i id="raka-brand-crown-<?php echo esc_attr( $brand['id'] ); ?>" class="ri-vip-crown-2-line text-2xl group-hover:scale-110 transition-transform duration-300"></i>
+								</div>
+							<?php endif; ?>
+							<h4 id="raka-brand-name-<?php echo esc_attr( $brand['id'] ); ?>" class="text-sm sm:text-base font-bold text-white font-hn group-hover:text-amber-400 transition-colors">
+								<?php echo esc_html( $brand['name'] ); ?>
+							</h4>
+							<span id="raka-brand-count-<?php echo esc_attr( $brand['id'] ); ?>" class="text-[10px] tracking-widest uppercase text-white/50 font-mono mt-1">
+								<?php echo esc_html( sprintf( _n( '%s Item', '%s Items', $brand['count'], 'raka-preorder-theme' ), number_format_i18n( $brand['count'] ) ) ); ?>
+							</span>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			<?php else : ?>
+				<div id="raka-brands-empty" class="text-center py-12 text-white/50 text-sm font-hn">
+					<?php esc_html_e( 'No brands registered yet.', 'raka-preorder-theme' ); ?>
+				</div>
+			<?php endif; ?>
+		</div>
+	</div>
+</div>
+
+<!-- 3. Contact & Store Modal -->
+<div id="raka-contact-modal" class="raka-popup-modal fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/80 backdrop-blur-2xl transition-all duration-300 opacity-0 pointer-events-none">
+	<div id="raka-contact-modal-backdrop" class="absolute inset-0" onclick="window.rakaCloseModal('contact')"></div>
+	<div id="raka-contact-modal-dialog" class="raka-modal-dialog relative z-10 w-full max-w-3xl max-h-[88vh] flex flex-col rounded-3xl bg-neutral-900/95 border border-white/15 shadow-2xl text-white overflow-hidden transform scale-95 transition-all duration-300">
+		<!-- Header -->
+		<div id="raka-contact-modal-header" class="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-white/10 shrink-0">
+			<div id="raka-contact-header-left" class="flex items-center gap-3">
+				<div id="raka-contact-icon-badge" class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+					<i id="raka-contact-modal-ico" class="ri-customer-service-2-fill text-lg"></i>
+				</div>
+				<div>
+					<h3 id="raka-contact-modal-title" class="text-lg sm:text-xl font-bold font-hn leading-tight text-white"><?php echo esc_html( ! empty( $contact_options['contact_title'] ) ? $contact_options['contact_title'] : __( 'Contact & Store Info', 'raka-preorder-theme' ) ); ?></h3>
+					<p id="raka-contact-modal-subtitle" class="text-xs text-white/50 font-hn mt-0.5"><?php echo esc_html( ! empty( $contact_options['contact_subtitle'] ) ? $contact_options['contact_subtitle'] : __( 'Get in touch with our team for orders and consultations', 'raka-preorder-theme' ) ); ?></p>
+				</div>
+			</div>
+			<button id="raka-contact-modal-close" type="button" onclick="window.rakaCloseModal('contact')" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="<?php esc_attr_e( 'Close', 'raka-preorder-theme' ); ?>">
+				<i id="raka-contact-close-icon" class="ri-close-line text-xl"></i>
+			</button>
+		</div>
+		<!-- Contact Content Body -->
+		<div id="raka-contact-modal-body" class="overflow-y-auto p-6 sm:p-8 space-y-6">
+			
+			<!-- Direct Channels Grid -->
+			<div id="raka-contact-channels-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				
+				<!-- LINE Official Card -->
+				<?php if ( ! empty( $contact_options['contact_line_id'] ) || ! empty( $contact_options['contact_line_url'] ) ) : ?>
+					<a
+						id="raka-contact-line-card"
+						href="<?php echo esc_url( ! empty( $contact_options['contact_line_url'] ) ? $contact_options['contact_line_url'] : 'https://line.me/ti/p/' . rawurlencode( $contact_options['contact_line_id'] ) ); ?>"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-[#06C755]/10 hover:bg-[#06C755]/20 border border-[#06C755]/30 hover:border-[#06C755] transition-all duration-300"
+					>
+						<div id="raka-contact-line-icon-wrap" class="w-12 h-12 rounded-xl bg-[#06C755] text-white flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+							<i id="raka-contact-line-ico" class="ri-line-fill text-2xl"></i>
+						</div>
+						<div id="raka-contact-line-details" class="flex-1 min-w-0">
+							<div id="raka-contact-line-tag" class="text-[10px] font-bold tracking-wider uppercase text-[#06C755] font-mono"><?php esc_html_e( 'LINE Official', 'raka-preorder-theme' ); ?></div>
+							<div id="raka-contact-line-id" class="text-sm font-bold text-white truncate font-hn"><?php echo esc_html( $contact_options['contact_line_id'] ); ?></div>
+							<div id="raka-contact-line-sub" class="text-[11px] text-white/50 font-hn"><?php esc_html_e( 'Chat with us 24/7', 'raka-preorder-theme' ); ?></div>
+						</div>
+						<i id="raka-contact-line-arrow" class="ri-arrow-right-up-line text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+					</a>
+				<?php endif; ?>
+
+				<!-- Facebook Card -->
+				<?php if ( ! empty( $contact_options['contact_facebook_url'] ) ) : ?>
+					<a
+						id="raka-contact-facebook-card"
+						href="<?php echo esc_url( $contact_options['contact_facebook_url'] ); ?>"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-[#1877F2]/10 hover:bg-[#1877F2]/20 border border-[#1877F2]/30 hover:border-[#1877F2] transition-all duration-300"
+					>
+						<div id="raka-contact-fb-icon-wrap" class="w-12 h-12 rounded-xl bg-[#1877F2] text-white flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+							<i id="raka-contact-fb-ico" class="ri-facebook-circle-fill text-2xl"></i>
+						</div>
+						<div id="raka-contact-fb-details" class="flex-1 min-w-0">
+							<div id="raka-contact-fb-tag" class="text-[10px] font-bold tracking-wider uppercase text-[#1877F2] font-mono"><?php esc_html_e( 'Facebook Page', 'raka-preorder-theme' ); ?></div>
+							<div id="raka-contact-fb-title" class="text-sm font-bold text-white truncate font-hn"><?php esc_html_e( 'OBSIDIAN Atelier', 'raka-preorder-theme' ); ?></div>
+							<div id="raka-contact-fb-sub" class="text-[11px] text-white/50 font-hn"><?php esc_html_e( 'Follow news & updates', 'raka-preorder-theme' ); ?></div>
+						</div>
+						<i id="raka-contact-fb-arrow" class="ri-arrow-right-up-line text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+					</a>
+				<?php endif; ?>
+
+				<!-- Phone Card -->
+				<?php if ( ! empty( $contact_options['contact_phone'] ) ) : ?>
+					<a
+						id="raka-contact-phone-card"
+						href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $contact_options['contact_phone'] ) ); ?>"
+						class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30 transition-all duration-300"
+					>
+						<div id="raka-contact-phone-icon-wrap" class="w-12 h-12 rounded-xl bg-white/15 text-white flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+							<i id="raka-contact-phone-ico" class="ri-phone-fill text-2xl"></i>
+						</div>
+						<div id="raka-contact-phone-details" class="flex-1 min-w-0">
+							<div id="raka-contact-phone-tag" class="text-[10px] font-bold tracking-wider uppercase text-white/50 font-mono"><?php esc_html_e( 'Direct Call', 'raka-preorder-theme' ); ?></div>
+							<div id="raka-contact-phone-num" class="text-sm font-bold text-white truncate font-hn"><?php echo esc_html( $contact_options['contact_phone'] ); ?></div>
+							<div id="raka-contact-phone-sub" class="text-[11px] text-white/50 font-hn"><?php esc_html_e( 'Customer hotline', 'raka-preorder-theme' ); ?></div>
+						</div>
+						<i id="raka-contact-phone-arrow" class="ri-phone-line text-white/50 group-hover:text-white transition-all"></i>
+					</a>
+				<?php endif; ?>
+
+				<!-- Email Card -->
+				<?php if ( ! empty( $contact_options['contact_email'] ) ) : ?>
+					<a
+						id="raka-contact-email-card"
+						href="mailto:<?php echo esc_attr( $contact_options['contact_email'] ); ?>"
+						class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30 transition-all duration-300"
+					>
+						<div id="raka-contact-email-icon-wrap" class="w-12 h-12 rounded-xl bg-white/15 text-white flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+							<i id="raka-contact-email-ico" class="ri-mail-fill text-2xl"></i>
+						</div>
+						<div id="raka-contact-email-details" class="flex-1 min-w-0">
+							<div id="raka-contact-email-tag" class="text-[10px] font-bold tracking-wider uppercase text-white/50 font-mono"><?php esc_html_e( 'Email Support', 'raka-preorder-theme' ); ?></div>
+							<div id="raka-contact-email-val" class="text-sm font-bold text-white truncate font-hn"><?php echo esc_html( $contact_options['contact_email'] ); ?></div>
+							<div id="raka-contact-email-sub" class="text-[11px] text-white/50 font-hn"><?php esc_html_e( 'Inquiries & orders', 'raka-preorder-theme' ); ?></div>
+						</div>
+						<i id="raka-contact-email-arrow" class="ri-mail-line text-white/50 group-hover:text-white transition-all"></i>
+					</a>
+				<?php endif; ?>
+			</div>
+
+			<!-- Studio Hours & Address Box -->
+			<div id="raka-contact-details-box" class="p-5 sm:p-6 rounded-2xl bg-white/5 border border-white/10 space-y-4">
+				<?php if ( ! empty( $contact_options['contact_hours'] ) ) : ?>
+					<div id="raka-contact-hours-row" class="flex items-start gap-3.5">
+						<div id="raka-contact-hours-icon" class="w-8 h-8 rounded-lg bg-white/10 text-white/80 flex items-center justify-center shrink-0 mt-0.5">
+							<i id="raka-hours-ico" class="ri-time-line text-base"></i>
+						</div>
+						<div>
+							<div id="raka-contact-hours-label" class="text-[10px] font-bold uppercase tracking-widest text-white/50 font-mono"><?php esc_html_e( 'Service Hours', 'raka-preorder-theme' ); ?></div>
+							<div id="raka-contact-hours-val" class="text-sm text-white/90 font-hn mt-0.5"><?php echo esc_html( $contact_options['contact_hours'] ); ?></div>
+						</div>
+					</div>
+				<?php endif; ?>
+
+				<?php if ( ! empty( $contact_options['contact_address'] ) ) : ?>
+					<div id="raka-contact-address-row" class="flex items-start gap-3.5 pt-3 border-t border-white/10">
+						<div id="raka-contact-address-icon" class="w-8 h-8 rounded-lg bg-white/10 text-white/80 flex items-center justify-center shrink-0 mt-0.5">
+							<i id="raka-address-ico" class="ri-map-pin-2-line text-base"></i>
+						</div>
+						<div>
+							<div id="raka-contact-address-label" class="text-[10px] font-bold uppercase tracking-widest text-white/50 font-mono"><?php esc_html_e( 'Store Location', 'raka-preorder-theme' ); ?></div>
+							<div id="raka-contact-address-val" class="text-sm text-white/90 font-hn mt-0.5"><?php echo esc_html( $contact_options['contact_address'] ); ?></div>
+						</div>
+					</div>
+				<?php endif; ?>
+
+				<?php if ( ! empty( $contact_options['contact_note'] ) ) : ?>
+					<div id="raka-contact-note-row" class="pt-3 border-t border-white/10">
+						<div id="raka-contact-note-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-1.5 font-mono">
+							<i id="raka-note-ico" class="ri-information-line"></i>
+							<span><?php esc_html_e( 'Notice', 'raka-preorder-theme' ); ?></span>
+						</div>
+						<p id="raka-contact-note-val" class="text-xs text-white/70 font-hn leading-relaxed">
+							<?php echo nl2br( esc_html( $contact_options['contact_note'] ) ); ?>
+						</p>
+					</div>
+				<?php endif; ?>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script id="raka-modal-controller-script">
+	(function initRakaModalController() {
+		window.rakaOpenModal = function(type) {
+			var modal = document.getElementById('raka-' + type + '-modal');
+			if (!modal) return;
+			modal.classList.remove('opacity-0', 'pointer-events-none');
+			modal.classList.add('opacity-100', 'pointer-events-auto');
+			var dialog = modal.querySelector('.raka-modal-dialog');
+			if (dialog) {
+				dialog.classList.remove('scale-95');
+				dialog.classList.add('scale-100');
+			}
+			document.body.style.overflow = 'hidden';
+		};
+
+		window.rakaCloseModal = function(type) {
+			var modals = type ? [document.getElementById('raka-' + type + '-modal')] : document.querySelectorAll('.raka-popup-modal');
+			modals.forEach(function(m) {
+				if (!m) return;
+				m.classList.remove('opacity-100', 'pointer-events-auto');
+				m.classList.add('opacity-0', 'pointer-events-none');
+				var dialog = m.querySelector('.raka-modal-dialog');
+				if (dialog) {
+					dialog.classList.remove('scale-100');
+					dialog.classList.add('scale-95');
+				}
+			});
+			document.body.style.overflow = '';
+		};
+
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				window.rakaCloseModal();
+			}
+		});
+	})();
+</script>
 
 <!-- ── ClosingSection Component ── -->
 <section class="relative min-h-screen bg-black dark:bg-black light:bg-neutral-950 flex flex-col justify-between overflow-hidden theme-transition">

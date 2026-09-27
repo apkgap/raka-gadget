@@ -317,6 +317,33 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 		}
 	}
 
+	// Contact & Store Info fields
+	$contact_fields = [
+		'contact_title',
+		'contact_subtitle',
+		'contact_line_id',
+		'contact_line_url',
+		'contact_facebook_url',
+		'contact_phone',
+		'contact_email',
+		'contact_hours',
+		'contact_address',
+		'contact_note',
+	];
+	foreach ( $contact_fields as $c_field ) {
+		if ( isset( $raw_data[ $c_field ] ) ) {
+			if ( strpos( $c_field, '_url' ) !== false ) {
+				$clean_options[ $c_field ] = esc_url_raw( trim( (string) $raw_data[ $c_field ] ) );
+			} elseif ( in_array( $c_field, [ 'contact_address', 'contact_note' ], true ) ) {
+				$clean_options[ $c_field ] = sanitize_textarea_field( (string) $raw_data[ $c_field ] );
+			} elseif ( $c_field === 'contact_email' ) {
+				$clean_options[ $c_field ] = sanitize_email( (string) $raw_data[ $c_field ] );
+			} else {
+				$clean_options[ $c_field ] = sanitize_text_field( (string) $raw_data[ $c_field ] );
+			}
+		}
+	}
+
 	// Dynamic Repeater: hero_cards
 	$allowed_positions = [ 'left', 'right', 'center', 'bottom_left', 'bottom_right' ];
 	$clean_hero_cards  = [];
