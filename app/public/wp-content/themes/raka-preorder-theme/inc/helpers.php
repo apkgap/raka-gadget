@@ -462,26 +462,26 @@ function raka_get_hero_cards(): array {
 		$sample_cards = [];
 		if ( function_exists( 'wc_get_products' ) ) {
 			$recent_products = wc_get_products( [
-				'limit'   => 4,
+				'limit'   => 12,
 				'status'  => 'publish',
 				'orderby' => 'date',
 				'order'   => 'DESC',
 			] );
 
-			$positions = [ 'left', 'right', 'left', 'right' ];
-			$tags      = [ 'PRE-ORDER', 'NEW ARRIVAL', 'FEATURED', 'HOT DEAL' ];
+			$positions = [ 'left', 'right' ];
+			$tags      = [ 'PRE-ORDER', 'NEW ARRIVAL', 'FLAGSHIP 8K', 'HOT DEAL', 'LIMITED EDITION', 'ESPORTS GRADE' ];
 
 			foreach ( $recent_products as $idx => $prod ) {
 				$sample_cards[] = [
 					'product_id'  => $prod->get_id(),
-					'tag'         => $tags[ $idx % 4 ],
+					'tag'         => $tags[ $idx % count( $tags ) ],
 					'title'       => '',
 					'description' => '',
 					'price'       => '',
 					'url'         => '',
 					'image_url'   => '',
 					'button_text' => 'Pre-Order Now',
-					'position'    => $positions[ $idx % 4 ],
+					'position'    => $positions[ $idx % 2 ],
 				];
 			}
 		}
