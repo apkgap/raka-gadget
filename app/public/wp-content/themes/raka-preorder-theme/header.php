@@ -104,16 +104,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</header>
 
 		<!-- ── Fullscreen Menu Overlay with Sliding Mega Menus ── -->
-		<div id="obsidian-menu-overlay" class="fixed inset-0 z-[55] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] pointer-events-none overflow-hidden" style="clip-path: inset(0% 0% 100% 0%);">
-			<div id="overlay-backdrop" class="absolute inset-0 bg-white/[0.98] dark:bg-black/[0.97] backdrop-blur-xl theme-transition"></div>
+		<div id="obsidian-menu-overlay" class="fixed inset-0 z-[90] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] pointer-events-none overflow-hidden" style="clip-path: inset(0% 0% 100% 0%);">
+			<div id="overlay-backdrop" class="absolute inset-0 bg-white/[0.99] dark:bg-black/[0.99] backdrop-blur-2xl theme-transition"></div>
 			
-			<div id="obsidian-menu-container" class="relative z-10 h-full w-full max-w-none flex flex-col justify-between px-6 sm:px-10 md:px-14 lg:px-20 xl:px-28 2xl:px-36 pt-20 md:pt-24 pb-8 overflow-y-auto">
+			<div id="obsidian-menu-container" class="relative z-10 h-full w-full max-w-none flex flex-col justify-between px-6 sm:px-10 md:px-14 lg:px-20 xl:px-28 2xl:px-36 pt-6 sm:pt-8 md:pt-10 pb-8 overflow-y-auto">
 				
+				<!-- ── Overlay Top Bar (Dedicated Cancel / Close Header) ── -->
+				<div id="overlay-top-bar" class="w-full flex items-center justify-between pb-5 mb-4 md:mb-6 border-b border-black/10 dark:border-white/10 shrink-0">
+					<!-- Brand -->
+					<div id="overlay-brand" class="text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight text-neutral-900 dark:text-white font-semibold">
+						<a id="overlay-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity flex items-center gap-1">
+							<span>OBSIDIAN</span> <span id="overlay-brand-copy" class="opacity-60 text-xs font-normal">©</span>
+						</a>
+					</div>
+
+					<!-- Center Meta Info -->
+					<div id="overlay-center-tag" class="hidden sm:flex items-center gap-3 text-[11px] md:text-xs font-mono tracking-[0.25em] uppercase text-neutral-400 dark:text-neutral-500">
+						<span id="overlay-tag-txt">DIRECTORY</span>
+						<span id="overlay-tag-dot" class="opacity-40">·</span>
+						<span id="overlay-tag-vol">MMXXV</span>
+					</div>
+
+					<!-- Right Controls: Theme Toggle & Dedicated Cancel Button -->
+					<div id="overlay-controls" class="flex items-center gap-3 sm:gap-5">
+						<!-- Theme Toggle in Overlay -->
+						<button
+							id="overlay-theme-btn"
+							type="button"
+							onclick="window.toggleObsidianTheme(event)"
+							class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-105 focus:outline-none cursor-pointer"
+							aria-label="Toggle dark / light mode"
+							title="Toggle theme"
+						>
+							<i id="overlay-theme-sun" class="ri-sun-line text-lg block text-amber-500"></i>
+							<i id="overlay-theme-moon" class="ri-moon-line text-lg hidden text-sky-400"></i>
+						</button>
+
+						<!-- Dedicated Cancel Button -->
+						<button
+							id="obsidian-menu-close-btn"
+							type="button"
+							class="btn-menu-close group inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border border-black/20 dark:border-white/25 bg-black/5 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/20 text-neutral-900 dark:text-white transition-all duration-300 text-xs sm:text-sm uppercase tracking-[0.25em] font-bold cursor-pointer focus:outline-none shadow-xs"
+							aria-label="Cancel and close menu"
+						>
+							<span id="txt-menu-cancel">CANCEL</span>
+							<i id="icon-close-menu" class="ri-close-line text-base sm:text-lg transition-transform duration-300 group-hover:rotate-90"></i>
+						</button>
+					</div>
+				</div>
+
 				<?php
 				$custom_nav_tree = raka_get_nav_menu_tree( 'primary-menu' );
 				if ( ! empty( $custom_nav_tree ) ) :
 				?>
-					<div id="menu-panels-viewport" class="menu-panels-grid flex-1 w-full relative items-stretch min-h-[calc(100vh-200px)] py-2">
+					<div id="menu-panels-viewport" class="menu-panels-grid flex-1 w-full relative items-stretch min-h-[calc(100vh-220px)] py-2">
 						<!-- ─── LEVEL 1: ROOT CUSTOM WORDPRESS MENU ──────────────── -->
 						<div id="menu-panel-root" class="w-full h-full min-h-full flex flex-col justify-center opacity-100 transform translate-y-0">
 							<div id="root-menu-list" class="flex flex-col gap-1 sm:gap-2">

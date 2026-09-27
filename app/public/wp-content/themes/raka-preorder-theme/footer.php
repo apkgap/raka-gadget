@@ -295,6 +295,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// Hamburger button click
 			menuBtn.addEventListener('click', () => toggleMenu());
 
+			// Dedicated Cancel / Close buttons inside overlay
+			const closeButtons = overlay.querySelectorAll('.btn-menu-close, #obsidian-menu-close-btn');
+			closeButtons.forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					e.preventDefault();
+					toggleMenu(false);
+				});
+			});
+
 			// Trigger click: Slide to Mega Menu Panel
 			megaTriggers.forEach(trigger => {
 				trigger.addEventListener('click', (e) => {
