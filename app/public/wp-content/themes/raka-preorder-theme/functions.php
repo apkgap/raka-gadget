@@ -85,9 +85,10 @@ remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
 remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 
 /**
- * Include theme helpers and theme options admin interface.
+ * Include theme helpers, term meta, and theme options admin interface.
  */
 require_once get_template_directory() . '/inc/helpers.php';
+require_once get_template_directory() . '/inc/term-meta.php';
 require_once get_template_directory() . '/inc/theme-options.php';
 
 /**

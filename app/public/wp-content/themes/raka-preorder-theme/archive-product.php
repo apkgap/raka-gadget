@@ -55,9 +55,15 @@ $all_cats = get_terms( [
 						<a
 							id="filter-pill-<?php echo esc_attr( $cat_term->slug ); ?>"
 							href="<?php echo esc_url( get_term_link( $cat_term ) ); ?>"
-							class="px-4 py-2 rounded-full text-xs uppercase tracking-wider font-mono transition-colors <?php echo esc_attr( $pill_cls ); ?>"
+							class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs uppercase tracking-wider font-mono transition-colors <?php echo esc_attr( $pill_cls ); ?>"
 						>
-							<?php echo esc_html( $cat_term->name ); ?> (<?php echo (int) $cat_term->count; ?>)
+							<?php
+							if ( function_exists( 'raka_get_term_icon_html' ) ) {
+								echo raka_get_term_icon_html( $cat_term->term_id, 'text-xs' );
+							}
+							?>
+							<span><?php echo esc_html( $cat_term->name ); ?></span>
+							<span class="opacity-50 text-[10px]">(<?php echo (int) $cat_term->count; ?>)</span>
 						</a>
 					<?php endforeach; ?>
 				</div>
