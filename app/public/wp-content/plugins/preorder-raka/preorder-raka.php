@@ -633,10 +633,52 @@ function preorder_raka_single_template( $single_template ) {
 add_filter( 'single_template', 'preorder_raka_single_template' );
 
 /**
- * Enqueue assets for single-preorder template page.
+ * Shortcode to render Pre-order Raka app on any page or post.
+ * Usage: [preorder_raka] or [preorder_raka id="123"]
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string Rendered HTML markup.
+ */
+function preorder_raka_app_shortcode( $atts ) {
+	$atts = shortcode_atts( [
+		'id' => '',
+	], $atts, 'preorder_raka' );
+
+	$post_id = ! empty( $atts['id'] ) ? absint( $atts['id'] ) : ( is_singular( 'preorder' ) ? get_the_ID() : '' );
+
+	ob_start();
+	?>
+	<div id="preorder-raka-single-app" class="preorder-app w:full" data-post-id="<?php echo esc_attr( (string) $post_id ); ?>">
+		<div id="preorder-raka-loading-box" class="preorder-loading-box" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:96px 0;color:#64748b;">
+			<div id="preorder-raka-loading-spinner" class="preorder-loading-spinner" style="position:relative;width:48px;height:48px;margin-bottom:20px;animation:spin 1s linear infinite;" aria-hidden="true">
+				<?php for ( $dot_index = 0; $dot_index < 12; $dot_index++ ) : ?>
+					<span
+						id="preorder-raka-loading-dot-<?php echo esc_attr( (string) $dot_index ); ?>"
+						class="preorder-loading-dot"
+						style="<?php echo esc_attr(
+							'position:absolute;left:50%;top:50%;display:block;width:6px;height:6px;border-radius:9999px;background:#3b82f6;' .
+							'opacity:' . ( 0.2 + ( $dot_index / 12 ) * 0.8 ) . ';' .
+							'transform:translate(-50%,-50%) rotate(' . ( $dot_index * 30 ) . 'deg) translateY(-20px);'
+						); ?>"
+					></span>
+				<?php endfor; ?>
+			</div>
+			<span id="preorder-raka-loading-text" class="preorder-loading-text" style="font-size:13px;font-weight:500;letter-spacing:0.5px;opacity:0.6;">กำลังโหลดระบบพรีออเดอร์...</span>
+		</div>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'preorder_raka', 'preorder_raka_app_shortcode' );
+
+/**
+ * Enqueue assets for single-preorder template page and shortcode pages.
  */
 function preorder_raka_enqueue_assets() {
-	if ( is_singular( 'preorder' ) || is_front_page() || is_home() ) {
+	global $post;
+	$has_shortcode = is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'preorder_raka' );
+
+	if ( is_singular( 'preorder' ) || is_front_page() || is_home() || $has_shortcode ) {
 		$asset_file   = plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 		$script_file  = plugin_dir_path( __FILE__ ) . 'build/index.js';
 		$dependencies = [ 'wp-element' ];
@@ -651,13 +693,16 @@ function preorder_raka_enqueue_assets() {
 		if ( file_exists( $script_file ) ) {
 			$version .= '-' . filemtime( $script_file );
 		}
-		// Hide Header & Footer CSS
-		wp_enqueue_style(
-			'preorder-raka-hide-header-footer',
-			plugin_dir_url( __FILE__ ) . 'assets/css/hide-header-footer.css',
-			[],
-			'1.0.0'
-		);
+
+		// Only hide header & footer on single preorder template
+		if ( is_singular( 'preorder' ) ) {
+			wp_enqueue_style(
+				'preorder-raka-hide-header-footer',
+				plugin_dir_url( __FILE__ ) . 'assets/css/hide-header-footer.css',
+				[],
+				'1.0.0'
+			);
+		}
 
 		// RemixIcon v4 — icon font for React UI
 		wp_enqueue_style(
@@ -701,3 +746,4 @@ function preorder_raka_enqueue_assets() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'preorder_raka_enqueue_assets' );
+

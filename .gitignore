@@ -1,0 +1,14 @@
+# Logs
+logs/
+*.log
+app/public/wp-content/uploads/wc-logs/
+
+# Cache & Node modules
+node_modules/
+.cache/
+app/public/wp-content/plugins/preorder-raka/node_modules/
+app/public/wp-content/themes/raka-preorder-theme/node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db

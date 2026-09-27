@@ -372,36 +372,15 @@ const PreOrderApp = ({ postId }) => {
 				</div>
 			)}
 
-			{/* Verify type tabs */}
-			<div id="preorder-raka-tab-row" style={S.tabWrap}>
-				<button id="preorder-raka-verify-phone-btn" style={S.tabBtn(verificationType === 'phone')} type="button" onClick={() => setVerificationType('phone')}>
-					<i className="ri-smartphone-line" style={{ fontSize: 16 }}/>เบอร์โทรศัพท์
-				</button>
-				<button id="preorder-raka-verify-citizen-btn" style={S.tabBtn(verificationType === 'citizen')} type="button" onClick={() => setVerificationType('citizen')}>
-					<i className="ri-id-card-line" style={{ fontSize: 16 }}/>บัตรประชาชน
-				</button>
+			{/* Phone number verification input */}
+			<div id="preorder-raka-input-phone-group">
+				<label id="preorder-raka-phone-label" htmlFor="phone" style={S.sectionLabel}>
+					<i className="ri-phone-line" style={{ marginRight: 6 }}/>เบอร์โทรศัพท์
+				</label>
+				<input id="phone" style={S.input('phone', focused)} type="tel" placeholder="0897777777"
+					value={phone} onChange={e => setPhone(e.target.value)}
+					onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)} required/>
 			</div>
-
-			{/* Verify input */}
-			{verificationType === 'phone' ? (
-				<div id="preorder-raka-input-phone-group">
-					<label id="preorder-raka-phone-label" htmlFor="phone" style={S.sectionLabel}>
-						<i className="ri-phone-line" style={{ marginRight: 6 }}/>เบอร์โทรศัพท์
-					</label>
-					<input id="phone" style={S.input('phone', focused)} type="tel" placeholder="0897777777"
-						value={phone} onChange={e => setPhone(e.target.value)}
-						onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)} required/>
-				</div>
-			) : (
-				<div id="preorder-raka-input-citizen-group">
-					<label id="preorder-raka-citizen-label" htmlFor="citizen_id" style={S.sectionLabel}>
-						<i className="ri-fingerprint-line" style={{ marginRight: 6 }}/>เลขบัตร 4 ตัวท้าย
-					</label>
-					<input id="citizen_id" style={S.input('citizen_id', focused)} type="password" maxLength={4}
-						placeholder="xxxx" value={citizenId} onChange={e => setCitizenId(e.target.value)}
-						onFocus={() => setFocused('citizen_id')} onBlur={() => setFocused(null)} required/>
-				</div>
-			)}
 
 			{/* Error box */}
 			{error && (

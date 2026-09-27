@@ -16,6 +16,15 @@ function raka_preorder_theme_setup() {
 	// Enable support for Post Thumbnails on posts and pages.
 	add_theme_support( 'post-thumbnails' );
 
+	// Enable support for Menus.
+	add_theme_support( 'menus' );
+
+	// Register Navigation Menu Locations.
+	register_nav_menus( [
+		'primary-menu' => __( 'Primary Navigation / Mega Menu', 'raka-preorder-theme' ),
+		'footer-menu'  => __( 'Footer Menu', 'raka-preorder-theme' ),
+	] );
+
 	// Enable support for Custom Logo.
 	add_theme_support( 'custom-logo', [
 		'height'      => 100,
@@ -63,3 +72,10 @@ add_action( 'wp_print_styles', 'raka_preorder_theme_clean_styles', 999 );
 // Remove block inline global styles action
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
 remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
+
+/**
+ * Include theme helpers and theme options admin interface.
+ */
+require_once get_template_directory() . '/inc/helpers.php';
+require_once get_template_directory() . '/inc/theme-options.php';
+

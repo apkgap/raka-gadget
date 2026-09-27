@@ -14,19 +14,6 @@ jobs:
       - name: 🚚 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: 📦 Install Dependencies & Build Plugin (preorder-raka)
-        run: |
-          if [ -d "app/public/wp-content/plugins/preorder-raka" ]; then
-            cd app/public/wp-content/plugins/preorder-raka
-            npm ci || npm install
-            npm run build
-          fi
-
       - name: 🚀 FTP Deploy Plugin (preorder-raka)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -50,14 +37,6 @@ jobs:
             **/AGENTS.md
             **/.windsurf/**
 
-      - name: 📦 Install Dependencies & Build Theme (raka-preorder-theme)
-        run: |
-          if [ -d "app/public/wp-content/themes/raka-preorder-theme" ] && [ -f "app/public/wp-content/themes/raka-preorder-theme/package.json" ]; then
-            cd app/public/wp-content/themes/raka-preorder-theme
-            npm ci || npm install
-            npm run build || true
-          fi
-
       - name: 🚀 FTP Deploy Theme (raka-preorder-theme)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -80,3 +59,4 @@ jobs:
             **/package-lock.json
             **/AGENTS.md
             **/.windsurf/**
+

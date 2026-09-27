@@ -1,0 +1,21 @@
+{
+  "name": "raka-preorder-theme",
+  "version": "1.0.0",
+  "description": "OBSIDIAN Theme with React Theme Settings",
+  "author": "raka gadget",
+  "scripts": {
+    "build": "wp-scripts build",
+    "dev": "wp-scripts start",
+    "start": "wp-scripts start"
+  },
+  "devDependencies": {
+    "@wordpress/api-fetch": "^6.0.0",
+    "@wordpress/components": "^25.0.0",
+    "@wordpress/element": "^5.0.0",
+    "@wordpress/i18n": "^4.0.0",
+    "@wordpress/scripts": "^26.0.0"
+  },
+  "dependencies": {
+    "pngjs": "^7.0.0"
+  }
+}
