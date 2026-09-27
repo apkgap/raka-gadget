@@ -46,7 +46,7 @@ $featured_categories = raka_get_featured_categories();
 $featured_brands     = raka_get_featured_brands();
 $contact_options     = raka_get_contact_options();
 
-$flash_sale_products = raka_get_flash_sale_products( 8 );
+$flash_sale_products = array_slice( raka_get_flash_sale_products( 4 ), 0, 4 );
 $homepage_catalog    = raka_get_homepage_catalog_products( 12 );
 $catalog_products    = $homepage_catalog['products'];
 $catalog_categories  = $homepage_catalog['categories'];

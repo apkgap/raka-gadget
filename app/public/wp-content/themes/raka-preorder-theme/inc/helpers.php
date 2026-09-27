@@ -1151,7 +1151,7 @@ function raka_render_product_card( $product, array $args = [] ): void {
 			<?php endif; ?>
 
 			<div id="p-stage-pill-<?php echo esc_attr( $card_id ); ?>" class="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-2 group-hover/stage:opacity-100 group-hover/stage:translate-y-0 transition-all duration-300 pointer-events-none hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/85 dark:bg-white/95 text-white dark:text-black text-xs font-mono uppercase tracking-wider backdrop-blur select-none">
-				<span id="p-stage-pill-txt-<?php echo esc_attr( $card_id ); ?>"><?php echo $is_flash_sale ? 'VIEW DEAL' : 'VIEW GEAR'; ?></span>
+				<span id="p-stage-pill-txt-<?php echo esc_attr( $card_id ); ?>">VIEW GEAR</span>
 				<i id="p-stage-pill-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-arrow-right-up-line text-xs"></i>
 			</div>
 		</a>
@@ -1213,20 +1213,20 @@ function raka_render_product_card( $product, array $args = [] ): void {
 						<a
 							id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>"
 							href="<?php echo esc_url( $p_link ); ?>"
-							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full <?php echo $is_flash_sale ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100'; ?> text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all whitespace-nowrap group/btn"
+							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all whitespace-nowrap group/btn"
 						>
 							<i id="p-btn-cart-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-arrow-right-line text-xs flex-shrink-0"></i>
-							<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap"><?php echo $is_flash_sale ? 'PRE-ORDER DEAL' : 'READ MORE'; ?></span>
+							<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap">READ MORE</span>
 						</a>
 					<?php else : ?>
 						<button
 							id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>"
 							type="button"
 							onclick="window.rakaCardAddToCart(<?php echo (int) $p_id; ?>, this)"
-							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full <?php echo $is_flash_sale ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100'; ?> text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all group/btn cursor-pointer whitespace-nowrap"
+							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all group/btn cursor-pointer whitespace-nowrap"
 						>
 							<i id="p-btn-cart-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-shopping-bag-3-line text-xs flex-shrink-0"></i>
-							<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap"><?php echo $is_flash_sale ? 'PRE-ORDER DEAL' : 'ADD TO CART'; ?></span>
+							<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap">ADD TO CART</span>
 						</button>
 					<?php endif; ?>
 				</div>
