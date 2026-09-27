@@ -20,22 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<link rel="stylesheet" href="https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css">
 	
-	<!-- Tailwind CDN & Theme Config -->
-	<script src="https://cdn.tailwindcss.com"></script>
-	<script id="obsidian-tailwind-config">
-		tailwind.config = {
-			darkMode: 'class',
-			theme: {
-				extend: {
-					colors: {
-						obsidian: '#080808',
-						cement: '#DADADA',
-						cementDark: '#121212',
-					}
-				}
-			}
-		};
-
+	<script id="obsidian-theme-init">
 		// Instant theme restore in head (Default: Light Mode)
 		(function() {
 			var saved = localStorage.getItem('obsidian_theme');
