@@ -43,26 +43,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<!-- Fallback Ripple Circle for browsers without native View Transitions -->
 		<div id="theme-ripple-circle"></div>
 
+		<?php
+		$is_home = is_front_page();
+		?>
 		<!-- ── Prominent Semantic Header Component ── -->
-		<header id="obsidian-site-header" class="fixed top-0 left-0 right-0 z-[60] pointer-events-none transition-all duration-300">
-			<nav id="obsidian-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 pt-5 md:pt-7 pb-5 pointer-events-none">
+		<header 
+			id="obsidian-site-header" 
+			class="fixed top-0 left-0 right-0 z-[60] transition-all duration-300 <?php echo $is_home ? 'pointer-events-none' : 'bg-white/90 dark:bg-obsidian/90 backdrop-blur-md border-b border-black/10 dark:border-white/10 pointer-events-auto shadow-xs'; ?>"
+		>
+			<nav id="obsidian-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
 				<!-- Left Brand -->
-				<div id="obsidian-nav-brand" class="pointer-events-auto mix-blend-difference text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase text-white leading-tight">
-					<a id="obsidian-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity font-semibold">
+				<div id="obsidian-nav-brand" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight">
+					<a id="obsidian-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity font-semibold flex items-center gap-1">
 						<span>OBSIDIAN</span> <span class="opacity-60 text-xs font-normal">©</span>
 					</a>
 				</div>
 
 				<!-- Center 1 -->
-				<div id="obsidian-nav-center-1" class="pointer-events-auto mix-blend-difference text-center hidden sm:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase text-white leading-snug">
+				<div id="obsidian-nav-center-1" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden sm:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
 					<div class="font-medium">VOLUME 01</div>
-					<div class="opacity-50 text-[10px] md:text-xs">MMXXV</div>
+					<div class="<?php echo $is_home ? 'opacity-50' : 'text-neutral-400 dark:text-neutral-500'; ?> text-[10px] md:text-xs">MMXXV</div>
 				</div>
 
 				<!-- Center 2 -->
-				<div id="obsidian-nav-center-2" class="pointer-events-auto mix-blend-difference text-center hidden md:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase text-white leading-snug">
+				<div id="obsidian-nav-center-2" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden md:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
 					<div class="font-medium">INK, FORM</div>
-					<div class="opacity-50 text-[10px] md:text-xs">& MODERN PRACTICE</div>
+					<div class="<?php echo $is_home ? 'opacity-50' : 'text-neutral-400 dark:text-neutral-500'; ?> text-[10px] md:text-xs">& MODERN PRACTICE</div>
 				</div>
 
 				<!-- Right Controls (Theme Toggle + Hamburger Button) -->
@@ -72,7 +78,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						id="obsidian-theme-btn"
 						type="button"
 						onclick="window.toggleObsidianTheme(event)"
-						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/10 dark:bg-white/10 backdrop-blur-md border border-black/15 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Toggle dark / light mode"
 						title="Toggle theme"
@@ -85,13 +91,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<button
 						id="obsidian-menu-btn"
 						type="button"
-						class="relative w-8 md:w-9 h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer mix-blend-difference py-0.5"
+						class="relative w-8 md:w-9 h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer <?php echo $is_home ? 'mix-blend-difference' : ''; ?> py-0.5"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Open menu"
 					>
-						<span id="burger-top" class="block h-[2px] bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
-						<span id="burger-mid" class="block h-[2px] bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] w-[65%]"></span>
-						<span id="burger-bot" class="block h-[2px] bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-[85%]"></span>
+						<span id="burger-top" class="block h-[2px] <?php echo $is_home ? 'bg-white' : 'bg-neutral-900 dark:bg-white'; ?> transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
+						<span id="burger-mid" class="block h-[2px] <?php echo $is_home ? 'bg-white' : 'bg-neutral-900 dark:bg-white'; ?> transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] w-[65%]"></span>
+						<span id="burger-bot" class="block h-[2px] <?php echo $is_home ? 'bg-white' : 'bg-neutral-900 dark:bg-white'; ?> transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-[85%]"></span>
 					</button>
 				</div>
 			</nav>
@@ -99,7 +105,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<!-- ── Fullscreen Menu Overlay with Sliding Mega Menus ── -->
 		<div id="obsidian-menu-overlay" class="fixed inset-0 z-[55] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] pointer-events-none overflow-hidden" style="clip-path: inset(0% 0% 100% 0%);">
-			<div id="overlay-backdrop" class="absolute inset-0 bg-neutral-100/[0.98] dark:bg-black/[0.97] backdrop-blur-xl theme-transition"></div>
+			<div id="overlay-backdrop" class="absolute inset-0 bg-white/[0.98] dark:bg-black/[0.97] backdrop-blur-xl theme-transition"></div>
 			
 			<div id="obsidian-menu-container" class="relative z-10 h-full w-full max-w-7xl mx-auto flex flex-col justify-between px-6 md:px-12 lg:px-16 pt-24 pb-8 overflow-y-auto">
 				
