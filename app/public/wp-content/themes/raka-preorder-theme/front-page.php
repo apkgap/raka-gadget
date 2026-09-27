@@ -308,7 +308,7 @@ $cat_icon_map = [
 						<a
 							id="raka-cat-item-<?php echo esc_attr( $cat['id'] ); ?>"
 							href="<?php echo esc_url( $cat['url'] ); ?>"
-							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-100/90 dark:bg-white/5 hover:bg-neutral-200/70 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-red-500/60 dark:hover:border-red-400/60 transition-all duration-300 p-5 sm:p-6 cursor-pointer"
+							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-50 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-red-500/60 dark:hover:border-red-400/60 transition-all duration-300 p-5 sm:p-6 cursor-pointer"
 						>
 							<!-- Top Icon -->
 							<div id="raka-cat-top-bar-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-start w-full">
@@ -367,7 +367,7 @@ $cat_icon_map = [
 						<a
 							id="raka-brand-item-<?php echo esc_attr( $brand['id'] ); ?>"
 							href="<?php echo esc_url( $brand['url'] ); ?>"
-							class="group relative flex flex-col items-center justify-center text-center rounded-3xl bg-neutral-100/90 dark:bg-white/5 hover:bg-neutral-200/70 dark:hover:bg-white/10 backdrop-blur-md border border-black/10 hover:border-amber-500/50 dark:border-white/10 dark:hover:border-amber-500/50 transition-all duration-300 p-6 sm:p-7"
+							class="group relative flex flex-col items-center justify-center text-center rounded-3xl bg-neutral-50 dark:bg-white/5 border border-black/10 hover:border-amber-500/50 dark:border-white/10 dark:hover:border-amber-500/50 transition-all duration-300 p-6 sm:p-7"
 						>
 							<?php if ( ! empty( $brand['image_url'] ) ) : ?>
 								<div id="raka-brand-img-wrap-<?php echo esc_attr( $brand['id'] ); ?>" class="w-16 h-16 sm:w-20 sm:h-20 mb-3 flex items-center justify-center overflow-hidden rounded-2xl bg-white dark:bg-white/10 border border-black/5 dark:border-white/10 p-2.5 group-hover:scale-105 transition-transform duration-300">
