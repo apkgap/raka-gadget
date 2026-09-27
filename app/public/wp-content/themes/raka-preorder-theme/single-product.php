@@ -383,31 +383,9 @@ while ( have_posts() ) :
 				<div id="related-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
 					<?php
 					foreach ( $related_products as $rel_p ) :
-						$rel_id       = $rel_p->get_id();
-						$rel_img_id   = $rel_p->get_image_id();
-						$rel_img_url  = $rel_img_id ? wp_get_attachment_image_url( $rel_img_id, 'medium' ) : wc_placeholder_img_src( 'medium' );
-						$rel_price    = $rel_p->get_price_html();
-						$rel_brands   = wp_get_post_terms( $rel_id, 'product_brand' );
-						$rel_b_logo   = ( ! is_wp_error( $rel_brands ) && ! empty( $rel_brands ) ) ? raka_get_brand_logo_url( $rel_brands[0] ) : '';
-						$rel_b_name   = ( ! is_wp_error( $rel_brands ) && ! empty( $rel_brands ) ) ? $rel_brands[0]->name : 'ATK';
+						raka_render_product_card( $rel_p );
+					endforeach;
 					?>
-						<a id="rel-card-<?php echo esc_attr( (string) $rel_id ); ?>" href="<?php echo esc_url( get_permalink( $rel_id ) ); ?>" class="group flex flex-col justify-between rounded-2xl bg-neutral-100 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/80 p-5 transition-all duration-300 hover:scale-[1.02] hover:border-black dark:hover:border-white">
-							<div id="rel-img-wrap-<?php echo esc_attr( (string) $rel_id ); ?>" class="relative w-full h-48 flex items-center justify-center overflow-hidden mb-4">
-								<div id="rel-brand-badge-<?php echo esc_attr( (string) $rel_id ); ?>" class="absolute top-0 left-0 z-10">
-									<?php if ( $rel_b_logo ) : ?>
-										<img id="rel-brand-img-<?php echo esc_attr( (string) $rel_id ); ?>" src="<?php echo esc_url( $rel_b_logo ); ?>" alt="<?php echo esc_attr( $rel_b_name ); ?>" class="h-3 sm:h-3.5 w-auto max-w-[70px] object-contain opacity-70 group-hover:opacity-100 transition-opacity filter dark:invert" />
-									<?php else : ?>
-										<span id="rel-brand-txt-<?php echo esc_attr( (string) $rel_id ); ?>" class="text-[9px] font-mono tracking-widest uppercase text-neutral-400 dark:text-neutral-500"><?php echo esc_html( $rel_b_name ); ?></span>
-									<?php endif; ?>
-								</div>
-								<img id="rel-img-<?php echo esc_attr( (string) $rel_id ); ?>" src="<?php echo esc_url( $rel_img_url ); ?>" alt="<?php echo esc_attr( $rel_p->get_name() ); ?>" class="max-h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-							</div>
-							<div id="rel-info-<?php echo esc_attr( (string) $rel_id ); ?>" class="space-y-2">
-								<h3 id="rel-title-<?php echo esc_attr( (string) $rel_id ); ?>" class="text-sm font-bold uppercase tracking-tight text-neutral-900 dark:text-white line-clamp-1 font-hn"><?php echo esc_html( $rel_p->get_name() ); ?></h3>
-								<div id="rel-price-<?php echo esc_attr( (string) $rel_id ); ?>" class="text-xs font-mono text-neutral-600 dark:text-neutral-300"><?php echo wp_kses_post( $rel_price ); ?></div>
-							</div>
-						</a>
-					<?php endforeach; ?>
 				</div>
 			</div>
 		<?php endif; ?>

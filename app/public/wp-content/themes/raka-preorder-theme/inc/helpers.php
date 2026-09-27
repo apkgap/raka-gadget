@@ -423,8 +423,246 @@ function raka_render_pagination( $query = null, array $args = [] ): void {
 }
 
 /**
+ * Helper to resolve realistic CSS hex or gradient styles from color names
+ *
+ * @param string $raw_name Color attribute or variation name.
+ * @return string CSS style string.
+ */
+if ( ! function_exists( 'raka_get_swatch_css' ) ) {
+	function raka_get_swatch_css( $raw_name ): string {
+		$c = strtolower( trim( html_entity_decode( (string) $raw_name, ENT_QUOTES, 'UTF-8' ) ) );
+		$c = preg_replace( '/[^\p{L}\p{N}\s\-]/u', '', $c );
+
+		if ( strpos( $c, 'black' ) !== false || strpos( $c, 'obsidian' ) !== false || strpos( $c, 'eon' ) !== false || strpos( $c, 'blackberry' ) !== false || strpos( $c, 'gunmetal' ) !== false ) {
+			return 'background-color: #121212; border-color: #383838;';
+		}
+		if ( strpos( $c, 'white' ) !== false || strpos( $c, 'polar' ) !== false || strpos( $c, 'ice' ) !== false || strpos( $c, 'prime' ) !== false || strpos( $c, 'arctic' ) !== false || strpos( $c, 'pearl' ) !== false ) {
+			return 'background-color: #F8F9FA; border: 1.5px solid #D1D5DB;';
+		}
+		if ( strpos( $c, 'yellow' ) !== false || strpos( $c, 'lemon' ) !== false ) {
+			return 'background-color: #FACC15; border-color: #EAB308;';
+		}
+		if ( strpos( $c, 'pink' ) !== false || strpos( $c, 'sakura' ) !== false || strpos( $c, 'blush' ) !== false ) {
+			return 'background-color: #F472B6; border-color: #EC4899;';
+		}
+		if ( strpos( $c, 'purple' ) !== false || strpos( $c, 'lilac' ) !== false || strpos( $c, 'violet' ) !== false ) {
+			return 'background-color: #A855F7; border-color: #9333EA;';
+		}
+		if ( strpos( $c, 'orange' ) !== false || strpos( $c, 'sunset' ) !== false ) {
+			return 'background-color: #FB923C; border-color: #EA580C;';
+		}
+		if ( strpos( $c, 'red' ) !== false || strpos( $c, 'crimson' ) !== false ) {
+			return 'background-color: #EF4444; border-color: #DC2626;';
+		}
+		if ( strpos( $c, 'blue' ) !== false || strpos( $c, 'verge' ) !== false || strpos( $c, 'cyan' ) !== false || strpos( $c, 'sky' ) !== false || strpos( $c, 'periwinkle' ) !== false ) {
+			return 'background-color: #38BDF8; border-color: #0284C7;';
+		}
+		if ( strpos( $c, 'silver' ) !== false || strpos( $c, 'metal' ) !== false || strpos( $c, 'gray' ) !== false || strpos( $c, 'grey' ) !== false ) {
+			return 'background-color: #94A3B8; border-color: #64748B;';
+		}
+		if ( strpos( $c, 'sand' ) !== false || strpos( $c, 'dune' ) !== false || strpos( $c, 'beige' ) !== false ) {
+			return 'background-color: #D4B996; border-color: #BCA380;';
+		}
+		if ( strpos( $c, 'green' ) !== false || strpos( $c, 'mint' ) !== false ) {
+			return 'background-color: #10B981; border-color: #059669;';
+		}
+
+		return 'background: linear-gradient(135deg, #4A5568 0%, #2D3748 100%); border-color: #4A5568;';
+	}
+}
+
+/**
+ * Render Ultra-Luxury Editorial Product Card
+ *
+ * @param WC_Product|int $product Product instance or Product ID.
+ * @param array          $args    Optional styling args.
+ */
+function raka_render_product_card( $product, array $args = [] ): void {
+	if ( is_numeric( $product ) ) {
+		$product = wc_get_product( $product );
+	}
+
+	if ( ! is_a( $product, 'WC_Product' ) ) {
+		return;
+	}
+
+	$p_id      = (string) $product->get_id();
+	$p_title   = $product->get_name();
+	$p_price   = $product->get_price_html();
+	$p_link    = get_permalink( (int) $p_id );
+
+	// Images: Main featured + first gallery image for hover crossfade
+	$p_img_id  = $product->get_image_id();
+	$p_img_url = $p_img_id ? wp_get_attachment_image_url( $p_img_id, 'medium_large' ) : wc_placeholder_img_src( 'medium_large' );
+
+	$gallery_ids       = $product->get_gallery_image_ids();
+	$secondary_img_url = '';
+	if ( ! empty( $gallery_ids ) ) {
+		$secondary_img_url = wp_get_attachment_image_url( $gallery_ids[0], 'medium_large' );
+	}
+
+	// Brand information
+	$p_brands = wp_get_post_terms( (int) $p_id, 'product_brand' );
+	$b_name   = ( ! is_wp_error( $p_brands ) && ! empty( $p_brands ) ) ? $p_brands[0]->name : 'ATK';
+	$b_logo   = ( ! is_wp_error( $p_brands ) && ! empty( $p_brands ) ) ? raka_get_brand_logo_url( $p_brands[0] ) : '';
+
+	// Categories
+	$p_cats   = wp_get_post_terms( (int) $p_id, 'product_cat' );
+	$cat_name = '';
+	if ( ! is_wp_error( $p_cats ) && ! empty( $p_cats ) ) {
+		foreach ( $p_cats as $c ) {
+			if ( 'uncategorized' !== $c->slug ) {
+				$cat_name = $c->name;
+				break;
+			}
+		}
+	}
+
+	// Stock & Preorder Status
+	$is_in_stock    = $product->is_in_stock();
+	$is_on_backorder = $product->is_on_backorder();
+	$is_preorder    = ( false !== stripos( $p_title, 'preorder' ) || false !== stripos( $p_title, 'pre-order' ) || $is_on_backorder );
+
+	// Color Variations preview
+	$color_swatches = [];
+	$total_colors   = 0;
+	if ( $product->is_type( 'variable' ) ) {
+		$attributes = $product->get_variation_attributes();
+		foreach ( $attributes as $attr_name => $options ) {
+			if ( false !== stripos( $attr_name, 'color' ) || false !== stripos( $attr_name, 'colour' ) || false !== stripos( $attr_name, 'สี' ) ) {
+				$color_swatches = array_slice( (array) $options, 0, 5 );
+				$total_colors   = count( (array) $options );
+				break;
+			}
+		}
+	}
+	if ( empty( $color_swatches ) ) {
+		$attrs = $product->get_attributes();
+		foreach ( $attrs as $attr_name => $attr_obj ) {
+			if ( false !== stripos( $attr_name, 'color' ) || false !== stripos( $attr_name, 'colour' ) || false !== stripos( $attr_name, 'สี' ) ) {
+				if ( is_object( $attr_obj ) && method_exists( $attr_obj, 'get_options' ) ) {
+					$opts           = (array) $attr_obj->get_options();
+					$color_swatches = array_slice( $opts, 0, 5 );
+					$total_colors   = count( $opts );
+				}
+				break;
+			}
+		}
+	}
+?>
+	<a
+		id="product-card-<?php echo esc_attr( $p_id ); ?>"
+		href="<?php echo esc_url( $p_link ); ?>"
+		class="group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-900/70 border border-neutral-200/80 dark:border-neutral-800/80 p-4 sm:p-5 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] hover:border-neutral-400 dark:hover:border-neutral-600 hover:-translate-y-1 backdrop-blur-sm"
+	>
+		<!-- ── Top Header: Brand Logo & Status Tag ── -->
+		<div id="p-header-<?php echo esc_attr( $p_id ); ?>" class="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+			<div id="p-brand-badge-<?php echo esc_attr( $p_id ); ?>" class="flex items-center min-h-[22px]">
+				<?php if ( $b_logo ) : ?>
+					<img
+						id="p-brand-img-<?php echo esc_attr( $p_id ); ?>"
+						src="<?php echo esc_url( $b_logo ); ?>"
+						alt="<?php echo esc_attr( $b_name ); ?>"
+						class="h-3.5 sm:h-4 w-auto max-w-[85px] object-contain opacity-75 group-hover:opacity-100 transition-opacity filter dark:invert"
+						loading="lazy"
+					/>
+				<?php else : ?>
+					<span id="p-brand-txt-<?php echo esc_attr( $p_id ); ?>" class="text-[10px] sm:text-[11px] font-mono font-semibold tracking-widest uppercase text-neutral-500 dark:text-neutral-400">
+						<?php echo esc_html( $b_name ); ?>
+					</span>
+				<?php endif; ?>
+			</div>
+
+			<div id="p-status-badge-<?php echo esc_attr( $p_id ); ?>" class="flex items-center">
+				<?php if ( ! $is_in_stock ) : ?>
+					<span id="p-badge-oos-<?php echo esc_attr( $p_id ); ?>" class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono uppercase tracking-wider font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+						SOLD OUT
+					</span>
+				<?php elseif ( $is_preorder ) : ?>
+					<span id="p-badge-pre-<?php echo esc_attr( $p_id ); ?>" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono uppercase tracking-wider font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+						<span id="p-badge-dot-<?php echo esc_attr( $p_id ); ?>" class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+						PRE-ORDER
+					</span>
+				<?php elseif ( ! empty( $cat_name ) ) : ?>
+					<span id="p-badge-cat-<?php echo esc_attr( $p_id ); ?>" class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+						<?php echo esc_html( $cat_name ); ?>
+					</span>
+				<?php endif; ?>
+			</div>
+		</div>
+
+		<!-- ── Visual Stage: Image with Dual Hover Crossfade & Floating Action ── -->
+		<div id="p-stage-wrap-<?php echo esc_attr( $p_id ); ?>" class="relative w-full aspect-square rounded-xl sm:rounded-2xl bg-white/70 dark:bg-black/40 border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden p-4 mb-4">
+			<img
+				id="p-img-main-<?php echo esc_attr( $p_id ); ?>"
+				src="<?php echo esc_url( $p_img_url ); ?>"
+				alt="<?php echo esc_attr( $p_title ); ?>"
+				class="max-h-full max-w-full object-contain transition-all duration-700 ease-out <?php echo $secondary_img_url ? 'group-hover:opacity-0 group-hover:scale-95' : 'group-hover:scale-105'; ?>"
+				loading="lazy"
+			/>
+
+			<?php if ( $secondary_img_url ) : ?>
+				<img
+					id="p-img-hover-<?php echo esc_attr( $p_id ); ?>"
+					src="<?php echo esc_url( $secondary_img_url ); ?>"
+					alt="<?php echo esc_attr( $p_title ); ?>"
+					class="absolute inset-0 m-auto max-h-[88%] max-w-[88%] object-contain opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+					loading="lazy"
+				/>
+			<?php endif; ?>
+
+			<div id="p-stage-pill-<?php echo esc_attr( $p_id ); ?>" class="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 pointer-events-none flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/85 dark:bg-white/95 text-white dark:text-black text-[10px] sm:text-[11px] font-mono uppercase tracking-wider backdrop-blur shadow-md select-none">
+				<span id="p-stage-pill-txt-<?php echo esc_attr( $p_id ); ?>">VIEW GEAR</span>
+				<i id="p-stage-pill-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-arrow-right-up-line text-xs"></i>
+			</div>
+		</div>
+
+		<!-- ── Lower Meta: Color Swatches, Title, and Price Row ── -->
+		<div id="p-info-wrap-<?php echo esc_attr( $p_id ); ?>" class="flex flex-col justify-between flex-grow space-y-3">
+			
+			<?php if ( ! empty( $color_swatches ) ) : ?>
+				<div id="p-swatches-row-<?php echo esc_attr( $p_id ); ?>" class="flex items-center gap-1.5 pt-0.5">
+					<?php foreach ( $color_swatches as $idx => $c_name ) :
+						$swatch_style = raka_get_swatch_css( $c_name );
+					?>
+						<span
+							id="p-swatch-<?php echo esc_attr( $p_id . '-' . $idx ); ?>"
+							title="<?php echo esc_attr( (string) $c_name ); ?>"
+							class="w-3 h-3 rounded-full border border-black/15 dark:border-white/20 shadow-xs flex-shrink-0 transition-transform group-hover:scale-110"
+							style="<?php echo esc_attr( $swatch_style ); ?>"
+						></span>
+					<?php endforeach; ?>
+					<?php if ( $total_colors > count( $color_swatches ) ) : ?>
+						<span id="p-swatch-more-<?php echo esc_attr( $p_id ); ?>" class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 pl-0.5">
+							+<?php echo (int) ( $total_colors - count( $color_swatches ) ); ?>
+						</span>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+
+			<h3 id="p-title-<?php echo esc_attr( $p_id ); ?>" class="text-sm sm:text-[15px] font-bold uppercase tracking-tight text-neutral-900 dark:text-neutral-100 line-clamp-2 leading-snug font-hn group-hover:text-black dark:group-hover:text-white transition-colors">
+				<?php echo esc_html( $p_title ); ?>
+			</h3>
+
+			<div id="p-price-row-<?php echo esc_attr( $p_id ); ?>" class="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
+				<div id="p-price-val-<?php echo esc_attr( $p_id ); ?>" class="text-xs sm:text-sm font-mono font-medium text-neutral-900 dark:text-neutral-200">
+					<?php echo wp_kses_post( $p_price ); ?>
+				</div>
+				
+				<div id="p-btn-action-<?php echo esc_attr( $p_id ); ?>" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-neutral-300 dark:border-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 group-hover:bg-black group-hover:text-white group-hover:border-black dark:group-hover:bg-white dark:group-hover:text-black dark:group-hover:border-white transition-all duration-300">
+					<i id="p-btn-icon-<?php echo esc_attr( $p_id ); ?>" class="ri-arrow-right-line text-sm transition-transform group-hover:translate-x-0.5"></i>
+				</div>
+			</div>
+
+		</div>
+	</a>
+<?php
+}
+
+/**
  * WooCommerce hook replacement for default pagination
  */
 function raka_render_woocommerce_pagination(): void {
 	raka_render_pagination();
 }
+
