@@ -53,27 +53,131 @@ if ( ! defined( 'ABSPATH' ) ) {
 			id="raka-site-header" 
 			class="<?php echo $is_home ? 'absolute top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300' : 'sticky top-0 left-0 right-0 z-50 bg-white/95 dark:bg-obsidian/95 backdrop-blur-md border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
 		>
-			<nav id="raka-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
-				<!-- Left Slot (Reserved / Empty for now) -->
-				<div id="raka-nav-left-slot" class="w-24 sm:w-36 flex items-center justify-start pointer-events-none">
-					<!-- Left slot placeholder -->
-				</div>
-
-				<!-- Centered Brand Logo -->
-				<div id="raka-nav-brand" class="pointer-events-auto text-neutral-950 dark:text-white text-xs sm:text-sm md:text-base tracking-[0.25em] uppercase leading-tight text-center font-semibold theme-transition">
-					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity">
-						<span>OBSIDIAN</span> <span id="raka-brand-copy" class="opacity-60 text-xs font-normal">©</span>
+			<nav id="raka-nav" class="flex items-center justify-between px-4 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
+				<!-- Left Slot: Pre-Order Menu -->
+				<div id="raka-nav-left-slot" class="flex-1 flex items-center justify-start pointer-events-auto">
+					<a
+						id="raka-nav-preorder-btn"
+						href="<?php echo esc_url( home_url( '/#hero-pinned-viewport' ) ); ?>"
+						class="group inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold tracking-wider uppercase text-neutral-900 dark:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-105 font-hn cursor-pointer shadow-xs"
+						aria-label="<?php esc_attr_e( 'Pre-Order Catalog', 'raka-preorder-theme' ); ?>"
+					>
+						<span id="raka-nav-preorder-dot" class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+						<span id="raka-nav-preorder-text"><?php esc_html_e( 'Pre-Order', 'raka-preorder-theme' ); ?></span>
 					</a>
 				</div>
 
-				<!-- Right Controls (Cart + Theme Toggle + Hamburger Button) -->
-				<div id="raka-nav-controls" class="pointer-events-auto flex items-center justify-end gap-3 sm:gap-4 w-24 sm:w-36">
+				<!-- Centered Brand Logo -->
+				<div id="raka-nav-brand" class="pointer-events-auto text-neutral-950 dark:text-white text-xs sm:text-sm md:text-base tracking-[0.25em] uppercase leading-tight text-center font-semibold theme-transition shrink-0 px-2 sm:px-4">
+					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity">
+						<span id="raka-brand-txt">OBSIDIAN</span> <span id="raka-brand-copy" class="opacity-60 text-xs font-normal">©</span>
+					</a>
+				</div>
+
+				<!-- Right Controls (Compare + Account Dropdown + Cart + Theme Toggle + Hamburger) -->
+				<div id="raka-nav-controls" class="pointer-events-auto flex-1 flex items-center justify-end gap-2 sm:gap-3 md:gap-3.5">
+					<!-- Compare Button -->
+					<a
+						id="raka-compare-btn"
+						href="<?php echo esc_url( home_url( '/compare' ) ); ?>"
+						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+						aria-label="<?php esc_attr_e( 'Compare Products', 'raka-preorder-theme' ); ?>"
+						title="<?php esc_attr_e( 'Compare Products', 'raka-preorder-theme' ); ?>"
+					>
+						<i id="raka-compare-icon" class="ri-scales-3-line text-lg block"></i>
+					</a>
+
+					<!-- User Account Dropdown -->
+					<div id="raka-account-wrapper" class="relative">
+						<button
+							id="raka-account-btn"
+							type="button"
+							onclick="window.toggleRakaAccountMenu(event)"
+							class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+							aria-label="<?php esc_attr_e( 'User Account', 'raka-preorder-theme' ); ?>"
+							title="<?php esc_attr_e( 'User Account', 'raka-preorder-theme' ); ?>"
+							aria-expanded="false"
+						>
+							<i id="raka-account-icon" class="ri-user-3-line text-lg block"></i>
+						</button>
+
+						<!-- Account Submenu Dropdown Popup -->
+						<div
+							id="raka-account-dropdown"
+							class="absolute right-0 mt-3 w-72 rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl p-5 transition-all duration-300 opacity-0 invisible translate-y-2 pointer-events-none z-[100] text-neutral-900 dark:text-white"
+						>
+							<?php if ( is_user_logged_in() ) : 
+								$current_user   = wp_get_current_user();
+								$my_account_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account' );
+								$logout_url     = function_exists( 'wc_logout_url' ) ? wc_logout_url() : wp_logout_url( home_url() );
+								$orders_url     = function_exists( 'wc_get_account_endpoint_url' ) ? wc_get_account_endpoint_url( 'orders' ) : home_url( '/my-account/orders' );
+							?>
+								<!-- Logged In User State -->
+								<div id="raka-account-user-header" class="flex items-center gap-3 pb-3.5 mb-3.5 border-b border-black/10 dark:border-white/10">
+									<div id="raka-account-avatar" class="w-10 h-10 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center font-bold font-hn text-sm shrink-0 border border-red-500/20">
+										<?php echo esc_html( strtoupper( substr( $current_user->display_name, 0, 1 ) ) ); ?>
+									</div>
+									<div id="raka-account-user-info" class="min-w-0 flex-1">
+										<p id="raka-account-user-name" class="text-sm font-bold truncate font-hn leading-tight"><?php echo esc_html( $current_user->display_name ); ?></p>
+										<p id="raka-account-user-email" class="text-[11px] text-neutral-500 dark:text-neutral-400 truncate font-mono mt-0.5"><?php echo esc_html( $current_user->user_email ); ?></p>
+									</div>
+								</div>
+								<div id="raka-account-user-links" class="flex flex-col gap-1.5">
+									<a id="raka-account-link-dashboard" href="<?php echo esc_url( $my_account_url ); ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors font-hn">
+										<i id="raka-account-ico-dash" class="ri-dashboard-line text-base text-neutral-500 dark:text-neutral-400"></i>
+										<span><?php esc_html_e( 'My Account', 'raka-preorder-theme' ); ?></span>
+									</a>
+									<a id="raka-account-link-orders" href="<?php echo esc_url( $orders_url ); ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors font-hn">
+										<i id="raka-account-ico-ord" class="ri-file-list-3-line text-base text-neutral-500 dark:text-neutral-400"></i>
+										<span><?php esc_html_e( 'My Orders', 'raka-preorder-theme' ); ?></span>
+									</a>
+									<a id="raka-account-link-logout" href="<?php echo esc_url( $logout_url ); ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors font-hn mt-1 border-t border-black/5 dark:border-white/5 pt-2.5">
+										<i id="raka-account-ico-out" class="ri-logout-box-r-line text-base"></i>
+										<span><?php esc_html_e( 'Log Out', 'raka-preorder-theme' ); ?></span>
+									</a>
+								</div>
+							<?php else : 
+								$account_url  = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account' );
+							?>
+								<!-- Guest State -->
+								<div id="raka-account-guest-header" class="pb-3.5 mb-3.5 border-b border-black/10 dark:border-white/10">
+									<div id="raka-account-guest-wrap" class="flex items-center gap-3">
+										<div id="raka-account-guest-badge" class="w-10 h-10 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/20 shrink-0">
+											<i id="raka-account-guest-ico" class="ri-user-smile-line text-lg"></i>
+										</div>
+										<div id="raka-account-guest-text" class="flex-1 min-w-0">
+											<h4 id="raka-account-guest-title" class="text-sm font-bold font-hn leading-tight"><?php esc_html_e( 'Welcome to OBSIDIAN', 'raka-preorder-theme' ); ?></h4>
+											<p id="raka-account-guest-sub" class="text-[11px] text-neutral-500 dark:text-neutral-400 font-hn mt-0.5"><?php esc_html_e( 'Sign in to access pre-orders', 'raka-preorder-theme' ); ?></p>
+										</div>
+									</div>
+								</div>
+								<div id="raka-account-guest-actions" class="flex flex-col gap-2">
+									<a
+										id="raka-account-btn-login"
+										href="<?php echo esc_url( $account_url ); ?>"
+										class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs font-bold font-hn tracking-wider uppercase shadow-md transition-all cursor-pointer"
+									>
+										<i id="raka-account-ico-log" class="ri-login-box-line text-base"></i>
+										<span><?php esc_html_e( 'Sign In / Login', 'raka-preorder-theme' ); ?></span>
+									</a>
+									<a
+										id="raka-account-btn-register"
+										href="<?php echo esc_url( $account_url ); ?>"
+										class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-semibold font-hn border border-black/10 dark:border-white/20 transition-all cursor-pointer"
+									>
+										<i id="raka-account-ico-reg" class="ri-user-add-line text-base"></i>
+										<span><?php esc_html_e( 'Create Account', 'raka-preorder-theme' ); ?></span>
+									</a>
+								</div>
+							<?php endif; ?>
+						</div>
+					</div>
+
 					<!-- Cart Button -->
 					<a
 						id="raka-cart-btn"
 						href="<?php echo esc_url( $cart_url ); ?>"
 						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
-						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Shopping Cart"
 						title="Shopping Cart"
 					>
@@ -92,7 +196,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 						type="button"
 						onclick="window.toggleRakaTheme(event)"
 						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
-						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Toggle dark / light mode"
 						title="Toggle theme"
 					>
@@ -105,7 +208,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 						id="raka-menu-btn"
 						type="button"
 						class="relative w-8 md:w-9 h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer py-0.5"
-						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Open menu"
 					>
 						<span id="burger-top" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>

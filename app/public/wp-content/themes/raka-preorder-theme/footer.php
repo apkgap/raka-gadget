@@ -132,6 +132,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 			}
 		})();
 
+		// ─── 1.1 Global User Account Dropdown ────────────────────────────────────
+		window.toggleRakaAccountMenu = function(event) {
+			if (event) {
+				event.stopPropagation();
+				event.preventDefault();
+			}
+			const dropdown = document.getElementById('raka-account-dropdown');
+			const btn = document.getElementById('raka-account-btn');
+			if (!dropdown) return;
+
+			const isClosed = dropdown.classList.contains('opacity-0') || dropdown.classList.contains('invisible');
+			if (isClosed) {
+				dropdown.classList.remove('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+				dropdown.classList.add('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+				if (btn) btn.setAttribute('aria-expanded', 'true');
+			} else {
+				dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+				dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+				if (btn) btn.setAttribute('aria-expanded', 'false');
+			}
+		};
+
+		document.addEventListener('click', function(e) {
+			const dropdown = document.getElementById('raka-account-dropdown');
+			const btn = document.getElementById('raka-account-btn');
+			if (dropdown && !dropdown.contains(e.target) && (!btn || !btn.contains(e.target))) {
+				dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+				dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+				if (btn) btn.setAttribute('aria-expanded', 'false');
+			}
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				const dropdown = document.getElementById('raka-account-dropdown');
+				const btn = document.getElementById('raka-account-btn');
+				if (dropdown) {
+					dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+					dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+					if (btn) btn.setAttribute('aria-expanded', 'false');
+				}
+			}
+		});
+
 		// ─── 2. Fullscreen Menu & Mega Menu Logic ─────────────────────────────────
 		(function initMenu() {
 			const menuBtn = document.getElementById('raka-menu-btn') || document.getElementById('obsidian-menu-btn');
