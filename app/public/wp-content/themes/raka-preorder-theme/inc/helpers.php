@@ -519,9 +519,9 @@ function raka_render_product_card( $product, array $args = [] ): void {
 	}
 
 	// Stock & Preorder Status
-	$is_in_stock    = $product->is_in_stock();
+	$is_in_stock     = $product->is_in_stock();
 	$is_on_backorder = $product->is_on_backorder();
-	$is_preorder    = ( false !== stripos( $p_title, 'preorder' ) || false !== stripos( $p_title, 'pre-order' ) || $is_on_backorder );
+	$is_preorder     = ( false !== stripos( $p_title, 'preorder' ) || false !== stripos( $p_title, 'pre-order' ) || $is_on_backorder );
 
 	// Color Variations preview
 	$color_swatches = [];
@@ -550,9 +550,8 @@ function raka_render_product_card( $product, array $args = [] ): void {
 		}
 	}
 ?>
-	<a
+	<div
 		id="product-card-<?php echo esc_attr( $p_id ); ?>"
-		href="<?php echo esc_url( $p_link ); ?>"
 		class="group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-900/70 border border-neutral-200/80 dark:border-neutral-800/80 p-4 sm:p-5 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] hover:border-neutral-400 dark:hover:border-neutral-600 hover:-translate-y-1 backdrop-blur-sm"
 	>
 		<!-- ── Top Header: Brand Logo & Status Tag ── -->
@@ -591,13 +590,17 @@ function raka_render_product_card( $product, array $args = [] ): void {
 			</div>
 		</div>
 
-		<!-- ── Visual Stage: Image with Dual Hover Crossfade & Floating Action ── -->
-		<div id="p-stage-wrap-<?php echo esc_attr( $p_id ); ?>" class="relative w-full aspect-square rounded-xl sm:rounded-2xl bg-white/70 dark:bg-black/40 border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden p-4 mb-4">
+		<!-- ── Visual Stage: Clickable Image with Dual Hover Crossfade & Floating Action ── -->
+		<a
+			id="p-stage-link-<?php echo esc_attr( $p_id ); ?>"
+			href="<?php echo esc_url( $p_link ); ?>"
+			class="relative w-full aspect-square rounded-xl sm:rounded-2xl bg-white/70 dark:bg-black/40 border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden p-4 mb-4 group/stage"
+		>
 			<img
 				id="p-img-main-<?php echo esc_attr( $p_id ); ?>"
 				src="<?php echo esc_url( $p_img_url ); ?>"
 				alt="<?php echo esc_attr( $p_title ); ?>"
-				class="max-h-full max-w-full object-contain transition-all duration-700 ease-out <?php echo $secondary_img_url ? 'group-hover:opacity-0 group-hover:scale-95' : 'group-hover:scale-105'; ?>"
+				class="max-h-full max-w-full object-contain transition-all duration-700 ease-out <?php echo $secondary_img_url ? 'group-hover/stage:opacity-0 group-hover/stage:scale-95' : 'group-hover/stage:scale-105'; ?>"
 				loading="lazy"
 			/>
 
@@ -606,16 +609,16 @@ function raka_render_product_card( $product, array $args = [] ): void {
 					id="p-img-hover-<?php echo esc_attr( $p_id ); ?>"
 					src="<?php echo esc_url( $secondary_img_url ); ?>"
 					alt="<?php echo esc_attr( $p_title ); ?>"
-					class="absolute inset-0 m-auto max-h-[88%] max-w-[88%] object-contain opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+					class="absolute inset-0 m-auto max-h-[88%] max-w-[88%] object-contain opacity-0 group-hover/stage:opacity-100 group-hover/stage:scale-105 transition-all duration-700 ease-out"
 					loading="lazy"
 				/>
 			<?php endif; ?>
 
-			<div id="p-stage-pill-<?php echo esc_attr( $p_id ); ?>" class="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 pointer-events-none flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/85 dark:bg-white/95 text-white dark:text-black text-[10px] sm:text-[11px] font-mono uppercase tracking-wider backdrop-blur shadow-md select-none">
+			<div id="p-stage-pill-<?php echo esc_attr( $p_id ); ?>" class="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-2 group-hover/stage:opacity-100 group-hover/stage:translate-y-0 transition-all duration-300 pointer-events-none flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/85 dark:bg-white/95 text-white dark:text-black text-[10px] sm:text-[11px] font-mono uppercase tracking-wider backdrop-blur shadow-md select-none">
 				<span id="p-stage-pill-txt-<?php echo esc_attr( $p_id ); ?>">VIEW GEAR</span>
 				<i id="p-stage-pill-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-arrow-right-up-line text-xs"></i>
 			</div>
-		</div>
+		</a>
 
 		<!-- ── Lower Meta: Color Swatches, Title, and Price Row ── -->
 		<div id="p-info-wrap-<?php echo esc_attr( $p_id ); ?>" class="flex flex-col justify-between flex-grow space-y-3">
@@ -640,22 +643,48 @@ function raka_render_product_card( $product, array $args = [] ): void {
 				</div>
 			<?php endif; ?>
 
-			<h3 id="p-title-<?php echo esc_attr( $p_id ); ?>" class="text-sm sm:text-[15px] font-bold uppercase tracking-tight text-neutral-900 dark:text-neutral-100 line-clamp-2 leading-snug font-hn group-hover:text-black dark:group-hover:text-white transition-colors">
-				<?php echo esc_html( $p_title ); ?>
-			</h3>
+			<a id="p-title-link-<?php echo esc_attr( $p_id ); ?>" href="<?php echo esc_url( $p_link ); ?>" class="block group/title">
+				<h3 id="p-title-<?php echo esc_attr( $p_id ); ?>" class="text-sm sm:text-[15px] font-bold uppercase tracking-tight text-neutral-900 dark:text-neutral-100 line-clamp-2 leading-snug font-hn group-hover/title:text-black dark:group-hover/title:text-white transition-colors">
+					<?php echo esc_html( $p_title ); ?>
+				</h3>
+			</a>
 
-			<div id="p-price-row-<?php echo esc_attr( $p_id ); ?>" class="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
-				<div id="p-price-val-<?php echo esc_attr( $p_id ); ?>" class="text-xs sm:text-sm font-mono font-medium text-neutral-900 dark:text-neutral-200">
+			<!-- Price & Add To Cart Action Row -->
+			<div id="p-price-row-<?php echo esc_attr( $p_id ); ?>" class="flex items-center justify-between gap-2 pt-2.5 border-t border-black/5 dark:border-white/5">
+				<div id="p-price-val-<?php echo esc_attr( $p_id ); ?>" class="text-xs sm:text-sm font-mono font-bold text-neutral-900 dark:text-neutral-100">
 					<?php echo wp_kses_post( $p_price ); ?>
 				</div>
 				
-				<div id="p-btn-action-<?php echo esc_attr( $p_id ); ?>" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-neutral-300 dark:border-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 group-hover:bg-black group-hover:text-white group-hover:border-black dark:group-hover:bg-white dark:group-hover:text-black dark:group-hover:border-white transition-all duration-300">
-					<i id="p-btn-icon-<?php echo esc_attr( $p_id ); ?>" class="ri-arrow-right-line text-sm transition-transform group-hover:translate-x-0.5"></i>
+				<div id="p-action-wrap-<?php echo esc_attr( $p_id ); ?>" class="flex items-center">
+					<?php if ( ! $is_in_stock ) : ?>
+						<span id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>" class="px-3 py-1.5 rounded-full bg-neutral-200/70 dark:bg-neutral-800/70 text-neutral-400 dark:text-neutral-500 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider cursor-not-allowed select-none">
+							SOLD OUT
+						</span>
+					<?php elseif ( $product->is_type( 'variable' ) ) : ?>
+						<a
+							id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>"
+							href="<?php echo esc_url( $p_link ); ?>"
+							class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-black dark:hover:bg-neutral-100 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold hover:scale-105 active:scale-95 transition-all shadow-sm group/btn"
+						>
+							<i id="p-btn-cart-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-equalizer-line text-xs"></i>
+							<span id="p-btn-cart-txt-<?php echo esc_attr( $p_id ); ?>">SELECT</span>
+						</a>
+					<?php else : ?>
+						<button
+							id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>"
+							type="button"
+							onclick="window.rakaCardAddToCart(<?php echo (int) $p_id; ?>, this)"
+							class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-black dark:hover:bg-neutral-100 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold hover:scale-105 active:scale-95 transition-all shadow-sm group/btn cursor-pointer"
+						>
+							<i id="p-btn-cart-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-shopping-bag-3-line text-xs"></i>
+							<span id="p-btn-cart-txt-<?php echo esc_attr( $p_id ); ?>">ADD TO CART</span>
+						</button>
+					<?php endif; ?>
 				</div>
 			</div>
 
 		</div>
-	</a>
+	</div>
 <?php
 }
 

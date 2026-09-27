@@ -334,8 +334,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 			});
 		})();
 
+		// ─── 3. Global Product Card AJAX Add to Cart Handler ───────────────────────
+		window.rakaCardAddToCart = function(productId, btn) {
+			if (!btn || btn.disabled) return;
+			btn.disabled = true;
+			const origContent = btn.innerHTML;
+			btn.innerHTML = '<i class="ri-loader-4-line animate-spin text-xs"></i><span>ADDING...</span>';
+			
+			const formData = new FormData();
+			formData.append('product_id', productId);
+			formData.append('quantity', 1);
+
+			fetch('<?php echo esc_url( home_url( '/?wc-ajax=add_to_cart' ) ); ?>', {
+				method: 'POST',
+				body: formData
+			})
+			.then(res => res.json())
+			.then(data => {
+				btn.innerHTML = '<i class="ri-check-line text-xs text-green-400"></i><span>ADDED!</span>';
+				if (window.jQuery) {
+					window.jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash, window.jQuery(btn)]);
+				}
+				setTimeout(() => {
+					btn.innerHTML = origContent;
+					btn.disabled = false;
+				}, 1800);
+			})
+			.catch(() => {
+				window.location.href = '<?php echo esc_url( wc_get_cart_url() ); ?>?add-to-cart=' + productId;
+			});
+		};
 	</script>
 
 	<?php wp_footer(); ?>
 </body>
 </html>
+
