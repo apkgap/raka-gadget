@@ -456,36 +456,38 @@ function raka_get_hero_cards(): array {
 	$options    = raka_get_all_options();
 	$hero_cards = $options['hero_cards'] ?? null;
 
-	// If no repeater items are configured yet, provide rich default cards
-	if ( ! is_array( $hero_cards ) || empty( $hero_cards ) ) {
-		// Attempt to auto-populate from latest published WooCommerce products
+	// Fetch top Keyboards for the hero banner stream
+	$keyboard_products = [];
+	if ( function_exists( 'wc_get_products' ) ) {
+		$keyboard_products = wc_get_products( [
+			'category' => [ 'keyboards', 'keyboard' ],
+			'limit'    => 12,
+			'status'   => 'publish',
+			'orderby'  => 'menu_order date',
+			'order'    => 'DESC',
+		] );
+	}
+
+	// Populate from Keyboards category
+	if ( ! empty( $keyboard_products ) ) {
 		$sample_cards = [];
-		if ( function_exists( 'wc_get_products' ) ) {
-			$recent_products = wc_get_products( [
-				'limit'   => 12,
-				'status'  => 'publish',
-				'orderby' => 'date',
-				'order'   => 'DESC',
-			] );
+		$positions    = [ 'left', 'right' ];
+		$tags         = [ 'HALL EFFECT 8K', 'PRE-ORDER', 'ESPORTS GRADE', 'ALUMINUM CNC', 'MAGNETIC SWITCH', 'LIMITED EDITION' ];
 
-			$positions = [ 'left', 'right' ];
-			$tags      = [ 'PRE-ORDER', 'NEW ARRIVAL', 'FLAGSHIP 8K', 'HOT DEAL', 'LIMITED EDITION', 'ESPORTS GRADE' ];
-
-			foreach ( $recent_products as $idx => $prod ) {
-				$sample_cards[] = [
-					'product_id'  => $prod->get_id(),
-					'tag'         => $tags[ $idx % count( $tags ) ],
-					'title'       => '',
-					'description' => '',
-					'price'       => '',
-					'url'         => '',
-					'image_url'   => '',
-					'button_text' => 'Pre-Order Now',
-					'position'    => $positions[ $idx % 2 ],
-				];
-			}
+		foreach ( $keyboard_products as $idx => $prod ) {
+			$sample_cards[] = [
+				'product_id'  => $prod->get_id(),
+				'tag'         => $tags[ $idx % count( $tags ) ],
+				'title'       => '',
+				'description' => '',
+				'price'       => '',
+				'url'         => '',
+				'image_url'   => '',
+				'button_text' => 'Pre-Order Now',
+				'position'    => $positions[ $idx % 2 ],
+			];
 		}
-
+		$hero_cards = $sample_cards;
 		if ( empty( $sample_cards ) ) {
 			$sample_cards = [
 				[
@@ -522,9 +524,8 @@ function raka_get_hero_cards(): array {
 					'position'    => 'left',
 				],
 			];
+			$hero_cards = $sample_cards;
 		}
-
-		$hero_cards = $sample_cards;
 	}
 
 	$resolved = [];
