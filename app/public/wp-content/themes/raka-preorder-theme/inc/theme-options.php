@@ -233,30 +233,49 @@ function raka_rest_get_settings() {
 		}
 	}
 
-	// Format products for React SelectControl
+	// Format products for React SelectControl with rich metadata
 	$products = [];
 	if ( post_type_exists( 'product' ) ) {
 		$prods = get_posts( [
 			'post_type'      => 'product',
-			'posts_per_page' => 100,
+			'posts_per_page' => 150,
 			'post_status'    => 'publish',
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 		] );
 		foreach ( $prods as $p ) {
 			$price = '';
+			$image_url = '';
+			$short_desc = '';
+			$permalink = get_permalink( $p->ID );
 			if ( function_exists( 'wc_get_product' ) ) {
 				$product = wc_get_product( $p->ID );
 				if ( $product ) {
 					$price = wp_strip_all_tags( wc_price( $product->get_price() ) );
+					$short_desc = $product->get_short_description() ?: wp_trim_words( $product->get_description(), 20 );
+					$img_id = $product->get_image_id();
+					if ( $img_id ) {
+						$img = wp_get_attachment_image_src( $img_id, 'medium' );
+						if ( $img ) {
+							$image_url = $img[0];
+						}
+					}
 				}
 			}
 			$products[] = [
-				'id'    => $p->ID,
-				'title' => $p->post_title,
-				'price' => $price,
+				'id'          => $p->ID,
+				'title'       => $p->post_title,
+				'price'       => $price,
+				'image_url'   => $image_url,
+				'permalink'   => $permalink,
+				'description' => $short_desc,
 			];
 		}
+	}
+
+	// Ensure hero_cards exists
+	if ( ! isset( $options['hero_cards'] ) || ! is_array( $options['hero_cards'] ) ) {
+		$options['hero_cards'] = raka_get_hero_cards();
 	}
 
 	return rest_ensure_response( [
@@ -302,7 +321,32 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 		}
 	}
 
-	// Card slots
+	// Dynamic Repeater: hero_cards
+	$allowed_positions = [ 'left', 'right', 'center', 'bottom_left', 'bottom_right' ];
+	$clean_hero_cards  = [];
+
+	if ( isset( $raw_data['hero_cards'] ) && is_array( $raw_data['hero_cards'] ) ) {
+		foreach ( $raw_data['hero_cards'] as $card ) {
+			if ( ! is_array( $card ) ) {
+				continue;
+			}
+			$pos = sanitize_key( $card['position'] ?? 'left' );
+			$clean_hero_cards[] = [
+				'product_id'  => absint( $card['product_id'] ?? 0 ),
+				'tag'         => sanitize_text_field( (string) ( $card['tag'] ?? '' ) ),
+				'title'       => sanitize_text_field( (string) ( $card['title'] ?? '' ) ),
+				'description' => sanitize_textarea_field( (string) ( $card['description'] ?? '' ) ),
+				'price'       => sanitize_text_field( (string) ( $card['price'] ?? '' ) ),
+				'url'         => esc_url_raw( trim( (string) ( $card['url'] ?? '' ) ) ),
+				'image_url'   => esc_url_raw( trim( (string) ( $card['image_url'] ?? '' ) ) ),
+				'button_text' => sanitize_text_field( (string) ( $card['button_text'] ?? __( 'Pre-Order Now', 'raka-preorder-theme' ) ) ),
+				'position'    => in_array( $pos, $allowed_positions, true ) ? $pos : 'left',
+			];
+		}
+	}
+	$clean_options['hero_cards'] = $clean_hero_cards;
+
+	// Backward-compatible card slots (sec_2, sec_3, sec_4_top, sec_4_bot, sec_5)
 	$slots = [ 'sec_2', 'sec_3', 'sec_4_top', 'sec_4_bot', 'sec_5' ];
 	$allowed_sources = [ 'custom', 'product_cat', 'brand', 'product' ];
 
@@ -327,7 +371,7 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 
 	return rest_ensure_response( [
 		'success' => true,
-		'message' => __( 'Theme settings saved successfully!', 'raka-preorder-theme' ),
+		'message' => __( 'Hero Banner settings saved successfully!', 'raka-preorder-theme' ),
 		'options' => $clean_options,
 	] );
 }

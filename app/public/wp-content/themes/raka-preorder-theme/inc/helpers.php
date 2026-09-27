@@ -270,6 +270,167 @@ function raka_get_resolved_card_data( string $slot_key, array $fallback = [] ): 
 }
 
 /**
+ * Get resolved hero banner product cards for front-page scroll timeline.
+ * Supports dynamic repeater cards with WooCommerce product resolution and fallback items.
+ *
+ * @return array List of resolved card items.
+ */
+function raka_get_hero_cards(): array {
+	$options    = raka_get_all_options();
+	$hero_cards = $options['hero_cards'] ?? null;
+
+	// If no repeater items are configured yet, provide rich default cards
+	if ( ! is_array( $hero_cards ) || empty( $hero_cards ) ) {
+		// Attempt to auto-populate from latest published WooCommerce products
+		$sample_cards = [];
+		if ( function_exists( 'wc_get_products' ) ) {
+			$recent_products = wc_get_products( [
+				'limit'   => 4,
+				'status'  => 'publish',
+				'orderby' => 'date',
+				'order'   => 'DESC',
+			] );
+
+			$positions = [ 'left', 'right', 'left', 'right' ];
+			$tags      = [ 'PRE-ORDER', 'NEW ARRIVAL', 'FEATURED', 'HOT DEAL' ];
+
+			foreach ( $recent_products as $idx => $prod ) {
+				$sample_cards[] = [
+					'product_id'  => $prod->get_id(),
+					'tag'         => $tags[ $idx % 4 ],
+					'title'       => '',
+					'description' => '',
+					'price'       => '',
+					'url'         => '',
+					'image_url'   => '',
+					'button_text' => 'Pre-Order Now',
+					'position'    => $positions[ $idx % 4 ],
+				];
+			}
+		}
+
+		if ( empty( $sample_cards ) ) {
+			$sample_cards = [
+				[
+					'product_id'  => 0,
+					'tag'         => 'FLAGSHIP PRE-ORDER',
+					'title'       => 'Vortex Pro 8K Wireless Keyboard',
+					'description' => 'Ultra-low latency 8,000Hz polling rate with Hall Effect magnetic switches and aerospace CNC aluminum body.',
+					'price'       => '฿4,990',
+					'url'         => '#',
+					'image_url'   => '',
+					'button_text' => 'Pre-Order Now',
+					'position'    => 'left',
+				],
+				[
+					'product_id'  => 0,
+					'tag'         => 'LIMITED EDITION',
+					'title'       => 'CyberPunk Glass Mousepad',
+					'description' => 'Micro-etched tempered glass surface engineered for pixel-perfect tracking and effortless glide.',
+					'price'       => '฿2,290',
+					'url'         => '#',
+					'image_url'   => '',
+					'button_text' => 'Pre-Order Now',
+					'position'    => 'right',
+				],
+				[
+					'product_id'  => 0,
+					'tag'         => 'CUSTOM SWITCHES',
+					'title'       => 'Aero Tactile Magnetic Switches',
+					'description' => 'Factory lubed linear switches with 0.1mm to 4.0mm adjustable actuation distance for esports dominance.',
+					'price'       => '฿1,150',
+					'url'         => '#',
+					'image_url'   => '',
+					'button_text' => 'Explore Specs',
+					'position'    => 'left',
+				],
+			];
+		}
+
+		$hero_cards = $sample_cards;
+	}
+
+	$resolved = [];
+	$default_positions = [ 'left', 'right', 'left', 'right' ];
+
+	foreach ( $hero_cards as $index => $raw_card ) {
+		if ( ! is_array( $raw_card ) ) {
+			continue;
+		}
+
+		$product_id  = absint( $raw_card['product_id'] ?? 0 );
+		$product     = ( $product_id > 0 && function_exists( 'wc_get_product' ) ) ? wc_get_product( $product_id ) : null;
+		$position    = ! empty( $raw_card['position'] ) ? sanitize_key( $raw_card['position'] ) : $default_positions[ $index % 4 ];
+		$button_text = ! empty( $raw_card['button_text'] ) ? sanitize_text_field( $raw_card['button_text'] ) : __( 'Pre-Order Now', 'raka-preorder-theme' );
+
+		$tag         = ! empty( $raw_card['tag'] ) ? sanitize_text_field( $raw_card['tag'] ) : '';
+		$title       = ! empty( $raw_card['title'] ) ? sanitize_text_field( $raw_card['title'] ) : '';
+		$description = ! empty( $raw_card['description'] ) ? sanitize_textarea_field( $raw_card['description'] ) : '';
+		$price_html  = ! empty( $raw_card['price'] ) ? esc_html( $raw_card['price'] ) : '';
+		$url         = ! empty( $raw_card['url'] ) ? esc_url_raw( $raw_card['url'] ) : '';
+		$image_url   = ! empty( $raw_card['image_url'] ) ? esc_url_raw( $raw_card['image_url'] ) : '';
+		$stock_status = '';
+
+		if ( $product ) {
+			if ( empty( $title ) ) {
+				$title = $product->get_name();
+			}
+			if ( empty( $description ) ) {
+				$description = $product->get_short_description() ?: wp_trim_words( $product->get_description(), 24 );
+			}
+			if ( empty( $price_html ) ) {
+				$price_html = $product->get_price_html();
+			}
+			if ( empty( $url ) ) {
+				$url = $product->get_permalink();
+			}
+			if ( empty( $image_url ) ) {
+				$image_id = $product->get_image_id();
+				if ( $image_id ) {
+					$img = wp_get_attachment_image_src( $image_id, 'medium_large' );
+					if ( $img ) {
+						$image_url = $img[0];
+					}
+				}
+			}
+			if ( empty( $tag ) ) {
+				$cats = wp_get_post_terms( $product_id, 'product_cat' );
+				if ( ! empty( $cats ) && ! is_wp_error( $cats ) ) {
+					$tag = $cats[0]->name;
+				} else {
+					$tag = __( 'PRE-ORDER', 'raka-preorder-theme' );
+				}
+			}
+			$stock_status = $product->get_stock_status();
+		}
+
+		if ( empty( $tag ) ) {
+			$tag = __( 'PRE-ORDER', 'raka-preorder-theme' );
+		}
+		if ( empty( $url ) ) {
+			$url = '#';
+		}
+
+		$resolved[] = [
+			'index'        => $index,
+			'product_id'   => $product_id,
+			'tag'          => $tag,
+			'title'        => $title,
+			'description'  => $description,
+			'price_html'   => $price_html,
+			'url'          => $url,
+			'image_url'    => $image_url,
+			'button_text'  => $button_text,
+			'position'     => $position,
+			'stock_status' => $stock_status,
+		];
+	}
+
+	return $resolved;
+}
+
+
+/**
  * Get Brand Logo image URL from term meta
  *
  * @param int|WP_Term $term_id_or_object Term ID or WP_Term object.

@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-// Fetch configured hero options and dynamic card data
+// Fetch configured hero options and dynamic repeater card data
 $default_overlay  = get_template_directory_uri() . '/assets/images/angel-hero.png';
 $hero_main_title  = raka_get_option( 'hero_main_title', 'OBSIDIAN' );
 $hero_caption     = raka_get_option( 'hero_caption', "RITUALS REFINED:\nTRACING LINE, SHADOW & SKIN\nACROSS A LIVING FORM." );
@@ -21,44 +21,13 @@ if ( strpos( $hero_overlay_url, 'figma.site' ) !== false ) {
 	$hero_overlay_url = $default_overlay;
 }
 
-$card_2 = raka_get_resolved_card_data( 'sec_2', [
-	'tag'         => 'ORIGIN',
-	'title'       => '',
-	'description' => "Obsidian Studio, established by globally acclaimed visionaries of Fine Line Tattoo, Micro Realism Tattoo, and Minimalist Tattoo, Elias Varen and Mira Solenne, unites the world's and Brooklyn's finest tattoo artists in Brooklyn, NYC.",
-	'url'         => '',
-] );
-
-$card_3 = raka_get_resolved_card_data( 'sec_3', [
-	'tag'         => 'Premise',
-	'title'       => '',
-	'description' => 'Here in our studio is a refuge for intention, where patience meets technique and craft dissolves all limits. With global reverence and an unwavering devotion to the singular.',
-	'url'         => '',
-] );
-
-$card_4_top = raka_get_resolved_card_data( 'sec_4_top', [
-	'tag'         => '',
-	'title'       => '',
-	'description' => 'singular visions into striking one of a kind tattoos in partnership with the most refined artists from NYC and from across the globe.',
-	'url'         => '',
-] );
-
-$card_4_bot = raka_get_resolved_card_data( 'sec_4_bot', [
-	'tag'         => 'Process',
-	'title'       => '',
-	'description' => 'We treat each tattoo as a silent dialogue, a mark that emerges from your story. Your form is a page, and we aspire to inscribe narratives that capture your singularity and essence.',
-	'url'         => '',
-] );
-
-$card_5 = raka_get_resolved_card_data( 'sec_5', [
-	'tag'         => '',
-	'title'       => "FIND<br/>YOUR<br/>ARTIST",
-	'description' => '',
-	'url'         => '',
-] );
+$hero_cards          = raka_get_hero_cards();
+$total_cards         = count( $hero_cards );
+$hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 ?>
 
 <!-- ── ScrollVideoHero Component ── -->
-<section id="scroll-video-hero-section" class="relative" style="height: 500vh;">
+<section id="scroll-video-hero-section" class="relative" style="height: <?php echo esc_attr( $hero_section_height ); ?>;">
 	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-white dark:bg-obsidian theme-transition gpu-accel">
 
 		<!-- 1. Video Layer -->
@@ -105,105 +74,70 @@ $card_5 = raka_get_resolved_card_data( 'sec_5', [
 			</div>
 		</div>
 
-		<!-- 5. Sections 2–5 (Overlay cards sliding with progress) -->
-		<!-- Section 2 -->
-		<div id="hero-sec-2" class="hero-sub-section absolute inset-0 z-20 gpu-accel flex flex-col justify-start p-6 md:p-12 lg:p-16 pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
-			<<?php echo ! empty( $card_2['url'] ) && '#' !== $card_2['url'] ? 'a href="' . esc_url( $card_2['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block max-w-md mt-12 md:mt-20 p-6 rounded-2xl bg-white/85 dark:bg-black/80 backdrop-blur-md border border-black/10 dark:border-white/10 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
-				<?php if ( ! empty( $card_2['tag'] ) ) : ?>
-					<div class="flex items-center justify-between mb-4">
-						<div class="text-[11px] tracking-[0.25em] uppercase text-black/50 dark:text-white/50 font-hn"><?php echo esc_html( $card_2['tag'] ); ?></div>
-						<?php if ( ! empty( $card_2['price_html'] ) ) : ?>
-							<div class="text-xs font-semibold text-black dark:text-white"><?php echo wp_kses_post( $card_2['price_html'] ); ?></div>
+		<!-- 5. Dynamic Repeater Product Cards (Scroll Popup Overlay Cards) -->
+		<?php foreach ( $hero_cards as $idx => $card ) :
+			$pos = $card['position'] ?? 'left';
+			$pos_classes = 'items-start justify-start p-6 md:p-12 lg:p-16 pt-20 md:pt-28';
+			if ( 'right' === $pos ) {
+				$pos_classes = 'items-start justify-end p-6 md:p-12 lg:p-16 pt-20 md:pt-28';
+			} elseif ( 'center' === $pos ) {
+				$pos_classes = 'items-center justify-center p-6 md:p-12';
+			} elseif ( 'bottom_left' === $pos ) {
+				$pos_classes = 'items-end justify-start p-6 md:p-12 lg:p-16 pb-20 md:pb-28';
+			} elseif ( 'bottom_right' === $pos ) {
+				$pos_classes = 'items-end justify-end p-6 md:p-12 lg:p-16 pb-20 md:pb-28';
+			}
+		?>
+			<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
+				<<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a href="' . esc_url( $card['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block max-w-lg w-full p-6 md:p-7 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
+					<!-- Header: Tag + Price -->
+					<div class="flex items-center justify-between gap-3 mb-4">
+						<?php if ( ! empty( $card['tag'] ) ) : ?>
+							<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] md:text-[11px] font-bold tracking-widest uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-hn">
+								<?php echo esc_html( $card['tag'] ); ?>
+							</span>
+						<?php endif; ?>
+						<?php if ( ! empty( $card['price_html'] ) ) : ?>
+							<div class="text-sm md:text-base font-bold text-neutral-900 dark:text-white font-hn">
+								<?php echo wp_kses_post( $card['price_html'] ); ?>
+							</div>
 						<?php endif; ?>
 					</div>
-				<?php endif; ?>
-				<?php if ( ! empty( $card_2['title'] ) ) : ?>
-					<h3 class="text-lg md:text-xl font-bold text-black dark:text-white mb-2 font-hn group-hover:translate-x-1 transition-transform"><?php echo esc_html( $card_2['title'] ); ?></h3>
-				<?php endif; ?>
-				<p class="text-base md:text-lg leading-[1.7] text-black/85 dark:text-white/90 font-light font-hn">
-					<?php echo esc_html( $card_2['description'] ); ?>
-				</p>
-				<?php if ( ! empty( $card_2['url'] ) && '#' !== $card_2['url'] ) : ?>
-					<div class="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-widest text-black/60 dark:text-white/60 group-hover:text-black dark:group-hover:text-white font-hn">
-						<span>View Details</span> <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-					</div>
-				<?php endif; ?>
-			</<?php echo ! empty( $card_2['url'] ) && '#' !== $card_2['url'] ? 'a' : 'div'; ?>>
-		</div>
 
-		<!-- Section 3 -->
-		<div id="hero-sec-3" class="hero-sub-section absolute inset-0 z-20 gpu-accel flex items-start justify-end p-6 md:p-12 lg:p-16 pt-20 md:pt-28 pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
-			<<?php echo ! empty( $card_3['url'] ) && '#' !== $card_3['url'] ? 'a href="' . esc_url( $card_3['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block bg-white/85 dark:bg-black/85 backdrop-blur-md px-6 py-5 max-w-[360px] rounded-2xl border border-black/10 dark:border-white/10 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
-				<?php if ( ! empty( $card_3['tag'] ) ) : ?>
-					<div class="flex items-center justify-between mb-3">
-						<div class="text-[11px] tracking-[0.25em] uppercase text-black/50 dark:text-white/40 font-hn"><?php echo esc_html( $card_3['tag'] ); ?></div>
-						<?php if ( ! empty( $card_3['price_html'] ) ) : ?>
-							<div class="text-xs font-semibold text-black dark:text-white"><?php echo wp_kses_post( $card_3['price_html'] ); ?></div>
+					<!-- Card Content: Image & Text -->
+					<div class="flex items-start gap-4 md:gap-5">
+						<?php if ( ! empty( $card['image_url'] ) ) : ?>
+							<div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 shrink-0 group-hover:scale-105 transition-transform duration-300">
+								<img src="<?php echo esc_url( $card['image_url'] ); ?>" alt="<?php echo esc_attr( $card['title'] ); ?>" class="w-full h-full object-cover" />
+							</div>
 						<?php endif; ?>
+						<div class="flex-1 min-w-0">
+							<?php if ( ! empty( $card['title'] ) ) : ?>
+								<h3 class="text-lg md:text-xl font-bold text-black dark:text-white font-hn group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-snug line-clamp-2">
+									<?php echo esc_html( $card['title'] ); ?>
+								</h3>
+							<?php endif; ?>
+							<?php if ( ! empty( $card['description'] ) ) : ?>
+								<p class="text-xs md:text-sm leading-relaxed text-black/70 dark:text-white/75 font-light font-hn mt-2 line-clamp-3">
+									<?php echo esc_html( $card['description'] ); ?>
+								</p>
+							<?php endif; ?>
+						</div>
 					</div>
-				<?php endif; ?>
-				<?php if ( ! empty( $card_3['title'] ) ) : ?>
-					<h3 class="text-base font-bold text-black dark:text-white mb-2 font-hn"><?php echo esc_html( $card_3['title'] ); ?></h3>
-				<?php endif; ?>
-				<p class="text-sm md:text-[15px] leading-[1.7] text-black/75 dark:text-white/75 font-light font-hn">
-					<?php echo esc_html( $card_3['description'] ); ?>
-				</p>
-				<?php if ( ! empty( $card_3['url'] ) && '#' !== $card_3['url'] ) : ?>
-					<div class="mt-3 inline-flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/60 dark:text-white/60 group-hover:text-black dark:group-hover:text-white font-hn">
-						<span>Explore</span> &rarr;
+
+					<!-- Card CTA Action Footer -->
+					<div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 flex items-center justify-between">
+						<span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold uppercase tracking-wider font-hn group-hover:shadow-md transition-all">
+							<?php echo esc_html( ! empty( $card['button_text'] ) ? $card['button_text'] : __( 'Pre-Order Now', 'raka-preorder-theme' ) ); ?>
+							<span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+						</span>
+						<span class="text-xs font-semibold text-black/50 dark:text-white/50 group-hover:text-black dark:group-hover:text-white font-hn">
+							<?php esc_html_e( 'View Details', 'raka-preorder-theme' ); ?>
+						</span>
 					</div>
-				<?php endif; ?>
-			</<?php echo ! empty( $card_3['url'] ) && '#' !== $card_3['url'] ? 'a' : 'div'; ?>>
-		</div>
-
-		<!-- Section 4 -->
-		<div id="hero-sec-4" class="hero-sub-section absolute inset-0 z-20 gpu-accel pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
-			<<?php echo ! empty( $card_4_top['url'] ) && '#' !== $card_4_top['url'] ? 'a href="' . esc_url( $card_4_top['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block absolute top-12 md:top-16 right-6 md:right-12 lg:right-16 max-w-[340px] text-right p-5 rounded-2xl bg-white/85 dark:bg-black/70 backdrop-blur-md border border-black/10 dark:border-white/10 shadow-xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all">
-				<?php if ( ! empty( $card_4_top['tag'] ) ) : ?>
-					<div class="text-[10px] tracking-[0.2em] uppercase text-black/50 dark:text-white/40 mb-2 font-hn"><?php echo esc_html( $card_4_top['tag'] ); ?></div>
-				<?php endif; ?>
-				<?php if ( ! empty( $card_4_top['title'] ) ) : ?>
-					<h4 class="text-sm font-bold text-black dark:text-white mb-1 font-hn"><?php echo esc_html( $card_4_top['title'] ); ?></h4>
-				<?php endif; ?>
-				<p class="text-sm md:text-[15px] leading-[1.7] text-black/75 dark:text-white/85 font-light font-hn">
-					<?php echo esc_html( $card_4_top['description'] ); ?>
-				</p>
-			</<?php echo ! empty( $card_4_top['url'] ) && '#' !== $card_4_top['url'] ? 'a' : 'div'; ?>>
-
-			<<?php echo ! empty( $card_4_bot['url'] ) && '#' !== $card_4_bot['url'] ? 'a href="' . esc_url( $card_4_bot['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block absolute bottom-12 md:bottom-16 left-6 md:left-12 lg:left-16 bg-white/85 dark:bg-black/85 backdrop-blur-md px-6 py-5 max-w-[360px] rounded-2xl border border-black/10 dark:border-white/10 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all">
-				<?php if ( ! empty( $card_4_bot['tag'] ) ) : ?>
-					<div class="flex items-center justify-between mb-3">
-						<div class="text-[11px] tracking-[0.25em] uppercase text-black/50 dark:text-white/40 font-hn"><?php echo esc_html( $card_4_bot['tag'] ); ?></div>
-						<?php if ( ! empty( $card_4_bot['price_html'] ) ) : ?>
-							<div class="text-xs font-semibold text-black dark:text-white"><?php echo wp_kses_post( $card_4_bot['price_html'] ); ?></div>
-						<?php endif; ?>
-					</div>
-				<?php endif; ?>
-				<?php if ( ! empty( $card_4_bot['title'] ) ) : ?>
-					<h3 class="text-base font-bold text-black dark:text-white mb-2 font-hn"><?php echo esc_html( $card_4_bot['title'] ); ?></h3>
-				<?php endif; ?>
-				<p class="text-sm md:text-[15px] leading-[1.7] text-black/75 dark:text-white/75 font-light font-hn">
-					<?php echo esc_html( $card_4_bot['description'] ); ?>
-				</p>
-			</<?php echo ! empty( $card_4_bot['url'] ) && '#' !== $card_4_bot['url'] ? 'a' : 'div'; ?>>
-		</div>
-
-		<!-- Section 5 -->
-		<div id="hero-sec-5" class="hero-sub-section absolute inset-0 z-20 gpu-accel flex items-center pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
-			<div class="pl-6 md:pl-12 lg:pl-16">
-				<?php if ( ! empty( $card_5['url'] ) && '#' !== $card_5['url'] ) : ?>
-					<a href="<?php echo esc_url( $card_5['url'] ); ?>" class="pointer-events-auto group block">
-						<h2 class="text-[20vw] md:text-[15vw] font-black leading-[0.82] tracking-[-0.03em] text-neutral-900 dark:text-white group-hover:opacity-80 transition-opacity uppercase select-none font-hn theme-transition">
-							<?php echo ! empty( $card_5['title'] ) ? wp_kses_post( $card_5['title'] ) : 'FIND<br/>YOUR<br/>ARTIST'; ?>
-						</h2>
-					</a>
-				<?php else : ?>
-					<h2 class="text-[20vw] md:text-[15vw] font-black leading-[0.82] tracking-[-0.03em] text-neutral-900 dark:text-white uppercase select-none font-hn theme-transition">
-						<?php echo ! empty( $card_5['title'] ) ? wp_kses_post( $card_5['title'] ) : 'FIND<br/>YOUR<br/>ARTIST'; ?>
-					</h2>
-				<?php endif; ?>
+				</<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a' : 'div'; ?>>
 			</div>
-		</div>
+		<?php endforeach; ?>
 	</div>
 </section>
 
@@ -262,13 +196,9 @@ $card_5 = raka_get_resolved_card_data( 'sec_5', [
 
 		const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 		const overlayPng = document.getElementById('hero-overlay-png-wrap');
-		const heroSec1 = document.getElementById('hero-section-1');
-		const subSecs = [
-			document.getElementById('hero-sec-2'),
-			document.getElementById('hero-sec-3'),
-			document.getElementById('hero-sec-4'),
-			document.getElementById('hero-sec-5')
-		];
+		const heroSec1   = document.getElementById('hero-section-1');
+		const subSecs    = Array.from(document.querySelectorAll('.hero-card-slide'));
+		const totalCards = subSecs.length;
 
 		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -333,30 +263,46 @@ $card_5 = raka_get_resolved_card_data( 'sec_5', [
 
 		function applyPositions(prog, scrollPx) {
 			if (heroSec1) {
-				const heroScroll = Math.max(0, 1 - prog * 8);
-				heroSec1.style.opacity = heroScroll;
+				const heroFactor = totalCards > 1 ? Math.max(4, (totalCards + 1) * 1.5) : 5;
+				const heroScroll = Math.max(0, 1 - prog * heroFactor);
+				heroSec1.style.opacity = heroScroll.toFixed(3);
 				heroSec1.style.transform = `translate3d(0, ${(1 - heroScroll) * -30}%, 0)`;
 			}
 
 			if (overlayPng) {
-				const pngOpacity = Math.max(0, 1 - prog * 5);
-				overlayPng.style.opacity = pngOpacity;
+				const pngFactor = totalCards > 1 ? Math.max(3, (totalCards + 1) * 1.2) : 4;
+				const pngOpacity = Math.max(0, 1 - prog * pngFactor);
+				overlayPng.style.opacity = pngOpacity.toFixed(3);
 			}
 
-			subSecs.forEach((sec, idx) => {
-				if (!sec) return;
-				const sectionIdx = idx + 1;
-				const local = (prog - sectionIdx / 5) / (1 / 5);
-				let t = 1;
-				if (local < 0) t = 1;
-				else if (local > 1) t = -1;
-				else t = 1 - 2 * local;
+			if (totalCards > 0) {
+				const step = 1 / (totalCards + 1);
+				subSecs.forEach((sec, idx) => {
+					if (!sec) return;
+					const centerProg = (idx + 1) * step;
+					const span = step * 0.95;
+					const local = (prog - centerProg) / span;
 
-				sec.style.transform = `translate3d(0, ${t * 100}%, 0)`;
-				const visible = Math.abs(t) < 1;
-				sec.style.opacity = visible ? '1' : '0';
-				sec.style.pointerEvents = visible ? 'auto' : 'none';
-			});
+					const visible = Math.abs(local) <= 1;
+					let offsetPercent = 100;
+					let opacity = 0;
+
+					if (local < -1) {
+						offsetPercent = 80;
+						opacity = 0;
+					} else if (local > 1) {
+						offsetPercent = -80;
+						opacity = 0;
+					} else {
+						offsetPercent = local * -60;
+						opacity = Math.max(0, 1 - Math.pow(local, 2));
+					}
+
+					sec.style.transform = `translate3d(0, ${offsetPercent.toFixed(1)}px, 0)`;
+					sec.style.opacity = opacity.toFixed(3);
+					sec.style.pointerEvents = opacity > 0.2 ? 'auto' : 'none';
+				});
+			}
 		}
 
 		window.addEventListener('scroll', () => {
