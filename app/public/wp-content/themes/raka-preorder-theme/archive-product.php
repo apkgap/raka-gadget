@@ -22,7 +22,7 @@ $all_cats = get_terms( [
 ?>
 
 <main id="archive-product-main" class="min-h-screen pt-28 md:pt-36 pb-24 bg-cement dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
-	<div id="archive-product-container" class="max-w-7xl mx-auto px-3.5 sm:px-8 md:px-12 lg:px-16">
+	<div id="archive-product-container" class="container">
 
 		<!-- ── Archive Header ── -->
 		<div id="archive-header-block" class="mb-12 md:mb-16 space-y-4 border-b border-black/10 dark:border-white/10 pb-8 md:pb-12">

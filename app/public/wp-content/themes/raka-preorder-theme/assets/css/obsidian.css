@@ -203,3 +203,49 @@ html.dark #breadcrumbs .breadcrumb_last {
 	color: #f5f5f5;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   STANDARDIZED OBSIDIAN CONTAINERS (1,280px Grid Engine)
+   ══════════════════════════════════════════════════════════════════════════════ */
+.container,
+.obsidian-container {
+	width: 100%;
+	max-width: 1280px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 1.5em;
+	padding-right: 1.5em;
+	padding-top: 2em;
+	padding-bottom: 2em;
+}
+
+@media (min-width: 768px) {
+	.container,
+	.obsidian-container {
+		padding-left: 2em;
+		padding-right: 2em;
+		padding-top: 3em;
+		padding-bottom: 3em;
+	}
+}
+
+@media (min-width: 1280px) {
+	.container,
+	.obsidian-container {
+		padding-left: 0;
+		padding-right: 0;
+		padding-top: 6em;
+		padding-bottom: 6em;
+	}
+}
+
+/* Pure Container: 1,280px Centered with ZERO padding for nested blocks */
+.pure-container,
+.container-pure {
+	width: 100%;
+	max-width: 1280px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0 !important;
+}
+
+

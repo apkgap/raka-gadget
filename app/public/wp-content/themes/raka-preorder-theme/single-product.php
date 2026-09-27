@@ -44,7 +44,7 @@ while ( have_posts() ) :
 ?>
 
 <main id="single-product-main" class="min-h-screen pt-28 md:pt-36 pb-24 bg-cement dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
-	<div id="single-product-container" class="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+	<div id="single-product-container" class="container">
 
 		<!-- ── Breadcrumbs ── -->
 		<?php raka_render_breadcrumbs( 'product-breadcrumbs', 'mb-8 md:mb-12' ); ?>
