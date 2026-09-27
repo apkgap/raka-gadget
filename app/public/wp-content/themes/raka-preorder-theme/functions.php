@@ -19,6 +19,12 @@ function raka_preorder_theme_setup() {
 	// Enable support for Menus.
 	add_theme_support( 'menus' );
 
+	// Enable support for WooCommerce.
+	add_theme_support( 'woocommerce' );
+	add_theme_support( 'wc-product-gallery-zoom' );
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	add_theme_support( 'wc-product-gallery-slider' );
+
 	// Register Navigation Menu Locations.
 	register_nav_menus( [
 		'primary-menu' => __( 'Primary Navigation / Mega Menu', 'raka-preorder-theme' ),
