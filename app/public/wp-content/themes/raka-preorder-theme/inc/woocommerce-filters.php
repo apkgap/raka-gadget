@@ -176,12 +176,12 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 		<!-- ── Filter Top Header: Title & Clear All ── -->
 		<div id="<?php echo esc_attr( $id_prefix ); ?>-filter-head" class="flex items-center justify-between pb-4 border-b border-black/10 dark:border-white/10">
 			<div id="<?php echo esc_attr( $id_prefix ); ?>-filter-title-wrap" class="flex items-center gap-2">
-				<i id="<?php echo esc_attr( $id_prefix ); ?>-filter-icon" class="ri-filter-3-line text-sm text-neutral-900 dark:text-white"></i>
-				<h2 id="<?php echo esc_attr( $id_prefix ); ?>-filter-title" class="text-xs font-mono font-bold uppercase tracking-[0.2em] text-neutral-900 dark:text-white">
+				<i id="<?php echo esc_attr( $id_prefix ); ?>-filter-icon" class="ri-filter-3-line text-base text-neutral-900 dark:text-white"></i>
+				<h2 id="<?php echo esc_attr( $id_prefix ); ?>-filter-title" class="text-sm font-mono font-bold uppercase tracking-[0.15em] text-neutral-900 dark:text-white">
 					FILTERS
 				</h2>
 				<?php if ( $state['active_count'] > 0 ) : ?>
-					<span id="<?php echo esc_attr( $id_prefix ); ?>-filter-badge" class="w-5 h-5 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-mono font-bold flex items-center justify-center">
+					<span id="<?php echo esc_attr( $id_prefix ); ?>-filter-badge" class="w-5 h-5 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-mono font-bold flex items-center justify-center">
 						<?php echo (int) $state['active_count']; ?>
 					</span>
 				<?php endif; ?>
@@ -191,7 +191,7 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 				<a
 					id="<?php echo esc_attr( $id_prefix ); ?>-filter-reset-btn"
 					href="<?php echo esc_url( $shop_link ); ?>"
-					class="text-[11px] font-mono uppercase tracking-wider text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors flex items-center gap-1"
+					class="text-xs font-mono font-semibold uppercase tracking-wider text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors flex items-center gap-1"
 				>
 					<i id="<?php echo esc_attr( $id_prefix ); ?>-filter-reset-ico" class="ri-refresh-line text-xs"></i>
 					<span>RESET</span>
@@ -208,9 +208,9 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 					name="filter_q"
 					value="<?php echo esc_attr( $state['search'] ); ?>"
 					placeholder="Search catalogue..."
-					class="w-full h-9 pl-8 pr-3 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors"
+					class="w-full h-10 pl-9 pr-3 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-sans text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors"
 				/>
-				<i id="<?php echo esc_attr( $id_prefix ); ?>-search-ico" class="ri-search-line absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-neutral-400 pointer-events-none"></i>
+				<i id="<?php echo esc_attr( $id_prefix ); ?>-search-ico" class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none"></i>
 				<?php
 				// Preserve existing active filters in search form
 				if ( ! empty( $state['brands'] ) ) {
@@ -229,9 +229,9 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 		<!-- ── 2. Categories Accordion ── -->
 		<?php if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) : ?>
 			<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-section" class="border-b border-black/5 dark:border-white/5 pb-5 space-y-3">
-				<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-title" class="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center justify-between">
+				<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center justify-between">
 					<span>CATEGORIES</span>
-					<span class="text-[10px] opacity-60"><?php echo count( $categories ); ?></span>
+					<span class="text-xs opacity-60"><?php echo count( $categories ); ?></span>
 				</div>
 
 				<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-list" class="space-y-1 max-h-56 overflow-y-auto pr-1">
@@ -242,17 +242,17 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 						<a
 							id="<?php echo esc_attr( $id_prefix ); ?>-cat-item-<?php echo esc_attr( $cat->slug ); ?>"
 							href="<?php echo esc_url( $cat_toggle_url ); ?>"
-							class="group flex items-center justify-between py-1.5 px-2 rounded-lg text-xs font-mono transition-colors <?php echo $is_checked ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
+							class="group flex items-center justify-between py-2 px-2.5 rounded-lg text-sm transition-colors <?php echo $is_checked ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
 						>
 							<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-info-<?php echo esc_attr( $cat->slug ); ?>" class="flex items-center gap-2 truncate">
 								<?php
 								if ( function_exists( 'raka_get_term_icon_html' ) ) {
-									echo raka_get_term_icon_html( $cat->term_id, 'text-xs flex-shrink-0' );
+									echo raka_get_term_icon_html( $cat->term_id, 'text-sm flex-shrink-0' );
 								}
 								?>
 								<span class="truncate"><?php echo esc_html( $cat->name ); ?></span>
 							</div>
-							<span id="<?php echo esc_attr( $id_prefix ); ?>-cat-count-<?php echo esc_attr( $cat->slug ); ?>" class="text-[10px] opacity-60 font-mono flex-shrink-0 pl-2">
+							<span id="<?php echo esc_attr( $id_prefix ); ?>-cat-count-<?php echo esc_attr( $cat->slug ); ?>" class="text-xs opacity-60 font-mono flex-shrink-0 pl-2">
 								<?php echo (int) $cat->count; ?>
 							</span>
 						</a>
@@ -264,9 +264,9 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 		<!-- ── 3. Brands Accordion ── -->
 		<?php if ( ! empty( $brands ) && ! is_wp_error( $brands ) ) : ?>
 			<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-section" class="border-b border-black/5 dark:border-white/5 pb-5 space-y-3">
-				<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-title" class="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center justify-between">
+				<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center justify-between">
 					<span>BRANDS</span>
-					<span class="text-[10px] opacity-60"><?php echo count( $brands ); ?></span>
+					<span class="text-xs opacity-60"><?php echo count( $brands ); ?></span>
 				</div>
 
 				<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-list" class="space-y-1 max-h-56 overflow-y-auto pr-1">
@@ -277,17 +277,17 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 						<a
 							id="<?php echo esc_attr( $id_prefix ); ?>-brand-item-<?php echo esc_attr( $brand->slug ); ?>"
 							href="<?php echo esc_url( $brand_toggle_url ); ?>"
-							class="group flex items-center justify-between py-1.5 px-2 rounded-lg text-xs font-mono transition-colors <?php echo $is_checked ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
+							class="group flex items-center justify-between py-2 px-2.5 rounded-lg text-sm transition-colors <?php echo $is_checked ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
 						>
 							<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-info-<?php echo esc_attr( $brand->slug ); ?>" class="flex items-center gap-2 truncate">
-								<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-box-<?php echo esc_attr( $brand->slug ); ?>" class="w-3.5 h-3.5 rounded border <?php echo $is_checked ? 'bg-white text-black dark:bg-black dark:text-white border-transparent' : 'border-neutral-400 dark:border-neutral-600'; ?> flex items-center justify-center text-[9px]">
+								<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-box-<?php echo esc_attr( $brand->slug ); ?>" class="w-4 h-4 rounded border <?php echo $is_checked ? 'bg-white text-black dark:bg-black dark:text-white border-transparent' : 'border-neutral-400 dark:border-neutral-600'; ?> flex items-center justify-center text-xs">
 									<?php if ( $is_checked ) : ?>
 										<i class="ri-check-line"></i>
 									<?php endif; ?>
 								</span>
 								<span class="truncate"><?php echo esc_html( $brand->name ); ?></span>
 							</div>
-							<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-count-<?php echo esc_attr( $brand->slug ); ?>" class="text-[10px] opacity-60 font-mono flex-shrink-0 pl-2">
+							<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-count-<?php echo esc_attr( $brand->slug ); ?>" class="text-xs opacity-60 font-mono flex-shrink-0 pl-2">
 								<?php echo (int) $brand->count; ?>
 							</span>
 						</a>
@@ -298,39 +298,39 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 
 		<!-- ── 4. Price Range Filter ── -->
 		<div id="<?php echo esc_attr( $id_prefix ); ?>-price-section" class="border-b border-black/5 dark:border-white/5 pb-5 space-y-3">
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-price-title" class="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+			<div id="<?php echo esc_attr( $id_prefix ); ?>-price-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
 				<span>PRICE RANGE (THB)</span>
 			</div>
 
 			<form id="<?php echo esc_attr( $id_prefix ); ?>-price-form" method="get" action="<?php echo esc_url( $shop_link ); ?>" class="space-y-3">
 				<div id="<?php echo esc_attr( $id_prefix ); ?>-price-inputs" class="flex items-center gap-2">
 					<div id="<?php echo esc_attr( $id_prefix ); ?>-min-wrap" class="relative flex-1">
-						<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-neutral-400">฿</span>
+						<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-400">฿</span>
 						<input
 							id="<?php echo esc_attr( $id_prefix ); ?>-min-price-input"
 							type="number"
 							name="min_price"
 							value="<?php echo $state['min_price'] !== null ? esc_attr( (string) $state['min_price'] ) : ''; ?>"
 							placeholder="Min"
-							class="w-full h-8 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
+							class="w-full h-9 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
 						/>
 					</div>
-					<span class="text-neutral-400 text-xs">&ndash;</span>
+					<span class="text-neutral-400 text-sm">&ndash;</span>
 					<div id="<?php echo esc_attr( $id_prefix ); ?>-max-wrap" class="relative flex-1">
-						<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-neutral-400">฿</span>
+						<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-400">฿</span>
 						<input
 							id="<?php echo esc_attr( $id_prefix ); ?>-max-price-input"
 							type="number"
 							name="max_price"
 							value="<?php echo $state['max_price'] !== null ? esc_attr( (string) $state['max_price'] ) : ''; ?>"
 							placeholder="Max"
-							class="w-full h-8 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
+							class="w-full h-9 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
 						/>
 					</div>
 					<button
 						id="<?php echo esc_attr( $id_prefix ); ?>-price-apply-btn"
 						type="submit"
-						class="h-8 px-3 rounded-lg bg-black text-white dark:bg-white dark:text-black text-[11px] font-mono font-bold uppercase hover:opacity-80 active:scale-95 transition-all"
+						class="h-9 px-3.5 rounded-lg bg-black text-white dark:bg-white dark:text-black text-xs font-mono font-bold uppercase hover:opacity-80 active:scale-95 transition-all"
 					>
 						GO
 					</button>
@@ -372,7 +372,7 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 					<a
 						id="<?php echo esc_attr( $id_prefix ); ?>-tier-<?php echo (int) $idx; ?>"
 						href="<?php echo esc_url( $tier_url ); ?>"
-						class="px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider transition-colors <?php echo $is_tier_active ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'bg-black/5 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:opacity-75'; ?>"
+						class="px-2.5 py-1 rounded text-xs font-mono font-medium uppercase tracking-wider transition-colors <?php echo $is_tier_active ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'bg-black/5 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:opacity-75'; ?>"
 					>
 						<?php echo esc_html( $tier['label'] ); ?>
 					</a>
@@ -382,7 +382,7 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 
 		<!-- ── 5. Stock & Availability Filter ── -->
 		<div id="<?php echo esc_attr( $id_prefix ); ?>-stock-section" class="space-y-3">
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-stock-title" class="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+			<div id="<?php echo esc_attr( $id_prefix ); ?>-stock-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
 				<span>AVAILABILITY</span>
 			</div>
 
@@ -401,9 +401,9 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 					<a
 						id="<?php echo esc_attr( $id_prefix ); ?>-stock-opt-<?php echo esc_attr( $key ?: 'all' ); ?>"
 						href="<?php echo esc_url( $stock_url ); ?>"
-						class="flex items-center gap-2 py-1.5 px-2 rounded-lg text-xs font-mono transition-colors <?php echo $is_stock_active ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
+						class="flex items-center gap-2 py-2 px-2.5 rounded-lg text-sm font-medium transition-colors <?php echo $is_stock_active ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
 					>
-						<i class="<?php echo esc_attr( $opt['ico'] ); ?> text-xs"></i>
+						<i class="<?php echo esc_attr( $opt['ico'] ); ?> text-base"></i>
 						<span><?php echo esc_html( $opt['label'] ); ?></span>
 					</a>
 				<?php endforeach; ?>
@@ -445,17 +445,17 @@ function raka_render_shop_active_filter_pills(): void {
 	}
 	?>
 	<div id="shop-active-filter-pills-bar" class="flex items-center flex-wrap gap-2 pb-6 pt-2">
-		<span id="shop-active-filter-label" class="text-[11px] font-mono uppercase text-neutral-400 dark:text-neutral-500 mr-1">Active:</span>
+		<span id="shop-active-filter-label" class="text-xs font-mono uppercase text-neutral-400 dark:text-neutral-500 mr-1">Active:</span>
 
 		<!-- Search Pill -->
 		<?php if ( ! empty( $state['search'] ) ) : ?>
 			<a
 				id="pill-active-search"
 				href="<?php echo esc_url( remove_query_arg( 'filter_q' ) ); ?>"
-				class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
+				class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs sm:text-sm font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
 			>
 				<span>Keyword: <?php echo esc_html( $state['search'] ); ?></span>
-				<i class="ri-close-line text-xs opacity-60 group-hover:opacity-100"></i>
+				<i class="ri-close-line text-sm opacity-60 group-hover:opacity-100"></i>
 			</a>
 		<?php endif; ?>
 
@@ -467,10 +467,10 @@ function raka_render_shop_active_filter_pills(): void {
 			<a
 				id="pill-active-cat-<?php echo esc_attr( $cat_slug ); ?>"
 				href="<?php echo esc_url( raka_get_filter_toggle_url( 'filter_cat', $cat_slug ) ); ?>"
-				class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
+				class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs sm:text-sm font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
 			>
 				<span>Cat: <?php echo esc_html( $cat_name ); ?></span>
-				<i class="ri-close-line text-xs opacity-60 group-hover:opacity-100"></i>
+				<i class="ri-close-line text-sm opacity-60 group-hover:opacity-100"></i>
 			</a>
 		<?php endforeach; ?>
 
@@ -482,10 +482,10 @@ function raka_render_shop_active_filter_pills(): void {
 			<a
 				id="pill-active-brand-<?php echo esc_attr( $brand_slug ); ?>"
 				href="<?php echo esc_url( raka_get_filter_toggle_url( 'filter_brand', $brand_slug ) ); ?>"
-				class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
+				class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs sm:text-sm font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
 			>
 				<span>Brand: <?php echo esc_html( $brand_name ); ?></span>
-				<i class="ri-close-line text-xs opacity-60 group-hover:opacity-100"></i>
+				<i class="ri-close-line text-sm opacity-60 group-hover:opacity-100"></i>
 			</a>
 		<?php endforeach; ?>
 
@@ -494,10 +494,10 @@ function raka_render_shop_active_filter_pills(): void {
 			<a
 				id="pill-active-price"
 				href="<?php echo esc_url( remove_query_arg( [ 'min_price', 'max_price' ] ) ); ?>"
-				class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
+				class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs sm:text-sm font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
 			>
 				<span>Price: ฿<?php echo esc_html( (string) ( $state['min_price'] ?? 0 ) ); ?> - ฿<?php echo esc_html( $state['max_price'] ? (string) $state['max_price'] : 'Max' ); ?></span>
-				<i class="ri-close-line text-xs opacity-60 group-hover:opacity-100"></i>
+				<i class="ri-close-line text-sm opacity-60 group-hover:opacity-100"></i>
 			</a>
 		<?php endif; ?>
 
@@ -506,10 +506,10 @@ function raka_render_shop_active_filter_pills(): void {
 			<a
 				id="pill-active-stock"
 				href="<?php echo esc_url( remove_query_arg( 'filter_stock' ) ); ?>"
-				class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
+				class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-neutral-900 dark:text-white text-xs sm:text-sm font-mono uppercase tracking-wider hover:bg-red-500 hover:text-white transition-colors group"
 			>
 				<span>Status: <?php echo esc_html( ucfirst( $state['stock'] ) ); ?></span>
-				<i class="ri-close-line text-xs opacity-60 group-hover:opacity-100"></i>
+				<i class="ri-close-line text-sm opacity-60 group-hover:opacity-100"></i>
 			</a>
 		<?php endif; ?>
 
@@ -517,7 +517,7 @@ function raka_render_shop_active_filter_pills(): void {
 		<a
 			id="pill-active-clear-all"
 			href="<?php echo esc_url( $shop_link ); ?>"
-			class="text-[11px] font-mono uppercase text-red-500 hover:underline pl-2"
+			class="text-xs font-mono font-semibold uppercase text-red-500 hover:underline pl-2"
 		>
 			Clear All
 		</a>
@@ -543,7 +543,7 @@ function raka_render_shop_sort_dropdown(): void {
 		<select
 			id="shop-sort-select"
 			onchange="window.location.href=this.value"
-			class="h-9 pl-3 pr-8 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs font-mono uppercase tracking-wider text-neutral-900 dark:text-white cursor-pointer focus:outline-none appearance-none transition-colors"
+			class="h-10 pl-3.5 pr-8 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono uppercase tracking-wider text-neutral-900 dark:text-white cursor-pointer focus:outline-none appearance-none transition-colors"
 		>
 			<?php foreach ( $orderby_options as $key => $label ) :
 				$sort_url = add_query_arg( 'orderby', $key );

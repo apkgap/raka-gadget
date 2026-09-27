@@ -31,7 +31,7 @@ $all_cats = get_terms( [
 				<h1 id="archive-title-heading" class="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-neutral-900 dark:text-white font-hn">
 					<?php echo esc_html( $archive_title ); ?>
 				</h1>
-				<p id="archive-desc-text" class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-light max-w-md font-hn leading-relaxed">
+				<p id="archive-desc-text" class="text-sm sm:text-base text-neutral-500 dark:text-neutral-400 font-light max-w-md font-hn leading-relaxed">
 					<?php echo esc_html( $archive_desc ?: 'Esports tournament gear, Hall Effect magnetic keyboards, and ultra-lightweight wireless mice.' ); ?>
 				</p>
 			</div>
@@ -51,7 +51,7 @@ $all_cats = get_terms( [
 				<!-- Top Bar: Result Count, Mobile Filter Trigger, and Sort Dropdown -->
 				<div id="shop-toolbar-bar" class="flex items-center justify-between gap-4 pb-4 border-b border-black/10 dark:border-white/10 mb-4">
 					<!-- Result Count -->
-					<div id="shop-result-count" class="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+					<div id="shop-result-count" class="text-xs sm:text-sm font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
 						<?php
 						global $wp_query;
 						$total_products = (int) $wp_query->found_posts;
@@ -66,15 +66,15 @@ $all_cats = get_terms( [
 							id="btn-mobile-filter-open"
 							type="button"
 							onclick="window.rakaOpenMobileFilters()"
-							class="lg:hidden inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-xs font-mono font-semibold uppercase tracking-wider shadow-sm active:scale-95 transition-transform cursor-pointer"
+							class="lg:hidden inline-flex items-center gap-1.5 h-10 px-4 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-xs sm:text-sm font-mono font-semibold uppercase tracking-wider shadow-sm active:scale-95 transition-transform cursor-pointer"
 						>
-							<i id="btn-mobile-filter-ico" class="ri-filter-3-line text-xs"></i>
+							<i id="btn-mobile-filter-ico" class="ri-filter-3-line text-sm"></i>
 							<span id="btn-mobile-filter-txt">FILTERS</span>
 							<?php
 							$f_state = raka_get_current_filter_state();
 							if ( $f_state['active_count'] > 0 ) :
 							?>
-								<span id="btn-mobile-filter-num" class="w-4 h-4 rounded-full bg-white text-black dark:bg-black dark:text-white text-[9px] font-mono font-bold flex items-center justify-center">
+								<span id="btn-mobile-filter-num" class="w-4 h-4 rounded-full bg-white text-black dark:bg-black dark:text-white text-[10px] font-mono font-bold flex items-center justify-center">
 									<?php echo (int) $f_state['active_count']; ?>
 								</span>
 							<?php endif; ?>
@@ -111,13 +111,13 @@ $all_cats = get_terms( [
 					<div id="archive-no-products" class="py-24 text-center space-y-4">
 						<i id="icon-empty-box" class="ri-inbox-line text-4xl text-neutral-400"></i>
 						<h3 id="no-products-title" class="text-xl font-bold uppercase tracking-wider font-hn">No products match your filter</h3>
-						<p id="no-products-desc" class="text-xs text-neutral-400 font-mono">Try clearing active filters or explore other categories.</p>
+						<p id="no-products-desc" class="text-sm text-neutral-400 font-mono">Try clearing active filters or explore other categories.</p>
 						<a
 							id="btn-no-products-reset"
 							href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' ) ); ?>"
-							class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-mono uppercase tracking-wider font-bold hover:scale-105 transition-transform"
+							class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs sm:text-sm font-mono uppercase tracking-wider font-bold hover:scale-105 transition-transform"
 						>
-							<i id="btn-no-products-ico" class="ri-refresh-line text-xs"></i>
+							<i id="btn-no-products-ico" class="ri-refresh-line text-sm"></i>
 							<span id="btn-no-products-txt">RESET ALL FILTERS</span>
 						</a>
 					</div>
@@ -150,14 +150,14 @@ $all_cats = get_terms( [
 		<!-- Top Bar -->
 		<div id="mobile-filters-top" class="flex items-center justify-between pb-4 border-b border-black/10 dark:border-white/10 flex-shrink-0">
 			<div id="mobile-filters-heading" class="flex items-center gap-2">
-				<i id="mobile-filters-heading-ico" class="ri-filter-3-line text-sm text-neutral-900 dark:text-white"></i>
-				<span id="mobile-filters-heading-txt" class="text-xs font-mono font-bold uppercase tracking-[0.2em] text-neutral-900 dark:text-white">FILTER CATALOGUE</span>
+				<i id="mobile-filters-heading-ico" class="ri-filter-3-line text-base text-neutral-900 dark:text-white"></i>
+				<span id="mobile-filters-heading-txt" class="text-sm font-mono font-bold uppercase tracking-[0.15em] text-neutral-900 dark:text-white">FILTER CATALOGUE</span>
 			</div>
 			<button
 				id="btn-mobile-filter-close"
 				type="button"
 				onclick="window.rakaCloseMobileFilters()"
-				class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-sm hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
+				class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-base hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
 			>
 				<i id="btn-mobile-filter-close-ico" class="ri-close-line"></i>
 			</button>
@@ -174,7 +174,7 @@ $all_cats = get_terms( [
 				id="btn-mobile-filter-apply"
 				type="button"
 				onclick="window.rakaCloseMobileFilters()"
-				class="w-full h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-xs font-mono font-bold uppercase tracking-wider shadow-md active:scale-95 transition-transform cursor-pointer"
+				class="w-full h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-sm font-mono font-bold uppercase tracking-wider shadow-md active:scale-95 transition-transform cursor-pointer"
 			>
 				APPLY FILTERS
 			</button>

@@ -163,9 +163,9 @@ a.added_to_cart {
 .yoast-breadcrumbs,
 #breadcrumbs {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-	font-size: 0.75rem;
-	line-height: 1rem;
-	letter-spacing: 0.15em;
+	font-size: 0.8125rem;
+	line-height: 1.25rem;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
 	color: #737373;
 	display: flex;
