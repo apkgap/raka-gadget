@@ -119,15 +119,9 @@ $all_cats = get_terms( [
 				<?php endwhile; ?>
 			</div>
 
-			<!-- Pagination -->
-			<div id="archive-pagination" class="mt-16 flex items-center justify-center gap-2">
-				<?php
-				echo paginate_links( [
-					'prev_text' => '<i class="ri-arrow-left-line"></i>',
-					'next_text' => '<i class="ri-arrow-right-line"></i>',
-					'type'      => 'list',
-				] );
-				?>
+			<!-- Minimal Pagination -->
+			<div id="archive-pagination-container" class="mt-12">
+				<?php raka_render_pagination(); ?>
 			</div>
 		<?php else : ?>
 			<div id="archive-no-products" class="py-24 text-center space-y-4">

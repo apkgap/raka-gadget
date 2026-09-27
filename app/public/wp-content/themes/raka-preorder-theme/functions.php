@@ -85,3 +85,9 @@ remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 require_once get_template_directory() . '/inc/helpers.php';
 require_once get_template_directory() . '/inc/theme-options.php';
 
+/**
+ * Replace WooCommerce default pagination with OBSIDIAN Ultra-Minimal Pagination
+ */
+remove_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 10 );
+add_action( 'woocommerce_after_shop_loop', 'raka_render_woocommerce_pagination', 10 );
+
