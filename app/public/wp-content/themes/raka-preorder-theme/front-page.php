@@ -77,21 +77,22 @@ $hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 		<!-- 5. Dynamic Repeater Product Cards (Scroll Popup Overlay Cards) -->
 		<?php foreach ( $hero_cards as $idx => $card ) :
 			$pos = $card['position'] ?? 'left';
-			$pos_classes = 'items-start justify-start p-6 md:p-12 lg:p-16 pt-20 md:pt-28';
+			// Generous top clearance so cards never collide with or slide under the fixed header
+			$pos_classes = 'items-start justify-start p-6 md:p-12 lg:p-16 pt-28 md:pt-36 lg:pt-40';
 			if ( 'right' === $pos ) {
-				$pos_classes = 'items-start justify-end p-6 md:p-12 lg:p-16 pt-20 md:pt-28';
+				$pos_classes = 'items-start justify-end p-6 md:p-12 lg:p-16 pt-28 md:pt-36 lg:pt-40';
 			} elseif ( 'center' === $pos ) {
-				$pos_classes = 'items-center justify-center p-6 md:p-12';
+				$pos_classes = 'items-center justify-center p-6 md:p-12 pt-28 md:pt-36';
 			} elseif ( 'bottom_left' === $pos ) {
-				$pos_classes = 'items-end justify-start p-6 md:p-12 lg:p-16 pb-20 md:pb-28';
+				$pos_classes = 'items-end justify-start p-6 md:p-12 lg:p-16 pb-16 md:pb-24';
 			} elseif ( 'bottom_right' === $pos ) {
-				$pos_classes = 'items-end justify-end p-6 md:p-12 lg:p-16 pb-20 md:pb-28';
+				$pos_classes = 'items-end justify-end p-6 md:p-12 lg:p-16 pb-16 md:pb-24';
 			}
 		?>
 			<?php if ( ! empty( $card['show_custom_text'] ) ) : ?>
 				<!-- Custom Statement / Atmospheric Text Card Mode -->
-				<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
-					<<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a href="' . esc_url( $card['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block max-w-lg w-full p-6 md:p-8 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
+				<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; visibility: hidden; transform: translate3d(0, 20px, 0);">
+					<<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a href="' . esc_url( $card['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block max-w-md md:max-w-lg w-full p-6 md:p-8 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
 						<?php if ( ! empty( $card['tag'] ) ) : ?>
 							<div class="text-[11px] tracking-[0.25em] uppercase text-black/50 dark:text-white/50 mb-3 font-hn"><?php echo esc_html( $card['tag'] ); ?></div>
 						<?php endif; ?>
@@ -112,8 +113,8 @@ $hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 				</div>
 			<?php else : ?>
 				<!-- WooCommerce Product Card Mode with Direct Add to Cart Action -->
-				<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
-					<div class="pointer-events-auto block max-w-lg w-full p-6 md:p-7 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
+				<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; visibility: hidden; transform: translate3d(0, 20px, 0);">
+					<div class="pointer-events-auto block max-w-md md:max-w-lg w-full p-6 md:p-7 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
 						<!-- Header: Tag + Price -->
 						<div class="flex items-center justify-between gap-3 mb-4">
 							<?php if ( ! empty( $card['tag'] ) ) : ?>
@@ -307,45 +308,72 @@ $hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 		}
 
 		function applyPositions(prog, scrollPx) {
+			// 1. Hero Main Title & Overlay PNG (Intro Slot)
+			const totalSlots = Math.max(2, totalCards + 1);
+			const introSlotLen = 1 / totalSlots;
+
 			if (heroSec1) {
-				const heroFactor = totalCards > 1 ? Math.max(4, (totalCards + 1) * 1.5) : 5;
-				const heroScroll = Math.max(0, 1 - prog * heroFactor);
-				heroSec1.style.opacity = heroScroll.toFixed(3);
-				heroSec1.style.transform = `translate3d(0, ${(1 - heroScroll) * -30}%, 0)`;
+				const introProg = Math.min(1, prog / (introSlotLen * 0.7));
+				const heroOpacity = Math.max(0, 1 - introProg);
+				heroSec1.style.opacity = heroOpacity.toFixed(3);
+				heroSec1.style.transform = `translate3d(0, ${(introProg * -25).toFixed(1)}px, 0)`;
+				heroSec1.style.visibility = heroOpacity > 0.01 ? 'visible' : 'hidden';
 			}
 
 			if (overlayPng) {
-				const pngFactor = totalCards > 1 ? Math.max(3, (totalCards + 1) * 1.2) : 4;
-				const pngOpacity = Math.max(0, 1 - prog * pngFactor);
+				const pngProg = Math.min(1, prog / (introSlotLen * 0.9));
+				const pngOpacity = Math.max(0, 1 - pngProg);
 				overlayPng.style.opacity = pngOpacity.toFixed(3);
+				overlayPng.style.visibility = pngOpacity > 0.01 ? 'visible' : 'hidden';
 			}
 
+			// 2. Sequential Cards Scrubbing (Strictly ONE active card slot at a time)
 			if (totalCards > 0) {
-				const step = 1 / (totalCards + 1);
+				const cardProgressStart = introSlotLen * 0.85;
+				const cardProgressRange = 1 - cardProgressStart;
+				const cardSlotSize = cardProgressRange / totalCards;
+
 				subSecs.forEach((sec, idx) => {
 					if (!sec) return;
-					const centerProg = (idx + 1) * step;
-					const span = step * 0.95;
-					const local = (prog - centerProg) / span;
 
-					const visible = Math.abs(local) <= 1;
-					let offsetPercent = 100;
-					let opacity = 0;
+					const mySlotStart = cardProgressStart + (idx * cardSlotSize);
+					const mySlotEnd   = mySlotStart + cardSlotSize;
 
-					if (local < -1) {
-						offsetPercent = 80;
-						opacity = 0;
-					} else if (local > 1) {
-						offsetPercent = -80;
-						opacity = 0;
-					} else {
-						offsetPercent = local * -60;
-						opacity = Math.max(0, 1 - Math.pow(local, 2));
+					// If scroll progress is outside this card's exclusive slot, hide it immediately
+					if (prog < mySlotStart || prog >= mySlotEnd) {
+						sec.style.opacity = '0';
+						sec.style.visibility = 'hidden';
+						sec.style.pointerEvents = 'none';
+						sec.style.transform = 'translate3d(0, 15px, 0)';
+						return;
 					}
 
-					sec.style.transform = `translate3d(0, ${offsetPercent.toFixed(1)}px, 0)`;
+					// Local progress within this card's dedicated slot [0.0 -> 1.0]
+					const local = (prog - mySlotStart) / cardSlotSize;
+
+					let opacity = 0;
+					let translateY = 0;
+
+					if (local < 0.2) {
+						// Enter phase (0.0 -> 0.2): smooth fade in and subtle rise
+						const enterT = local / 0.2;
+						opacity = enterT;
+						translateY = (1 - enterT) * 15;
+					} else if (local > 0.8) {
+						// Exit phase (0.8 -> 1.0): smooth fade out and subtle exit
+						const exitT = (local - 0.8) / 0.2;
+						opacity = 1 - exitT;
+						translateY = exitT * -15;
+					} else {
+						// Steady active phase (0.2 -> 0.8): 100% full opacity, resting in place
+						opacity = 1;
+						translateY = 0;
+					}
+
+					sec.style.visibility = 'visible';
 					sec.style.opacity = opacity.toFixed(3);
-					sec.style.pointerEvents = opacity > 0.2 ? 'auto' : 'none';
+					sec.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0)`;
+					sec.style.pointerEvents = opacity > 0.4 ? 'auto' : 'none';
 				});
 			}
 		}
