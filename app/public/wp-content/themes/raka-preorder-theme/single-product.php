@@ -11,6 +11,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
+/**
+ * Helper to resolve realistic CSS hex or gradient styles from color names
+ */
+function raka_get_swatch_css( $raw_name ) {
+	$c = strtolower( trim( html_entity_decode( (string) $raw_name, ENT_QUOTES, 'UTF-8' ) ) );
+	$c = preg_replace( '/[^\p{L}\p{N}\s\-]/u', '', $c );
+
+	if ( strpos( $c, 'black' ) !== false || strpos( $c, 'obsidian' ) !== false || strpos( $c, 'eon' ) !== false || strpos( $c, 'blackberry' ) !== false || strpos( $c, 'gunmetal' ) !== false ) {
+		return 'background-color: #121212; border-color: #383838;';
+	}
+	if ( strpos( $c, 'white' ) !== false || strpos( $c, 'polar' ) !== false || strpos( $c, 'ice' ) !== false || strpos( $c, 'prime' ) !== false || strpos( $c, 'arctic' ) !== false || strpos( $c, 'pearl' ) !== false ) {
+		return 'background-color: #F8F9FA; border: 1.5px solid #D1D5DB;';
+	}
+	if ( strpos( $c, 'yellow' ) !== false || strpos( $c, 'lemon' ) !== false ) {
+		return 'background-color: #FACC15; border-color: #EAB308;';
+	}
+	if ( strpos( $c, 'pink' ) !== false || strpos( $c, 'sakura' ) !== false || strpos( $c, 'blush' ) !== false ) {
+		return 'background-color: #F472B6; border-color: #EC4899;';
+	}
+	if ( strpos( $c, 'purple' ) !== false || strpos( $c, 'lilac' ) !== false || strpos( $c, 'violet' ) !== false ) {
+		return 'background-color: #A855F7; border-color: #9333EA;';
+	}
+	if ( strpos( $c, 'orange' ) !== false || strpos( $c, 'sunset' ) !== false ) {
+		return 'background-color: #FB923C; border-color: #EA580C;';
+	}
+	if ( strpos( $c, 'red' ) !== false || strpos( $c, 'crimson' ) !== false ) {
+		return 'background-color: #EF4444; border-color: #DC2626;';
+	}
+	if ( strpos( $c, 'blue' ) !== false || strpos( $c, 'verge' ) !== false || strpos( $c, 'cyan' ) !== false || strpos( $c, 'sky' ) !== false || strpos( $c, 'periwinkle' ) !== false ) {
+		return 'background-color: #38BDF8; border-color: #0284C7;';
+	}
+	if ( strpos( $c, 'silver' ) !== false || strpos( $c, 'metal' ) !== false || strpos( $c, 'gray' ) !== false || strpos( $c, 'grey' ) !== false ) {
+		return 'background-color: #94A3B8; border-color: #64748B;';
+	}
+	if ( strpos( $c, 'sand' ) !== false || strpos( $c, 'dune' ) !== false || strpos( $c, 'beige' ) !== false ) {
+		return 'background-color: #D4B996; border-color: #BCA380;';
+	}
+	if ( strpos( $c, 'green' ) !== false || strpos( $c, 'mint' ) !== false ) {
+		return 'background-color: #10B981; border-color: #059669;';
+	}
+
+	return 'background: linear-gradient(135deg, #4A5568 0%, #2D3748 100%); border-color: #4A5568;';
+}
+
 while ( have_posts() ) :
 	the_post();
 	global $product;
@@ -18,15 +62,15 @@ while ( have_posts() ) :
 		$product = wc_get_product( get_the_ID() );
 	}
 
-	$product_id        = $product->get_id();
-	$product_title     = $product->get_name();
-	$product_type      = $product->get_type();
+	$product_id         = $product->get_id();
+	$product_title      = $product->get_name();
+	$product_type       = $product->get_type();
 	$product_price_html = $product->get_price_html();
-	$is_variable       = $product->is_type( 'variable' );
-	$image_id          = $product->get_image_id();
-	$main_img_url      = $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : wc_placeholder_img_src( 'full' );
-	$gallery_ids       = $product->get_gallery_image_ids();
-	$all_images        = array_unique( array_filter( array_merge( [ $image_id ], $gallery_ids ) ) );
+	$is_variable        = $product->is_type( 'variable' );
+	$image_id           = $product->get_image_id();
+	$main_img_url       = $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : wc_placeholder_img_src( 'full' );
+	$gallery_ids        = $product->get_gallery_image_ids();
+	$all_images         = array_unique( array_filter( array_merge( [ $image_id ], $gallery_ids ) ) );
 
 	$brands     = wp_get_post_terms( $product_id, 'product_brand' );
 	$brand_name = ( ! is_wp_error( $brands ) && ! empty( $brands ) ) ? $brands[0]->name : 'ATK Gear';
@@ -35,7 +79,6 @@ while ( have_posts() ) :
 	$cat_name = ( ! is_wp_error( $cats ) && ! empty( $cats ) ) ? $cats[0]->name : 'Peripherals';
 	$cat_link = ( ! is_wp_error( $cats ) && ! empty( $cats ) ) ? get_term_link( $cats[0] ) : home_url( '/shop' );
 
-	// Pre-fetch available variations data for JS interactivity
 	$available_variations_json = '[]';
 	if ( $is_variable ) {
 		$variations_data = $product->get_available_variations();
@@ -61,7 +104,7 @@ while ( have_posts() ) :
 			<!-- Left Column: Gallery & Image Display -->
 			<div id="product-gallery-col" class="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 sm:gap-6 sticky top-28">
 				
-				<!-- Thumbnails Strip (Left on Desktop, Bottom on Mobile) -->
+				<!-- Thumbnails Strip -->
 				<?php if ( count( $all_images ) > 1 ) : ?>
 					<div id="product-thumbnails-list" class="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:max-h-[560px] pb-2 md:pb-0 scrollbar-none">
 						<?php
@@ -139,40 +182,70 @@ while ( have_posts() ) :
 						<?php
 						$attributes = $product->get_variation_attributes();
 						foreach ( $attributes as $attribute_name => $options ) :
-							$attr_label = wc_attribute_label( $attribute_name );
-							$attr_slug  = sanitize_title( $attribute_name );
+							$attr_label   = wc_attribute_label( $attribute_name );
+							$attr_slug    = sanitize_title( $attribute_name );
+							$is_color_attr = ( strpos( strtolower( $attr_slug ), 'color' ) !== false || strpos( strtolower( $attr_slug ), 'colour' ) !== false );
 						?>
 							<div id="attr-group-<?php echo esc_attr( $attr_slug ); ?>" class="space-y-3">
 								<div id="attr-label-wrap-<?php echo esc_attr( $attr_slug ); ?>" class="flex items-center justify-between text-xs uppercase tracking-[0.2em] font-mono">
 									<span id="attr-title-<?php echo esc_attr( $attr_slug ); ?>" class="font-medium text-neutral-800 dark:text-neutral-200"><?php echo esc_html( $attr_label ); ?>:</span>
-									<span id="attr-selected-val-<?php echo esc_attr( $attr_slug ); ?>" class="text-neutral-500 dark:text-neutral-400 font-normal"><?php echo esc_html( $options[0] ?? '' ); ?></span>
+									<span id="attr-selected-val-<?php echo esc_attr( $attr_slug ); ?>" class="text-neutral-900 dark:text-neutral-100 font-semibold"><?php echo esc_html( $options[0] ?? '' ); ?></span>
 								</div>
 
-								<!-- Button Pills for Choices -->
-								<div id="attr-options-<?php echo esc_attr( $attr_slug ); ?>" class="flex flex-wrap gap-2.5">
-									<?php
-									foreach ( $options as $opt_idx => $option_val ) :
-										$is_active = ( $opt_idx === 0 );
-										$btn_cls = $is_active
-											? 'bg-black text-white dark:bg-white dark:text-black border-black dark:border-white shadow-sm'
-											: 'bg-transparent text-neutral-700 dark:text-neutral-300 border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white';
-									?>
-										<button
-											id="btn-opt-<?php echo esc_attr( $attr_slug . '-' . sanitize_title( $option_val ) ); ?>"
-											type="button"
-											data-attr="<?php echo esc_attr( $attr_slug ); ?>"
-											data-val="<?php echo esc_attr( $option_val ); ?>"
-											onclick="window.onVariationOptionSelect(this)"
-											class="variation-pill-btn px-4 py-2.5 rounded-lg border text-xs sm:text-sm uppercase tracking-wider font-mono font-medium transition-all duration-200 cursor-pointer focus:outline-none <?php echo esc_attr( $btn_cls ); ?>"
-										>
-											<?php echo esc_html( $option_val ); ?>
-										</button>
-									<?php endforeach; ?>
-								</div>
+								<?php if ( $is_color_attr ) : ?>
+									<!-- ── CIRCLE COLOR SWATCHES ── -->
+									<div id="attr-options-<?php echo esc_attr( $attr_slug ); ?>" class="flex flex-wrap items-center gap-3.5 pt-1">
+										<?php
+										foreach ( $options as $opt_idx => $option_val ) :
+											$is_active    = ( $opt_idx === 0 );
+											$swatch_style = raka_get_swatch_css( $option_val );
+											$active_ring  = $is_active
+												? 'ring-2 ring-black dark:ring-white ring-offset-2 ring-offset-cement dark:ring-offset-obsidian scale-110 shadow-md'
+												: 'opacity-85 hover:opacity-100 hover:scale-105';
+										?>
+											<button
+												id="btn-opt-<?php echo esc_attr( $attr_slug . '-' . sanitize_title( $option_val ) ); ?>"
+												type="button"
+												data-attr="<?php echo esc_attr( $attr_slug ); ?>"
+												data-val="<?php echo esc_attr( $option_val ); ?>"
+												title="<?php echo esc_attr( $option_val ); ?>"
+												onclick="window.onVariationOptionSelect(this)"
+												class="variation-color-circle relative w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all duration-200 cursor-pointer focus:outline-none flex items-center justify-center p-0.5 <?php echo esc_attr( $active_ring ); ?>"
+												style="<?php echo esc_attr( $swatch_style ); ?>"
+											>
+												<span id="dot-check-<?php echo esc_attr( $attr_slug . '-' . sanitize_title( $option_val ) ); ?>" class="swatch-check-icon <?php echo $is_active ? 'opacity-100' : 'opacity-0'; ?> transition-opacity text-sm <?php echo ( stripos( $swatch_style, '#F8F9FA' ) !== false || stripos( $swatch_style, '#FACC15' ) !== false ) ? 'text-black' : 'text-white'; ?>">
+													<i id="icon-check-<?php echo esc_attr( $attr_slug . '-' . sanitize_title( $option_val ) ); ?>" class="ri-check-line font-bold"></i>
+												</span>
+											</button>
+										<?php endforeach; ?>
+									</div>
+								<?php else : ?>
+									<!-- ── STANDARD BUTTON PILLS FOR MODEL / SWITCHES ── -->
+									<div id="attr-options-<?php echo esc_attr( $attr_slug ); ?>" class="flex flex-wrap gap-2.5">
+										<?php
+										foreach ( $options as $opt_idx => $option_val ) :
+											$is_active = ( $opt_idx === 0 );
+											$btn_cls = $is_active
+												? 'bg-black text-white dark:bg-white dark:text-black border-black dark:border-white shadow-sm'
+												: 'bg-transparent text-neutral-700 dark:text-neutral-300 border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white';
+										?>
+											<button
+												id="btn-opt-<?php echo esc_attr( $attr_slug . '-' . sanitize_title( $option_val ) ); ?>"
+												type="button"
+												data-attr="<?php echo esc_attr( $attr_slug ); ?>"
+												data-val="<?php echo esc_attr( $option_val ); ?>"
+												onclick="window.onVariationOptionSelect(this)"
+												class="variation-pill-btn px-4 py-2.5 rounded-lg border text-xs sm:text-sm uppercase tracking-wider font-mono font-medium transition-all duration-200 cursor-pointer focus:outline-none <?php echo esc_attr( $btn_cls ); ?>"
+											>
+												<?php echo esc_html( $option_val ); ?>
+											</button>
+										<?php endforeach; ?>
+									</div>
+								<?php endif; ?>
 							</div>
 						<?php endforeach; ?>
 
-						<!-- Hidden standard WooCommerce form elements for add-to-cart submission -->
+						<!-- Hidden standard WooCommerce form elements -->
 						<input id="hidden-variation-id" type="hidden" name="variation_id" value="" />
 						<input id="hidden-product-id" type="hidden" name="product_id" value="<?php echo esc_attr( (string) $product_id ); ?>" />
 					</form>
@@ -193,7 +266,7 @@ while ( have_posts() ) :
 							</button>
 						</div>
 
-						<!-- Add to Cart / Pre-Order Button -->
+						<!-- Add to Cart Button -->
 						<button
 							id="btn-add-to-cart"
 							type="button"
@@ -205,7 +278,7 @@ while ( have_posts() ) :
 						</button>
 					</div>
 
-					<!-- Direct Pre-Order / Buy Now Secondary Action -->
+					<!-- Direct Pre-Order / Inquire Action -->
 					<div id="product-secondary-actions" class="flex items-center gap-3">
 						<a
 							id="btn-direct-inquire"
@@ -369,23 +442,42 @@ while ( have_posts() ) :
 		qtyInput.value = val;
 	};
 
-	// 3. Variation Option Select Handler
+	// 3. Variation Option Select Handler (Circles & Pills)
 	window.onVariationOptionSelect = function(btn) {
 		const attrSlug = btn.getAttribute('data-attr');
 		const val = btn.getAttribute('data-val');
-
-		// Toggle active classes on buttons in the same attribute group
 		const parentGroup = document.getElementById('attr-options-' + attrSlug);
-		if (parentGroup) {
-			parentGroup.querySelectorAll('.variation-pill-btn').forEach(b => {
-				b.classList.remove('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black', 'border-black', 'dark:border-white', 'shadow-sm');
-				b.classList.add('bg-transparent', 'text-neutral-700', 'dark:text-neutral-300', 'border-neutral-300', 'dark:border-neutral-700');
-			});
-		}
-		btn.classList.remove('bg-transparent', 'text-neutral-700', 'dark:text-neutral-300', 'border-neutral-300', 'dark:border-neutral-700');
-		btn.classList.add('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black', 'border-black', 'dark:border-white', 'shadow-sm');
 
-		// Update label
+		if (parentGroup) {
+			// Handle circle color swatches
+			const circles = parentGroup.querySelectorAll('.variation-color-circle');
+			if (circles.length > 0) {
+				circles.forEach(b => {
+					b.classList.remove('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-cement', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
+					b.classList.add('opacity-85');
+					const check = b.querySelector('.swatch-check-icon');
+					if (check) check.classList.replace('opacity-100', 'opacity-0');
+				});
+
+				btn.classList.remove('opacity-85');
+				btn.classList.add('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-cement', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
+				const activeCheck = btn.querySelector('.swatch-check-icon');
+				if (activeCheck) activeCheck.classList.replace('opacity-0', 'opacity-100');
+			}
+
+			// Handle regular text pill buttons
+			const pills = parentGroup.querySelectorAll('.variation-pill-btn');
+			if (pills.length > 0) {
+				pills.forEach(b => {
+					b.classList.remove('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black', 'border-black', 'dark:border-white', 'shadow-sm');
+					b.classList.add('bg-transparent', 'text-neutral-700', 'dark:text-neutral-300', 'border-neutral-300', 'dark:border-neutral-700');
+				});
+				btn.classList.remove('bg-transparent', 'text-neutral-700', 'dark:text-neutral-300', 'border-neutral-300', 'dark:border-neutral-700');
+				btn.classList.add('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black', 'border-black', 'dark:border-white', 'shadow-sm');
+			}
+		}
+
+		// Update Selected Attribute Value Label in Real-time
 		const labelEl = document.getElementById('attr-selected-val-' + attrSlug);
 		if (labelEl) labelEl.textContent = val;
 
@@ -396,9 +488,9 @@ while ( have_posts() ) :
 	function matchActiveVariation() {
 		if (!form || !variationsData.length) return;
 
-		// Collect currently selected attributes
+		// Collect currently selected attributes from active circles or pills
 		const selected = {};
-		form.querySelectorAll('.variation-pill-btn.bg-black, .variation-pill-btn.dark\\:bg-white').forEach(btn => {
+		form.querySelectorAll('.variation-color-circle.ring-2, .variation-pill-btn.bg-black, .variation-pill-btn.dark\\:bg-white').forEach(btn => {
 			const attr = btn.getAttribute('data-attr');
 			const val = btn.getAttribute('data-val');
 			selected['attribute_' + attr] = val;
@@ -409,7 +501,9 @@ while ( have_posts() ) :
 			return Object.keys(v.attributes).every(k => {
 				const requiredVal = v.attributes[k];
 				if (!requiredVal) return true; // Any value matches
-				return selected[k] === requiredVal || selected['attribute_' + k] === requiredVal;
+				const cleanReq = requiredVal.trim();
+				const curVal = (selected[k] || selected['attribute_' + k] || '').trim();
+				return curVal === cleanReq;
 			});
 		}) || variationsData[0];
 
@@ -467,7 +561,6 @@ while ( have_posts() ) :
 			}
 		})
 		.catch(err => {
-			// Fallback direct link
 			window.location.href = '<?php echo esc_url( wc_get_cart_url() ); ?>?add-to-cart=' + (varId || pId) + '&quantity=' + qty;
 		});
 	};
