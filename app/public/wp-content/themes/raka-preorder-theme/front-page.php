@@ -139,7 +139,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 
 <!-- ── ScrollVideoHero Component ── -->
 <section id="scroll-video-hero-section" class="relative" style="height: <?php echo esc_attr( $hero_section_height ); ?>;">
-	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-[#eeedea] dark:bg-[#080808] theme-transition gpu-accel flex items-center justify-center">
+	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-white dark:bg-obsidian theme-transition gpu-accel">
 
 		<!-- 1. Video Layer -->
 		<video
