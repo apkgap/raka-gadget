@@ -59,11 +59,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<a
 						id="raka-nav-preorder-btn"
 						href="<?php echo esc_url( home_url( '/#hero-pinned-viewport' ) ); ?>"
-						class="group inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold tracking-wider uppercase text-neutral-900 dark:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-105 font-hn cursor-pointer shadow-xs"
+						class="group relative inline-flex items-center gap-2 sm:gap-2.5 pl-1.5 pr-3 sm:pl-2 sm:pr-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-xs font-bold tracking-wider uppercase text-neutral-900 dark:text-white bg-white/80 dark:bg-neutral-900/80 hover:bg-white dark:hover:bg-neutral-800 backdrop-blur-xl border border-black/10 hover:border-red-500/50 dark:border-white/15 dark:hover:border-red-500/50 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 font-hn cursor-pointer"
 						aria-label="<?php esc_attr_e( 'Pre-Order Catalog', 'raka-preorder-theme' ); ?>"
 					>
-						<span id="raka-nav-preorder-dot" class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-						<span id="raka-nav-preorder-text"><?php esc_html_e( 'Pre-Order', 'raka-preorder-theme' ); ?></span>
+						<!-- Glowing Icon Badge -->
+						<span id="raka-nav-preorder-icon-wrap" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-xs sm:text-sm shadow-md shadow-red-600/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+							<i id="raka-nav-preorder-ico" class="ri-flashlight-fill"></i>
+						</span>
+						<!-- Text & Accent -->
+						<span id="raka-nav-preorder-text" class="group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors"><?php esc_html_e( 'Pre-Order', 'raka-preorder-theme' ); ?></span>
+						<!-- Arrow Indicator -->
+						<i id="raka-nav-preorder-arrow" class="ri-arrow-right-up-line text-xs text-neutral-400 dark:text-neutral-500 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
 					</a>
 				</div>
 
