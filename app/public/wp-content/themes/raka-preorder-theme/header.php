@@ -304,7 +304,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 									<i id="icon-back-<?php echo esc_attr( $nav_item->ID ); ?>" class="ri-arrow-left-line text-base transition-transform group-hover:-translate-x-1.5"></i>
 									<span>BACK</span>
 								</button>
-								<span id="tag-header-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500"><?php echo esc_html( $pad_idx . ' // ' . $nav_item->title ); ?></span>
+								<span id="tag-header-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500"><?php echo esc_html( $pad_idx . ' · ' . $nav_item->title ); ?></span>
 							</div>
 
 							<!-- Sub-links Grid (Ultra-Minimalist Editorial Layout) -->
@@ -358,7 +358,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 								<!-- Parent Spotlight / Overview Column (Ultra-Minimal, Open Air) -->
 								<div id="spotlight-col-<?php echo esc_attr( $nav_item->ID ); ?>" class="md:col-span-4 flex flex-col justify-center border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 md:pl-12 pt-8 md:pt-0 space-y-4">
-									<div id="spotlight-tag-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// OVERVIEW</div>
+									<div id="spotlight-tag-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">OVERVIEW</div>
 									<h3 id="spotlight-title-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-2xl md:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-neutral-900 dark:text-white font-hn"><?php echo esc_html( $nav_item->title ); ?></h3>
 									<?php if ( ! empty( $nav_item->description ) ) : ?>
 										<p id="spotlight-desc-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-xs md:text-sm text-neutral-500 dark:text-neutral-400 font-light leading-relaxed max-w-sm font-hn"><?php echo esc_html( $nav_item->description ); ?></p>
@@ -468,7 +468,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<i id="icon-back-atelier" class="ri-arrow-left-line text-base transition-transform group-hover:-translate-x-1.5"></i>
 								<span>BACK</span>
 							</button>
-							<span id="tag-header-atelier" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">01 // ATELIER</span>
+							<span id="tag-header-atelier" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">01 · ATELIER</span>
 						</div>
 
 						<!-- Content Grid -->
@@ -500,15 +500,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<!-- Details & Meta Column -->
 							<div id="atelier-meta-col" class="md:col-span-4 flex flex-col justify-center border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 md:pl-10 pt-6 md:pt-0 space-y-6">
 								<div id="atelier-meta-block-1">
-									<div id="atelier-lbl-loc" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono mb-1">// FOUNDRY LOCATION</div>
+									<div id="atelier-lbl-loc" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono mb-1">FOUNDRY LOCATION</div>
 									<div id="atelier-val-loc" class="text-sm text-neutral-800 dark:text-neutral-300 font-light font-hn">Brooklyn Navy Yard, New York</div>
 								</div>
 								<div id="atelier-meta-block-2">
-									<div id="atelier-lbl-stat" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono mb-1">// STATUS</div>
+									<div id="atelier-lbl-stat" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono mb-1">STATUS</div>
 									<div id="atelier-val-stat" class="text-sm text-neutral-800 dark:text-neutral-300 font-mono">BATCH 04 IN PRODUCTION</div>
 								</div>
 								<div id="atelier-meta-block-3">
-									<div id="atelier-lbl-inq" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono mb-1">// CONCIERGE</div>
+									<div id="atelier-lbl-inq" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono mb-1">CONCIERGE</div>
 									<div id="atelier-val-inq" class="text-sm text-neutral-800 dark:text-neutral-300 font-light font-hn">atelier@obsidian.studio</div>
 								</div>
 							</div>
@@ -523,7 +523,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<i id="icon-back-artists" class="ri-arrow-left-line text-base transition-transform group-hover:-translate-x-1.5"></i>
 								<span>BACK</span>
 							</button>
-							<span id="tag-header-artists" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">02 // ARTISTS</span>
+							<span id="tag-header-artists" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">02 · ARTISTS</span>
 						</div>
 
 						<!-- Content Grid -->
@@ -547,7 +547,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</div>
 
 							<div id="artists-feature-col" class="md:col-span-4 flex flex-col justify-center border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 md:pl-10 pt-6 md:pt-0 space-y-4">
-								<div id="artists-prog-tag" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// RESIDENCY</div>
+								<div id="artists-prog-tag" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">RESIDENCY</div>
 								<h3 id="artists-prog-title" class="text-xl md:text-3xl font-bold uppercase tracking-tight text-neutral-900 dark:text-white font-hn">MMXXVI FELLOWSHIP</h3>
 								<p id="artists-prog-desc" class="text-xs md:text-sm text-neutral-500 dark:text-neutral-400 font-light leading-relaxed font-hn">Applications open for sculptors, miniaturists, and character artists seeking studio residency.</p>
 								<div id="artists-prog-btn-wrap" class="pt-2">
@@ -568,7 +568,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<i id="icon-back-shop" class="ri-arrow-left-line text-base transition-transform group-hover:-translate-x-1.5"></i>
 								<span>BACK</span>
 							</button>
-							<span id="tag-header-shop" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">03 // EDITIONS & SHOP</span>
+							<span id="tag-header-shop" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">03 · EDITIONS & SHOP</span>
 						</div>
 
 						<!-- Content Grid -->
@@ -612,7 +612,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</div>
 
 							<div id="shop-feature-col" class="md:col-span-4 flex flex-col justify-center border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 md:pl-10 pt-6 md:pt-0 space-y-4">
-								<div id="shop-feat-tag" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// CATALOGUE</div>
+								<div id="shop-feat-tag" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">CATALOGUE</div>
 								<h3 id="shop-feat-title" class="text-xl md:text-3xl font-bold uppercase tracking-tight text-neutral-900 dark:text-white font-hn">FULL STORE</h3>
 								<p id="shop-feat-desc" class="text-xs md:text-sm text-neutral-500 dark:text-neutral-400 font-light leading-relaxed font-hn">Browse all in-stock collectibles, active pre-orders, and archival editions.</p>
 								<div id="shop-feat-btn-wrap" class="pt-2">
@@ -633,25 +633,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<i id="icon-back-gallery" class="ri-arrow-left-line text-base transition-transform group-hover:-translate-x-1.5"></i>
 								<span>BACK</span>
 							</button>
-							<span id="tag-header-gallery" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">04 // GALLERY</span>
+							<span id="tag-header-gallery" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">04 · GALLERY</span>
 						</div>
 
 						<!-- Content Grid -->
 						<div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 flex-1 items-center">
 							<div id="gallery-exhibit-1" class="flex flex-col justify-between space-y-3">
-								<div id="gallery-tag-1" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// CURRENT</div>
+								<div id="gallery-tag-1" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">CURRENT</div>
 								<h4 id="gallery-title-1" class="text-xl md:text-2xl font-light uppercase text-neutral-900 dark:text-white font-hn">Forms of the Unseen</h4>
 								<p id="gallery-desc-1" class="text-xs text-neutral-500 dark:text-neutral-400 font-light leading-relaxed font-hn">Oct 12 – Dec 30, MMXXV<br>Obsidian Main Hall, Brooklyn</p>
 							</div>
 
 							<div id="gallery-exhibit-2" class="flex flex-col justify-between space-y-3">
-								<div id="gallery-tag-2" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// UPCOMING</div>
+								<div id="gallery-tag-2" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">UPCOMING</div>
 								<h4 id="gallery-title-2" class="text-xl md:text-2xl font-light uppercase text-neutral-900 dark:text-white font-hn">Tokyo Figuration</h4>
 								<p id="gallery-desc-2" class="text-xs text-neutral-500 dark:text-neutral-400 font-light leading-relaxed font-hn">Feb 15 – Feb 22, MMXXVI<br>Mori Arts Center Gallery, Roppongi</p>
 							</div>
 
 							<div id="gallery-exhibit-3" class="flex flex-col justify-between space-y-3">
-								<div id="gallery-tag-3" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// SPATIAL</div>
+								<div id="gallery-tag-3" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">SPATIAL</div>
 								<h4 id="gallery-title-3" class="text-xl md:text-2xl font-light uppercase text-neutral-900 dark:text-white font-hn">3D Viewing Chamber</h4>
 								<p id="gallery-desc-3" class="text-xs text-neutral-500 dark:text-neutral-400 font-light leading-relaxed font-hn">Interactive WebGL spatial gallery viewing for collectors worldwide.</p>
 							</div>
@@ -666,27 +666,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<i id="icon-back-inquire" class="ri-arrow-left-line text-base transition-transform group-hover:-translate-x-1.5"></i>
 								<span>BACK</span>
 							</button>
-							<span id="tag-header-inquire" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">05 // CONCIERGE</span>
+							<span id="tag-header-inquire" class="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-mono text-neutral-400 dark:text-neutral-500">05 · CONCIERGE</span>
 						</div>
 
 						<!-- Content Grid -->
 						<div id="inquire-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 flex-1 items-center">
 							<div id="inquire-box-1" class="flex flex-col space-y-2">
-								<div id="inquire-tag-1" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// ACQUISITIONS</div>
+								<div id="inquire-tag-1" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">ACQUISITIONS</div>
 								<h4 id="inquire-title-1" class="text-lg font-light text-neutral-900 dark:text-white uppercase font-hn">Collector Concierge</h4>
 								<p id="inquire-desc-1" class="text-xs text-neutral-500 dark:text-neutral-400 font-light font-hn">Dedicated advisory for private collectors & insured delivery.</p>
 								<div id="inquire-val-1" class="text-xs font-mono text-neutral-800 dark:text-neutral-300 pt-1">collector@obsidian.studio</div>
 							</div>
 
 							<div id="inquire-box-2" class="flex flex-col space-y-2">
-								<div id="inquire-tag-2" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// VISITS</div>
+								<div id="inquire-tag-2" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">VISITS</div>
 								<h4 id="inquire-title-2" class="text-lg font-light text-neutral-900 dark:text-white uppercase font-hn">Private Appointment</h4>
 								<p id="inquire-desc-2" class="text-xs text-neutral-500 dark:text-neutral-400 font-light font-hn">Foundry & salon visits by reservation only.</p>
 								<div id="inquire-val-2" class="text-xs font-mono text-neutral-800 dark:text-neutral-300 pt-1">+1 (718) 555-0199</div>
 							</div>
 
 							<div id="inquire-box-3" class="flex flex-col space-y-2">
-								<div id="inquire-tag-3" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// EDITORIAL</div>
+								<div id="inquire-tag-3" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">EDITORIAL</div>
 								<h4 id="inquire-title-3" class="text-lg font-light text-neutral-900 dark:text-white uppercase font-hn">Media Inquiries</h4>
 								<p id="inquire-desc-3" class="text-xs text-neutral-500 dark:text-neutral-400 font-light font-hn">High-res asset packs & exhibition releases.</p>
 								<div id="inquire-val-3" class="text-xs font-mono text-neutral-800 dark:text-neutral-300 pt-1">press@obsidian.studio</div>
