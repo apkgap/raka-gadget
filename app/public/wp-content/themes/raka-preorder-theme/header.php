@@ -48,36 +48,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 		<!-- ── Prominent Semantic Header Component ── -->
 		<header 
-			id="obsidian-site-header" 
+			id="raka-site-header" 
 			class="<?php echo $is_home ? 'fixed top-0 left-0 right-0 z-[60] bg-transparent transition-all duration-300 pointer-events-none' : 'sticky top-0 left-0 right-0 z-[60] bg-white dark:bg-obsidian border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
 		>
-			<nav id="obsidian-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
+			<nav id="raka-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
 				<!-- Left Brand -->
-				<div id="obsidian-nav-brand" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight">
-					<a id="obsidian-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity font-semibold flex items-center gap-1">
+				<div id="raka-nav-brand" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight">
+					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity font-semibold flex items-center gap-1">
 						<span>OBSIDIAN</span> <span class="opacity-60 text-xs font-normal">©</span>
 					</a>
 				</div>
 
 				<!-- Center 1 -->
-				<div id="obsidian-nav-center-1" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden sm:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
+				<div id="raka-nav-center-1" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden sm:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
 					<div class="font-medium">VOLUME 01</div>
 					<div class="<?php echo $is_home ? 'opacity-50' : 'text-neutral-400 dark:text-neutral-500'; ?> text-[10px] md:text-xs">MMXXV</div>
 				</div>
 
 				<!-- Center 2 -->
-				<div id="obsidian-nav-center-2" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden md:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
+				<div id="raka-nav-center-2" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden md:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
 					<div class="font-medium">INK, FORM</div>
 					<div class="<?php echo $is_home ? 'opacity-50' : 'text-neutral-400 dark:text-neutral-500'; ?> text-[10px] md:text-xs">& MODERN PRACTICE</div>
 				</div>
 
 				<!-- Right Controls (Theme Toggle + Hamburger Button) -->
-				<div id="obsidian-nav-controls" class="pointer-events-auto flex items-center gap-4 sm:gap-6 z-[70]">
+				<div id="raka-nav-controls" class="pointer-events-auto flex items-center gap-4 sm:gap-6 z-[70]">
 					<!-- Theme Toggle Button -->
 					<button
-						id="obsidian-theme-btn"
+						id="raka-theme-btn"
 						type="button"
-						onclick="window.toggleObsidianTheme(event)"
+						onclick="window.toggleRakaTheme(event)"
 						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Toggle dark / light mode"
@@ -89,7 +89,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 					<!-- Hamburger Button -->
 					<button
-						id="obsidian-menu-btn"
+						id="raka-menu-btn"
 						type="button"
 						class="relative w-8 md:w-9 h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer <?php echo $is_home ? 'mix-blend-difference' : ''; ?> py-0.5"
 						style="cursor: pointer; pointer-events: auto;"
@@ -104,12 +104,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</header>
 
 		<!-- ── Fullscreen Menu Overlay with Sliding Mega Menus ── -->
-		<div id="obsidian-menu-overlay" class="fixed inset-0 z-[90] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] pointer-events-none overflow-hidden" style="clip-path: inset(0% 0% 100% 0%);">
+		<div id="raka-menu-overlay" class="fixed inset-0 z-[90] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] pointer-events-none overflow-hidden" style="clip-path: inset(0% 0% 100% 0%);">
 			<div id="overlay-backdrop" class="absolute inset-0 bg-white/[0.99] dark:bg-black/[0.99] backdrop-blur-2xl theme-transition"></div>
 			
-			<div id="obsidian-menu-container" class="relative z-10 h-full w-full max-w-none flex flex-col justify-between px-6 sm:px-10 md:px-14 lg:px-20 xl:px-28 2xl:px-36 pt-6 sm:pt-8 md:pt-10 pb-8 overflow-y-auto">
+			<div id="raka-menu-container" class="relative z-10 h-full w-full max-w-none flex flex-col justify-between px-6 sm:px-10 md:px-14 lg:px-20 xl:px-28 2xl:px-36 pt-6 sm:pt-8 md:pt-10 pb-8 overflow-y-auto">
 				
-				<!-- ── Overlay Top Bar (Dedicated Cancel / Close Header) ── -->
+				<!-- ── Overlay Top Bar (Dedicated Minimalist Close Header) ── -->
 				<div id="overlay-top-bar" class="w-full flex items-center justify-between pb-5 mb-4 md:mb-6 border-b border-black/10 dark:border-white/10 shrink-0">
 					<!-- Brand -->
 					<div id="overlay-brand" class="text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight text-neutral-900 dark:text-white font-semibold">
@@ -125,14 +125,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<span id="overlay-tag-vol">MMXXV</span>
 					</div>
 
-					<!-- Right Controls: Theme Toggle & Dedicated Cancel Button -->
-					<div id="overlay-controls" class="flex items-center gap-3 sm:gap-5">
+					<!-- Right Controls: Theme Toggle & Minimalist X Button -->
+					<div id="overlay-controls" class="flex items-center gap-3 sm:gap-4">
 						<!-- Theme Toggle in Overlay -->
 						<button
 							id="overlay-theme-btn"
 							type="button"
-							onclick="window.toggleObsidianTheme(event)"
-							class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-105 focus:outline-none cursor-pointer"
+							onclick="window.toggleRakaTheme(event)"
+							class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-105 focus:outline-none cursor-pointer"
 							aria-label="Toggle dark / light mode"
 							title="Toggle theme"
 						>
@@ -140,15 +140,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<i id="overlay-theme-moon" class="ri-moon-line text-lg hidden text-sky-400"></i>
 						</button>
 
-						<!-- Dedicated Cancel Button -->
+						<!-- Minimalist X Close Button -->
 						<button
-							id="obsidian-menu-close-btn"
+							id="raka-menu-close-btn"
 							type="button"
-							class="btn-menu-close group inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border border-black/20 dark:border-white/25 bg-black/5 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/20 text-neutral-900 dark:text-white transition-all duration-300 text-xs sm:text-sm uppercase tracking-[0.25em] font-bold cursor-pointer focus:outline-none shadow-xs"
-							aria-label="Cancel and close menu"
+							class="btn-menu-close group w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-black/15 dark:border-white/20 bg-black/5 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/25 text-neutral-900 dark:text-white transition-all duration-300 hover:scale-105 cursor-pointer focus:outline-none shadow-xs"
+							aria-label="Close menu"
+							title="Close menu"
 						>
-							<span id="txt-menu-cancel">CANCEL</span>
-							<i id="icon-close-menu" class="ri-close-line text-base sm:text-lg transition-transform duration-300 group-hover:rotate-90"></i>
+							<i id="icon-close-menu" class="ri-close-line text-xl sm:text-2xl transition-transform duration-300 group-hover:rotate-90"></i>
 						</button>
 					</div>
 				</div>

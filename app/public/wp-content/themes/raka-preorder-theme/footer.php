@@ -12,14 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div><!-- #root -->
 
 	<!-- ── Scripts Engine: Theme Switcher & Fullscreen Menu ── -->
-	<script id="obsidian-theme-menu-scripts">
+	<script id="raka-theme-menu-scripts">
 		// ─── 1. Global Theme Switcher ──────────────────────────────────────────────
-		window.toggleObsidianTheme = function(event) {
+		window.toggleRakaTheme = function(event) {
 			const html = document.documentElement;
 			const isDark = html.classList.contains('dark') || !html.classList.contains('light');
 			const targetTheme = isDark ? 'light' : 'dark';
 
-			const themeBtn = document.getElementById('obsidian-theme-btn');
+			const themeBtn = document.getElementById('raka-theme-btn') || document.getElementById('obsidian-theme-btn');
 			const sunIcon = document.getElementById('theme-icon-sun');
 			const moonIcon = document.getElementById('theme-icon-moon');
 			const rippleCircle = document.getElementById('theme-ripple-circle');
@@ -44,8 +44,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					if (sunIcon) { sunIcon.classList.remove('block'); sunIcon.classList.add('hidden'); }
 					if (moonIcon) { moonIcon.classList.remove('hidden'); moonIcon.classList.add('block'); }
 				}
+				localStorage.setItem('raka_theme', targetTheme);
 				localStorage.setItem('obsidian_theme', targetTheme);
-				window.dispatchEvent(new CustomEvent('obsidian-theme-changed', { detail: { theme: targetTheme } }));
+				window.dispatchEvent(new CustomEvent('raka-theme-changed', { detail: { theme: targetTheme } }));
 			}
 
 			// 3. Animation Coordinates
@@ -107,6 +108,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				apply();
 			}
 		};
+		// Backward compatibility alias
+		window.toggleObsidianTheme = window.toggleRakaTheme;
 
 		// Sync button icon on load
 		(function syncIconsOnLoad() {
@@ -124,8 +127,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		// ─── 2. Fullscreen Menu & Mega Menu Logic ─────────────────────────────────
 		(function initMenu() {
-			const menuBtn = document.getElementById('obsidian-menu-btn');
-			const overlay = document.getElementById('obsidian-menu-overlay');
+			const menuBtn = document.getElementById('raka-menu-btn') || document.getElementById('obsidian-menu-btn');
+			const overlay = document.getElementById('raka-menu-overlay') || document.getElementById('obsidian-menu-overlay');
 			const burgerTop = document.getElementById('burger-top');
 			const burgerMid = document.getElementById('burger-mid');
 			const burgerBot = document.getElementById('burger-bot');
@@ -296,7 +299,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			menuBtn.addEventListener('click', () => toggleMenu());
 
 			// Dedicated Cancel / Close buttons inside overlay
-			const closeButtons = overlay.querySelectorAll('.btn-menu-close, #obsidian-menu-close-btn');
+			const closeButtons = overlay.querySelectorAll('.btn-menu-close, #raka-menu-close-btn, #obsidian-menu-close-btn');
 			closeButtons.forEach(btn => {
 				btn.addEventListener('click', (e) => {
 					e.preventDefault();
@@ -394,7 +397,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		// ─── 4. Dynamic Sticky/Fixed Header on Scroll Controller ──────────────────
 		(function() {
-			const header = document.getElementById('obsidian-site-header');
+			const header = document.getElementById('raka-site-header') || document.getElementById('obsidian-site-header');
 			if (!header) return;
 
 			function handleScroll() {

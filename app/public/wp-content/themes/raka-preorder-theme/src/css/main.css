@@ -117,19 +117,23 @@ body {
 }
 
 /* ── WordPress AdminBar Compatibility ── */
+.admin-bar #raka-site-header,
 .admin-bar #obsidian-site-header {
 	top: 32px !important;
 }
 
+.admin-bar #raka-menu-overlay,
 .admin-bar #obsidian-menu-overlay {
 	top: 32px !important;
 	height: calc(100vh - 32px) !important;
 }
 
 @media screen and (max-width: 782px) {
+	.admin-bar #raka-site-header,
 	.admin-bar #obsidian-site-header {
 		top: 46px !important;
 	}
+	.admin-bar #raka-menu-overlay,
 	.admin-bar #obsidian-menu-overlay {
 		top: 46px !important;
 		height: calc(100vh - 46px) !important;
@@ -137,6 +141,7 @@ body {
 }
 
 /* ── Dynamic Sticky / Fixed Header on Scroll ── */
+#raka-site-header,
 #obsidian-site-header {
 	transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
 	            border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
@@ -145,6 +150,7 @@ body {
 }
 
 /* Scrolled state: Frosted glass background, subtle border and elevated shadow */
+#raka-site-header.header-scrolled,
 #obsidian-site-header.header-scrolled {
 	background-color: rgba(255, 255, 255, 0.92) !important;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
@@ -154,6 +160,7 @@ body {
 	pointer-events: auto !important;
 }
 
+html.dark #raka-site-header.header-scrolled,
 html.dark #obsidian-site-header.header-scrolled {
 	background-color: rgba(10, 10, 10, 0.92) !important;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -161,27 +168,36 @@ html.dark #obsidian-site-header.header-scrolled {
 }
 
 /* Home page scrolled state: adapt mixed blend elements to clean contrast */
+body.home #raka-site-header.header-scrolled #raka-nav-brand,
 body.home #obsidian-site-header.header-scrolled #obsidian-nav-brand,
+body.home #raka-site-header.header-scrolled #raka-nav-center-1,
 body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
+body.home #raka-site-header.header-scrolled #raka-nav-center-2,
 body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
 	mix-blend-mode: normal !important;
 	color: #171717 !important;
 }
 
+html.dark body.home #raka-site-header.header-scrolled #raka-nav-brand,
 html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-brand,
+html.dark body.home #raka-site-header.header-scrolled #raka-nav-center-1,
 html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
+html.dark body.home #raka-site-header.header-scrolled #raka-nav-center-2,
 html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
 	color: #ffffff !important;
 }
 
+body.home #raka-site-header.header-scrolled #raka-menu-btn,
 body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn {
 	mix-blend-mode: normal !important;
 }
 
+body.home #raka-site-header.header-scrolled #raka-menu-btn span,
 body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
 	background-color: #171717 !important;
 }
 
+html.dark body.home #raka-site-header.header-scrolled #raka-menu-btn span,
 html.dark body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
 	background-color: #ffffff !important;
 }
