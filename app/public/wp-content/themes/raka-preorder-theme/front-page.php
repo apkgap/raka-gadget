@@ -330,9 +330,9 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			}
 		}
 
-		function applyPositions(prog, scrollPx) {
-			// 1. Hero Main Title & Overlay PNG (Intro Section: Delayed & Relaxed)
-			const introDuration = totalCards > 0 ? 0.22 : 0.40;
+		function applyPositions(prog) {
+			// 1. Hero Main Title & Overlay PNG (Intro Section)
+			const introDuration = totalCards > 0 ? 0.20 : 0.40;
 
 			if (heroSec1) {
 				// Title stays solid for the first 8% scroll, then fades out smoothly
@@ -342,7 +342,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 					heroOpacity = Math.max(0, 1 - t);
 				}
 				heroSec1.style.opacity = heroOpacity.toFixed(3);
-				heroSec1.style.transform = `translate3d(0, ${(prog * -40).toFixed(1)}px, 0)`;
+				heroSec1.style.transform = `translate3d(0, ${(prog * -35).toFixed(1)}px, 0)`;
 				heroSec1.style.visibility = heroOpacity > 0.01 ? 'visible' : 'hidden';
 			}
 
@@ -356,10 +356,10 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 				overlayPng.style.visibility = pngOpacity > 0.01 ? 'visible' : 'hidden';
 			}
 
-			// 2. Quad-Card Scrubbing (Delayed start + Generous hold + Pause buffer between quads)
+			// 2. Quad-Card Scrubbing (Harmoniously synced with video playback)
 			if (totalCards > 0) {
-				const cardProgressStart = 0.24; // Cards only start appearing after 24% scroll!
-				const cardProgressRange = Math.max(0.1, 1 - cardProgressStart);
+				const cardProgressStart = 0.16; // Seamless handoff right after title fades
+				const cardProgressRange = Math.max(0.1, 0.94 - cardProgressStart);
 				const cardSlotSize = cardProgressRange / totalCards;
 
 				subSecs.forEach((sec, idx) => {
@@ -373,7 +373,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 						sec.style.opacity = '0';
 						sec.style.visibility = 'hidden';
 						sec.style.pointerEvents = 'none';
-						sec.style.transform = 'translate3d(0, 15px, 0)';
+						sec.style.transform = 'translate3d(0, 16px, 0)';
 						return;
 					}
 
@@ -383,24 +383,27 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 					let opacity = 0;
 					let translateY = 0;
 
-					if (local < 0.15) {
-						// Smooth enter phase (0.0 -> 0.15)
-						const enterT = local / 0.15;
-						opacity = enterT;
-						translateY = (1 - enterT) * 14;
+					if (local < 0.14) {
+						// Smooth enter phase (0.0 -> 0.14)
+						const enterT = local / 0.14;
+						// Quadratic ease-out for ultra smooth entry
+						const ease = enterT * (2 - enterT);
+						opacity = ease;
+						translateY = (1 - ease) * 16;
 					} else if (local > 0.72) {
-						// Smooth exit phase (0.72 -> 0.86) + pause buffer (0.86 -> 1.0)
-						if (local < 0.86) {
-							const exitT = (local - 0.72) / 0.14;
-							opacity = 1 - exitT;
-							translateY = exitT * -14;
+						// Smooth exit phase (0.72 -> 0.88) + inter-quad rest buffer (0.88 -> 1.0)
+						if (local < 0.88) {
+							const exitT = (local - 0.72) / 0.16;
+							const ease = exitT * exitT; // Quadratic ease-in for gentle lift off
+							opacity = Math.max(0, 1 - ease);
+							translateY = ease * -16;
 						} else {
-							// Buffer deadband between slides (0.86 -> 1.0) so next cards don't collide
+							// Clean buffer rest before next slide enters
 							opacity = 0;
-							translateY = -14;
+							translateY = -16;
 						}
 					} else {
-						// Generous steady hold phase (0.15 -> 0.72 = 57% solid visibility)
+						// Generous solid hold phase (0.14 -> 0.72)
 						opacity = 1;
 						translateY = 0;
 					}
@@ -419,8 +422,6 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			if (video.duration) {
 				targetTime = progress * video.duration;
 			}
-			const scrollPx = Math.max(0, scrollY - start);
-			applyPositions(progress, scrollPx);
 		}, { passive: true });
 
 		const bank = {
@@ -485,6 +486,12 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 					currentTime = targetTime;
 				}
 			}
+
+			// Synchronize card transforms and opacity with the exact smoothed video clock
+			const animProgress = (video.duration && video.duration > 0)
+				? (currentTime / video.duration)
+				: progress;
+			applyPositions(animProgress);
 
 			if (bank.ready && bank.frames.length > 0) {
 				const targetMicros = currentTime * 1e6;
