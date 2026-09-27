@@ -259,8 +259,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 									<div id="menu-item-wrap-<?php echo esc_attr( $nav_item->ID ); ?>" class="group block overflow-hidden py-1 sm:py-2">
 										<?php if ( $has_children ) : ?>
 											<button id="menu-trigger-<?php echo esc_attr( $nav_item->ID ); ?>" type="button" class="mega-menu-trigger w-full text-left flex items-center justify-between group cursor-pointer focus:outline-none" data-mega-target="mega-panel-<?php echo esc_attr( $nav_item->ID ); ?>" data-delay="<?php echo esc_attr( $delay_ms ); ?>">
-												<span id="menu-text-<?php echo esc_attr( $nav_item->ID ); ?>" class="nav-link-text flex items-baseline gap-4 text-[9vw] sm:text-[6.5vw] md:text-[5vw] font-black uppercase text-neutral-900/90 dark:text-white/90 leading-[1.05] tracking-[-0.03em] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
-													<span id="menu-idx-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-xs sm:text-sm md:text-base font-normal tracking-[0.2em] text-neutral-400 dark:text-neutral-500"><?php echo esc_html( $pad_idx ); ?></span>
+												<span id="menu-text-<?php echo esc_attr( $nav_item->ID ); ?>" class="nav-link-text flex items-baseline gap-3 sm:gap-4 text-[7.5vw] sm:text-[5vw] md:text-[3.2vw] lg:text-[2.4vw] xl:text-[36px] font-extrabold uppercase text-neutral-900/90 dark:text-white/90 leading-[1.1] tracking-tight transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
+													<span id="menu-idx-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-xs sm:text-sm font-mono tracking-widest text-neutral-400 dark:text-neutral-500 font-normal"><?php echo esc_html( $pad_idx ); ?></span>
 													<?php echo esc_html( $nav_item->title ); ?>
 												</span>
 												<span id="menu-meta-<?php echo esc_attr( $nav_item->ID ); ?>" class="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
@@ -270,8 +270,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 											</button>
 										<?php else : ?>
 											<a id="menu-link-<?php echo esc_attr( $nav_item->ID ); ?>" href="<?php echo esc_url( $nav_item->url ); ?>" class="nav-menu-link w-full text-left flex items-center justify-between group cursor-pointer focus:outline-none" data-delay="<?php echo esc_attr( $delay_ms ); ?>">
-												<span id="menu-text-<?php echo esc_attr( $nav_item->ID ); ?>" class="nav-link-text flex items-baseline gap-4 text-[9vw] sm:text-[6.5vw] md:text-[5vw] font-black uppercase text-neutral-900/90 dark:text-white/90 leading-[1.05] tracking-[-0.03em] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
-													<span id="menu-idx-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-xs sm:text-sm md:text-base font-normal tracking-[0.2em] text-neutral-400 dark:text-neutral-500"><?php echo esc_html( $pad_idx ); ?></span>
+												<span id="menu-text-<?php echo esc_attr( $nav_item->ID ); ?>" class="nav-link-text flex items-baseline gap-3 sm:gap-4 text-[7.5vw] sm:text-[5vw] md:text-[3.2vw] lg:text-[2.4vw] xl:text-[36px] font-extrabold uppercase text-neutral-900/90 dark:text-white/90 leading-[1.1] tracking-tight transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
+													<span id="menu-idx-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-xs sm:text-sm font-mono tracking-widest text-neutral-400 dark:text-neutral-500 font-normal"><?php echo esc_html( $pad_idx ); ?></span>
 													<?php echo esc_html( $nav_item->title ); ?>
 												</span>
 												<span id="menu-meta-<?php echo esc_attr( $nav_item->ID ); ?>" class="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
@@ -327,12 +327,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 												</div>
 
 												<!-- Minimal Brand Links Typography List -->
-												<div id="group-items-grid-<?php echo esc_attr( $child->ID ); ?>" class="flex flex-wrap items-center gap-x-10 gap-y-4 pt-1">
+												<div id="group-items-grid-<?php echo esc_attr( $child->ID ); ?>" class="flex flex-wrap items-center gap-x-8 gap-y-3 pt-1">
 													<?php
 													$sub_idx = 1;
 													foreach ( $child->children as $grandchild ) :
 													?>
-														<a id="grandchild-link-<?php echo esc_attr( $grandchild->ID ); ?>" href="<?php echo esc_url( $grandchild->url ); ?>" class="group/item inline-flex items-center gap-2 text-2xl sm:text-3xl md:text-4xl font-light uppercase tracking-tight text-neutral-900 dark:text-white hover:opacity-40 transition-opacity">
+														<a id="grandchild-link-<?php echo esc_attr( $grandchild->ID ); ?>" href="<?php echo esc_url( $grandchild->url ); ?>" class="group/item inline-flex items-center gap-2 text-xl sm:text-2xl md:text-2xl lg:text-3xl font-light uppercase tracking-tight text-neutral-900 dark:text-white hover:opacity-40 transition-opacity">
 															<span id="grandchild-txt-<?php echo esc_attr( $grandchild->ID ); ?>" class="font-hn"><?php echo esc_html( $grandchild->title ); ?></span>
 															<i id="grandchild-icon-<?php echo esc_attr( $grandchild->ID ); ?>" class="ri-arrow-right-up-line text-sm md:text-base opacity-30 group-hover/item:opacity-100 group-hover/item:translate-x-0.5 group-hover/item:-translate-y-0.5 transition-all"></i>
 														</a>
@@ -344,7 +344,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 											</div>
 										<?php else : ?>
 											<!-- Minimal Direct Sublink -->
-											<a id="child-link-<?php echo esc_attr( $child->ID ); ?>" href="<?php echo esc_url( $child->url ); ?>" class="group inline-flex items-baseline gap-4 text-2xl sm:text-3xl md:text-4xl font-light uppercase tracking-tight text-neutral-900 dark:text-white hover:opacity-40 transition-opacity">
+											<a id="child-link-<?php echo esc_attr( $child->ID ); ?>" href="<?php echo esc_url( $child->url ); ?>" class="group inline-flex items-baseline gap-4 text-xl sm:text-2xl md:text-2xl lg:text-3xl font-light uppercase tracking-tight text-neutral-900 dark:text-white hover:opacity-40 transition-opacity">
 												<span id="child-pad-<?php echo esc_attr( $child->ID ); ?>" class="text-xs font-mono text-neutral-400 font-normal"><?php echo esc_html( $c_pad ); ?>.</span>
 												<span id="child-txt-<?php echo esc_attr( $child->ID ); ?>" class="font-hn"><?php echo esc_html( $child->title ); ?></span>
 												<i id="child-icon-<?php echo esc_attr( $child->ID ); ?>" class="ri-arrow-right-up-line text-base opacity-30 group-hover:opacity-100 transition-opacity"></i>
@@ -359,7 +359,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<!-- Parent Spotlight / Overview Column (Ultra-Minimal, Open Air) -->
 								<div id="spotlight-col-<?php echo esc_attr( $nav_item->ID ); ?>" class="md:col-span-4 flex flex-col justify-center border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 md:pl-12 pt-8 md:pt-0 space-y-4">
 									<div id="spotlight-tag-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// OVERVIEW</div>
-									<h3 id="spotlight-title-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-3xl md:text-5xl font-black uppercase tracking-tight text-neutral-900 dark:text-white font-hn"><?php echo esc_html( $nav_item->title ); ?></h3>
+									<h3 id="spotlight-title-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-2xl md:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-neutral-900 dark:text-white font-hn"><?php echo esc_html( $nav_item->title ); ?></h3>
 									<?php if ( ! empty( $nav_item->description ) ) : ?>
 										<p id="spotlight-desc-<?php echo esc_attr( $nav_item->ID ); ?>" class="text-xs md:text-sm text-neutral-500 dark:text-neutral-400 font-light leading-relaxed max-w-sm font-hn"><?php echo esc_html( $nav_item->description ); ?></p>
 									<?php else : ?>
@@ -388,8 +388,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<!-- Item 1: Atelier (Has Mega) -->
 							<div id="menu-item-atelier-wrap" class="group block overflow-hidden py-1 sm:py-2">
 								<button id="menu-trigger-atelier" type="button" class="mega-menu-trigger w-full text-left flex items-center justify-between group cursor-pointer focus:outline-none" data-mega-target="mega-panel-atelier" data-delay="60ms">
-									<span id="menu-text-atelier" class="nav-link-text flex items-baseline gap-4 text-[9vw] sm:text-[6.5vw] md:text-[5vw] font-black uppercase text-neutral-900/90 dark:text-white/90 leading-[1.05] tracking-[-0.03em] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
-										<span id="menu-idx-atelier" class="text-xs sm:text-sm md:text-base font-normal tracking-[0.2em] text-neutral-400 dark:text-neutral-500">01</span>
+									<span id="menu-text-atelier" class="nav-link-text flex items-baseline gap-3 sm:gap-4 text-[7.5vw] sm:text-[5vw] md:text-[3.2vw] lg:text-[2.4vw] xl:text-[36px] font-extrabold uppercase text-neutral-900/90 dark:text-white/90 leading-[1.1] tracking-tight transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
+										<span id="menu-idx-atelier" class="text-xs sm:text-sm font-mono tracking-widest text-neutral-400 dark:text-neutral-500 font-normal">01</span>
 										Atelier
 									</span>
 									<span id="menu-meta-atelier" class="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
@@ -402,8 +402,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<!-- Item 2: Artists (Has Mega) -->
 							<div id="menu-item-artists-wrap" class="group block overflow-hidden py-1 sm:py-2">
 								<button id="menu-trigger-artists" type="button" class="mega-menu-trigger w-full text-left flex items-center justify-between group cursor-pointer focus:outline-none" data-mega-target="mega-panel-artists" data-delay="120ms">
-									<span id="menu-text-artists" class="nav-link-text flex items-baseline gap-4 text-[9vw] sm:text-[6.5vw] md:text-[5vw] font-black uppercase text-neutral-900/90 dark:text-white/90 leading-[1.05] tracking-[-0.03em] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
-										<span id="menu-idx-artists" class="text-xs sm:text-sm md:text-base font-normal tracking-[0.2em] text-neutral-400 dark:text-neutral-500">02</span>
+									<span id="menu-text-artists" class="nav-link-text flex items-baseline gap-3 sm:gap-4 text-[7.5vw] sm:text-[5vw] md:text-[3.2vw] lg:text-[2.4vw] xl:text-[36px] font-extrabold uppercase text-neutral-900/90 dark:text-white/90 leading-[1.1] tracking-tight transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
+										<span id="menu-idx-artists" class="text-xs sm:text-sm font-mono tracking-widest text-neutral-400 dark:text-neutral-500 font-normal">02</span>
 										Artists
 									</span>
 									<span id="menu-meta-artists" class="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
@@ -416,8 +416,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<!-- Item 3: Editions & Shop (Has Mega) -->
 							<div id="menu-item-shop-wrap" class="group block overflow-hidden py-1 sm:py-2">
 								<button id="menu-trigger-shop" type="button" class="mega-menu-trigger w-full text-left flex items-center justify-between group cursor-pointer focus:outline-none" data-mega-target="mega-panel-shop" data-delay="180ms">
-									<span id="menu-text-shop" class="nav-link-text flex items-baseline gap-4 text-[9vw] sm:text-[6.5vw] md:text-[5vw] font-black uppercase text-neutral-900/90 dark:text-white/90 leading-[1.05] tracking-[-0.03em] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
-										<span id="menu-idx-shop" class="text-xs sm:text-sm md:text-base font-normal tracking-[0.2em] text-neutral-400 dark:text-neutral-500">03</span>
+									<span id="menu-text-shop" class="nav-link-text flex items-baseline gap-3 sm:gap-4 text-[7.5vw] sm:text-[5vw] md:text-[3.2vw] lg:text-[2.4vw] xl:text-[36px] font-extrabold uppercase text-neutral-900/90 dark:text-white/90 leading-[1.1] tracking-tight transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
+										<span id="menu-idx-shop" class="text-xs sm:text-sm font-mono tracking-widest text-neutral-400 dark:text-neutral-500 font-normal">03</span>
 										Editions & Shop
 									</span>
 									<span id="menu-meta-shop" class="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
@@ -430,8 +430,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<!-- Item 4: Gallery & Exhibitions (Has Mega) -->
 							<div id="menu-item-gallery-wrap" class="group block overflow-hidden py-1 sm:py-2">
 								<button id="menu-trigger-gallery" type="button" class="mega-menu-trigger w-full text-left flex items-center justify-between group cursor-pointer focus:outline-none" data-mega-target="mega-panel-gallery" data-delay="240ms">
-									<span id="menu-text-gallery" class="nav-link-text flex items-baseline gap-4 text-[9vw] sm:text-[6.5vw] md:text-[5vw] font-black uppercase text-neutral-900/90 dark:text-white/90 leading-[1.05] tracking-[-0.03em] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
-										<span id="menu-idx-gallery" class="text-xs sm:text-sm md:text-base font-normal tracking-[0.2em] text-neutral-400 dark:text-neutral-500">04</span>
+									<span id="menu-text-gallery" class="nav-link-text flex items-baseline gap-3 sm:gap-4 text-[7.5vw] sm:text-[5vw] md:text-[3.2vw] lg:text-[2.4vw] xl:text-[36px] font-extrabold uppercase text-neutral-900/90 dark:text-white/90 leading-[1.1] tracking-tight transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
+										<span id="menu-idx-gallery" class="text-xs sm:text-sm font-mono tracking-widest text-neutral-400 dark:text-neutral-500 font-normal">04</span>
 										Gallery
 									</span>
 									<span id="menu-meta-gallery" class="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
@@ -444,8 +444,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<!-- Item 5: Concierge & Inquire (Has Mega) -->
 							<div id="menu-item-inquire-wrap" class="group block overflow-hidden py-1 sm:py-2">
 								<button id="menu-trigger-inquire" type="button" class="mega-menu-trigger w-full text-left flex items-center justify-between group cursor-pointer focus:outline-none" data-mega-target="mega-panel-inquire" data-delay="300ms">
-									<span id="menu-text-inquire" class="nav-link-text flex items-baseline gap-4 text-[9vw] sm:text-[6.5vw] md:text-[5vw] font-black uppercase text-neutral-900/90 dark:text-white/90 leading-[1.05] tracking-[-0.03em] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
-										<span id="menu-idx-inquire" class="text-xs sm:text-sm md:text-base font-normal tracking-[0.2em] text-neutral-400 dark:text-neutral-500">05</span>
+									<span id="menu-text-inquire" class="nav-link-text flex items-baseline gap-3 sm:gap-4 text-[7.5vw] sm:text-[5vw] md:text-[3.2vw] lg:text-[2.4vw] xl:text-[36px] font-extrabold uppercase text-neutral-900/90 dark:text-white/90 leading-[1.1] tracking-tight transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:text-black dark:group-hover:text-white group-hover:translate-x-3 font-hn" style="transform: translateY(110%);">
+										<span id="menu-idx-inquire" class="text-xs sm:text-sm font-mono tracking-widest text-neutral-400 dark:text-neutral-500 font-normal">05</span>
 										Concierge & Inquire
 									</span>
 									<span id="menu-meta-inquire" class="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
