@@ -133,7 +133,7 @@ $all_cats = get_terms( [
 <!-- ── Mobile Filter Slide-over Drawer ── -->
 <div
 	id="mobile-filters-drawer"
-	class="fixed inset-0 z-[100] pointer-events-none opacity-0 transition-opacity duration-300 flex justify-end"
+	class="fixed inset-0 z-[70] pointer-events-none opacity-0 transition-opacity duration-300 flex justify-end"
 >
 	<!-- Backdrop -->
 	<div

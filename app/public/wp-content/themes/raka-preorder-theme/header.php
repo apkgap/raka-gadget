@@ -51,12 +51,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<!-- ── Prominent Semantic Header Component ── -->
 		<header 
 			id="raka-site-header" 
-			class="<?php echo $is_home ? 'fixed top-0 left-0 right-0 z-[60] bg-transparent transition-all duration-300 pointer-events-none' : 'sticky top-0 left-0 right-0 z-[60] bg-white dark:bg-obsidian border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
+			class="<?php echo $is_home ? 'fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300' : 'sticky top-0 left-0 right-0 z-50 bg-white/95 dark:bg-obsidian/95 backdrop-blur-md border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
 		>
 			<nav id="raka-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
 				<!-- Left Brand -->
 				<div id="raka-nav-brand" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight">
-					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity font-semibold flex items-center gap-1">
+					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity font-semibold">
 						<span>OBSIDIAN</span> <span class="opacity-60 text-xs font-normal">©</span>
 					</a>
 				</div>
@@ -74,12 +74,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</div>
 
 				<!-- Right Controls (Cart + Theme Toggle + Hamburger Button) -->
-				<div id="raka-nav-controls" class="pointer-events-auto flex items-center gap-3 sm:gap-5 z-[70]">
+				<div id="raka-nav-controls" class="pointer-events-auto flex items-center gap-4 sm:gap-6">
 					<!-- Cart Button -->
 					<a
 						id="raka-cart-btn"
 						href="<?php echo esc_url( $cart_url ); ?>"
-						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer <?php echo $is_home ? 'mix-blend-difference' : ''; ?>"
+						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 backdrop-blur-md border border-black/15 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Shopping Cart"
 						title="Shopping Cart"
@@ -98,7 +98,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						id="raka-theme-btn"
 						type="button"
 						onclick="window.toggleRakaTheme(event)"
-						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 backdrop-blur-md border border-black/15 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Toggle dark / light mode"
 						title="Toggle theme"
@@ -124,7 +124,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</header>
 
 		<!-- ── Fullscreen Menu Overlay with Sliding Mega Menus ── -->
-		<div id="raka-menu-overlay" class="fixed inset-0 z-[90] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] pointer-events-none overflow-hidden" style="clip-path: inset(0% 0% 100% 0%);">
+		<div id="raka-menu-overlay" class="fixed inset-0 z-[80] transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] pointer-events-none overflow-hidden" style="clip-path: inset(0% 0% 100% 0%);">
 			<div id="overlay-backdrop" class="absolute inset-0 bg-white/[0.99] dark:bg-black/[0.99] backdrop-blur-2xl theme-transition"></div>
 			
 			<div id="raka-menu-container" class="relative z-10 h-full w-full max-w-none flex flex-col justify-between px-6 sm:px-10 md:px-14 lg:px-20 xl:px-28 2xl:px-36 pt-6 sm:pt-8 md:pt-10 pb-8 overflow-y-auto">

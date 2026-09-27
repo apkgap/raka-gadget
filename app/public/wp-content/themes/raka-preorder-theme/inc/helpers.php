@@ -894,7 +894,7 @@ function raka_render_cart_drawer(): void {
 	$cart_count = ( WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
 	?>
 	<!-- ── Raka Luxury Cart Drawer Modal (Slide-Over) ── -->
-	<div id="raka-cart-drawer" class="fixed inset-0 z-[95] pointer-events-none transition-all duration-500" aria-hidden="true">
+	<div id="raka-cart-drawer" class="fixed inset-0 z-[100] pointer-events-none transition-all duration-500" aria-hidden="true">
 		<!-- Backdrop -->
 		<div id="raka-cart-backdrop" onclick="window.closeRakaCart()" class="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xs opacity-0 transition-opacity duration-500 cursor-pointer"></div>
 

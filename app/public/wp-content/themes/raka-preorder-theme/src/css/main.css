@@ -169,36 +169,54 @@ html.dark #obsidian-site-header.header-scrolled {
 
 /* Home page scrolled state: adapt mixed blend elements to clean contrast */
 body.home #raka-site-header.header-scrolled #raka-nav-brand,
+body.front-page #raka-site-header.header-scrolled #raka-nav-brand,
 body.home #obsidian-site-header.header-scrolled #obsidian-nav-brand,
+body.front-page #obsidian-site-header.header-scrolled #obsidian-nav-brand,
 body.home #raka-site-header.header-scrolled #raka-nav-center-1,
+body.front-page #raka-site-header.header-scrolled #raka-nav-center-1,
 body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
+body.front-page #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
 body.home #raka-site-header.header-scrolled #raka-nav-center-2,
-body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
+body.front-page #raka-site-header.header-scrolled #raka-nav-center-2,
+body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2,
+body.front-page #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
 	mix-blend-mode: normal !important;
 	color: #171717 !important;
 }
 
 html.dark body.home #raka-site-header.header-scrolled #raka-nav-brand,
+html.dark body.front-page #raka-site-header.header-scrolled #raka-nav-brand,
 html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-brand,
+html.dark body.front-page #obsidian-site-header.header-scrolled #obsidian-nav-brand,
 html.dark body.home #raka-site-header.header-scrolled #raka-nav-center-1,
+html.dark body.front-page #raka-site-header.header-scrolled #raka-nav-center-1,
 html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
+html.dark body.front-page #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
 html.dark body.home #raka-site-header.header-scrolled #raka-nav-center-2,
-html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
+html.dark body.front-page #raka-site-header.header-scrolled #raka-nav-center-2,
+html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2,
+html.dark body.front-page #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
 	color: #ffffff !important;
 }
 
 body.home #raka-site-header.header-scrolled #raka-menu-btn,
-body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn {
+body.front-page #raka-site-header.header-scrolled #raka-menu-btn,
+body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn,
+body.front-page #obsidian-site-header.header-scrolled #obsidian-menu-btn {
 	mix-blend-mode: normal !important;
 }
 
 body.home #raka-site-header.header-scrolled #raka-menu-btn span,
-body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
+body.front-page #raka-site-header.header-scrolled #raka-menu-btn span,
+body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span,
+body.front-page #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
 	background-color: #171717 !important;
 }
 
 html.dark body.home #raka-site-header.header-scrolled #raka-menu-btn span,
-html.dark body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
+html.dark body.front-page #raka-site-header.header-scrolled #raka-menu-btn span,
+html.dark body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span,
+html.dark body.front-page #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
 	background-color: #ffffff !important;
 }
 
