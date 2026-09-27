@@ -308,11 +308,11 @@ $cat_icon_map = [
 						<a
 							id="raka-cat-item-<?php echo esc_attr( $cat['id'] ); ?>"
 							href="<?php echo esc_url( $cat['url'] ); ?>"
-							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-100/90 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-red-500/60 dark:hover:border-red-400/60 shadow-md hover:shadow-2xl transition-all duration-300 p-5 sm:p-6 cursor-pointer"
+							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-100/90 dark:bg-white/5 hover:bg-neutral-200/70 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-red-500/60 dark:hover:border-red-400/60 transition-all duration-300 p-5 sm:p-6 cursor-pointer"
 						>
 							<!-- Top Icon -->
 							<div id="raka-cat-top-bar-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-start w-full">
-								<div id="raka-cat-ico-wrap-<?php echo esc_attr( $cat['id'] ); ?>" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white dark:group-hover:bg-red-500 dark:group-hover:text-white transition-all duration-300 shadow-sm">
+								<div id="raka-cat-ico-wrap-<?php echo esc_attr( $cat['id'] ); ?>" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white dark:group-hover:bg-red-500 dark:group-hover:text-white transition-all duration-300">
 									<?php if ( ! empty( $media_src ) ) : ?>
 										<img id="raka-cat-media-<?php echo esc_attr( $cat['id'] ); ?>" src="<?php echo esc_url( $media_src ); ?>" alt="<?php echo esc_attr( $cat['name'] ); ?>" class="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
 									<?php else : ?>
@@ -367,10 +367,10 @@ $cat_icon_map = [
 						<a
 							id="raka-brand-item-<?php echo esc_attr( $brand['id'] ); ?>"
 							href="<?php echo esc_url( $brand['url'] ); ?>"
-							class="group relative flex flex-col items-center justify-center text-center rounded-3xl bg-neutral-100/90 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 backdrop-blur-md border border-black/10 hover:border-amber-500/50 dark:border-white/10 dark:hover:border-amber-500/50 shadow-md hover:shadow-2xl transition-all duration-300 p-6 sm:p-7"
+							class="group relative flex flex-col items-center justify-center text-center rounded-3xl bg-neutral-100/90 dark:bg-white/5 hover:bg-neutral-200/70 dark:hover:bg-white/10 backdrop-blur-md border border-black/10 hover:border-amber-500/50 dark:border-white/10 dark:hover:border-amber-500/50 transition-all duration-300 p-6 sm:p-7"
 						>
 							<?php if ( ! empty( $brand['image_url'] ) ) : ?>
-								<div id="raka-brand-img-wrap-<?php echo esc_attr( $brand['id'] ); ?>" class="w-16 h-16 sm:w-20 sm:h-20 mb-3 flex items-center justify-center overflow-hidden rounded-2xl bg-white dark:bg-white/10 border border-black/5 dark:border-white/10 p-2.5 shadow-sm group-hover:scale-105 transition-transform duration-300">
+								<div id="raka-brand-img-wrap-<?php echo esc_attr( $brand['id'] ); ?>" class="w-16 h-16 sm:w-20 sm:h-20 mb-3 flex items-center justify-center overflow-hidden rounded-2xl bg-white dark:bg-white/10 border border-black/5 dark:border-white/10 p-2.5 group-hover:scale-105 transition-transform duration-300">
 									<img
 										id="raka-brand-img-<?php echo esc_attr( $brand['id'] ); ?>"
 										src="<?php echo esc_url( $brand['image_url'] ); ?>"
@@ -432,7 +432,7 @@ $cat_icon_map = [
 						rel="noopener noreferrer"
 						class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-[#06C755]/10 hover:bg-[#06C755]/20 border border-[#06C755]/30 hover:border-[#06C755] transition-all duration-300"
 					>
-						<div id="raka-contact-line-icon-wrap" class="w-12 h-12 rounded-xl bg-[#06C755] text-white flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+						<div id="raka-contact-line-icon-wrap" class="w-12 h-12 rounded-xl bg-[#06C755] text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
 							<i id="raka-contact-line-ico" class="ri-line-fill text-2xl"></i>
 						</div>
 						<div id="raka-contact-line-details" class="flex-1 min-w-0">
@@ -453,7 +453,7 @@ $cat_icon_map = [
 						rel="noopener noreferrer"
 						class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-[#1877F2]/10 hover:bg-[#1877F2]/20 border border-[#1877F2]/30 hover:border-[#1877F2] transition-all duration-300"
 					>
-						<div id="raka-contact-fb-icon-wrap" class="w-12 h-12 rounded-xl bg-[#1877F2] text-white flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+						<div id="raka-contact-fb-icon-wrap" class="w-12 h-12 rounded-xl bg-[#1877F2] text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
 							<i id="raka-contact-fb-ico" class="ri-facebook-circle-fill text-2xl"></i>
 						</div>
 						<div id="raka-contact-fb-details" class="flex-1 min-w-0">
@@ -472,7 +472,7 @@ $cat_icon_map = [
 						href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $contact_options['contact_phone'] ) ); ?>"
 						class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-neutral-100 hover:bg-neutral-200 dark:bg-white/5 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 transition-all duration-300"
 					>
-						<div id="raka-contact-phone-icon-wrap" class="w-12 h-12 rounded-xl bg-black/10 dark:bg-white/15 text-neutral-900 dark:text-white flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+						<div id="raka-contact-phone-icon-wrap" class="w-12 h-12 rounded-xl bg-black/10 dark:bg-white/15 text-neutral-900 dark:text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
 							<i id="raka-contact-phone-ico" class="ri-phone-fill text-2xl"></i>
 						</div>
 						<div id="raka-contact-phone-details" class="flex-1 min-w-0">
