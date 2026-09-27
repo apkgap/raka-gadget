@@ -50,6 +50,9 @@ function raka_enqueue_theme_settings_assets( $hook ) {
 		return;
 	}
 
+	// Enqueue WordPress media library modal scripts & styles
+	wp_enqueue_media();
+
 	// Enqueue WordPress components stylesheet
 	wp_enqueue_style( 'wp-components' );
 

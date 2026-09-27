@@ -18,6 +18,201 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Modern Segmented Tab Switcher Component.
+ */
+function TabSwitcher( { tabs, activeTab, onSelect, style } ) {
+	return (
+		<div
+			style={ {
+				display: 'inline-flex',
+				background: '#f1f5f9',
+				padding: '3px',
+				borderRadius: '8px',
+				border: '1px solid #e2e8f0',
+				marginBottom: '12px',
+				gap: '2px',
+				...style,
+			} }
+		>
+			{ tabs.map( ( t ) => {
+				const isActive = activeTab === t.id;
+				return (
+					<button
+						key={ t.id }
+						type="button"
+						onClick={ () => onSelect( t.id ) }
+						style={ {
+							border: 'none',
+							background: isActive ? '#ffffff' : 'transparent',
+							color: isActive ? '#0f172a' : '#64748b',
+							fontWeight: isActive ? 600 : 500,
+							fontSize: '12px',
+							padding: '6px 14px',
+							borderRadius: '6px',
+							cursor: 'pointer',
+							boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '6px',
+							transition: 'all 0.15s ease',
+						} }
+					>
+						{ t.icon && <i className={ t.icon } style={ { fontSize: '14px', color: isActive ? '#2563eb' : '#94a3b8' } } /> }
+						<span>{ t.label }</span>
+					</button>
+				);
+			} ) }
+		</div>
+	);
+}
+
+/**
+ * Reusable WordPress Media Modal Uploader Component.
+ */
+function MediaUploaderControl( {
+	label,
+	value,
+	onChange,
+	help,
+	mediaType = 'image',
+	title = __( 'Select Media', 'raka-preorder-theme' ),
+	buttonText = __( 'Use This Media', 'raka-preorder-theme' ),
+} ) {
+	const openModal = () => {
+		if ( ! window.wp || ! window.wp.media ) {
+			alert( __( 'WordPress Media library is not loaded. Please refresh the page.', 'raka-preorder-theme' ) );
+			return;
+		}
+
+		const frame = window.wp.media( {
+			title,
+			button: { text: buttonText },
+			multiple: false,
+			library: { type: mediaType },
+		} );
+
+		frame.on( 'select', () => {
+			const attachment = frame.state().get( 'selection' ).first().toJSON();
+			if ( attachment && attachment.url ) {
+				onChange( attachment.url );
+			}
+		} );
+
+		frame.open();
+	};
+
+	return (
+		<div style={ { marginBottom: '14px' } }>
+			{ label && (
+				<label style={ { display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px', color: '#1e1e1e' } }>
+					{ label }
+				</label>
+			) }
+
+			{ value ? (
+				<div
+					style={ {
+						display: 'flex',
+						alignItems: 'center',
+						gap: '14px',
+						padding: '10px 14px',
+						background: '#f8fafc',
+						border: '1px solid #e2e8f0',
+						borderRadius: '10px',
+					} }
+				>
+					{ mediaType === 'image' && (
+						<img
+							src={ value }
+							alt=""
+							style={ {
+								width: '60px',
+								height: '60px',
+								objectFit: 'cover',
+								borderRadius: '8px',
+								border: '1px solid #cbd5e1',
+								background: '#0f172a',
+								flexShrink: 0,
+							} }
+						/>
+					) }
+					{ mediaType === 'video' && (
+						<div
+							style={ {
+								width: '60px',
+								height: '60px',
+								borderRadius: '8px',
+								background: '#0f172a',
+								color: '#fff',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								flexShrink: 0,
+							} }
+						>
+							<i className="ri-movie-line" style={ { fontSize: '24px' } } />
+						</div>
+					) }
+					<div style={ { flex: 1, minWidth: 0 } }>
+						<div style={ { fontSize: '11px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: '2px' } }>
+							{ __( 'Selected Media File', 'raka-preorder-theme' ) }
+						</div>
+						<div style={ { fontSize: '12px', color: '#1e293b', wordBreak: 'break-all', fontFamily: 'monospace' } }>
+							{ value }
+						</div>
+					</div>
+					<div style={ { display: 'flex', gap: '6px', flexShrink: 0 } }>
+						<Button variant="secondary" onClick={ openModal } size="small">
+							<i className="ri-folder-image-line" style={ { marginRight: '4px' } } />
+							{ __( 'Change', 'raka-preorder-theme' ) }
+						</Button>
+						<Button variant="secondary" isDestructive onClick={ () => onChange( '' ) } size="small">
+							<i className="ri-delete-bin-line" />
+						</Button>
+					</div>
+				</div>
+			) : (
+				<div
+					onClick={ openModal }
+					style={ {
+						border: '2px dashed #cbd5e1',
+						borderRadius: '10px',
+						padding: '22px 16px',
+						textAlign: 'center',
+						cursor: 'pointer',
+						background: '#f8fafc',
+						transition: 'all 0.2s ease',
+					} }
+					onMouseEnter={ ( e ) => {
+						e.currentTarget.style.borderColor = '#3b82f6';
+						e.currentTarget.style.background = '#f0f7ff';
+					} }
+					onMouseLeave={ ( e ) => {
+						e.currentTarget.style.borderColor = '#cbd5e1';
+						e.currentTarget.style.background = '#f8fafc';
+					} }
+				>
+					<i
+						className={ mediaType === 'video' ? 'ri-video-upload-line' : 'ri-image-add-line' }
+						style={ { fontSize: '32px', color: '#64748b', display: 'block', marginBottom: '6px' } }
+					/>
+					<span style={ { fontSize: '13px', fontWeight: 600, color: '#2563eb', display: 'block' } }>
+						{ mediaType === 'video'
+							? __( 'Choose Video from WordPress Media Library', 'raka-preorder-theme' )
+							: __( 'Choose Image from WordPress Media Library', 'raka-preorder-theme' ) }
+					</span>
+					<span style={ { fontSize: '11px', color: '#94a3b8', display: 'block', marginTop: '3px' } }>
+						{ __( 'Upload new file or select from existing media files', 'raka-preorder-theme' ) }
+					</span>
+				</div>
+			) }
+
+			{ help && <p style={ { margin: '5px 0 0 0', fontSize: '12px', color: '#646970' } }>{ help }</p> }
+		</div>
+	);
+}
+
+/**
  * Reusable Select2 component integrated into WordPress Component style.
  */
 function Select2Control( {
@@ -74,7 +269,7 @@ function Select2Control( {
 	}, [ value ] );
 
 	return (
-		<div className="raka-select2-field" style={ { marginBottom: '16px' } }>
+		<div className="raka-select2-field" style={ { marginBottom: '14px' } }>
 			{ label && (
 				<label
 					style={ {
@@ -138,6 +333,9 @@ export default function ThemeSettingsApp() {
 	} );
 	const [ activeCardIndex, setActiveCardIndex ] = useState( 0 );
 
+	// Card sub-tab tracking state (per card index)
+	const [ cardTabModes, setCardTabModes ] = useState( {} );
+
 	// Fetch initial settings & WooCommerce terms from REST API
 	useEffect( () => {
 		apiFetch( { path: '/raka/v1/settings' } )
@@ -173,7 +371,7 @@ export default function ThemeSettingsApp() {
 	};
 
 	// Repeater handlers
-	const heroCards = Array.isArray( options.hero_cards) ? options.hero_cards : [];
+	const heroCards = Array.isArray( options.hero_cards ) ? options.hero_cards : [];
 
 	const handleCardChange = ( index, field, value ) => {
 		const updated = [ ...heroCards ];
@@ -367,7 +565,7 @@ export default function ThemeSettingsApp() {
 						</h1>
 					</div>
 					<p style={ { margin: '6px 0 0 46px', color: '#9ca3af', fontSize: '13px' } }>
-						{ __( 'Configure dynamic scroll-activated product cards (unlimited repeater), custom statement text mode, and hero video scrubbing.', 'raka-preorder-theme' ) }
+						{ __( 'Configure dynamic scroll-activated product cards (unlimited repeater), media library / direct URL switchers, and hero video scrubbing.', 'raka-preorder-theme' ) }
 					</p>
 				</div>
 				<div style={ { display: 'flex', gap: '10px' } }>
@@ -442,21 +640,41 @@ export default function ThemeSettingsApp() {
 										/>
 									</div>
 
-									<div style={ { marginTop: '18px' } }>
+									{ /* Hero Video Section with Media Picker + URL fallback */ }
+									<div style={ { marginTop: '22px', padding: '18px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' } }>
+										<MediaUploaderControl
+											label={ __( 'Background Video (MP4 / WebM for Ultra-Smooth Scrubbing)', 'raka-preorder-theme' ) }
+											value={ options.hero_video_url ?? '' }
+											mediaType="video"
+											title={ __( 'Select Hero Background Video', 'raka-preorder-theme' ) }
+											buttonText={ __( 'Use This Video', 'raka-preorder-theme' ) }
+											onChange={ ( val ) => handleOptionChange( 'hero_video_url', val ) }
+											help={ __( 'Direct URL or media file to a 60fps MP4 video used for the scroll scrubber.', 'raka-preorder-theme' ) }
+										/>
 										<TextControl
-											label={ __( 'Background Video MP4 URL (Ultra-Smooth WebCodecs Scrubbing)', 'raka-preorder-theme' ) }
+											label={ __( 'Or Enter Direct Video URL', 'raka-preorder-theme' ) }
 											value={ options.hero_video_url ?? '' }
 											onChange={ ( val ) => handleOptionChange( 'hero_video_url', val ) }
-											help={ __( 'Direct URL to a 60fps MP4 video used for the scroll scrubber.', 'raka-preorder-theme' ) }
+											placeholder="https://.../video.mp4"
 										/>
 									</div>
 
-									<div style={ { marginTop: '18px' } }>
-										<TextControl
-											label={ __( 'Hero Character Overlay Image URL (Figma PNG Asset)', 'raka-preorder-theme' ) }
+									{ /* Hero Overlay Character PNG */ }
+									<div style={ { marginTop: '22px', padding: '18px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' } }>
+										<MediaUploaderControl
+											label={ __( 'Hero Character Overlay Image (Transparent PNG Asset)', 'raka-preorder-theme' ) }
 											value={ options.hero_overlay_url ?? '' }
+											mediaType="image"
+											title={ __( 'Select Hero Character Overlay PNG', 'raka-preorder-theme' ) }
+											buttonText={ __( 'Use This PNG', 'raka-preorder-theme' ) }
 											onChange={ ( val ) => handleOptionChange( 'hero_overlay_url', val ) }
 											help={ __( 'Local transparent PNG of the character overlay that fades during scrolling.', 'raka-preorder-theme' ) }
+										/>
+										<TextControl
+											label={ __( 'Or Enter Direct Image URL', 'raka-preorder-theme' ) }
+											value={ options.hero_overlay_url ?? '' }
+											onChange={ ( val ) => handleOptionChange( 'hero_overlay_url', val ) }
+											placeholder="https://.../character-overlay.png"
 										/>
 									</div>
 								</CardBody>
@@ -483,7 +701,7 @@ export default function ThemeSettingsApp() {
 											{ __( 'Hero Scroll Product Cards (Repeater)', 'raka-preorder-theme' ) }
 										</h2>
 										<p style={ { color: '#6b7280', fontSize: '13px', margin: 0 } }>
-											{ __( 'Add as many cards as you like. Toggle between WooCommerce Product Card (with Add to Cart) or Custom Statement Text.', 'raka-preorder-theme' ) }
+											{ __( 'Add as many cards as you like. Switch between WooCommerce Select2 or Custom URL, and Media Library or Direct Image URL.', 'raka-preorder-theme' ) }
 										</p>
 									</div>
 									<Button
@@ -541,6 +759,18 @@ export default function ThemeSettingsApp() {
 										const displayTag = card.tag || ( card.show_custom_text ? 'ORIGIN' : 'PRE-ORDER' );
 										const displayPrice = card.price || ( selectedProd ? selectedProd.price : '' );
 										const displayImage = card.image_url || ( selectedProd ? selectedProd.image_url : '' );
+
+										// Tab state for Product vs Custom URL (default 'product' if product_id is set, otherwise 'custom_url' if url is set)
+										const linkTab = cardTabModes[ `${ idx }_link` ] || ( Number( card.product_id ) > 0 ? 'product' : 'product' );
+										const setLinkTab = ( val ) => {
+											setCardTabModes( ( prev ) => ( { ...prev, [ `${ idx }_link` ]: val } ) );
+										};
+
+										// Tab state for Media vs URL (default 'media' if image is present from media or empty)
+										const imageTab = cardTabModes[ `${ idx }_image` ] || 'media';
+										const setImageTab = ( val ) => {
+											setCardTabModes( ( prev ) => ( { ...prev, [ `${ idx }_image` ]: val } ) );
+										};
 
 										return (
 											<div
@@ -751,18 +981,53 @@ export default function ThemeSettingsApp() {
 															/>
 														</div>
 
-														{ /* Product Selection (if in Product Card mode) */ }
+														{ /* Product / Destination Selection with Switcher Tabs */ }
 														{ ! card.show_custom_text && (
-															<div style={ { background: '#f8fafc', padding: '16px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '20px' } }>
-																<Select2Control
-																	label={ __( 'Select WooCommerce Product', 'raka-preorder-theme' ) }
-																	icon="ri-shopping-bag-3-line"
-																	value={ card.product_id }
-																	options={ productOptions }
-																	onChange={ ( val ) => handleCardChange( idx, 'product_id', val ) }
-																	placeholder={ __( '-- Search & Pick Product --', 'raka-preorder-theme' ) }
-																	help={ __( 'Selecting a product automatically fills in Title, Price, Description, Thumbnail, and Link.', 'raka-preorder-theme' ) }
-																/>
+															<div style={ { background: '#f8fafc', padding: '18px 20px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '20px' } }>
+																<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' } }>
+																	<label style={ { fontWeight: 700, fontSize: '13px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' } }>
+																		<i className="ri-links-line" style={ { color: '#3b82f6' } } />
+																		{ __( 'Product & Destination Link Source', 'raka-preorder-theme' ) }
+																	</label>
+																	<TabSwitcher
+																		tabs={ [
+																			{ id: 'product', label: __( 'WooCommerce Product (Select2)', 'raka-preorder-theme' ), icon: 'ri-shopping-bag-3-line' },
+																			{ id: 'custom_url', label: __( 'Custom Destination URL', 'raka-preorder-theme' ), icon: 'ri-link' },
+																		] }
+																		activeTab={ linkTab }
+																		onSelect={ setLinkTab }
+																		style={ { marginBottom: 0 } }
+																	/>
+																</div>
+
+																{ linkTab === 'product' ? (
+																	<div>
+																		<Select2Control
+																			label={ '' }
+																			value={ card.product_id }
+																			options={ productOptions }
+																			onChange={ ( val ) => handleCardChange( idx, 'product_id', val ) }
+																			placeholder={ __( '-- Search & Pick WooCommerce Product --', 'raka-preorder-theme' ) }
+																			help={ __( 'Picking a product automatically fills Title, Price, Description, Thumbnail, and Product Link.', 'raka-preorder-theme' ) }
+																		/>
+																		{ selectedProd && (
+																			<div style={ { marginTop: '8px', padding: '8px 12px', background: '#ecfdf5', borderRadius: '6px', border: '1px solid #a7f3d0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#065f46' } }>
+																				<i className="ri-checkbox-circle-fill" style={ { color: '#10b981' } } />
+																				<span><strong>{ selectedProd.title }</strong> &bull; { selectedProd.price || 'No price set' } &bull; <a href={ selectedProd.permalink } target="_blank" rel="noreferrer" style={ { color: '#047857', textDecoration: 'underline' } }>{ __( 'View Product', 'raka-preorder-theme' ) }</a></span>
+																			</div>
+																		) }
+																	</div>
+																) : (
+																	<div>
+																		<TextControl
+																			label={ __( 'Custom Destination Link URL', 'raka-preorder-theme' ) }
+																			value={ card.url ?? '' }
+																			onChange={ ( val ) => handleCardChange( idx, 'url', val ) }
+																			placeholder="https://raka-gadget.local/custom-page/"
+																			help={ __( 'Enter custom internal or external URL link for this card.', 'raka-preorder-theme' ) }
+																		/>
+																	</div>
+																) }
 															</div>
 														) }
 
@@ -823,7 +1088,7 @@ export default function ThemeSettingsApp() {
 															/>
 														</div>
 
-														{ /* Row 4: CTA Button Text + Destination URL */ }
+														{ /* Row 4: CTA Button Text + Destination URL (if not already managed above or in text mode) */ }
 														<Flex gap={ 4 } style={ { marginBottom: '18px' } }>
 															<FlexItem isBlock>
 																<TextControl
@@ -833,26 +1098,68 @@ export default function ThemeSettingsApp() {
 																	placeholder={ card.show_custom_text ? 'Explore' : 'Pre-Order Now' }
 																/>
 															</FlexItem>
-															<FlexItem isBlock>
-																<TextControl
-																	label={ __( 'Destination URL (Leave blank to use Product Page)', 'raka-preorder-theme' ) }
-																	value={ card.url ?? '' }
-																	onChange={ ( val ) => handleCardChange( idx, 'url', val ) }
-																	placeholder={ selectedProd ? selectedProd.permalink : 'https://...' }
-																/>
-															</FlexItem>
+															{ ( card.show_custom_text || linkTab === 'custom_url' ) && (
+																<FlexItem isBlock>
+																	<TextControl
+																		label={ __( 'Destination URL', 'raka-preorder-theme' ) }
+																		value={ card.url ?? '' }
+																		onChange={ ( val ) => handleCardChange( idx, 'url', val ) }
+																		placeholder={ selectedProd ? selectedProd.permalink : 'https://...' }
+																	/>
+																</FlexItem>
+															) }
 														</Flex>
 
-														{ /* Row 5: Custom Image URL (if product mode) */ }
+														{ /* Row 5: Image Source Switcher (Media Library vs Direct URL) */ }
 														{ ! card.show_custom_text && (
-															<div>
-																<TextControl
-																	label={ __( 'Custom Image URL (Optional override)', 'raka-preorder-theme' ) }
-																	value={ card.image_url ?? '' }
-																	onChange={ ( val ) => handleCardChange( idx, 'image_url', val ) }
-																	placeholder={ selectedProd ? selectedProd.image_url : 'https://.../product.jpg' }
-																	help={ __( 'Leave blank to automatically use the product featured image.', 'raka-preorder-theme' ) }
-																/>
+															<div style={ { background: '#f8fafc', padding: '18px 20px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '20px' } }>
+																<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' } }>
+																	<label style={ { fontWeight: 700, fontSize: '13px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' } }>
+																		<i className="ri-image-line" style={ { color: '#3b82f6' } } />
+																		{ __( 'Card Thumbnail / Image Source', 'raka-preorder-theme' ) }
+																	</label>
+																	<TabSwitcher
+																		tabs={ [
+																			{ id: 'media', label: __( 'Media Library', 'raka-preorder-theme' ), icon: 'ri-folder-image-line' },
+																			{ id: 'url', label: __( 'Direct Image URL', 'raka-preorder-theme' ), icon: 'ri-global-line' },
+																		] }
+																		activeTab={ imageTab }
+																		onSelect={ setImageTab }
+																		style={ { marginBottom: 0 } }
+																	/>
+																</div>
+
+																{ imageTab === 'media' ? (
+																	<MediaUploaderControl
+																		label={ __( 'Select / Upload Image from Media Library', 'raka-preorder-theme' ) }
+																		value={ card.image_url ?? ( selectedProd ? selectedProd.image_url : '' ) }
+																		mediaType="image"
+																		title={ __( 'Select Hero Card Image', 'raka-preorder-theme' ) }
+																		buttonText={ __( 'Use as Card Image', 'raka-preorder-theme' ) }
+																		onChange={ ( val ) => handleCardChange( idx, 'image_url', val ) }
+																		help={ __( 'Pick an image from WordPress Media Library or upload a new high-res photo.', 'raka-preorder-theme' ) }
+																	/>
+																) : (
+																	<div>
+																		<TextControl
+																			label={ __( 'Custom Direct Image URL', 'raka-preorder-theme' ) }
+																			value={ card.image_url ?? '' }
+																			onChange={ ( val ) => handleCardChange( idx, 'image_url', val ) }
+																			placeholder={ selectedProd ? selectedProd.image_url : 'https://.../product.jpg' }
+																			help={ __( 'Leave blank to automatically use the WooCommerce product featured image.', 'raka-preorder-theme' ) }
+																		/>
+																		{ card.image_url && (
+																			<div style={ { marginTop: '8px', display: 'flex', alignItems: 'center', gap: '10px' } }>
+																				<img
+																					src={ card.image_url }
+																					alt=""
+																					style={ { width: '48px', height: '48px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #cbd5e1' } }
+																				/>
+																				<span style={ { fontSize: '12px', color: '#64748b' } }>{ __( 'Image URL Preview', 'raka-preorder-theme' ) }</span>
+																			</div>
+																		) }
+																	</div>
+																) }
 															</div>
 														) }
 
