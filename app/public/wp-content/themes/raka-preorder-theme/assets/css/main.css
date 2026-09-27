@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════════
-   OBSIDIAN THEME CORE STYLES
+   THEME CORE STYLES (main.css)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 * {
@@ -204,7 +204,7 @@ html.dark #breadcrumbs .breadcrumb_last {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   STANDARDIZED OBSIDIAN CONTAINERS (1,280px Grid Engine)
+   STANDARDIZED CONTAINERS (1,280px Grid Engine)
    ══════════════════════════════════════════════════════════════════════════════ */
 .container,
 .obsidian-container {
@@ -247,5 +247,3 @@ html.dark #breadcrumbs .breadcrumb_last {
 	margin-right: auto;
 	padding: 0 !important;
 }
-
-
