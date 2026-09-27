@@ -696,6 +696,13 @@ function raka_render_woocommerce_pagination(): void {
 }
 
 /**
+ * Custom Chevron Separator for Yoast SEO Breadcrumbs
+ */
+add_filter( 'wpseo_breadcrumb_separator', function( $separator ) {
+	return '<i class="ri-arrow-right-s-line text-sm opacity-50 mx-1 align-middle inline-block"></i>';
+} );
+
+/**
  * Render Breadcrumbs using Yoast SEO if active, with clean Obsidian editorial fallback
  */
 function raka_render_breadcrumbs( string $wrapper_id = 'obsidian-breadcrumbs', string $extra_classes = '' ): void {
@@ -711,17 +718,17 @@ function raka_render_breadcrumbs( string $wrapper_id = 'obsidian-breadcrumbs', s
 	echo '<nav id="' . esc_attr( $wrapper_id ) . '" class="yoast-breadcrumbs flex items-center flex-wrap gap-2 text-xs uppercase tracking-[0.2em] font-mono text-neutral-400 dark:text-neutral-500 ' . esc_attr( $extra_classes ) . '">';
 	echo '<a id="' . esc_attr( $wrapper_id ) . '-home" href="' . esc_url( home_url( '/' ) ) . '" class="hover:text-black dark:hover:text-white transition-colors">HOME</a>';
 	if ( is_singular( 'product' ) ) {
-		echo '<span id="' . esc_attr( $wrapper_id ) . '-sep-1" class="opacity-40">/</span>';
+		echo '<i id="' . esc_attr( $wrapper_id ) . '-sep-1" class="ri-arrow-right-s-line text-sm opacity-50"></i>';
 		echo '<a id="' . esc_attr( $wrapper_id ) . '-shop" href="' . esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ) . '" class="hover:text-black dark:hover:text-white transition-colors">SHOP</a>';
-		echo '<span id="' . esc_attr( $wrapper_id ) . '-sep-2" class="opacity-40">/</span>';
+		echo '<i id="' . esc_attr( $wrapper_id ) . '-sep-2" class="ri-arrow-right-s-line text-sm opacity-50"></i>';
 		echo '<span id="' . esc_attr( $wrapper_id ) . '-current" class="text-neutral-900 dark:text-neutral-200 font-semibold truncate max-w-[200px]">' . esc_html( get_the_title() ) . '</span>';
 	} elseif ( is_shop() ) {
-		echo '<span id="' . esc_attr( $wrapper_id ) . '-sep-1" class="opacity-40">/</span>';
+		echo '<i id="' . esc_attr( $wrapper_id ) . '-sep-1" class="ri-arrow-right-s-line text-sm opacity-50"></i>';
 		echo '<span id="' . esc_attr( $wrapper_id ) . '-current" class="text-neutral-900 dark:text-neutral-200 font-semibold">SHOP</span>';
 	} elseif ( is_tax() || is_category() || is_tag() ) {
-		echo '<span id="' . esc_attr( $wrapper_id ) . '-sep-1" class="opacity-40">/</span>';
+		echo '<i id="' . esc_attr( $wrapper_id ) . '-sep-1" class="ri-arrow-right-s-line text-sm opacity-50"></i>';
 		echo '<a id="' . esc_attr( $wrapper_id ) . '-shop" href="' . esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ) . '" class="hover:text-black dark:hover:text-white transition-colors">SHOP</a>';
-		echo '<span id="' . esc_attr( $wrapper_id ) . '-sep-2" class="opacity-40">/</span>';
+		echo '<i id="' . esc_attr( $wrapper_id ) . '-sep-2" class="ri-arrow-right-s-line text-sm opacity-50"></i>';
 		echo '<span id="' . esc_attr( $wrapper_id ) . '-current" class="text-neutral-900 dark:text-neutral-200 font-semibold">' . esc_html( single_term_title( '', false ) ) . '</span>';
 	}
 	echo '</nav>';
