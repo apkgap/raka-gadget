@@ -139,7 +139,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 
 <!-- ── ScrollVideoHero Component ── -->
 <section id="scroll-video-hero-section" class="relative" style="height: <?php echo esc_attr( $hero_section_height ); ?>;">
-	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-white dark:bg-obsidian theme-transition gpu-accel">
+	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-[#1a1a1a]" style="will-change: transform;">
 
 		<!-- 1. Video Layer -->
 		<video
@@ -148,8 +148,8 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			muted
 			playsinline
 			preload="auto"
-			class="absolute inset-0 w-full h-full object-cover object-top gpu-accel pointer-events-none"
-			style="opacity: 0; will-change: transform, opacity;"
+			class="absolute inset-0 w-full h-full object-cover pointer-events-none"
+			style="opacity: 0;"
 		></video>
 
 		<!-- 2. Canvas Layer (Ultra Smooth WebCodecs Frame Blitter) -->
@@ -157,72 +157,69 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			id="hero-canvas"
 			width="1280"
 			height="720"
-			class="absolute inset-0 w-full h-full object-cover object-top gpu-accel pointer-events-none transition-opacity duration-300"
-			style="opacity: 0; will-change: transform, opacity;"
+			class="absolute inset-0 w-full h-full object-cover transition-opacity duration-200 pointer-events-none"
+			style="opacity: 0;"
 		></canvas>
 
 		<!-- 3. Hero Overlay Image (Figma asset: Pure white wings & gold angel) -->
-		<div id="hero-overlay-png-wrap" class="absolute inset-0 z-30 pointer-events-none gpu-accel transition-opacity duration-150">
+		<div id="hero-overlay-png-wrap" class="absolute inset-0 z-30 pointer-events-none">
 			<img
 				id="hero-overlay-png"
 				alt=""
-				class="w-full h-full object-cover object-top"
+				class="w-full h-full object-cover"
 				src="<?php echo esc_url( $hero_overlay_url ); ?>"
 			/>
 		</div>
 
 		<!-- 4. Hero Content (Section 1) -->
-		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col justify-between pointer-events-none gpu-accel p-6 md:p-10 pb-8 md:pb-10">
+		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col pointer-events-none">
 			<!-- Centered Main Title -->
-			<div id="hero-title-container" class="flex justify-center mt-10 md:mt-12">
-				<h1 id="hero-main-title" class="text-[18vw] md:text-[20vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition">
+			<div id="hero-title-container" class="flex justify-center mt-12 md:mt-14">
+				<h1 id="hero-main-title" class="text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition">
 					<?php echo esc_html( $hero_main_title ); ?>
 				</h1>
 			</div>
 
-			<!-- Bottom Hero Action Bar (Left: Caption & Contact | Right: Categories & Brands) -->
-			<div id="hero-bottom-bar" class="w-full flex flex-col md:flex-row items-start md:items-end justify-between gap-6 pointer-events-none mt-auto">
-				<!-- Bottom Left: Caption & Contact Popup Button -->
-				<div id="hero-bottom-left-panel" class="pointer-events-auto flex flex-col items-start gap-3.5 max-w-sm">
-					<p id="hero-caption-text" class="text-[9px] md:text-[10px] tracking-[0.15em] uppercase leading-[1.8] text-black/80 dark:text-white/80 font-hn theme-transition">
-						<?php echo nl2br( esc_html( $hero_caption ) ); ?>
-					</p>
-					<button
-						id="hero-contact-trigger-btn"
-						type="button"
-						onclick="window.rakaOpenModal('contact')"
-						class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
-					>
-						<span id="hero-contact-btn-pulse" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-						<span id="hero-contact-btn-text"><?php echo esc_html( ! empty( $contact_options['contact_title'] ) ? $contact_options['contact_title'] : __( 'Contact & Store', 'raka-preorder-theme' ) ); ?></span>
-						<i id="hero-contact-btn-icon" class="ri-arrow-right-up-line text-sm opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
-					</button>
-				</div>
+			<!-- Bottom Left: Caption & Contact Popup Button -->
+			<div id="hero-bottom-left-panel" class="absolute bottom-6 left-6 md:left-10 md:bottom-8 pointer-events-auto flex flex-col items-start gap-3.5 max-w-sm">
+				<p id="hero-caption-text" class="text-[9px] md:text-[10px] tracking-[0.15em] uppercase leading-[1.8] text-black/80 dark:text-white/80 font-hn theme-transition">
+					<?php echo nl2br( esc_html( $hero_caption ) ); ?>
+				</p>
+				<button
+					id="hero-contact-trigger-btn"
+					type="button"
+					onclick="window.rakaOpenModal('contact')"
+					class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+				>
+					<span id="hero-contact-btn-pulse" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+					<span id="hero-contact-btn-text"><?php echo esc_html( ! empty( $contact_options['contact_title'] ) ? $contact_options['contact_title'] : __( 'Contact & Store', 'raka-preorder-theme' ) ); ?></span>
+					<i id="hero-contact-btn-icon" class="ri-arrow-right-up-line text-sm opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+				</button>
+			</div>
 
-				<!-- Bottom Right: Categories & Brands Popup Buttons -->
-				<div id="hero-bottom-right-panel" class="pointer-events-auto flex items-center flex-wrap gap-2.5 sm:gap-3.5 self-start md:self-end">
-					<button
-						id="hero-categories-trigger-btn"
-						type="button"
-						onclick="window.rakaOpenModal('categories')"
-						class="group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
-					>
-						<i id="hero-categories-btn-icon" class="ri-grid-fill text-sm opacity-75 group-hover:opacity-100 group-hover:rotate-12 transition-transform"></i>
-						<span id="hero-categories-btn-text"><?php esc_html_e( 'Categories', 'raka-preorder-theme' ); ?></span>
-						<span id="hero-categories-btn-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/10 dark:bg-white/15 text-neutral-800 dark:text-white font-mono"><?php echo esc_html( count( $featured_categories ) ); ?></span>
-					</button>
+			<!-- Bottom Right: Categories & Brands Popup Buttons -->
+			<div id="hero-bottom-right-panel" class="absolute bottom-6 right-6 md:right-10 md:bottom-8 pointer-events-auto flex items-center flex-wrap gap-2.5 sm:gap-3.5">
+				<button
+					id="hero-categories-trigger-btn"
+					type="button"
+					onclick="window.rakaOpenModal('categories')"
+					class="group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+				>
+					<i id="hero-categories-btn-icon" class="ri-grid-fill text-sm opacity-75 group-hover:opacity-100 group-hover:rotate-12 transition-transform"></i>
+					<span id="hero-categories-btn-text"><?php esc_html_e( 'Categories', 'raka-preorder-theme' ); ?></span>
+					<span id="hero-categories-btn-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/10 dark:bg-white/15 text-neutral-800 dark:text-white font-mono"><?php echo esc_html( count( $featured_categories ) ); ?></span>
+				</button>
 
-					<button
-						id="hero-brands-trigger-btn"
-						type="button"
-						onclick="window.rakaOpenModal('brands')"
-						class="group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
-					>
-						<i id="hero-brands-btn-icon" class="ri-fire-fill text-sm text-amber-500 group-hover:scale-125 transition-transform"></i>
-						<span id="hero-brands-btn-text"><?php esc_html_e( 'Brands', 'raka-preorder-theme' ); ?></span>
-						<span id="hero-brands-btn-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/10 dark:bg-white/15 text-neutral-800 dark:text-white font-mono"><?php echo esc_html( count( $featured_brands ) ); ?></span>
-					</button>
-				</div>
+				<button
+					id="hero-brands-trigger-btn"
+					type="button"
+					onclick="window.rakaOpenModal('brands')"
+					class="group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+				>
+					<i id="hero-brands-btn-icon" class="ri-fire-fill text-sm text-amber-500 group-hover:scale-125 transition-transform"></i>
+					<span id="hero-brands-btn-text"><?php esc_html_e( 'Brands', 'raka-preorder-theme' ); ?></span>
+					<span id="hero-brands-btn-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/10 dark:bg-white/15 text-neutral-800 dark:text-white font-mono"><?php echo esc_html( count( $featured_brands ) ); ?></span>
+				</button>
 			</div>
 		</div>
 
