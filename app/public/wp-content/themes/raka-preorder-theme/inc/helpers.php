@@ -660,16 +660,7 @@ function raka_render_product_card( $product, array $args = [] ): void {
 						<span id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>" class="px-3.5 py-1.5 rounded-full bg-neutral-200/70 dark:bg-neutral-800/70 text-neutral-400 dark:text-neutral-500 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider cursor-not-allowed select-none whitespace-nowrap">
 							SOLD OUT
 						</span>
-					<?php elseif ( $product->is_type( 'variable' ) ) : ?>
-						<a
-							id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>"
-							href="<?php echo esc_url( $p_link ); ?>"
-							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-8.5 px-3.5 sm:px-4 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-black dark:hover:bg-neutral-100 text-[10.5px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold hover:scale-105 active:scale-95 transition-all shadow-xs whitespace-nowrap group/btn"
-						>
-							<i id="p-btn-cart-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-equalizer-line text-xs flex-shrink-0"></i>
-							<span id="p-btn-cart-txt-<?php echo esc_attr( $p_id ); ?>" class="whitespace-nowrap">SELECT</span>
-						</a>
-					<?php else : ?>
+					<?php elseif ( ! $product->is_type( 'variable' ) ) : ?>
 						<button
 							id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>"
 							type="button"
