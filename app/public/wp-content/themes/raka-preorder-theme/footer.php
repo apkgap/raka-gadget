@@ -412,6 +412,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 			window.addEventListener('scroll', handleScroll, { passive: true });
 			handleScroll();
 		})();
+
+		// ─── 5. WooCommerce Cart Badge Dynamic Updater ───────────────────────────
+		(function() {
+			function updateBadges(count) {
+				const badges = document.querySelectorAll('.raka-cart-count-badge');
+				badges.forEach(b => {
+					if (typeof count === 'number') {
+						b.textContent = count;
+						if (count > 0) {
+							b.classList.remove('scale-0');
+							b.classList.add('scale-100');
+						} else {
+							b.classList.remove('scale-100');
+							b.classList.add('scale-0');
+						}
+					}
+					// Bounce animation
+					b.classList.remove('scale-125');
+					void b.offsetWidth;
+					b.classList.add('scale-125');
+					setTimeout(() => b.classList.remove('scale-125'), 300);
+				});
+			}
+
+			if (window.jQuery) {
+				window.jQuery(document.body).on('added_to_cart', function(event, fragments) {
+					if (fragments && fragments['#raka-cart-count']) {
+						const temp = document.createElement('div');
+						temp.innerHTML = fragments['#raka-cart-count'];
+						const newSpan = temp.querySelector('span') || temp.firstChild;
+						if (newSpan) {
+							const cnt = parseInt(newSpan.textContent.trim(), 10);
+							if (!isNaN(cnt)) updateBadges(cnt);
+						}
+					}
+				});
+			}
+		})();
 	</script>
 
 	<?php wp_footer(); ?>

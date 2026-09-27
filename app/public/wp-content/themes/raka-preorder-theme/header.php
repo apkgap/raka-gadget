@@ -44,7 +44,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div id="theme-ripple-circle"></div>
 
 		<?php
-		$is_home = is_front_page();
+		$is_home    = is_front_page();
+		$cart_count = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+		$cart_url   = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart' );
 		?>
 		<!-- ── Prominent Semantic Header Component ── -->
 		<header 
@@ -71,8 +73,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div class="<?php echo $is_home ? 'opacity-50' : 'text-neutral-400 dark:text-neutral-500'; ?> text-[10px] md:text-xs">& MODERN PRACTICE</div>
 				</div>
 
-				<!-- Right Controls (Theme Toggle + Hamburger Button) -->
-				<div id="raka-nav-controls" class="pointer-events-auto flex items-center gap-4 sm:gap-6 z-[70]">
+				<!-- Right Controls (Cart + Theme Toggle + Hamburger Button) -->
+				<div id="raka-nav-controls" class="pointer-events-auto flex items-center gap-3 sm:gap-5 z-[70]">
+					<!-- Cart Button -->
+					<a
+						id="raka-cart-btn"
+						href="<?php echo esc_url( $cart_url ); ?>"
+						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer <?php echo $is_home ? 'mix-blend-difference' : ''; ?>"
+						style="cursor: pointer; pointer-events: auto;"
+						aria-label="Shopping Cart"
+						title="Shopping Cart"
+					>
+						<i id="raka-cart-icon" class="ri-shopping-bag-3-line text-lg block"></i>
+						<span
+							id="raka-cart-count"
+							class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
+						>
+							<?php echo esc_html( (string) $cart_count ); ?>
+						</span>
+					</a>
+
 					<!-- Theme Toggle Button -->
 					<button
 						id="raka-theme-btn"
@@ -125,8 +145,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<span id="overlay-tag-vol">MMXXV</span>
 					</div>
 
-					<!-- Right Controls: Theme Toggle & Minimalist X Button -->
+					<!-- Right Controls: Cart + Theme Toggle & Minimalist X Button -->
 					<div id="overlay-controls" class="flex items-center gap-3 sm:gap-4">
+						<!-- Cart Button in Overlay -->
+						<a
+							id="overlay-cart-btn"
+							href="<?php echo esc_url( $cart_url ); ?>"
+							class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-105 focus:outline-none cursor-pointer"
+							aria-label="Shopping Cart"
+							title="Shopping Cart"
+						>
+							<i id="overlay-cart-icon" class="ri-shopping-bag-3-line text-lg block"></i>
+							<span
+								id="overlay-cart-count"
+								class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
+							>
+								<?php echo esc_html( (string) $cart_count ); ?>
+							</span>
+						</a>
+
 						<!-- Theme Toggle in Overlay -->
 						<button
 							id="overlay-theme-btn"

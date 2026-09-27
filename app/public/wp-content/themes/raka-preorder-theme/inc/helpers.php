@@ -734,4 +734,22 @@ function raka_render_breadcrumbs( string $wrapper_id = 'obsidian-breadcrumbs', s
 	echo '</nav>';
 }
 
+/**
+ * Add WooCommerce Cart fragments to update cart badge count via AJAX.
+ *
+ * @param array $fragments Existing fragments.
+ * @return array
+ */
+function raka_add_to_cart_fragments( array $fragments ): array {
+	$cart_count = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+	$scale_class = ( $cart_count > 0 ) ? 'scale-100' : 'scale-0';
+	
+	$html = '<span id="raka-cart-count" class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 ' . esc_attr( $scale_class ) . '">' . esc_html( (string) $cart_count ) . '</span>';
+	
+	$fragments['#raka-cart-count'] = $html;
+	return $fragments;
+}
+add_filter( 'woocommerce_add_to_cart_fragments', 'raka_add_to_cart_fragments' );
+
+
 
