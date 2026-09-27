@@ -64,38 +64,38 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			</div>
 		<?php else : ?>
 			<!-- WooCommerce Product Card Mode with Direct Add to Cart Action -->
-			<div class="pointer-events-auto block max-w-md lg:max-w-[420px] w-full p-6 md:p-7 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300 <?php echo esc_attr( $custom_classes ); ?>">
+			<div class="pointer-events-auto block max-w-full sm:max-w-md lg:max-w-[420px] w-full p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl bg-white/95 dark:bg-black/90 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300 <?php echo esc_attr( $custom_classes ); ?>">
 				<!-- Header: Tag + Price -->
-				<div class="flex items-center justify-between gap-3 mb-3">
+				<div class="flex items-center justify-between gap-3 mb-2.5 sm:mb-3">
 					<?php if ( ! empty( $card['tag'] ) ) : ?>
-						<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] md:text-[11px] font-bold tracking-widest uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-hn">
+						<span class="inline-flex items-center px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] sm:text-[10px] md:text-[11px] font-bold tracking-widest uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-hn">
 							<?php echo esc_html( $card['tag'] ); ?>
 						</span>
 					<?php endif; ?>
 					<?php if ( ! empty( $card['price_html'] ) ) : ?>
-						<div class="text-sm md:text-base font-bold text-neutral-900 dark:text-white font-hn">
+						<div class="text-xs sm:text-sm md:text-base font-bold text-neutral-900 dark:text-white font-hn">
 							<?php echo esc_html( $card['price_html'] ); ?>
 						</div>
 					<?php endif; ?>
 				</div>
 
 				<!-- Card Content: Image & Text -->
-				<div class="flex items-start gap-4">
+				<div class="flex items-start gap-3 sm:gap-4">
 					<?php if ( ! empty( $card['image_url'] ) ) : ?>
-						<a href="<?php echo esc_url( $card['url'] ); ?>" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 shrink-0 group-hover:scale-105 transition-transform duration-300 block">
+						<a href="<?php echo esc_url( $card['url'] ); ?>" class="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 shrink-0 group-hover:scale-105 transition-transform duration-300 block">
 							<img src="<?php echo esc_url( $card['image_url'] ); ?>" alt="<?php echo esc_attr( $card['title'] ); ?>" class="w-full h-full object-cover" />
 						</a>
 					<?php endif; ?>
 					<div class="flex-1 min-w-0">
 						<?php if ( ! empty( $card['title'] ) ) : ?>
-							<h3 class="text-base md:text-lg font-bold text-black dark:text-white font-hn group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-snug line-clamp-2">
+							<h3 class="text-sm sm:text-base md:text-lg font-bold text-black dark:text-white font-hn group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-snug line-clamp-2">
 								<a href="<?php echo esc_url( $card['url'] ); ?>">
 									<?php echo esc_html( $card['title'] ); ?>
 								</a>
 							</h3>
 						<?php endif; ?>
 						<?php if ( ! empty( $card['description'] ) ) : ?>
-							<p class="text-xs leading-relaxed text-black/70 dark:text-white/75 font-light font-hn mt-1.5 line-clamp-2">
+							<p class="text-[11px] sm:text-xs leading-relaxed text-black/70 dark:text-white/75 font-light font-hn mt-1 sm:mt-1.5 line-clamp-2">
 								<?php echo esc_html( $card['description'] ); ?>
 							</p>
 						<?php endif; ?>
@@ -103,20 +103,20 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 				</div>
 
 				<!-- Card CTA Action Footer: Direct Add to Cart + Details Link -->
-				<div class="mt-4 pt-3.5 border-t border-black/10 dark:border-white/10 flex items-center justify-between gap-3">
+				<div class="mt-3 sm:mt-4 pt-2.5 sm:pt-3.5 border-t border-black/10 dark:border-white/10 flex items-center justify-between gap-2 sm:gap-3">
 					<?php if ( ! empty( $card['product_id'] ) ) : ?>
 						<button
 							type="button"
 							onclick="window.rakaCardAddToCart(<?php echo esc_attr( $card['product_id'] ); ?>, this)"
-							class="raka-hero-add-to-cart-btn inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-900 text-xs font-bold uppercase tracking-wider font-hn shadow-md hover:shadow-lg transition-all cursor-pointer"
+							class="raka-hero-add-to-cart-btn inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-900 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-hn shadow-md hover:shadow-lg transition-all cursor-pointer"
 						>
-							<i class="ri-shopping-bag-3-line text-sm flex-shrink-0"></i>
+							<i class="ri-shopping-bag-3-line text-xs sm:text-sm flex-shrink-0"></i>
 							<span><?php echo esc_html( ! empty( $card['button_text'] ) ? $card['button_text'] : __( 'Pre-Order Now', 'raka-preorder-theme' ) ); ?></span>
 						</button>
 					<?php else : ?>
 						<a
 							href="<?php echo esc_url( $card['url'] ); ?>"
-							class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold uppercase tracking-wider font-hn shadow-md hover:shadow-lg transition-all"
+							class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-hn shadow-md hover:shadow-lg transition-all"
 						>
 							<span><?php echo esc_html( ! empty( $card['button_text'] ) ? $card['button_text'] : __( 'Pre-Order Now', 'raka-preorder-theme' ) ); ?></span>
 							<span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
@@ -124,7 +124,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 					<?php endif; ?>
 
 					<?php if ( ! empty( $card['url'] ) && '#' !== $card['url'] ) : ?>
-						<a href="<?php echo esc_url( $card['url'] ); ?>" class="text-xs font-semibold text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white inline-flex items-center gap-1 font-hn transition-colors">
+						<a href="<?php echo esc_url( $card['url'] ); ?>" class="text-[11px] sm:text-xs font-semibold text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white inline-flex items-center gap-1 font-hn transition-colors">
 							<span><?php esc_html_e( 'View Details', 'raka-preorder-theme' ); ?></span>
 							<span>&rarr;</span>
 						</a>
@@ -174,64 +174,64 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<!-- 4. Hero Content (Section 1) -->
 		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col pointer-events-none gpu-accel">
 			<!-- Centered Main Title -->
-			<div id="hero-title-container" class="w-full flex justify-center mt-12 md:mt-14 select-none pointer-events-none">
-				<h1 id="hero-main-title" class="text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition text-center whitespace-nowrap">
+			<div id="hero-title-container" class="w-full flex justify-center mt-12 md:mt-14 px-2 select-none pointer-events-none overflow-hidden">
+				<h1 id="hero-main-title" class="text-[17vw] sm:text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition text-center whitespace-nowrap">
 					<?php echo esc_html( $hero_main_title ); ?>
 				</h1>
 			</div>
 
 			<!-- Bottom Left: Caption & Contact Popup Button -->
-			<div id="hero-bottom-left-panel" class="absolute bottom-6 left-6 md:left-10 md:bottom-8 pointer-events-auto flex flex-col items-start gap-3.5 max-w-sm z-20">
-				<p id="hero-caption-text" class="text-[10px] md:text-[11px] tracking-[0.16em] uppercase leading-[1.8] text-black/85 dark:text-white/85 font-hn font-medium theme-transition">
+			<div id="hero-bottom-left-panel" class="absolute bottom-20 sm:bottom-6 md:bottom-8 left-4 sm:left-6 md:left-10 right-4 sm:right-auto pointer-events-auto flex flex-col items-start gap-2.5 sm:gap-3.5 max-w-sm z-20">
+				<p id="hero-caption-text" class="text-[10px] md:text-[11px] tracking-[0.14em] uppercase leading-relaxed text-black/85 dark:text-white/85 font-hn font-medium theme-transition max-w-[280px] sm:max-w-none">
 					<?php echo nl2br( esc_html( $hero_caption ) ); ?>
 				</p>
 				<button
 					id="hero-contact-trigger-btn"
 					type="button"
 					onclick="window.rakaOpenModal('contact')"
-					class="group inline-flex items-center gap-2.5 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+					class="group inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
 				>
-					<span id="hero-contact-btn-pulse-wrap" class="relative flex h-2.5 w-2.5">
+					<span id="hero-contact-btn-pulse-wrap" class="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
 						<span id="hero-contact-btn-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-						<span id="hero-contact-btn-pulse" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+						<span id="hero-contact-btn-pulse" class="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-emerald-500"></span>
 					</span>
 					<span id="hero-contact-btn-text"><?php echo esc_html( ! empty( $contact_options['contact_title'] ) ? $contact_options['contact_title'] : __( 'Contact & Store', 'raka-preorder-theme' ) ); ?></span>
-					<i id="hero-contact-btn-icon" class="ri-arrow-right-up-line text-base opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+					<i id="hero-contact-btn-icon" class="ri-arrow-right-up-line text-sm sm:text-base opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
 				</button>
 			</div>
 
 			<!-- Bottom Right: Categories & Brands Popup Buttons -->
-			<div id="hero-bottom-right-panel" class="absolute bottom-6 right-6 md:right-10 md:bottom-8 pointer-events-auto flex items-center flex-wrap gap-3 sm:gap-4 z-20">
+			<div id="hero-bottom-right-panel" class="absolute bottom-5 sm:bottom-6 md:bottom-8 left-4 right-4 sm:left-auto sm:right-6 md:right-10 pointer-events-auto flex items-center justify-between sm:justify-end gap-2 sm:gap-4 z-20">
 				<button
 					id="hero-categories-trigger-btn"
 					type="button"
 					onclick="window.rakaOpenModal('categories')"
-					class="group inline-flex items-center gap-2.5 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+					class="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 sm:gap-2.5 px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-[11px] sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
 				>
-					<i id="hero-categories-btn-icon" class="ri-grid-fill text-base sm:text-lg text-neutral-800 dark:text-neutral-200 opacity-80 group-hover:opacity-100 group-hover:rotate-12 transition-transform"></i>
+					<i id="hero-categories-btn-icon" class="ri-grid-fill text-sm sm:text-lg text-neutral-800 dark:text-neutral-200 opacity-80 group-hover:opacity-100 group-hover:rotate-12 transition-transform"></i>
 					<span id="hero-categories-btn-text"><?php esc_html_e( 'Categories', 'raka-preorder-theme' ); ?></span>
-					<span id="hero-categories-btn-count" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-neutral-200/80 dark:bg-neutral-800/90 text-neutral-900 dark:text-neutral-100 border border-black/5 dark:border-white/10 font-mono"><?php echo esc_html( count( $featured_categories ) ); ?></span>
+					<span id="hero-categories-btn-count" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-neutral-200/80 dark:bg-neutral-800/90 text-neutral-900 dark:text-neutral-100 border border-black/5 dark:border-white/10 font-mono"><?php echo esc_html( count( $featured_categories ) ); ?></span>
 				</button>
 
 				<button
 					id="hero-brands-trigger-btn"
 					type="button"
 					onclick="window.rakaOpenModal('brands')"
-					class="group inline-flex items-center gap-2.5 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+					class="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 sm:gap-2.5 px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-[11px] sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
 				>
-					<i id="hero-brands-btn-icon" class="ri-fire-fill text-base sm:text-lg text-amber-500 group-hover:scale-125 transition-transform"></i>
+					<i id="hero-brands-btn-icon" class="ri-fire-fill text-sm sm:text-lg text-amber-500 group-hover:scale-125 transition-transform"></i>
 					<span id="hero-brands-btn-text"><?php esc_html_e( 'Brands', 'raka-preorder-theme' ); ?></span>
-					<span id="hero-brands-btn-count" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-neutral-200/80 dark:bg-neutral-800/90 text-neutral-900 dark:text-neutral-100 border border-black/5 dark:border-white/10 font-mono"><?php echo esc_html( count( $featured_brands ) ); ?></span>
+					<span id="hero-brands-btn-count" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-neutral-200/80 dark:bg-neutral-800/90 text-neutral-900 dark:text-neutral-100 border border-black/5 dark:border-white/10 font-mono"><?php echo esc_html( count( $featured_brands ) ); ?></span>
 				</button>
 			</div>
 		</div>
 
 		<!-- 5. Quad-Card Slides (Show 4 Cards Simultaneously Per Scroll Step: 2 Left, 2 Right) -->
 		<?php foreach ( $hero_card_quads as $quad_idx => $quad ) : ?>
-			<div id="hero-card-quad-<?php echo esc_attr( $quad_idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel pointer-events-none p-6 md:p-8 lg:p-12 pt-20 md:pt-24 lg:pt-28 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 md:gap-8 lg:gap-12 overflow-y-auto md:overflow-visible" style="opacity: 0; visibility: hidden; transform: translate3d(0, 20px, 0);">
+			<div id="hero-card-quad-<?php echo esc_attr( $quad_idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel pointer-events-none p-4 sm:p-6 md:p-8 lg:p-12 pt-16 sm:pt-20 md:pt-24 lg:pt-28 flex flex-col md:flex-row items-center md:items-start justify-between gap-3 sm:gap-4 md:gap-8 lg:gap-12 overflow-y-auto md:overflow-visible" style="opacity: 0; visibility: hidden; transform: translate3d(0, 20px, 0);">
 
 				<!-- Left Flank: Card 0 + Card 2 (if present) -->
-				<div id="hero-quad-left-<?php echo esc_attr( $quad_idx ); ?>" class="flex flex-col gap-4 md:gap-5 w-full max-w-md lg:max-w-[420px]">
+				<div id="hero-quad-left-<?php echo esc_attr( $quad_idx ); ?>" class="flex flex-col gap-3 sm:gap-4 md:gap-5 w-full max-w-sm md:max-w-md lg:max-w-[420px]">
 					<?php if ( isset( $quad[0] ) ) : ?>
 						<?php raka_render_hero_card_item( $quad[0] ); ?>
 					<?php endif; ?>
@@ -241,7 +241,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 				</div>
 
 				<!-- Right Flank: Card 1 + Card 3 (if present) -->
-				<div id="hero-quad-right-<?php echo esc_attr( $quad_idx ); ?>" class="flex flex-col gap-4 md:gap-5 w-full max-w-md lg:max-w-[420px] md:mt-4 lg:mt-6">
+				<div id="hero-quad-right-<?php echo esc_attr( $quad_idx ); ?>" class="flex flex-col gap-3 sm:gap-4 md:gap-5 w-full max-w-sm md:max-w-md lg:max-w-[420px] md:mt-4 lg:mt-6">
 					<?php if ( isset( $quad[1] ) ) : ?>
 						<?php raka_render_hero_card_item( $quad[1] ); ?>
 					<?php endif; ?>
