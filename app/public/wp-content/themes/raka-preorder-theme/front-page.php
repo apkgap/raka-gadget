@@ -88,7 +88,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 					<?php endif; ?>
 					<div class="flex-1 min-w-0">
 						<?php if ( ! empty( $card['title'] ) ) : ?>
-							<h3 class="text-base md:text-lg font-bold text-black dark:text-white font-hn group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-snug line-clamp-2">
+							<h3 class="text-base md:text-lg font-bold text-black dark:text-white font-hn group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-snug line-clamp-2">
 								<a href="<?php echo esc_url( $card['url'] ); ?>">
 									<?php echo esc_html( $card['title'] ); ?>
 								</a>
@@ -283,7 +283,7 @@ $cat_icon_map = [
 		<!-- Header -->
 		<div id="raka-categories-modal-header" class="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-black/10 dark:border-white/10 shrink-0">
 			<div id="raka-categories-header-left" class="flex items-center gap-3">
-				<div id="raka-categories-icon-badge" class="w-10 h-10 rounded-2xl bg-blue-500/15 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/25 dark:border-blue-500/30 flex items-center justify-center">
+				<div id="raka-categories-icon-badge" class="w-10 h-10 rounded-2xl bg-red-500/10 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/25 flex items-center justify-center">
 					<i id="raka-cat-modal-ico" class="ri-grid-fill text-lg"></i>
 				</div>
 				<div>
@@ -308,11 +308,11 @@ $cat_icon_map = [
 						<a
 							id="raka-cat-item-<?php echo esc_attr( $cat['id'] ); ?>"
 							href="<?php echo esc_url( $cat['url'] ); ?>"
-							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-100/90 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-blue-500/60 dark:hover:border-blue-400/60 shadow-md hover:shadow-2xl transition-all duration-300 p-5 sm:p-6 cursor-pointer"
+							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-100/90 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-red-500/60 dark:hover:border-red-400/60 shadow-md hover:shadow-2xl transition-all duration-300 p-5 sm:p-6 cursor-pointer"
 						>
 							<!-- Top Icon & Count Badge -->
 							<div id="raka-cat-top-bar-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-between w-full">
-								<div id="raka-cat-ico-wrap-<?php echo esc_attr( $cat['id'] ); ?>" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-500/10 dark:bg-blue-400/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 dark:border-blue-400/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white dark:group-hover:bg-blue-500 dark:group-hover:text-white transition-all duration-300 shadow-sm">
+								<div id="raka-cat-ico-wrap-<?php echo esc_attr( $cat['id'] ); ?>" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white dark:group-hover:bg-red-500 dark:group-hover:text-white transition-all duration-300 shadow-sm">
 									<?php if ( ! empty( $media_src ) ) : ?>
 										<img id="raka-cat-media-<?php echo esc_attr( $cat['id'] ); ?>" src="<?php echo esc_url( $media_src ); ?>" alt="<?php echo esc_attr( $cat['name'] ); ?>" class="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
 									<?php else : ?>
@@ -326,10 +326,10 @@ $cat_icon_map = [
 
 							<!-- Bottom Title & Arrow -->
 							<div id="raka-cat-meta-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-end justify-between gap-2 mt-4">
-								<h4 id="raka-cat-title-<?php echo esc_attr( $cat['id'] ); ?>" class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-hn group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+								<h4 id="raka-cat-title-<?php echo esc_attr( $cat['id'] ); ?>" class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-hn group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-snug">
 									<?php echo esc_html( $cat['name'] ); ?>
 								</h4>
-								<i id="raka-cat-arr-<?php echo esc_attr( $cat['id'] ); ?>" class="ri-arrow-right-line text-lg text-neutral-400 dark:text-white/50 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all shrink-0"></i>
+								<i id="raka-cat-arr-<?php echo esc_attr( $cat['id'] ); ?>" class="ri-arrow-right-line text-lg text-neutral-400 dark:text-white/50 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:translate-x-1 transition-all shrink-0"></i>
 							</div>
 						</a>
 					<?php endforeach; ?>
