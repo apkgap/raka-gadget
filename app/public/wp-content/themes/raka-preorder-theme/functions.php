@@ -48,6 +48,11 @@ function raka_preorder_theme_scripts() {
 	// Enqueue main stylesheet (loads Kanit font rules)
 	wp_enqueue_style( 'raka-preorder-theme-style', get_stylesheet_uri(), [], '1.0.0' );
 
+	// Enqueue Obsidian theme core styles
+	$obsidian_css_path = get_template_directory() . '/assets/css/obsidian.css';
+	$obsidian_css_ver  = file_exists( $obsidian_css_path ) ? (string) filemtime( $obsidian_css_path ) : '1.0.0';
+	wp_enqueue_style( 'raka-obsidian-style', get_template_directory_uri() . '/assets/css/obsidian.css', [], $obsidian_css_ver );
+
 	// Enqueue Master CSS locally from the theme assets in the header
 	wp_enqueue_script(
 		'raka-theme-master-css',
