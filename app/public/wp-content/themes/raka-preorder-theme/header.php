@@ -54,32 +54,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 			class="<?php echo $is_home ? 'absolute top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300' : 'sticky top-0 left-0 right-0 z-50 bg-white/95 dark:bg-obsidian/95 backdrop-blur-md border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
 		>
 			<nav id="raka-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
-				<!-- Left Brand -->
-				<div id="raka-nav-brand" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight">
-					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity font-semibold">
-						<span>OBSIDIAN</span> <span class="opacity-60 text-xs font-normal">©</span>
+				<!-- Left Slot (Reserved / Empty for now) -->
+				<div id="raka-nav-left-slot" class="w-24 sm:w-36 flex items-center justify-start pointer-events-none">
+					<!-- Left slot placeholder -->
+				</div>
+
+				<!-- Centered Brand Logo -->
+				<div id="raka-nav-brand" class="pointer-events-auto text-neutral-950 dark:text-white text-xs sm:text-sm md:text-base tracking-[0.25em] uppercase leading-tight text-center font-semibold theme-transition">
+					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity">
+						<span>OBSIDIAN</span> <span id="raka-brand-copy" class="opacity-60 text-xs font-normal">©</span>
 					</a>
 				</div>
 
-				<!-- Center 1 -->
-				<div id="raka-nav-center-1" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden sm:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
-					<div class="font-medium">VOLUME 01</div>
-					<div class="<?php echo $is_home ? 'opacity-50' : 'text-neutral-400 dark:text-neutral-500'; ?> text-[10px] md:text-xs">MMXXV</div>
-				</div>
-
-				<!-- Center 2 -->
-				<div id="raka-nav-center-2" class="pointer-events-auto <?php echo $is_home ? 'mix-blend-difference text-white' : 'text-neutral-900 dark:text-white'; ?> text-center hidden md:block text-[11px] md:text-xs lg:text-sm tracking-[0.2em] uppercase leading-snug">
-					<div class="font-medium">INK, FORM</div>
-					<div class="<?php echo $is_home ? 'opacity-50' : 'text-neutral-400 dark:text-neutral-500'; ?> text-[10px] md:text-xs">& MODERN PRACTICE</div>
-				</div>
-
 				<!-- Right Controls (Cart + Theme Toggle + Hamburger Button) -->
-				<div id="raka-nav-controls" class="pointer-events-auto flex items-center gap-4 sm:gap-6">
+				<div id="raka-nav-controls" class="pointer-events-auto flex items-center justify-end gap-3 sm:gap-4 w-24 sm:w-36">
 					<!-- Cart Button -->
 					<a
 						id="raka-cart-btn"
 						href="<?php echo esc_url( $cart_url ); ?>"
-						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 backdrop-blur-md border border-black/15 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Shopping Cart"
 						title="Shopping Cart"
@@ -87,7 +80,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<i id="raka-cart-icon" class="ri-shopping-bag-3-line text-lg block"></i>
 						<span
 							id="raka-cart-count"
-							class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
+							class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-[10px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
 						>
 							<?php echo esc_html( (string) $cart_count ); ?>
 						</span>
@@ -98,7 +91,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						id="raka-theme-btn"
 						type="button"
 						onclick="window.toggleRakaTheme(event)"
-						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 backdrop-blur-md border border-black/15 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+						class="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Toggle dark / light mode"
 						title="Toggle theme"
@@ -111,13 +104,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<button
 						id="raka-menu-btn"
 						type="button"
-						class="relative w-8 md:w-9 h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer <?php echo $is_home ? 'mix-blend-difference' : ''; ?> py-0.5"
+						class="relative w-8 md:w-9 h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer py-0.5"
 						style="cursor: pointer; pointer-events: auto;"
 						aria-label="Open menu"
 					>
-						<span id="burger-top" class="block h-[2px] <?php echo $is_home ? 'bg-white' : 'bg-neutral-900 dark:bg-white'; ?> transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
-						<span id="burger-mid" class="block h-[2px] <?php echo $is_home ? 'bg-white' : 'bg-neutral-900 dark:bg-white'; ?> transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] w-[65%]"></span>
-						<span id="burger-bot" class="block h-[2px] <?php echo $is_home ? 'bg-white' : 'bg-neutral-900 dark:bg-white'; ?> transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-[85%]"></span>
+						<span id="burger-top" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
+						<span id="burger-mid" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] w-[65%]"></span>
+						<span id="burger-bot" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-[85%]"></span>
 					</button>
 				</div>
 			</nav>
