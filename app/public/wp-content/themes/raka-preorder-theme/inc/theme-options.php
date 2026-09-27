@@ -14,22 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Register the Theme Options admin menu and submenu.
  */
 function raka_register_theme_options_menu() {
-	// Top-level menu in Admin sidebar: "Theme Settings"
-	add_menu_page(
-		__( 'Theme Settings', 'raka-preorder-theme' ),
-		__( 'Theme Settings', 'raka-preorder-theme' ),
-		'manage_options',
-		'raka-theme-settings',
-		'raka_render_theme_options_page',
-		'dashicons-art',
-		58
-	);
-
-	// Sub-menu for Hero Banner Settings
+	// Submenu under Appearance (themes.php): "Theme Settings"
 	add_submenu_page(
-		'raka-theme-settings',
-		__( 'Hero Banner & Product Cards', 'raka-preorder-theme' ),
-		__( 'Hero Banner', 'raka-preorder-theme' ),
+		'themes.php',
+		__( 'Theme Settings', 'raka-preorder-theme' ),
+		__( 'Theme Settings', 'raka-preorder-theme' ),
 		'manage_options',
 		'raka-theme-settings',
 		'raka_render_theme_options_page'
