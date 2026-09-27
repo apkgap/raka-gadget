@@ -116,27 +116,51 @@ body {
 	            box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── WordPress AdminBar Compatibility ── */
+/* ── WordPress AdminBar Comprehensive Compatibility ── */
 .admin-bar #raka-site-header,
-.admin-bar #obsidian-site-header {
+.admin-bar #obsidian-site-header,
+.admin-bar #raka-site-header.header-scrolled,
+.admin-bar #obsidian-site-header.header-scrolled {
 	top: 32px !important;
 }
 
 .admin-bar #raka-menu-overlay,
-.admin-bar #obsidian-menu-overlay {
+.admin-bar #obsidian-menu-overlay,
+.admin-bar #raka-cart-drawer,
+.admin-bar #mobile-filters-drawer {
+	top: 32px !important;
+	height: calc(100vh - 32px) !important;
+}
+
+.admin-bar #hero-pinned-viewport {
 	top: 32px !important;
 	height: calc(100vh - 32px) !important;
 }
 
 @media screen and (max-width: 782px) {
 	.admin-bar #raka-site-header,
-	.admin-bar #obsidian-site-header {
+	.admin-bar #obsidian-site-header,
+	.admin-bar #raka-site-header.header-scrolled,
+	.admin-bar #obsidian-site-header.header-scrolled {
 		top: 46px !important;
 	}
 	.admin-bar #raka-menu-overlay,
-	.admin-bar #obsidian-menu-overlay {
+	.admin-bar #obsidian-menu-overlay,
+	.admin-bar #raka-cart-drawer,
+	.admin-bar #mobile-filters-drawer {
 		top: 46px !important;
 		height: calc(100vh - 46px) !important;
+	}
+	.admin-bar #hero-pinned-viewport {
+		top: 46px !important;
+		height: calc(100vh - 46px) !important;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	/* Keep WordPress adminbar position fixed on very small screens for consistent layout */
+	#wpadminbar {
+		position: fixed !important;
 	}
 }
 
