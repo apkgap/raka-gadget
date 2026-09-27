@@ -594,13 +594,13 @@ function raka_render_product_card( $product, array $args = [] ): void {
 		<a
 			id="p-stage-link-<?php echo esc_attr( $p_id ); ?>"
 			href="<?php echo esc_url( $p_link ); ?>"
-			class="relative w-full aspect-square rounded-xl sm:rounded-2xl bg-white/70 dark:bg-black/40 border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden p-4 mb-4 group/stage"
+			class="relative w-full aspect-square rounded-xl sm:rounded-2xl bg-white/70 dark:bg-black/40 border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden mb-4 group/stage"
 		>
 			<img
 				id="p-img-main-<?php echo esc_attr( $p_id ); ?>"
 				src="<?php echo esc_url( $p_img_url ); ?>"
 				alt="<?php echo esc_attr( $p_title ); ?>"
-				class="max-h-full max-w-full object-contain transition-all duration-700 ease-out <?php echo $secondary_img_url ? 'group-hover/stage:opacity-0 group-hover/stage:scale-95' : 'group-hover/stage:scale-105'; ?>"
+				class="w-full h-full object-cover rounded-xl sm:rounded-2xl transition-all duration-700 ease-out <?php echo $secondary_img_url ? 'group-hover/stage:opacity-0 group-hover/stage:scale-95' : 'group-hover/stage:scale-105'; ?>"
 				loading="lazy"
 			/>
 
@@ -609,7 +609,7 @@ function raka_render_product_card( $product, array $args = [] ): void {
 					id="p-img-hover-<?php echo esc_attr( $p_id ); ?>"
 					src="<?php echo esc_url( $secondary_img_url ); ?>"
 					alt="<?php echo esc_attr( $p_title ); ?>"
-					class="absolute inset-0 m-auto max-h-[88%] max-w-[88%] object-contain opacity-0 group-hover/stage:opacity-100 group-hover/stage:scale-105 transition-all duration-700 ease-out"
+					class="absolute inset-0 w-full h-full object-cover rounded-xl sm:rounded-2xl opacity-0 group-hover/stage:opacity-100 group-hover/stage:scale-105 transition-all duration-700 ease-out"
 					loading="lazy"
 				/>
 			<?php endif; ?>
