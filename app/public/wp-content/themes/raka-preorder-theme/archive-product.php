@@ -21,7 +21,7 @@ $all_cats = get_terms( [
 ] );
 ?>
 
-<main id="archive-product-main" class="min-h-screen pt-28 md:pt-36 pb-24 bg-cement dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
+<main id="archive-product-main" class="min-h-screen pt-20 md:pt-24 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
 	<div id="archive-product-container" class="container">
 
 		<!-- ── Archive Header ── -->
@@ -145,7 +145,7 @@ $all_cats = get_terms( [
 	<!-- Drawer Panel -->
 	<div
 		id="mobile-filters-panel"
-		class="relative w-full max-w-md h-full bg-cement dark:bg-obsidian text-black dark:text-white p-6 shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-hidden"
+		class="relative w-full max-w-md h-full bg-white dark:bg-obsidian text-black dark:text-white p-6 shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-hidden"
 	>
 		<!-- Top Bar -->
 		<div id="mobile-filters-top" class="flex items-center justify-between pb-4 border-b border-black/10 dark:border-white/10 flex-shrink-0">

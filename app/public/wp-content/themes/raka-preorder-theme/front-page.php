@@ -59,7 +59,7 @@ $card_5 = raka_get_resolved_card_data( 'sec_5', [
 
 <!-- ── ScrollVideoHero Component ── -->
 <section id="scroll-video-hero-section" class="relative" style="height: 500vh;">
-	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-cement dark:bg-obsidian theme-transition gpu-accel">
+	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-white dark:bg-obsidian theme-transition gpu-accel">
 
 		<!-- 1. Video Layer -->
 		<video

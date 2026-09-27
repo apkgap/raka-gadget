@@ -43,7 +43,7 @@ while ( have_posts() ) :
 	}
 ?>
 
-<main id="single-product-main" class="min-h-screen pt-28 md:pt-36 pb-24 bg-cement dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
+<main id="single-product-main" class="min-h-screen pt-20 md:pt-24 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
 	<div id="single-product-container" class="container">
 
 		<!-- ── Breadcrumbs ── -->
@@ -160,7 +160,7 @@ while ( have_posts() ) :
 											$is_active    = ( $opt_idx === 0 );
 											$swatch_style = raka_get_swatch_css( $option_val );
 											$active_ring  = $is_active
-												? 'ring-2 ring-black dark:ring-white ring-offset-2 ring-offset-cement dark:ring-offset-obsidian scale-110 shadow-md'
+												? 'ring-2 ring-black dark:ring-white ring-offset-2 ring-offset-white dark:ring-offset-obsidian scale-110 shadow-md'
 												: 'opacity-85 hover:opacity-100 hover:scale-105';
 										?>
 											<button
@@ -401,14 +401,14 @@ while ( have_posts() ) :
 			const circles = parentGroup.querySelectorAll('.variation-color-circle');
 			if (circles.length > 0) {
 				circles.forEach(b => {
-					b.classList.remove('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-cement', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
+					b.classList.remove('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-white', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
 					b.classList.add('opacity-85');
 					const check = b.querySelector('.swatch-check-icon');
 					if (check) check.classList.replace('opacity-100', 'opacity-0');
 				});
 
 				btn.classList.remove('opacity-85');
-				btn.classList.add('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-cement', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
+				btn.classList.add('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-white', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
 				const activeCheck = btn.querySelector('.swatch-check-icon');
 				if (activeCheck) activeCheck.classList.replace('opacity-0', 'opacity-100');
 			}

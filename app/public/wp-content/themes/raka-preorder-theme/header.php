@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php wp_head(); ?>
 </head>
-<body id="obsidian-body" <?php body_class( 'bg-cement dark:bg-obsidian text-black dark:text-white theme-transition' ); ?>>
+<body id="obsidian-body" <?php body_class( 'bg-white dark:bg-obsidian text-black dark:text-white theme-transition' ); ?>>
 	<?php wp_body_open(); ?>
 	<div id="root" class="bg-inherit theme-transition">
 

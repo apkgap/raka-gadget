@@ -15,7 +15,7 @@ $archive_title = get_the_archive_title();
 $archive_desc  = get_the_archive_description();
 ?>
 
-<main id="obsidian-archive-main" class="min-h-screen pt-28 md:pt-36 pb-24 bg-cement dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
+<main id="obsidian-archive-main" class="min-h-screen pt-20 md:pt-24 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
 	<div id="obsidian-archive-container" class="container">
 
 		<!-- ── Archive Header ── -->
