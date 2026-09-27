@@ -552,7 +552,7 @@ function raka_render_product_card( $product, array $args = [] ): void {
 ?>
 	<div
 		id="product-card-<?php echo esc_attr( $p_id ); ?>"
-		class="group relative flex flex-col justify-between rounded-none border-none bg-neutral-100/90 dark:bg-neutral-900/70 p-4 sm:p-5 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1 backdrop-blur-sm"
+		class="group relative flex flex-col justify-between rounded-none border-none bg-white dark:bg-neutral-900/70 p-4 sm:p-5 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1 backdrop-blur-sm"
 	>
 		<!-- ── Top Header: Brand Logo & Status Tag ── -->
 		<div id="p-header-<?php echo esc_attr( $p_id ); ?>" class="flex items-center justify-between gap-2 mb-3 sm:mb-4">
