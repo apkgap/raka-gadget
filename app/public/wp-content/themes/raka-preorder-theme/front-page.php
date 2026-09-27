@@ -333,71 +333,22 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		</div>
 
 		<!-- Products Grid -->
-		<div id="raka-flashsale-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pt-8 sm:pt-10">
-			<?php foreach ( $flash_sale_products as $item ) : ?>
-				<div id="raka-flash-item-<?php echo esc_attr( (string) $item['id'] ); ?>" class="group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl bg-white dark:bg-neutral-900/70 border border-neutral-200 dark:border-neutral-800/90 hover:border-red-500/50 dark:hover:border-red-500/50 transition-all duration-300 p-4 sm:p-5">
-					<!-- Top Bar: Category & Discount Badge -->
-					<div id="raka-flash-top-<?php echo esc_attr( (string) $item['id'] ); ?>" class="flex items-center justify-between gap-2 mb-3">
-						<span id="raka-flash-cat-<?php echo esc_attr( (string) $item['id'] ); ?>" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 dark:text-neutral-400 truncate">
-							<?php echo esc_html( $item['category'] ); ?>
-						</span>
-						<span id="raka-flash-badge-<?php echo esc_attr( (string) $item['id'] ); ?>" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-red-500/10 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/30">
-							-<?php echo esc_html( (string) $item['discount_pct'] ); ?>% OFF
-						</span>
-					</div>
-
-					<!-- Image Box -->
-					<a id="raka-flash-img-link-<?php echo esc_attr( (string) $item['id'] ); ?>" href="<?php echo esc_url( $item['url'] ); ?>" class="relative block aspect-square rounded-2xl overflow-hidden bg-neutral-100 dark:bg-black/40 border border-neutral-200 dark:border-neutral-800 mb-4 group-hover:border-neutral-400 dark:group-hover:border-neutral-700 transition-colors">
-						<?php if ( ! empty( $item['image_url'] ) ) : ?>
-							<img id="raka-flash-img-<?php echo esc_attr( (string) $item['id'] ); ?>" src="<?php echo esc_url( $item['image_url'] ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-						<?php else : ?>
-							<div id="raka-flash-placeholder-<?php echo esc_attr( (string) $item['id'] ); ?>" class="w-full h-full flex items-center justify-center text-neutral-400 dark:text-neutral-600">
-								<i id="raka-flash-placeholder-ico-<?php echo esc_attr( (string) $item['id'] ); ?>" class="ri-image-line text-4xl"></i>
-							</div>
-						<?php endif; ?>
-					</a>
-
-					<!-- Title -->
-					<div id="raka-flash-info-<?php echo esc_attr( (string) $item['id'] ); ?>" class="flex-1 min-w-0 mb-4">
-						<h3 id="raka-flash-title-<?php echo esc_attr( (string) $item['id'] ); ?>" class="text-sm sm:text-base font-bold font-hn text-neutral-950 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors line-clamp-2 leading-snug">
-							<a id="raka-flash-title-link-<?php echo esc_attr( (string) $item['id'] ); ?>" href="<?php echo esc_url( $item['url'] ); ?>">
-								<?php echo esc_html( $item['name'] ); ?>
-							</a>
-						</h3>
-
-						<!-- Pricing -->
-						<div id="raka-flash-price-wrap-<?php echo esc_attr( (string) $item['id'] ); ?>" class="flex items-baseline gap-2 mt-2">
-							<span id="raka-flash-sale-price-<?php echo esc_attr( (string) $item['id'] ); ?>" class="text-base sm:text-lg font-black font-hn text-neutral-950 dark:text-white">
-								<?php echo wp_kses_post( $item['sale_price'] ); ?>
-							</span>
-							<?php if ( ! empty( $item['regular_price'] ) ) : ?>
-								<span id="raka-flash-reg-price-<?php echo esc_attr( (string) $item['id'] ); ?>" class="text-xs text-neutral-400 dark:text-neutral-500 line-through font-mono">
-									<?php echo wp_kses_post( $item['regular_price'] ); ?>
-								</span>
-							<?php endif; ?>
-						</div>
-
-						<!-- Stock Urgency Progress Bar -->
-						<div id="raka-flash-progress-wrap-<?php echo esc_attr( (string) $item['id'] ); ?>" class="mt-3.5 space-y-1.5">
-							<div id="raka-flash-progress-meta-<?php echo esc_attr( (string) $item['id'] ); ?>" class="flex items-center justify-between text-[10px] font-mono text-neutral-500 dark:text-neutral-400">
-								<span id="raka-flash-claimed-lbl-<?php echo esc_attr( (string) $item['id'] ); ?>">Claimed: <?php echo esc_html( (string) $item['claimed_pct'] ); ?>%</span>
-								<span id="raka-flash-left-lbl-<?php echo esc_attr( (string) $item['id'] ); ?>" class="text-red-600 dark:text-red-400 font-bold"><?php echo esc_html( (string) $item['left_count'] ); ?> left</span>
-							</div>
-							<div id="raka-flash-progress-track-<?php echo esc_attr( (string) $item['id'] ); ?>" class="w-full h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
-								<div id="raka-flash-progress-bar-<?php echo esc_attr( (string) $item['id'] ); ?>" class="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-500" style="width: <?php echo esc_attr( (string) $item['claimed_pct'] ); ?>%"></div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Bottom Action CTA -->
-					<div id="raka-flash-action-<?php echo esc_attr( (string) $item['id'] ); ?>" class="pt-2">
-						<a id="raka-flash-cta-btn-<?php echo esc_attr( (string) $item['id'] ); ?>" href="<?php echo esc_url( $item['url'] ); ?>" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-neutral-900 hover:bg-red-600 dark:bg-neutral-800 dark:hover:bg-red-600 text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 font-mono group/btn">
-							<span id="raka-flash-cta-txt-<?php echo esc_attr( (string) $item['id'] ); ?>"><?php esc_html_e( 'Pre-Order Deal', 'raka-preorder-theme' ); ?></span>
-							<i id="raka-flash-cta-arr-<?php echo esc_attr( (string) $item['id'] ); ?>" class="ri-arrow-right-line text-sm group-hover/btn:translate-x-1 transition-transform"></i>
-						</a>
-					</div>
-				</div>
-			<?php endforeach; ?>
+		<div id="raka-flashsale-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 pt-8 sm:pt-10">
+			<?php
+			foreach ( $flash_sale_products as $item ) :
+				$p_obj = wc_get_product( $item['id'] );
+				if ( ! $p_obj ) {
+					continue;
+				}
+				raka_render_product_card( $p_obj, [
+					'id_prefix'     => 'flash',
+					'is_flash_sale' => true,
+					'discount_pct'  => $item['discount_pct'] ?? 0,
+					'claimed_pct'   => $item['claimed_pct'] ?? 0,
+					'left_count'    => $item['left_count'] ?? 0,
+				] );
+			endforeach;
+			?>
 		</div>
 	</div>
 </section>
@@ -455,64 +406,20 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		</div>
 
 		<!-- Product Grid -->
-		<div id="raka-catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-			<?php foreach ( $catalog_products as $p ) : ?>
-				<div
-					id="raka-catalog-card-<?php echo esc_attr( (string) $p['id'] ); ?>"
-					data-category="<?php echo esc_attr( implode( ' ', (array) $p['cat_slugs'] ) ); ?>"
-					class="raka-catalog-product-card group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl bg-neutral-50/80 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-700 transition-all duration-300 p-4 sm:p-5"
-				>
-					<!-- Top Meta -->
-					<div id="raka-catalog-card-top-<?php echo esc_attr( (string) $p['id'] ); ?>" class="flex items-center justify-between gap-2 mb-3">
-						<span id="raka-catalog-cat-<?php echo esc_attr( (string) $p['id'] ); ?>" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 dark:text-neutral-400 truncate">
-							<?php echo esc_html( $p['category'] ); ?>
-						</span>
-						<?php if ( ! empty( $p['brand'] ) ) : ?>
-							<span id="raka-catalog-brand-<?php echo esc_attr( (string) $p['id'] ); ?>" class="text-[10px] font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 bg-neutral-200/80 dark:bg-neutral-800/80 px-2 py-0.5 rounded-md border border-neutral-300 dark:border-neutral-700/40">
-								<?php echo esc_html( $p['brand'] ); ?>
-							</span>
-						<?php endif; ?>
-					</div>
-
-					<!-- Image -->
-					<a id="raka-catalog-img-link-<?php echo esc_attr( (string) $p['id'] ); ?>" href="<?php echo esc_url( $p['url'] ); ?>" class="relative block aspect-square rounded-2xl overflow-hidden bg-white dark:bg-black/40 border border-neutral-200 dark:border-neutral-800 mb-4 group-hover:border-neutral-400 dark:group-hover:border-neutral-700 transition-colors">
-						<?php if ( ! empty( $p['image_url'] ) ) : ?>
-							<img id="raka-catalog-img-<?php echo esc_attr( (string) $p['id'] ); ?>" src="<?php echo esc_url( $p['image_url'] ); ?>" alt="<?php echo esc_attr( $p['name'] ); ?>" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-						<?php else : ?>
-							<div id="raka-catalog-ph-<?php echo esc_attr( (string) $p['id'] ); ?>" class="w-full h-full flex items-center justify-center text-neutral-400 dark:text-neutral-600">
-								<i id="raka-catalog-ph-ico-<?php echo esc_attr( (string) $p['id'] ); ?>" class="ri-image-line text-4xl"></i>
-							</div>
-						<?php endif; ?>
-					</a>
-
-					<!-- Info & Price -->
-					<div id="raka-catalog-info-<?php echo esc_attr( (string) $p['id'] ); ?>" class="flex-1 min-w-0 mb-4">
-						<h3 id="raka-catalog-title-<?php echo esc_attr( (string) $p['id'] ); ?>" class="text-sm sm:text-base font-bold font-hn text-neutral-950 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors line-clamp-2 leading-snug">
-							<a id="raka-catalog-title-link-<?php echo esc_attr( (string) $p['id'] ); ?>" href="<?php echo esc_url( $p['url'] ); ?>">
-								<?php echo esc_html( $p['name'] ); ?>
-							</a>
-						</h3>
-
-						<div id="raka-catalog-price-row-<?php echo esc_attr( (string) $p['id'] ); ?>" class="flex items-center justify-between gap-2 mt-2.5">
-							<div id="raka-catalog-price-<?php echo esc_attr( (string) $p['id'] ); ?>" class="text-sm sm:text-base font-bold font-hn text-neutral-950 dark:text-white">
-								<?php echo wp_kses_post( $p['price_html'] ); ?>
-							</div>
-							<div id="raka-catalog-rating-<?php echo esc_attr( (string) $p['id'] ); ?>" class="flex items-center gap-1 text-[11px] font-mono text-amber-500 dark:text-amber-400">
-								<i id="raka-catalog-star-<?php echo esc_attr( (string) $p['id'] ); ?>" class="ri-star-fill text-xs"></i>
-								<span id="raka-catalog-rate-val-<?php echo esc_attr( (string) $p['id'] ); ?>">5.0</span>
-							</div>
-						</div>
-					</div>
-
-					<!-- Bottom Action -->
-					<div id="raka-catalog-action-<?php echo esc_attr( (string) $p['id'] ); ?>" class="pt-2">
-						<a id="raka-catalog-cta-<?php echo esc_attr( (string) $p['id'] ); ?>" href="<?php echo esc_url( $p['url'] ); ?>" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-neutral-200/80 hover:bg-neutral-950 hover:text-white text-neutral-800 dark:bg-neutral-800/80 dark:hover:bg-white dark:text-neutral-300 dark:hover:text-neutral-950 text-xs font-bold uppercase tracking-wider transition-all duration-300 font-mono group/btn border border-neutral-300 dark:border-neutral-700/60">
-							<span id="raka-catalog-cta-txt-<?php echo esc_attr( (string) $p['id'] ); ?>"><?php esc_html_e( 'View Product', 'raka-preorder-theme' ); ?></span>
-							<i id="raka-catalog-cta-arr-<?php echo esc_attr( (string) $p['id'] ); ?>" class="ri-arrow-right-line text-sm group-hover/btn:translate-x-1 transition-transform"></i>
-						</a>
-					</div>
-				</div>
-			<?php endforeach; ?>
+		<div id="raka-catalog-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6">
+			<?php
+			foreach ( $catalog_products as $p ) :
+				$prod_obj = wc_get_product( $p['id'] );
+				if ( ! $prod_obj ) {
+					continue;
+				}
+				raka_render_product_card( $prod_obj, [
+					'id_prefix'     => 'cat',
+					'data_category' => implode( ' ', (array) $p['cat_slugs'] ),
+					'extra_classes' => 'raka-catalog-product-card',
+				] );
+			endforeach;
+			?>
 		</div>
 
 		<!-- Bottom CTA Strip -->

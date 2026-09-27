@@ -977,7 +977,7 @@ if ( ! function_exists( 'raka_get_swatch_css' ) ) {
  * Render Ultra-Luxury Editorial Product Card
  *
  * @param WC_Product|int $product Product instance or Product ID.
- * @param array          $args    Optional styling args.
+ * @param array          $args    Optional styling and behavior args.
  */
 function raka_render_product_card( $product, array $args = [] ): void {
 	if ( is_numeric( $product ) ) {
@@ -989,6 +989,8 @@ function raka_render_product_card( $product, array $args = [] ): void {
 	}
 
 	$p_id      = (string) $product->get_id();
+	$id_prefix = ! empty( $args['id_prefix'] ) ? (string) $args['id_prefix'] . '-' : '';
+	$card_id   = $id_prefix . $p_id;
 	$p_title   = $product->get_name();
 	$p_price   = $product->get_price_html();
 	$p_link    = get_permalink( (int) $p_id );
@@ -1004,7 +1006,10 @@ function raka_render_product_card( $product, array $args = [] ): void {
 	}
 
 	// Brand information
-	$p_brands = wp_get_post_terms( (int) $p_id, 'product_brand' );
+	$p_brands = wp_get_post_terms( (int) $p_id, 'pwb-brand' );
+	if ( empty( $p_brands ) || is_wp_error( $p_brands ) ) {
+		$p_brands = wp_get_post_terms( (int) $p_id, 'product_brand' );
+	}
 	$b_name   = ( ! is_wp_error( $p_brands ) && ! empty( $p_brands ) ) ? $p_brands[0]->name : 'ATK';
 	$b_logo   = ( ! is_wp_error( $p_brands ) && ! empty( $p_brands ) ) ? raka_get_brand_logo_url( $p_brands[0] ) : '';
 
@@ -1024,6 +1029,25 @@ function raka_render_product_card( $product, array $args = [] ): void {
 	$is_in_stock     = $product->is_in_stock();
 	$is_on_backorder = $product->is_on_backorder();
 	$is_preorder     = ( false !== stripos( $p_title, 'preorder' ) || false !== stripos( $p_title, 'pre-order' ) || $is_on_backorder );
+
+	// Flash Sale Args
+	$is_flash_sale = ! empty( $args['is_flash_sale'] );
+	$discount_pct  = $args['discount_pct'] ?? 0;
+	$claimed_pct   = $args['claimed_pct'] ?? 0;
+	$left_count    = $args['left_count'] ?? 0;
+	if ( $is_flash_sale && ! $discount_pct ) {
+		$regular_price = (float) $product->get_regular_price();
+		$current_price = (float) $product->get_price();
+		if ( $regular_price > 0 && $current_price < $regular_price ) {
+			$discount_pct = round( ( ( $regular_price - $current_price ) / $regular_price ) * 100 );
+		} else {
+			$discount_pct = 15 + ( ( (int) $p_id % 4 ) * 5 );
+		}
+	}
+	if ( $is_flash_sale && ! $claimed_pct ) {
+		$claimed_pct = 60 + ( ( (int) $p_id * 7 ) % 35 );
+		$left_count  = max( 2, 18 - ( ( (int) $p_id * 3 ) % 15 ) );
+	}
 
 	// Color Variations preview
 	$color_swatches = [];
@@ -1051,41 +1075,51 @@ function raka_render_product_card( $product, array $args = [] ): void {
 			}
 		}
 	}
+
+	// Custom classes & Data Category attribute
+	$extra_classes = ! empty( $args['extra_classes'] ) ? ' ' . trim( $args['extra_classes'] ) : '';
+	$data_cat_attr = ! empty( $args['data_category'] ) ? ' data-category="' . esc_attr( $args['data_category'] ) . '"' : '';
+	$border_hover  = $is_flash_sale ? 'hover:border-red-500/50 dark:hover:border-red-500/50' : 'hover:border-black/20 dark:hover:border-white/25';
 ?>
 	<div
-		id="product-card-<?php echo esc_attr( $p_id ); ?>"
-		class="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/25 bg-white dark:bg-neutral-900/70 p-2.5 sm:p-5 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1 backdrop-blur-sm"
+		id="product-card-<?php echo esc_attr( $card_id ); ?>"
+		<?php echo $data_cat_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		class="group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800/80 <?php echo esc_attr( $border_hover ); ?> bg-white dark:bg-neutral-900/70 p-3 sm:p-5 transition-all duration-300 backdrop-blur-sm<?php echo esc_attr( $extra_classes ); ?>"
 	>
-		<!-- ── Top Header: Brand Logo & Status Tag ── -->
-		<div id="p-header-<?php echo esc_attr( $p_id ); ?>" class="flex items-center justify-between gap-2 mb-2.5 sm:mb-4 min-h-[20px] sm:min-h-[24px]">
-			<div id="p-brand-badge-<?php echo esc_attr( $p_id ); ?>" class="flex items-center">
+		<!-- ── Top Header: Brand Logo & Status / Flash Tag ── -->
+		<div id="p-header-<?php echo esc_attr( $card_id ); ?>" class="flex items-center justify-between gap-2 mb-2.5 sm:mb-4 min-h-[20px] sm:min-h-[24px]">
+			<div id="p-brand-badge-<?php echo esc_attr( $card_id ); ?>" class="flex items-center">
 				<?php if ( $b_logo ) : ?>
 					<img
-						id="p-brand-img-<?php echo esc_attr( $p_id ); ?>"
+						id="p-brand-img-<?php echo esc_attr( $card_id ); ?>"
 						src="<?php echo esc_url( $b_logo ); ?>"
 						alt="<?php echo esc_attr( $b_name ); ?>"
 						class="h-3.5 sm:h-4.5 w-auto max-w-[65px] sm:max-w-[95px] object-contain opacity-75 group-hover:opacity-100 transition-opacity filter dark:invert"
 						loading="lazy"
 					/>
 				<?php else : ?>
-					<span id="p-brand-txt-<?php echo esc_attr( $p_id ); ?>" class="text-xs sm:text-sm font-mono font-semibold tracking-wider uppercase text-neutral-500 dark:text-neutral-400 truncate max-w-[80px] sm:max-w-none">
+					<span id="p-brand-txt-<?php echo esc_attr( $card_id ); ?>" class="text-xs sm:text-sm font-mono font-semibold tracking-wider uppercase text-neutral-500 dark:text-neutral-400 truncate max-w-[80px] sm:max-w-none">
 						<?php echo esc_html( $b_name ); ?>
 					</span>
 				<?php endif; ?>
 			</div>
 
-			<div id="p-status-badge-<?php echo esc_attr( $p_id ); ?>" class="flex items-center">
-				<?php if ( ! $is_in_stock ) : ?>
-					<span id="p-badge-oos-<?php echo esc_attr( $p_id ); ?>" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+			<div id="p-status-badge-<?php echo esc_attr( $card_id ); ?>" class="flex items-center">
+				<?php if ( $is_flash_sale && $discount_pct > 0 ) : ?>
+					<span id="p-badge-flash-<?php echo esc_attr( $card_id ); ?>" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/30">
+						-<?php echo (int) $discount_pct; ?>% OFF
+					</span>
+				<?php elseif ( ! $is_in_stock ) : ?>
+					<span id="p-badge-oos-<?php echo esc_attr( $card_id ); ?>" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
 						SOLD OUT
 					</span>
 				<?php elseif ( $is_preorder ) : ?>
-					<span id="p-badge-pre-<?php echo esc_attr( $p_id ); ?>" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-						<span id="p-badge-dot-<?php echo esc_attr( $p_id ); ?>" class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+					<span id="p-badge-pre-<?php echo esc_attr( $card_id ); ?>" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+						<span id="p-badge-dot-<?php echo esc_attr( $card_id ); ?>" class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
 						PRE-ORDER
 					</span>
 				<?php elseif ( ! empty( $cat_name ) ) : ?>
-					<span id="p-badge-cat-<?php echo esc_attr( $p_id ); ?>" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+					<span id="p-badge-cat-<?php echo esc_attr( $card_id ); ?>" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700/50">
 						<?php echo esc_html( $cat_name ); ?>
 					</span>
 				<?php endif; ?>
@@ -1094,92 +1128,105 @@ function raka_render_product_card( $product, array $args = [] ): void {
 
 		<!-- ── Visual Stage: Clickable Image with Dual Hover Crossfade & Floating Action ── -->
 		<a
-			id="p-stage-link-<?php echo esc_attr( $p_id ); ?>"
+			id="p-stage-link-<?php echo esc_attr( $card_id ); ?>"
 			href="<?php echo esc_url( $p_link ); ?>"
-			class="relative w-full aspect-square rounded-lg sm:rounded-2xl bg-white/70 dark:bg-black/40 border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden mb-3 sm:mb-4 group/stage"
+			class="relative w-full aspect-square rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-black/40 border border-neutral-200 dark:border-neutral-800 flex items-center justify-center overflow-hidden mb-3 sm:mb-4 group/stage"
 		>
 			<img
-				id="p-img-main-<?php echo esc_attr( $p_id ); ?>"
+				id="p-img-main-<?php echo esc_attr( $card_id ); ?>"
 				src="<?php echo esc_url( $p_img_url ); ?>"
 				alt="<?php echo esc_attr( $p_title ); ?>"
-				class="w-full h-full object-cover rounded-lg sm:rounded-2xl transition-all duration-700 ease-out <?php echo $secondary_img_url ? 'group-hover/stage:opacity-0 group-hover/stage:scale-95' : 'group-hover/stage:scale-105'; ?>"
+				class="w-full h-full object-cover rounded-xl sm:rounded-2xl transition-all duration-700 ease-out <?php echo $secondary_img_url ? 'group-hover/stage:opacity-0 group-hover/stage:scale-95' : 'group-hover/stage:scale-105'; ?>"
 				loading="lazy"
 			/>
 
 			<?php if ( $secondary_img_url ) : ?>
 				<img
-					id="p-img-hover-<?php echo esc_attr( $p_id ); ?>"
+					id="p-img-hover-<?php echo esc_attr( $card_id ); ?>"
 					src="<?php echo esc_url( $secondary_img_url ); ?>"
 					alt="<?php echo esc_attr( $p_title ); ?>"
-					class="absolute inset-0 w-full h-full object-cover rounded-lg sm:rounded-2xl opacity-0 group-hover/stage:opacity-100 group-hover/stage:scale-105 transition-all duration-700 ease-out"
+					class="absolute inset-0 w-full h-full object-cover rounded-xl sm:rounded-2xl opacity-0 group-hover/stage:opacity-100 group-hover/stage:scale-105 transition-all duration-700 ease-out"
 					loading="lazy"
 				/>
 			<?php endif; ?>
 
-			<div id="p-stage-pill-<?php echo esc_attr( $p_id ); ?>" class="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-2 group-hover/stage:opacity-100 group-hover/stage:translate-y-0 transition-all duration-300 pointer-events-none hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/85 dark:bg-white/95 text-white dark:text-black text-xs font-mono uppercase tracking-wider backdrop-blur shadow-md select-none">
-				<span id="p-stage-pill-txt-<?php echo esc_attr( $p_id ); ?>">VIEW GEAR</span>
-				<i id="p-stage-pill-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-arrow-right-up-line text-xs"></i>
+			<div id="p-stage-pill-<?php echo esc_attr( $card_id ); ?>" class="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-2 group-hover/stage:opacity-100 group-hover/stage:translate-y-0 transition-all duration-300 pointer-events-none hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/85 dark:bg-white/95 text-white dark:text-black text-xs font-mono uppercase tracking-wider backdrop-blur select-none">
+				<span id="p-stage-pill-txt-<?php echo esc_attr( $card_id ); ?>"><?php echo $is_flash_sale ? 'VIEW DEAL' : 'VIEW GEAR'; ?></span>
+				<i id="p-stage-pill-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-arrow-right-up-line text-xs"></i>
 			</div>
 		</a>
 
-		<!-- ── Lower Meta: Color Swatches, Title, and Price Row ── -->
-		<div id="p-info-wrap-<?php echo esc_attr( $p_id ); ?>" class="flex flex-col justify-between flex-grow space-y-2.5 sm:space-y-3">
+		<!-- ── Lower Meta: Color Swatches, Title, Stock Urgency (if Flash Sale), Price & CTA ── -->
+		<div id="p-info-wrap-<?php echo esc_attr( $card_id ); ?>" class="flex flex-col justify-between flex-grow space-y-2.5 sm:space-y-3">
 			
 			<?php if ( ! empty( $color_swatches ) ) : ?>
-				<div id="p-swatches-row-<?php echo esc_attr( $p_id ); ?>" class="flex items-center gap-1.5 pt-0.5">
+				<div id="p-swatches-row-<?php echo esc_attr( $card_id ); ?>" class="flex items-center gap-1.5 pt-0.5">
 					<?php foreach ( $color_swatches as $idx => $c_name ) :
 						$swatch_style = raka_get_swatch_css( $c_name );
 					?>
 						<span
-							id="p-swatch-<?php echo esc_attr( $p_id . '-' . $idx ); ?>"
+							id="p-swatch-<?php echo esc_attr( $card_id . '-' . $idx ); ?>"
 							title="<?php echo esc_attr( (string) $c_name ); ?>"
-							class="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border border-black/15 dark:border-white/20 shadow-xs flex-shrink-0 transition-transform group-hover:scale-110"
+							class="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border border-neutral-300 dark:border-neutral-600 shadow-xs flex-shrink-0 transition-transform group-hover:scale-110"
 							style="<?php echo esc_attr( $swatch_style ); ?>"
 						></span>
 					<?php endforeach; ?>
 					<?php if ( $total_colors > count( $color_swatches ) ) : ?>
-						<span id="p-swatch-more-<?php echo esc_attr( $p_id ); ?>" class="text-[10px] sm:text-xs font-mono text-neutral-400 dark:text-neutral-500 pl-0.5">
+						<span id="p-swatch-more-<?php echo esc_attr( $card_id ); ?>" class="text-[10px] sm:text-xs font-mono text-neutral-400 dark:text-neutral-500 pl-0.5">
 							+<?php echo (int) ( $total_colors - count( $color_swatches ) ); ?>
 						</span>
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 
-			<a id="p-title-link-<?php echo esc_attr( $p_id ); ?>" href="<?php echo esc_url( $p_link ); ?>" class="block group/title">
-				<h3 id="p-title-<?php echo esc_attr( $p_id ); ?>" class="text-sm sm:text-base font-bold uppercase tracking-tight text-neutral-900 dark:text-neutral-100 line-clamp-2 leading-snug font-hn group-hover/title:text-black dark:group-hover/title:text-white transition-colors">
+			<a id="p-title-link-<?php echo esc_attr( $card_id ); ?>" href="<?php echo esc_url( $p_link ); ?>" class="block group/title">
+				<h3 id="p-title-<?php echo esc_attr( $card_id ); ?>" class="text-sm sm:text-base font-bold uppercase tracking-tight text-neutral-900 dark:text-neutral-100 line-clamp-2 leading-snug font-hn group-hover/title:text-red-600 dark:group-hover/title:text-red-400 transition-colors">
 					<?php echo esc_html( $p_title ); ?>
 				</h3>
 			</a>
 
-			<!-- Price & Add To Cart Action Row (Single-line on desktop, clean stacked on 2-col mobile) -->
-			<div id="p-price-row-<?php echo esc_attr( $p_id ); ?>" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 pt-2.5 sm:pt-3 border-t border-black/5 dark:border-white/5">
-				<div id="p-price-val-<?php echo esc_attr( $p_id ); ?>" class="text-sm sm:text-lg font-bold font-hn text-neutral-900 dark:text-neutral-100 whitespace-nowrap flex-shrink min-w-0 truncate">
+			<?php if ( $is_flash_sale ) : ?>
+				<!-- Flash Sale Urgency Progress Bar -->
+				<div id="p-flash-progress-wrap-<?php echo esc_attr( $card_id ); ?>" class="space-y-1.5 pt-1">
+					<div id="p-flash-progress-meta-<?php echo esc_attr( $card_id ); ?>" class="flex items-center justify-between text-[10px] font-mono text-neutral-500 dark:text-neutral-400">
+						<span id="p-flash-claimed-lbl-<?php echo esc_attr( $card_id ); ?>">Claimed: <?php echo esc_html( (string) $claimed_pct ); ?>%</span>
+						<span id="p-flash-left-lbl-<?php echo esc_attr( $card_id ); ?>" class="text-red-600 dark:text-red-400 font-bold"><?php echo esc_html( (string) $left_count ); ?> left</span>
+					</div>
+					<div id="p-flash-progress-track-<?php echo esc_attr( $card_id ); ?>" class="w-full h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
+						<div id="p-flash-progress-bar-<?php echo esc_attr( $card_id ); ?>" class="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-500" style="width: <?php echo esc_attr( (string) $claimed_pct ); ?>%"></div>
+					</div>
+				</div>
+			<?php endif; ?>
+
+			<!-- Price & Add To Cart Action Row -->
+			<div id="p-price-row-<?php echo esc_attr( $card_id ); ?>" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 pt-2.5 sm:pt-3 border-t border-neutral-200 dark:border-neutral-800">
+				<div id="p-price-val-<?php echo esc_attr( $card_id ); ?>" class="text-sm sm:text-base font-bold font-hn text-neutral-900 dark:text-neutral-100 whitespace-nowrap flex-shrink min-w-0 truncate">
 					<?php echo wp_kses_post( $p_price ); ?>
 				</div>
 				
-				<div id="p-action-wrap-<?php echo esc_attr( $p_id ); ?>" class="w-full sm:w-auto flex items-center justify-start sm:justify-end flex-shrink-0">
+				<div id="p-action-wrap-<?php echo esc_attr( $card_id ); ?>" class="w-full sm:w-auto flex items-center justify-start sm:justify-end flex-shrink-0">
 					<?php if ( ! $is_in_stock ) : ?>
-						<span id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>" class="inline-flex items-center justify-center h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-full bg-neutral-200/70 dark:bg-neutral-800/70 text-neutral-400 dark:text-neutral-500 text-xs font-mono uppercase tracking-wider cursor-not-allowed select-none whitespace-nowrap">
+						<span id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>" class="inline-flex items-center justify-center h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full bg-neutral-200/70 dark:bg-neutral-800/70 text-neutral-400 dark:text-neutral-500 text-xs font-mono uppercase tracking-wider cursor-not-allowed select-none whitespace-nowrap">
 							SOLD OUT
 						</span>
 					<?php elseif ( $product->is_type( 'variable' ) ) : ?>
 						<a
-							id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>"
+							id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>"
 							href="<?php echo esc_url( $p_link ); ?>"
-							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-black dark:hover:bg-neutral-100 text-xs font-mono uppercase tracking-wider font-semibold hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-xs whitespace-nowrap group/btn"
+							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full <?php echo $is_flash_sale ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100'; ?> text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all whitespace-nowrap group/btn"
 						>
-							<i id="p-btn-cart-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-arrow-right-line text-xs flex-shrink-0"></i>
-							<span id="p-btn-cart-txt-<?php echo esc_attr( $p_id ); ?>" class="whitespace-nowrap">READ MORE</span>
+							<i id="p-btn-cart-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-arrow-right-line text-xs flex-shrink-0"></i>
+							<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap"><?php echo $is_flash_sale ? 'PRE-ORDER DEAL' : 'READ MORE'; ?></span>
 						</a>
 					<?php else : ?>
 						<button
-							id="p-btn-cart-<?php echo esc_attr( $p_id ); ?>"
+							id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>"
 							type="button"
 							onclick="window.rakaCardAddToCart(<?php echo (int) $p_id; ?>, this)"
-							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-black dark:hover:bg-neutral-100 text-xs font-mono uppercase tracking-wider font-semibold hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-xs group/btn cursor-pointer whitespace-nowrap"
+							class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full <?php echo $is_flash_sale ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100'; ?> text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all group/btn cursor-pointer whitespace-nowrap"
 						>
-							<i id="p-btn-cart-ico-<?php echo esc_attr( $p_id ); ?>" class="ri-shopping-bag-3-line text-xs flex-shrink-0"></i>
-							<span id="p-btn-cart-txt-<?php echo esc_attr( $p_id ); ?>" class="whitespace-nowrap">ADD TO CART</span>
+							<i id="p-btn-cart-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-shopping-bag-3-line text-xs flex-shrink-0"></i>
+							<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap"><?php echo $is_flash_sale ? 'PRE-ORDER DEAL' : 'ADD TO CART'; ?></span>
 						</button>
 					<?php endif; ?>
 				</div>
