@@ -47,8 +47,9 @@ $featured_brands     = raka_get_featured_brands();
 $contact_options     = raka_get_contact_options();
 $theme_options       = raka_get_all_options();
 
-$flash_sale_limit   = ! empty( $theme_options['flash_sale_limit'] ) ? (int) $theme_options['flash_sale_limit'] : 4;
-$our_products_limit = ! empty( $theme_options['our_products_limit'] ) ? (int) $theme_options['our_products_limit'] : 8;
+$flash_sale_campaign = raka_get_flash_sale_campaign_data();
+$flash_sale_limit    = ! empty( $theme_options['flash_sale_limit'] ) ? (int) $theme_options['flash_sale_limit'] : 4;
+$our_products_limit  = ! empty( $theme_options['our_products_limit'] ) ? (int) $theme_options['our_products_limit'] : 8;
 
 $flash_sale_products = array_slice( raka_get_flash_sale_products( $flash_sale_limit ), 0, $flash_sale_limit );
 $homepage_catalog    = raka_get_homepage_catalog_products( $our_products_limit );
@@ -269,7 +270,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 </section>
 
 <!-- ── SECTION: FLASH SALE (LIMITED DROPS) ── -->
-<?php if ( ! empty( $flash_sale_products ) ) : ?>
+<?php if ( ! empty( $flash_sale_campaign['enabled'] ) && ! empty( $flash_sale_products ) ) : ?>
 <section id="raka-flashsale-section" class="relative z-20 py-16 sm:py-20 md:py-24 bg-neutral-100 dark:bg-neutral-950 border-t border-neutral-300 dark:border-neutral-800/80 text-neutral-900 dark:text-white transition-colors duration-300 overflow-hidden">
 	<div id="raka-flashsale-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<!-- Section Header -->
@@ -282,20 +283,47 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 						<span id="raka-flashsale-static-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
 					</span>
 					<span id="raka-flashsale-tag" class="text-xs font-mono font-bold tracking-[0.2em] text-red-600 dark:text-red-400 uppercase">
-						<?php esc_html_e( 'LIMITED TIME DROPS', 'raka-preorder-theme' ); ?>
+						<?php echo esc_html( $flash_sale_campaign['tag'] ); ?>
 					</span>
 				</div>
 				<h2 id="raka-flashsale-title" class="text-2xl sm:text-3xl md:text-4xl font-black font-hn tracking-tight text-neutral-950 dark:text-white flex items-center gap-3">
-					<span id="raka-flashsale-title-text"><?php esc_html_e( 'FLASH SALE', 'raka-preorder-theme' ); ?></span>
+					<span id="raka-flashsale-title-text"><?php echo esc_html( $flash_sale_campaign['title'] ); ?></span>
 					<i id="raka-flashsale-fire-icon" class="ri-flashlight-fill text-red-500 text-2xl sm:text-3xl"></i>
 				</h2>
 				<p id="raka-flashsale-desc" class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-light font-hn max-w-md">
-					<?php esc_html_e( 'Exclusive pre-order allocations at special introductory prices. Once stock is claimed, regular rates apply.', 'raka-preorder-theme' ); ?>
+					<?php echo esc_html( $flash_sale_campaign['desc'] ); ?>
 				</p>
 			</div>
 
 			<!-- Live Countdown Timer -->
-			<div id="raka-flashsale-timer-wrap" class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white/90 dark:bg-neutral-900/90 border border-neutral-300 dark:border-neutral-800 rounded-2xl p-3 sm:p-4 shrink-0 shadow-sm">
+			<div id="raka-flashsale-timer-wrap" 
+				class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white/90 dark:bg-neutral-900/90 border border-neutral-300 dark:border-neutral-800 rounded-2xl p-3 sm:p-4 shrink-0 shadow-sm"
+				x-data="{
+					remaining: <?php echo (int) $flash_sale_campaign['remaining_seconds']; ?>,
+					hours: '<?php echo esc_js( sprintf( '%02d', floor( $flash_sale_campaign['remaining_seconds'] / 3600 ) ) ); ?>',
+					mins: '<?php echo esc_js( sprintf( '%02d', floor( ( $flash_sale_campaign['remaining_seconds'] % 3600 ) / 60 ) ) ); ?>',
+					secs: '<?php echo esc_js( sprintf( '%02d', $flash_sale_campaign['remaining_seconds'] % 60 ) ); ?>',
+					timer: null,
+					init() {
+						this.update();
+						this.timer = setInterval(() => {
+							if (this.remaining > 0) {
+								this.remaining--;
+								this.update();
+							} else {
+								clearInterval(this.timer);
+							}
+						}, 1000);
+					},
+					update() {
+						const h = Math.floor(this.remaining / 3600);
+						const m = Math.floor((this.remaining % 3600) / 60);
+						const s = this.remaining % 60;
+						this.hours = String(h).padStart(2, '0');
+						this.mins = String(m).padStart(2, '0');
+						this.secs = String(s).padStart(2, '0');
+					}
+				}">
 				<div id="raka-flashsale-timer-label-wrap" class="flex items-center gap-2">
 					<i id="raka-flashsale-timer-icon" class="ri-time-line text-red-500 dark:text-red-400 text-lg"></i>
 					<span id="raka-flashsale-timer-label" class="text-[11px] font-mono tracking-widest uppercase text-neutral-500 dark:text-neutral-400">
@@ -304,17 +332,17 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 				</div>
 				<div id="raka-flashsale-countdown-clock" class="flex items-center gap-1.5 font-mono">
 					<div id="raka-timer-box-hours" class="flex flex-col items-center justify-center w-12 h-11 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700/60">
-						<span id="raka-timer-hours" class="text-base sm:text-lg font-bold text-neutral-950 dark:text-white tracking-wider">08</span>
+						<span id="raka-timer-hours" class="text-base sm:text-lg font-bold text-neutral-950 dark:text-white tracking-wider" x-text="hours"><?php echo esc_html( sprintf( '%02d', floor( $flash_sale_campaign['remaining_seconds'] / 3600 ) ) ); ?></span>
 						<span id="raka-timer-hours-sub" class="text-[9px] text-neutral-500 dark:text-neutral-400 font-sans uppercase">HRS</span>
 					</div>
 					<span id="raka-timer-colon-1" class="text-red-500 font-bold text-lg">:</span>
 					<div id="raka-timer-box-mins" class="flex flex-col items-center justify-center w-12 h-11 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700/60">
-						<span id="raka-timer-mins" class="text-base sm:text-lg font-bold text-neutral-950 dark:text-white tracking-wider">42</span>
+						<span id="raka-timer-mins" class="text-base sm:text-lg font-bold text-neutral-950 dark:text-white tracking-wider" x-text="mins"><?php echo esc_html( sprintf( '%02d', floor( ( $flash_sale_campaign['remaining_seconds'] % 3600 ) / 60 ) ) ); ?></span>
 						<span id="raka-timer-mins-sub" class="text-[9px] text-neutral-500 dark:text-neutral-400 font-sans uppercase">MIN</span>
 					</div>
 					<span id="raka-timer-colon-2" class="text-red-500 font-bold text-lg">:</span>
 					<div id="raka-timer-box-secs" class="flex flex-col items-center justify-center w-12 h-11 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700/60">
-						<span id="raka-timer-secs" class="text-base sm:text-lg font-bold text-red-600 dark:text-red-400 tracking-wider">19</span>
+						<span id="raka-timer-secs" class="text-base sm:text-lg font-bold text-red-600 dark:text-red-400 tracking-wider" x-text="secs"><?php echo esc_html( sprintf( '%02d', $flash_sale_campaign['remaining_seconds'] % 60 ) ); ?></span>
 						<span id="raka-timer-secs-sub" class="text-[9px] text-neutral-500 dark:text-neutral-400 font-sans uppercase">SEC</span>
 					</div>
 				</div>

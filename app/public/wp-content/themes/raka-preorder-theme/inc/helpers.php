@@ -612,6 +612,59 @@ function raka_get_hero_cards(): array {
 }
 
 /**
+ * Retrieve Flash Sale campaign metadata, status and live countdown details.
+ *
+ * @return array
+ */
+function raka_get_flash_sale_campaign_data(): array {
+	$options = raka_get_all_options();
+
+	$enabled = isset( $options['flash_sale_enabled'] ) ? (bool) $options['flash_sale_enabled'] : true;
+	$title   = ! empty( $options['flash_sale_title'] ) ? $options['flash_sale_title'] : __( 'FLASH SALE', 'raka-preorder-theme' );
+	$tag     = ! empty( $options['flash_sale_tag'] ) ? $options['flash_sale_tag'] : __( 'LIMITED TIME DROPS', 'raka-preorder-theme' );
+	$desc    = ! empty( $options['flash_sale_desc'] ) ? $options['flash_sale_desc'] : __( 'Exclusive pre-order allocations at special introductory prices. Once stock is claimed, regular rates apply.', 'raka-preorder-theme' );
+
+	$start_str = ! empty( $options['flash_sale_start_time'] ) ? $options['flash_sale_start_time'] : '';
+	$end_str   = ! empty( $options['flash_sale_end_time'] ) ? $options['flash_sale_end_time'] : '';
+
+	$current_time = current_time( 'timestamp' ); // Respect WordPress site timezone
+
+	$start_ts = ! empty( $start_str ) ? strtotime( $start_str ) : 0;
+	$end_ts   = ! empty( $end_str ) ? strtotime( $end_str ) : 0;
+
+	// If no end time is specified or invalid, default to tomorrow night (24-48 hours window)
+	if ( $end_ts <= 0 ) {
+		$end_ts = strtotime( 'tomorrow midnight' ) + ( 18 * 3600 );
+	}
+
+	$status = 'active';
+	if ( ! $enabled ) {
+		$status = 'disabled';
+	} elseif ( $start_ts > 0 && $current_time < $start_ts ) {
+		$status = 'upcoming';
+	} elseif ( $end_ts > 0 && $current_time >= $end_ts ) {
+		$status = 'ended';
+	}
+
+	$is_active         = ( 'active' === $status );
+	$remaining_seconds = max( 0, $end_ts - $current_time );
+
+	return [
+		'enabled'           => $enabled,
+		'is_active'         => $is_active,
+		'status'            => $status,
+		'title'             => $title,
+		'tag'               => $tag,
+		'desc'              => $desc,
+		'start_time'        => $start_str,
+		'end_time'          => $end_str ? $end_str : wp_date( 'Y-m-d\TH:i', $end_ts ),
+		'end_timestamp'     => $end_ts,
+		'current_timestamp' => $current_time,
+		'remaining_seconds' => $remaining_seconds,
+	];
+}
+
+/**
  * Retrieve products for the homepage Flash Sale section.
  *
  * @param int $limit Number of products to fetch.

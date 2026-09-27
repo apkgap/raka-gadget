@@ -375,6 +375,9 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 	}
 
 	// Section display counts and settings
+	if ( isset( $raw_data['flash_sale_enabled'] ) ) {
+		$clean_options['flash_sale_enabled'] = ! empty( $raw_data['flash_sale_enabled'] );
+	}
 	if ( isset( $raw_data['flash_sale_limit'] ) ) {
 		$clean_options['flash_sale_limit'] = max( 1, min( 24, (int) $raw_data['flash_sale_limit'] ) );
 	}
@@ -383,6 +386,18 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 	}
 	if ( isset( $raw_data['flash_sale_title'] ) ) {
 		$clean_options['flash_sale_title'] = sanitize_text_field( (string) $raw_data['flash_sale_title'] );
+	}
+	if ( isset( $raw_data['flash_sale_tag'] ) ) {
+		$clean_options['flash_sale_tag'] = sanitize_text_field( (string) $raw_data['flash_sale_tag'] );
+	}
+	if ( isset( $raw_data['flash_sale_desc'] ) ) {
+		$clean_options['flash_sale_desc'] = sanitize_textarea_field( (string) $raw_data['flash_sale_desc'] );
+	}
+	if ( isset( $raw_data['flash_sale_end_time'] ) ) {
+		$clean_options['flash_sale_end_time'] = sanitize_text_field( (string) $raw_data['flash_sale_end_time'] );
+	}
+	if ( isset( $raw_data['flash_sale_start_time'] ) ) {
+		$clean_options['flash_sale_start_time'] = sanitize_text_field( (string) $raw_data['flash_sale_start_time'] );
 	}
 	if ( isset( $raw_data['our_products_title'] ) ) {
 		$clean_options['our_products_title'] = sanitize_text_field( (string) $raw_data['our_products_title'] );

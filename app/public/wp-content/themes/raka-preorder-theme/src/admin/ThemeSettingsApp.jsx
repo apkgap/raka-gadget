@@ -335,9 +335,13 @@ export default function ThemeSettingsApp() {
 		contact_hours: 'Mon - Sun: 10:00 - 20:00 (Daily)',
 		contact_address: '123/45 Gadget District, Bangkok 10110',
 		contact_note: 'For custom inquiries, private showroom sessions, or pre-order status, message us directly via LINE Official 24/7.',
+		flash_sale_enabled: true,
 		flash_sale_limit: 4,
+		flash_sale_title: 'FLASH SALE',
+		flash_sale_tag: 'LIMITED TIME DROPS',
+		flash_sale_desc: 'Exclusive pre-order allocations at special introductory prices. Once stock is claimed, regular rates apply.',
+		flash_sale_end_time: '',
 		our_products_limit: 8,
-		flash_sale_title: 'FLASH SALE DEALS',
 		our_products_title: 'OUR PRODUCTS',
 		our_products_desc: 'Explore custom keyboards, precision ergonomic gaming mice, and studio-grade audio gear built for uncompromising performance.',
 	} );
@@ -701,6 +705,36 @@ export default function ThemeSettingsApp() {
 											</div>
 
 											<div style={ { display: 'flex', flexDirection: 'column', gap: '14px' } }>
+												<ToggleControl
+													label={ __( 'Enable Flash Sale Section', 'raka-preorder-theme' ) }
+													help={ options.flash_sale_enabled !== false ? __( 'Flash Sale is active and visible on the homepage.', 'raka-preorder-theme' ) : __( 'Flash Sale is hidden.', 'raka-preorder-theme' ) }
+													checked={ options.flash_sale_enabled !== false }
+													onChange={ ( val ) => handleOptionChange( 'flash_sale_enabled', val ) }
+												/>
+
+												<div style={ { display: 'flex', flexDirection: 'column', gap: '4px' } }>
+													<label style={ { fontSize: '11px', fontWeight: 600, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.05em' } }>
+														{ __( 'Campaign End Date & Time (Countdown Target)', 'raka-preorder-theme' ) }
+													</label>
+													<input
+														type="datetime-local"
+														value={ options.flash_sale_end_time || '' }
+														onChange={ ( e ) => handleOptionChange( 'flash_sale_end_time', e.target.value ) }
+														style={ {
+															padding: '8px 12px',
+															border: '1px solid #cbd5e1',
+															borderRadius: '6px',
+															fontSize: '13px',
+															background: '#fff',
+															color: '#0f172a',
+															outline: 'none',
+														} }
+													/>
+													<p style={ { margin: 0, fontSize: '11px', color: '#64748b' } }>
+														{ __( 'Sets the real-time live countdown timer target on the homepage.', 'raka-preorder-theme' ) }
+													</p>
+												</div>
+
 												<SelectControl
 													label={ __( 'Number of Products to Display (Rows)', 'raka-preorder-theme' ) }
 													value={ String( options.flash_sale_limit ?? 4 ) }
@@ -715,9 +749,22 @@ export default function ThemeSettingsApp() {
 												/>
 
 												<TextControl
+													label={ __( 'Flash Sale Badge Tag', 'raka-preorder-theme' ) }
+													value={ options.flash_sale_tag ?? 'LIMITED TIME DROPS' }
+													onChange={ ( val ) => handleOptionChange( 'flash_sale_tag', val ) }
+												/>
+
+												<TextControl
 													label={ __( 'Flash Sale Section Title', 'raka-preorder-theme' ) }
-													value={ options.flash_sale_title ?? 'FLASH SALE DEALS' }
+													value={ options.flash_sale_title ?? 'FLASH SALE' }
 													onChange={ ( val ) => handleOptionChange( 'flash_sale_title', val ) }
+												/>
+
+												<TextareaControl
+													label={ __( 'Flash Sale Description Text', 'raka-preorder-theme' ) }
+													rows={ 2 }
+													value={ options.flash_sale_desc ?? 'Exclusive pre-order allocations at special introductory prices. Once stock is claimed, regular rates apply.' }
+													onChange={ ( val ) => handleOptionChange( 'flash_sale_desc', val ) }
 												/>
 											</div>
 										</div>
