@@ -148,7 +148,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			muted
 			playsinline
 			preload="auto"
-			class="absolute inset-0 w-full h-full object-cover gpu-accel pointer-events-none"
+			class="absolute inset-0 w-full h-full object-contain object-center gpu-accel pointer-events-none"
 			style="opacity: 0; will-change: transform, opacity;"
 		></video>
 
@@ -157,16 +157,16 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			id="hero-canvas"
 			width="1280"
 			height="720"
-			class="absolute inset-0 w-full h-full object-cover gpu-accel pointer-events-none transition-opacity duration-300"
+			class="absolute inset-0 w-full h-full object-contain object-center gpu-accel pointer-events-none transition-opacity duration-300"
 			style="opacity: 0; will-change: transform, opacity;"
 		></canvas>
 
 		<!-- 3. Hero Overlay Image (Figma asset: Pure white wings & gold angel) -->
-		<div id="hero-overlay-png-wrap" class="absolute inset-0 z-30 pointer-events-none gpu-accel transition-opacity duration-150">
+		<div id="hero-overlay-png-wrap" class="absolute inset-0 z-30 pointer-events-none gpu-accel transition-opacity duration-150 flex items-center justify-center">
 			<img
 				id="hero-overlay-png"
 				alt=""
-				class="w-full h-full object-cover"
+				class="w-full h-full object-contain object-center"
 				src="<?php echo esc_url( $hero_overlay_url ); ?>"
 			/>
 		</div>
