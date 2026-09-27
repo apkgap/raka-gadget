@@ -735,7 +735,7 @@ function raka_render_breadcrumbs( string $wrapper_id = 'obsidian-breadcrumbs', s
 }
 
 /**
- * Add WooCommerce Cart fragments to update cart badge count via AJAX.
+ * Add WooCommerce Cart fragments to update cart badge count and drawer HTML via AJAX.
  *
  * @param array $fragments Existing fragments.
  * @return array
@@ -747,9 +747,207 @@ function raka_add_to_cart_fragments( array $fragments ): array {
 	$html = '<span id="raka-cart-count" class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 ' . esc_attr( $scale_class ) . '">' . esc_html( (string) $cart_count ) . '</span>';
 	
 	$fragments['#raka-cart-count'] = $html;
+	$fragments['#overlay-cart-count'] = '<span id="overlay-cart-count" class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 ' . esc_attr( $scale_class ) . '">' . esc_html( (string) $cart_count ) . '</span>';
+	$fragments['#raka-cart-drawer-count'] = '<span id="raka-cart-drawer-count">' . esc_html( (string) $cart_count ) . '</span>';
+	$fragments['#raka-cart-drawer-content'] = raka_get_cart_drawer_html();
+
 	return $fragments;
 }
 add_filter( 'woocommerce_add_to_cart_fragments', 'raka_add_to_cart_fragments' );
+
+/**
+ * Render inner content of Cart Drawer (items list, empty state, subtotal, actions).
+ *
+ * @return string
+ */
+function raka_get_cart_drawer_html(): string {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		return '<div id="raka-cart-drawer-content" class="p-6 text-center text-sm text-neutral-400">WooCommerce is inactive.</div>';
+	}
+
+	$cart         = WC()->cart;
+	$cart_items   = $cart->get_cart();
+	$subtotal     = $cart->get_cart_subtotal();
+	$checkout_url = wc_get_checkout_url();
+	$cart_url     = wc_get_cart_url();
+
+	ob_start();
+	?>
+	<div id="raka-cart-drawer-content" class="flex flex-col h-full justify-between">
+		<!-- ── Items List ── -->
+		<div id="raka-cart-drawer-items" class="flex-1 overflow-y-auto px-6 py-4 divide-y divide-black/5 dark:divide-white/5 space-y-4">
+			<?php if ( empty( $cart_items ) ) : ?>
+				<div id="raka-cart-empty-state" class="flex flex-col items-center justify-center h-full min-h-[260px] py-16 text-center space-y-4">
+					<div id="raka-cart-empty-icon-wrap" class="w-16 h-16 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-neutral-400">
+						<i id="raka-cart-empty-icon" class="ri-shopping-bag-3-line text-3xl"></i>
+					</div>
+					<div id="raka-cart-empty-text-wrap" class="space-y-1">
+						<h4 id="raka-cart-empty-title" class="text-base font-bold uppercase tracking-wider text-neutral-900 dark:text-white font-hn">YOUR BAG IS EMPTY</h4>
+						<p id="raka-cart-empty-desc" class="text-xs text-neutral-500 dark:text-neutral-400 font-light font-hn max-w-xs">You have no items in your shopping bag yet.</p>
+					</div>
+					<div id="raka-cart-empty-action-wrap" class="pt-2">
+						<a id="raka-cart-empty-shop-btn" href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' ) ); ?>" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm">
+							<span id="raka-cart-empty-shop-txt">START SHOPPING</span>
+							<i id="raka-cart-empty-shop-ico" class="ri-arrow-right-line text-sm"></i>
+						</a>
+					</div>
+				</div>
+			<?php else : ?>
+				<?php
+				foreach ( $cart_items as $cart_item_key => $cart_item ) :
+					$_product   = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+					$product_id = apply_filters( 'woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key );
+
+					if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters( 'woocommerce_cart_item_visible', true, $cart_item, $cart_item_key ) ) :
+						$product_permalink = apply_filters( 'woocommerce_cart_item_permalink', $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '', $cart_item, $cart_item_key );
+						$thumbnail         = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'woocommerce_thumbnail', [ 'class' => 'w-full h-full object-contain p-1' ] ), $cart_item, $cart_item_key );
+						$product_price     = apply_filters( 'woocommerce_cart_item_price', $cart->get_product_price( $_product ), $cart_item, $cart_item_key );
+				?>
+					<div id="cart-item-<?php echo esc_attr( $cart_item_key ); ?>" class="flex items-center gap-4 pt-4 first:pt-0 group">
+						<!-- Product Thumbnail -->
+						<div id="cart-thumb-<?php echo esc_attr( $cart_item_key ); ?>" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-black/5 dark:border-white/5 flex items-center justify-center shrink-0 overflow-hidden">
+							<?php echo $thumbnail; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						</div>
+
+						<!-- Details -->
+						<div id="cart-details-<?php echo esc_attr( $cart_item_key ); ?>" class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+							<div id="cart-info-<?php echo esc_attr( $cart_item_key ); ?>" class="space-y-0.5">
+								<h5 id="cart-title-<?php echo esc_attr( $cart_item_key ); ?>" class="text-xs sm:text-sm font-bold uppercase tracking-tight text-neutral-900 dark:text-white truncate font-hn">
+									<?php if ( $product_permalink ) : ?>
+										<a id="cart-link-<?php echo esc_attr( $cart_item_key ); ?>" href="<?php echo esc_url( $product_permalink ); ?>" class="hover:opacity-60 transition-opacity">
+											<?php echo esc_html( $_product->get_name() ); ?>
+										</a>
+									<?php else : ?>
+										<?php echo esc_html( $_product->get_name() ); ?>
+									<?php endif; ?>
+								</h5>
+
+								<?php if ( ! empty( $cart_item['variation'] ) ) : ?>
+									<div id="cart-var-<?php echo esc_attr( $cart_item_key ); ?>" class="text-[10px] sm:text-xs text-neutral-400 font-mono">
+										<?php echo esc_html( wc_get_formatted_cart_item_data( $cart_item, true ) ); ?>
+									</div>
+								<?php endif; ?>
+							</div>
+
+							<div id="cart-meta-<?php echo esc_attr( $cart_item_key ); ?>" class="flex items-center justify-between pt-2">
+								<span id="cart-qty-<?php echo esc_attr( $cart_item_key ); ?>" class="text-[11px] sm:text-xs font-mono text-neutral-500 dark:text-neutral-400">
+									QTY: <?php echo esc_html( (string) $cart_item['quantity'] ); ?> × <?php echo wp_kses_post( $product_price ); ?>
+								</span>
+
+								<!-- Remove Action -->
+								<button
+									id="cart-remove-<?php echo esc_attr( $cart_item_key ); ?>"
+									type="button"
+									onclick="window.rakaRemoveCartItem('<?php echo esc_attr( $cart_item_key ); ?>', this)"
+									class="text-xs text-neutral-400 hover:text-red-500 transition-colors p-1 cursor-pointer focus:outline-none"
+									aria-label="Remove item"
+									title="Remove item"
+								>
+									<i id="cart-del-icon-<?php echo esc_attr( $cart_item_key ); ?>" class="ri-delete-bin-line text-sm"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				<?php
+					endif;
+				endforeach;
+				?>
+			<?php endif; ?>
+		</div>
+
+		<!-- ── Footer Summary & Checkout ── -->
+		<?php if ( ! empty( $cart_items ) ) : ?>
+			<div id="raka-cart-drawer-footer" class="p-6 border-t border-black/10 dark:border-white/10 bg-neutral-50/50 dark:bg-neutral-900/50 space-y-4 shrink-0">
+				<div id="raka-cart-subtotal-row" class="flex items-center justify-between">
+					<span id="raka-cart-subtotal-lbl" class="text-xs font-mono uppercase tracking-widest text-neutral-500 dark:text-neutral-400">SUBTOTAL</span>
+					<span id="raka-cart-subtotal-val" class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-mono"><?php echo wp_kses_post( $subtotal ); ?></span>
+				</div>
+
+				<p id="raka-cart-tax-note" class="text-[10px] text-neutral-400 dark:text-neutral-500 font-light font-hn text-center">
+					Shipping, taxes, and promotional discounts calculated at checkout.
+				</p>
+
+				<div id="raka-cart-actions-wrap" class="space-y-2.5">
+					<a id="raka-cart-checkout-btn" href="<?php echo esc_url( $checkout_url ); ?>" class="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 px-6 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold text-xs sm:text-sm uppercase tracking-widest hover:opacity-90 transition-opacity shadow-sm">
+						<span id="raka-cart-checkout-txt">CHECKOUT NOW</span>
+						<i id="raka-cart-checkout-icon" class="ri-arrow-right-line text-base"></i>
+					</a>
+
+					<a id="raka-cart-view-btn" href="<?php echo esc_url( $cart_url ); ?>" class="w-full flex items-center justify-center py-2 px-6 rounded-full border border-black/15 dark:border-white/20 text-neutral-800 dark:text-neutral-200 font-medium text-xs uppercase tracking-widest hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+						<span id="raka-cart-view-txt">VIEW FULL BAG</span>
+					</a>
+				</div>
+			</div>
+		<?php endif; ?>
+	</div>
+	<?php
+	return (string) ob_get_clean();
+}
+
+/**
+ * Render Complete Cart Drawer Wrapper Modal in theme footer.
+ */
+function raka_render_cart_drawer(): void {
+	if ( ! function_exists( 'WC' ) ) {
+		return;
+	}
+	$cart_count = ( WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+	?>
+	<!-- ── Raka Luxury Cart Drawer Modal (Slide-Over) ── -->
+	<div id="raka-cart-drawer" class="fixed inset-0 z-[95] pointer-events-none transition-all duration-500" aria-hidden="true">
+		<!-- Backdrop -->
+		<div id="raka-cart-backdrop" onclick="window.closeRakaCart()" class="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xs opacity-0 transition-opacity duration-500 cursor-pointer"></div>
+
+		<!-- Slide-Over Panel -->
+		<div id="raka-cart-panel" class="absolute top-0 right-0 bottom-0 w-full max-w-md sm:max-w-lg bg-white dark:bg-neutral-950 shadow-2xl flex flex-col justify-between translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-10 border-l border-black/10 dark:border-white/10">
+			<!-- Header -->
+			<div id="raka-cart-drawer-header" class="flex items-center justify-between px-6 py-5 border-b border-black/10 dark:border-white/10 shrink-0">
+				<div id="raka-cart-drawer-title-wrap" class="flex items-center gap-3">
+					<h3 id="raka-cart-drawer-heading" class="text-sm sm:text-base font-extrabold uppercase tracking-[0.2em] text-neutral-900 dark:text-white font-hn">SHOPPING BAG</h3>
+					<span id="raka-cart-drawer-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-black/5 dark:bg-white/10 text-neutral-700 dark:text-neutral-300">
+						<span id="raka-cart-drawer-count"><?php echo esc_html( (string) $cart_count ); ?></span> ITEMS
+					</span>
+				</div>
+
+				<!-- Close Button -->
+				<button
+					id="raka-cart-close-btn"
+					type="button"
+					onclick="window.closeRakaCart()"
+					class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-neutral-900 dark:text-white transition-all duration-300 hover:scale-105 cursor-pointer focus:outline-none"
+					aria-label="Close cart"
+					title="Close cart"
+				>
+					<i id="raka-cart-close-icon" class="ri-close-line text-xl transition-transform duration-300 hover:rotate-90"></i>
+				</button>
+			</div>
+
+			<!-- Dynamic Content Container -->
+			<div id="raka-cart-drawer-body" class="flex-1 overflow-hidden relative">
+				<?php echo raka_get_cart_drawer_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</div>
+		</div>
+	</div>
+	<?php
+}
+
+/**
+ * AJAX handler for removing item from cart drawer.
+ */
+function raka_ajax_remove_cart_item(): void {
+	$cart_item_key = isset( $_POST['cart_item_key'] ) ? sanitize_text_field( wp_unslash( $_POST['cart_item_key'] ) ) : '';
+
+	if ( $cart_item_key && function_exists( 'WC' ) && WC()->cart ) {
+		WC()->cart->remove_cart_item( $cart_item_key );
+		if ( class_exists( 'WC_AJAX' ) ) {
+			WC_AJAX::get_refreshed_fragments();
+		}
+	}
+	wp_die();
+}
+add_action( 'wp_ajax_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
+add_action( 'wp_ajax_nopriv_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
+
 
 
 

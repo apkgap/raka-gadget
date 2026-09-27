@@ -11,7 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 	</div><!-- #root -->
 
-	<!-- ── Scripts Engine: Theme Switcher & Fullscreen Menu ── -->
+	<?php
+	// ── Render Global Slide-Over Cart Drawer ──
+	if ( function_exists( 'raka_render_cart_drawer' ) ) {
+		raka_render_cart_drawer();
+	}
+	?>
+
+	<!-- ── Scripts Engine: Theme Switcher, Fullscreen Menu & Cart Drawer ── -->
 	<script id="raka-theme-menu-scripts">
 		// ─── 1. Global Theme Switcher ──────────────────────────────────────────────
 		window.toggleRakaTheme = function(event) {
@@ -384,6 +391,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					window.jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash]);
 				}
 
+				// Automatically open Slide-Over Cart Drawer upon adding
+				if (typeof window.openRakaCart === 'function') {
+					window.openRakaCart();
+				}
+
 				setTimeout(() => {
 					if (txtSpan) txtSpan.textContent = origTxt;
 					if (icoEl) icoEl.className = origIco;
@@ -413,8 +425,93 @@ if ( ! defined( 'ABSPATH' ) ) {
 			handleScroll();
 		})();
 
-		// ─── 5. WooCommerce Cart Badge Dynamic Updater ───────────────────────────
+		// ─── 5. Luxury Slide-Over Cart Drawer Controller ──────────────────────────
 		(function() {
+			const drawer   = document.getElementById('raka-cart-drawer');
+			const backdrop = document.getElementById('raka-cart-backdrop');
+			const panel    = document.getElementById('raka-cart-panel');
+			let isCartOpen = false;
+
+			window.openRakaCart = function() {
+				if (!drawer || !backdrop || !panel) return;
+				isCartOpen = true;
+				drawer.classList.remove('pointer-events-none');
+				drawer.classList.add('pointer-events-auto');
+				drawer.setAttribute('aria-hidden', 'false');
+
+				// Backdrop fade in
+				backdrop.classList.remove('opacity-0');
+				backdrop.classList.add('opacity-100');
+
+				// Panel slide in
+				panel.classList.remove('translate-x-full');
+				panel.classList.add('translate-x-0');
+
+				document.body.style.overflow = 'hidden';
+			};
+
+			window.closeRakaCart = function() {
+				if (!drawer || !backdrop || !panel) return;
+				isCartOpen = false;
+
+				// Panel slide out
+				panel.classList.remove('translate-x-0');
+				panel.classList.add('translate-x-full');
+
+				// Backdrop fade out
+				backdrop.classList.remove('opacity-100');
+				backdrop.classList.add('opacity-0');
+
+				drawer.classList.remove('pointer-events-auto');
+				drawer.classList.add('pointer-events-none');
+				drawer.setAttribute('aria-hidden', 'true');
+
+				// If fullscreen menu overlay is not open, unlock body scroll
+				const menuOverlay = document.getElementById('raka-menu-overlay') || document.getElementById('fullscreen-menu-overlay');
+				const isMenuOpen = menuOverlay && menuOverlay.style.pointerEvents === 'auto';
+				if (!isMenuOpen) {
+					document.body.style.overflow = '';
+				}
+			};
+
+			// Remove Cart Item with Live AJAX
+			window.rakaRemoveCartItem = function(cartItemKey, btn) {
+				if (!cartItemKey) return;
+				const itemRow = document.getElementById('cart-item-' + cartItemKey);
+				if (itemRow) {
+					itemRow.style.opacity = '0.4';
+					itemRow.style.pointerEvents = 'none';
+				}
+				if (btn) {
+					btn.innerHTML = '<i class="ri-loader-4-line animate-spin text-sm"></i>';
+				}
+
+				const formData = new FormData();
+				formData.append('action', 'raka_remove_cart_item');
+				formData.append('cart_item_key', cartItemKey);
+
+				fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
+					method: 'POST',
+					body: formData
+				})
+				.then(res => res.json())
+				.then(data => {
+					if (data && data.fragments) {
+						updateCartDrawerFragments(data.fragments);
+					} else {
+						// Trigger WC fragment refresh if needed
+						if (window.jQuery) {
+							window.jQuery(document.body).trigger('wc_fragment_refresh');
+						}
+					}
+				})
+				.catch(() => {
+					if (window.jQuery) {
+						window.jQuery(document.body).trigger('wc_fragment_refresh');
+					}
+				});
+			};
+
 			function updateBadges(count) {
 				const badges = document.querySelectorAll('.raka-cart-count-badge');
 				badges.forEach(b => {
@@ -428,7 +525,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							b.classList.add('scale-0');
 						}
 					}
-					// Bounce animation
+					// Pulse animation
 					b.classList.remove('scale-125');
 					void b.offsetWidth;
 					b.classList.add('scale-125');
@@ -436,17 +533,70 @@ if ( ! defined( 'ABSPATH' ) ) {
 				});
 			}
 
+			function updateCartDrawerFragments(fragments) {
+				if (!fragments) return;
+
+				// Update Cart Drawer Content
+				if (fragments['#raka-cart-drawer-content']) {
+					const drawerBody = document.getElementById('raka-cart-drawer-body');
+					if (drawerBody) {
+						drawerBody.innerHTML = fragments['#raka-cart-drawer-content'];
+					}
+				}
+
+				// Update Drawer Count
+				if (fragments['#raka-cart-drawer-count']) {
+					const temp = document.createElement('div');
+					temp.innerHTML = fragments['#raka-cart-drawer-count'];
+					const countEl = document.getElementById('raka-cart-drawer-count');
+					if (countEl && temp.firstChild) {
+						countEl.textContent = temp.firstChild.textContent.trim();
+					}
+				}
+
+				// Update Badges
+				if (fragments['#raka-cart-count']) {
+					const temp = document.createElement('div');
+					temp.innerHTML = fragments['#raka-cart-count'];
+					const newSpan = temp.querySelector('span') || temp.firstChild;
+					if (newSpan) {
+						const cnt = parseInt(newSpan.textContent.trim(), 10);
+						if (!isNaN(cnt)) updateBadges(cnt);
+					}
+				}
+			}
+
+			// Intercept Header & Overlay Cart buttons
+			const cartBtns = document.querySelectorAll('#raka-cart-btn, #overlay-cart-btn, a[href*="cart"]');
+			cartBtns.forEach(btn => {
+				// Only intercept if not checkout link
+				if (btn.id === 'raka-cart-btn' || btn.id === 'overlay-cart-btn') {
+					btn.addEventListener('click', function(e) {
+						e.preventDefault();
+						window.openRakaCart();
+					});
+				}
+			});
+
+			// Escape key to close cart
+			document.addEventListener('keydown', function(e) {
+				if (e.key === 'Escape' && isCartOpen) {
+					window.closeRakaCart();
+				}
+			});
+
+			// WooCommerce jQuery events
 			if (window.jQuery) {
 				window.jQuery(document.body).on('added_to_cart', function(event, fragments) {
-					if (fragments && fragments['#raka-cart-count']) {
-						const temp = document.createElement('div');
-						temp.innerHTML = fragments['#raka-cart-count'];
-						const newSpan = temp.querySelector('span') || temp.firstChild;
-						if (newSpan) {
-							const cnt = parseInt(newSpan.textContent.trim(), 10);
-							if (!isNaN(cnt)) updateBadges(cnt);
-						}
-					}
+					if (fragments) updateCartDrawerFragments(fragments);
+				});
+
+				window.jQuery(document.body).on('removed_from_cart', function(event, fragments) {
+					if (fragments) updateCartDrawerFragments(fragments);
+				});
+
+				window.jQuery(document.body).on('wc_fragments_refreshed wc_fragments_loaded', function() {
+					// Auto sync if needed
 				});
 			}
 		})();
