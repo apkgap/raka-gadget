@@ -11,49 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-/**
- * Helper to resolve realistic CSS hex or gradient styles from color names
- */
-function raka_get_swatch_css( $raw_name ) {
-	$c = strtolower( trim( html_entity_decode( (string) $raw_name, ENT_QUOTES, 'UTF-8' ) ) );
-	$c = preg_replace( '/[^\p{L}\p{N}\s\-]/u', '', $c );
-
-	if ( strpos( $c, 'black' ) !== false || strpos( $c, 'obsidian' ) !== false || strpos( $c, 'eon' ) !== false || strpos( $c, 'blackberry' ) !== false || strpos( $c, 'gunmetal' ) !== false ) {
-		return 'background-color: #121212; border-color: #383838;';
-	}
-	if ( strpos( $c, 'white' ) !== false || strpos( $c, 'polar' ) !== false || strpos( $c, 'ice' ) !== false || strpos( $c, 'prime' ) !== false || strpos( $c, 'arctic' ) !== false || strpos( $c, 'pearl' ) !== false ) {
-		return 'background-color: #F8F9FA; border: 1.5px solid #D1D5DB;';
-	}
-	if ( strpos( $c, 'yellow' ) !== false || strpos( $c, 'lemon' ) !== false ) {
-		return 'background-color: #FACC15; border-color: #EAB308;';
-	}
-	if ( strpos( $c, 'pink' ) !== false || strpos( $c, 'sakura' ) !== false || strpos( $c, 'blush' ) !== false ) {
-		return 'background-color: #F472B6; border-color: #EC4899;';
-	}
-	if ( strpos( $c, 'purple' ) !== false || strpos( $c, 'lilac' ) !== false || strpos( $c, 'violet' ) !== false ) {
-		return 'background-color: #A855F7; border-color: #9333EA;';
-	}
-	if ( strpos( $c, 'orange' ) !== false || strpos( $c, 'sunset' ) !== false ) {
-		return 'background-color: #FB923C; border-color: #EA580C;';
-	}
-	if ( strpos( $c, 'red' ) !== false || strpos( $c, 'crimson' ) !== false ) {
-		return 'background-color: #EF4444; border-color: #DC2626;';
-	}
-	if ( strpos( $c, 'blue' ) !== false || strpos( $c, 'verge' ) !== false || strpos( $c, 'cyan' ) !== false || strpos( $c, 'sky' ) !== false || strpos( $c, 'periwinkle' ) !== false ) {
-		return 'background-color: #38BDF8; border-color: #0284C7;';
-	}
-	if ( strpos( $c, 'silver' ) !== false || strpos( $c, 'metal' ) !== false || strpos( $c, 'gray' ) !== false || strpos( $c, 'grey' ) !== false ) {
-		return 'background-color: #94A3B8; border-color: #64748B;';
-	}
-	if ( strpos( $c, 'sand' ) !== false || strpos( $c, 'dune' ) !== false || strpos( $c, 'beige' ) !== false ) {
-		return 'background-color: #D4B996; border-color: #BCA380;';
-	}
-	if ( strpos( $c, 'green' ) !== false || strpos( $c, 'mint' ) !== false ) {
-		return 'background-color: #10B981; border-color: #059669;';
-	}
-
-	return 'background: linear-gradient(135deg, #4A5568 0%, #2D3748 100%); border-color: #4A5568;';
-}
 
 while ( have_posts() ) :
 	the_post();
