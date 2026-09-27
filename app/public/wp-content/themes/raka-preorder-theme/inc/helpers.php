@@ -610,6 +610,165 @@ function raka_get_hero_cards(): array {
 	return $resolved;
 }
 
+/**
+ * Retrieve products for the homepage Flash Sale section.
+ *
+ * @param int $limit Number of products to fetch.
+ * @return array
+ */
+function raka_get_flash_sale_products( int $limit = 6 ): array {
+	if ( ! function_exists( 'wc_get_products' ) ) {
+		return [];
+	}
+
+	// 1. Try fetching on-sale products
+	$sale_products = wc_get_products( [
+		'limit'   => $limit,
+		'status'  => 'publish',
+		'on_sale' => true,
+		'orderby' => 'date',
+		'order'   => 'DESC',
+	] );
+
+	// Fallback to recent products if not enough sale items
+	if ( count( $sale_products ) < $limit ) {
+		$exclude_ids = wp_list_pluck( $sale_products, 'id' );
+		$fallback = wc_get_products( [
+			'limit'   => $limit - count( $sale_products ),
+			'status'  => 'publish',
+			'exclude' => $exclude_ids,
+			'orderby' => 'popularity',
+			'order'   => 'DESC',
+		] );
+		$sale_products = array_merge( $sale_products, $fallback );
+	}
+
+	$results = [];
+	foreach ( $sale_products as $prod ) {
+		if ( ! $prod instanceof WC_Product ) {
+			continue;
+		}
+
+		$pid           = $prod->get_id();
+		$regular_price = (float) $prod->get_regular_price();
+		$sale_price    = (float) $prod->get_sale_price();
+		$current_price = (float) $prod->get_price();
+		$discount_pct  = 0;
+
+		if ( $regular_price > 0 && $sale_price > 0 && $sale_price < $regular_price ) {
+			$discount_pct = round( ( ( $regular_price - $sale_price ) / $regular_price ) * 100 );
+		} elseif ( $regular_price > 0 && $current_price < $regular_price ) {
+			$discount_pct = round( ( ( $regular_price - $current_price ) / $regular_price ) * 100 );
+		} else {
+			$discount_pct  = 15 + ( ( $pid % 4 ) * 5 );
+			$regular_price = $current_price > 0 ? ( $current_price * 1.25 ) : 2990;
+		}
+
+		$img_url = '';
+		if ( $prod->get_image_id() ) {
+			$img = wp_get_attachment_image_src( $prod->get_image_id(), 'medium_large' );
+			if ( $img ) {
+				$img_url = $img[0];
+			}
+		}
+
+		$cats     = wp_get_post_terms( $pid, 'product_cat' );
+		$cat_name = ( ! empty( $cats ) && ! is_wp_error( $cats ) ) ? $cats[0]->name : __( 'Gadget', 'raka-preorder-theme' );
+
+		$claimed_pct = 60 + ( ( $pid * 7 ) % 35 );
+		$left_count  = max( 2, 18 - ( ( $pid * 3 ) % 15 ) );
+
+		$results[] = [
+			'id'            => $pid,
+			'name'          => html_entity_decode( $prod->get_name(), ENT_QUOTES, 'UTF-8' ),
+			'url'           => $prod->get_permalink(),
+			'image_url'     => $img_url,
+			'category'      => $cat_name,
+			'regular_price' => wc_price( $regular_price ),
+			'sale_price'    => wc_price( $current_price > 0 ? $current_price : 2490 ),
+			'discount_pct'  => $discount_pct,
+			'claimed_pct'   => $claimed_pct,
+			'left_count'    => $left_count,
+			'is_on_sale'    => $prod->is_on_sale() || $discount_pct > 0,
+		];
+	}
+
+	return $results;
+}
+
+/**
+ * Retrieve products and category tabs for the homepage Our Products section.
+ *
+ * @param int $limit Total limit of products.
+ * @return array
+ */
+function raka_get_homepage_catalog_products( int $limit = 12 ): array {
+	if ( ! function_exists( 'wc_get_products' ) ) {
+		return [ 'products' => [], 'categories' => [] ];
+	}
+
+	$products = wc_get_products( [
+		'limit'   => $limit,
+		'status'  => 'publish',
+		'orderby' => 'date',
+		'order'   => 'DESC',
+	] );
+
+	$items      = [];
+	$categories = [];
+
+	foreach ( $products as $prod ) {
+		if ( ! $prod instanceof WC_Product ) {
+			continue;
+		}
+
+		$pid     = $prod->get_id();
+		$img_url = '';
+		if ( $prod->get_image_id() ) {
+			$img = wp_get_attachment_image_src( $prod->get_image_id(), 'medium_large' );
+			if ( $img ) {
+				$img_url = $img[0];
+			}
+		}
+
+		$cats      = wp_get_post_terms( $pid, 'product_cat' );
+		$cat_slugs = [];
+		$cat_name  = __( 'Gear', 'raka-preorder-theme' );
+		if ( ! empty( $cats ) && ! is_wp_error( $cats ) ) {
+			$cat_name = $cats[0]->name;
+			foreach ( $cats as $c ) {
+				$cat_slugs[]            = $c->slug;
+				$categories[ $c->slug ] = $c->name;
+			}
+		}
+
+		$brands = wp_get_post_terms( $pid, 'pwb-brand' );
+		if ( empty( $brands ) || is_wp_error( $brands ) ) {
+			$brands = wp_get_post_terms( $pid, 'product_brand' );
+		}
+		$brand_name = ( ! empty( $brands ) && ! is_wp_error( $brands ) ) ? $brands[0]->name : '';
+
+		$items[] = [
+			'id'         => $pid,
+			'name'       => html_entity_decode( $prod->get_name(), ENT_QUOTES, 'UTF-8' ),
+			'url'        => $prod->get_permalink(),
+			'image_url'  => $img_url,
+			'category'   => $cat_name,
+			'cat_slugs'  => $cat_slugs,
+			'brand'      => $brand_name,
+			'price_html' => $prod->get_price_html() ?: wc_price( $prod->get_price() ),
+			'stock'      => $prod->get_stock_status(),
+			'is_on_sale' => $prod->is_on_sale(),
+			'rating'     => (float) $prod->get_average_rating(),
+		];
+	}
+
+	return [
+		'products'   => $items,
+		'categories' => $categories,
+	];
+}
+
 
 /**
  * Get Brand Logo image URL from term meta
@@ -1289,6 +1448,8 @@ function raka_ajax_remove_cart_item(): void {
 }
 add_action( 'wp_ajax_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
 add_action( 'wp_ajax_nopriv_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
+
+
 
 
 
