@@ -139,7 +139,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 
 <!-- ── ScrollVideoHero Component ── -->
 <section id="scroll-video-hero-section" class="relative" style="height: <?php echo esc_attr( $hero_section_height ); ?>;">
-	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-white dark:bg-obsidian theme-transition gpu-accel">
+	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-[#eeedea] dark:bg-[#080808] theme-transition gpu-accel flex items-center justify-center">
 
 		<!-- 1. Video Layer -->
 		<video
@@ -174,8 +174,8 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<!-- 4. Hero Content (Section 1) -->
 		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col justify-between pointer-events-none gpu-accel p-6 md:p-10 pb-8 md:pb-10">
 			<!-- Centered Main Title -->
-			<div id="hero-title-container" class="flex justify-center mt-12 md:mt-14">
-				<h1 id="hero-main-title" class="text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition">
+			<div id="hero-title-container" class="flex justify-center mt-10 md:mt-12">
+				<h1 id="hero-main-title" class="text-[18vw] md:text-[20vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition">
 					<?php echo esc_html( $hero_main_title ); ?>
 				</h1>
 			</div>
@@ -229,7 +229,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<!-- 5. Quad-Card Slides (Show 4 Cards Simultaneously Per Scroll Step: 2 Left, 2 Right) -->
 		<?php foreach ( $hero_card_quads as $quad_idx => $quad ) : ?>
 			<div id="hero-card-quad-<?php echo esc_attr( $quad_idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel pointer-events-none p-6 md:p-8 lg:p-12 pt-20 md:pt-24 lg:pt-28 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 md:gap-8 lg:gap-12 overflow-y-auto md:overflow-visible" style="opacity: 0; visibility: hidden; transform: translate3d(0, 20px, 0);">
-				
+
 				<!-- Left Flank: Card 0 + Card 2 (if present) -->
 				<div id="hero-quad-left-<?php echo esc_attr( $quad_idx ); ?>" class="flex flex-col gap-4 md:gap-5 w-full max-w-md lg:max-w-[420px]">
 					<?php if ( isset( $quad[0] ) ) : ?>
@@ -396,10 +396,10 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		</div>
 		<!-- Contact Content Body -->
 		<div id="raka-contact-modal-body" class="overflow-y-auto p-6 sm:p-8 space-y-6">
-			
+
 			<!-- Direct Channels Grid -->
 			<div id="raka-contact-channels-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-				
+
 				<!-- LINE Official Card -->
 				<?php if ( ! empty( $contact_options['contact_line_id'] ) || ! empty( $contact_options['contact_line_url'] ) ) : ?>
 					<a
