@@ -152,6 +152,10 @@ body {
 /* Scrolled state: Frosted glass background, subtle border and elevated shadow */
 #raka-site-header.header-scrolled,
 #obsidian-site-header.header-scrolled {
+	position: fixed !important;
+	top: 0 !important;
+	left: 0 !important;
+	right: 0 !important;
 	background-color: rgba(255, 255, 255, 0.92) !important;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
 	backdrop-filter: blur(16px) !important;
