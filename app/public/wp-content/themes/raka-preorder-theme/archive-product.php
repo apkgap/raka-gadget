@@ -22,7 +22,7 @@ $all_cats = get_terms( [
 ?>
 
 <main id="archive-product-main" class="min-h-screen pt-28 md:pt-36 pb-24 bg-cement dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
-	<div id="archive-product-container" class="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+	<div id="archive-product-container" class="max-w-7xl mx-auto px-3.5 sm:px-8 md:px-12 lg:px-16">
 
 		<!-- ── Archive Header ── -->
 		<div id="archive-header-block" class="mb-12 md:mb-16 space-y-4 border-b border-black/10 dark:border-white/10 pb-8 md:pb-12">
@@ -70,9 +70,9 @@ $all_cats = get_terms( [
 			<?php endif; ?>
 		</div>
 
-		<!-- ── Products Grid ── -->
+		<!-- ── Products Grid (2 Columns on Mobile, 3 on Tablet, 4 on Desktop) ── -->
 		<?php if ( have_posts() ) : ?>
-			<div id="archive-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+			<div id="archive-products-grid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 lg:gap-8">
 				<?php
 				while ( have_posts() ) :
 					the_post();
