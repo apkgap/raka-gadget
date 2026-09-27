@@ -83,6 +83,7 @@ $all_cats = get_terms( [
 
 					$p_brands = wp_get_post_terms( $p_id, 'product_brand' );
 					$b_name   = ( ! is_wp_error( $p_brands ) && ! empty( $p_brands ) ) ? $p_brands[0]->name : 'ATK';
+					$b_logo   = ( ! is_wp_error( $p_brands ) && ! empty( $p_brands ) ) ? raka_get_brand_logo_url( $p_brands[0] ) : '';
 				?>
 					<a
 						id="product-card-<?php echo esc_attr( (string) $p_id ); ?>"
@@ -91,9 +92,13 @@ $all_cats = get_terms( [
 					>
 						<!-- Card Media -->
 						<div id="p-img-wrap-<?php echo esc_attr( (string) $p_id ); ?>" class="relative w-full h-56 flex items-center justify-center overflow-hidden mb-6">
-							<span id="p-brand-badge-<?php echo esc_attr( (string) $p_id ); ?>" class="absolute top-0 left-0 text-[10px] font-mono tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-								<?php echo esc_html( $b_name ); ?>
-							</span>
+							<div id="p-brand-badge-<?php echo esc_attr( (string) $p_id ); ?>" class="absolute top-0 left-0 z-10">
+								<?php if ( $b_logo ) : ?>
+									<img id="p-brand-img-<?php echo esc_attr( (string) $p_id ); ?>" src="<?php echo esc_url( $b_logo ); ?>" alt="<?php echo esc_attr( $b_name ); ?>" class="h-3.5 sm:h-4 w-auto max-w-[80px] object-contain opacity-70 group-hover:opacity-100 transition-opacity filter dark:invert" />
+								<?php else : ?>
+									<span id="p-brand-txt-<?php echo esc_attr( (string) $p_id ); ?>" class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 dark:text-neutral-500"><?php echo esc_html( $b_name ); ?></span>
+								<?php endif; ?>
+							</div>
 							<img
 								id="p-img-<?php echo esc_attr( (string) $p_id ); ?>"
 								src="<?php echo esc_url( $p_img_url ); ?>"

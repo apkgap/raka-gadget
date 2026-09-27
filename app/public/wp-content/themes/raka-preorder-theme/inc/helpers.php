@@ -270,6 +270,36 @@ function raka_get_resolved_card_data( string $slot_key, array $fallback = [] ): 
 }
 
 /**
+ * Get Brand Logo image URL from term meta
+ *
+ * @param int|WP_Term $term_id_or_object Term ID or WP_Term object.
+ * @return string Brand logo image URL or empty string.
+ */
+function raka_get_brand_logo_url( $term_id_or_object ): string {
+	$term_id = is_object( $term_id_or_object ) ? (int) $term_id_or_object->term_id : (int) $term_id_or_object;
+	if ( $term_id <= 0 ) {
+		return '';
+	}
+
+	$thumb_id = get_term_meta( $term_id, 'thumbnail_id', true )
+		?: get_term_meta( $term_id, 'pwb_brand_image', true )
+		?: get_term_meta( $term_id, 'brand_image_id', true );
+
+	if ( $thumb_id ) {
+		$url = wp_get_attachment_image_url( (int) $thumb_id, 'full' );
+		if ( $url ) {
+			return $url;
+		}
+		$post = get_post( (int) $thumb_id );
+		if ( $post && ! empty( $post->guid ) ) {
+			return $post->guid;
+		}
+	}
+
+	return '';
+}
+
+/**
  * Render Ultra-Minimal Pagination (Left: « ‹ [ 1 ] จาก 499 › » | Right: แสดง 1-12 จาก 5985 รายการ)
  *
  * @param WP_Query|null $query Custom query or defaults to global $wp_query.
