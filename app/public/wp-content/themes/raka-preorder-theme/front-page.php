@@ -23,7 +23,8 @@ if ( strpos( $hero_overlay_url, 'figma.site' ) !== false ) {
 
 $hero_cards          = raka_get_hero_cards();
 $total_cards         = count( $hero_cards );
-$hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
+// Snappy fast scroll: ~35vh per card instead of 100vh
+$hero_section_height = max( 220, ( $total_cards * 35 ) + 80 ) . 'vh';
 ?>
 
 <!-- ── ScrollVideoHero Component ── -->
@@ -248,8 +249,8 @@ $hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 
 		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		// Smooth Constants
-		const LERP_TAU = 16;
+		// Fast & Responsive Smoothing Constants
+		const LERP_TAU = 28;
 		const SNAP = 0.001;
 		const LRU_MAX = 36;
 		const LEAD = 24;
@@ -327,7 +328,7 @@ $hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 				overlayPng.style.visibility = pngOpacity > 0.01 ? 'visible' : 'hidden';
 			}
 
-			// 2. Sequential Cards Scrubbing (Strictly ONE active card slot at a time)
+			// 2. Sequential Cards Scrubbing (Fast, Snappy Single-Card Transitions)
 			if (totalCards > 0) {
 				const cardProgressStart = introSlotLen * 0.85;
 				const cardProgressRange = 1 - cardProgressStart;
@@ -354,18 +355,18 @@ $hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 					let opacity = 0;
 					let translateY = 0;
 
-					if (local < 0.2) {
-						// Enter phase (0.0 -> 0.2): smooth fade in and subtle rise
-						const enterT = local / 0.2;
+					if (local < 0.15) {
+						// Fast enter phase (0.0 -> 0.15)
+						const enterT = local / 0.15;
 						opacity = enterT;
-						translateY = (1 - enterT) * 15;
-					} else if (local > 0.8) {
-						// Exit phase (0.8 -> 1.0): smooth fade out and subtle exit
-						const exitT = (local - 0.8) / 0.2;
+						translateY = (1 - enterT) * 12;
+					} else if (local > 0.85) {
+						// Fast exit phase (0.85 -> 1.0)
+						const exitT = (local - 0.85) / 0.15;
 						opacity = 1 - exitT;
-						translateY = exitT * -15;
+						translateY = exitT * -12;
 					} else {
-						// Steady active phase (0.2 -> 0.8): 100% full opacity, resting in place
+						// Active steady phase (0.15 -> 0.85)
 						opacity = 1;
 						translateY = 0;
 					}
