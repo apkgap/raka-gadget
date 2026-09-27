@@ -8,6 +8,7 @@ import {
 	TextControl,
 	TextareaControl,
 	SelectControl,
+	ToggleControl,
 	Notice,
 	Spinner,
 	Flex,
@@ -172,7 +173,7 @@ export default function ThemeSettingsApp() {
 	};
 
 	// Repeater handlers
-	const heroCards = Array.isArray( options.hero_cards ) ? options.hero_cards : [];
+	const heroCards = Array.isArray( options.hero_cards) ? options.hero_cards : [];
 
 	const handleCardChange = ( index, field, value ) => {
 		const updated = [ ...heroCards ];
@@ -181,26 +182,16 @@ export default function ThemeSettingsApp() {
 			[ field ]: value,
 		};
 
-		// If product_id changed, auto-populate details if they are currently blank
+		// If product_id changed, auto-populate details
 		if ( field === 'product_id' ) {
 			const prodId = Number( value );
 			const matched = wcData.products.find( ( p ) => p.id === prodId );
 			if ( matched ) {
-				if ( ! updated[ index ].title ) {
-					updated[ index ].title = matched.title;
-				}
-				if ( ! updated[ index ].price && matched.price ) {
-					updated[ index ].price = matched.price;
-				}
-				if ( ! updated[ index ].url && matched.permalink ) {
-					updated[ index ].url = matched.permalink;
-				}
-				if ( ! updated[ index ].image_url && matched.image_url ) {
-					updated[ index ].image_url = matched.image_url;
-				}
-				if ( ! updated[ index ].description && matched.description ) {
-					updated[ index ].description = matched.description;
-				}
+				updated[ index ].title = matched.title || '';
+				updated[ index ].price = matched.price || '';
+				updated[ index ].url = matched.permalink || '';
+				updated[ index ].image_url = matched.image_url || '';
+				updated[ index ].description = matched.description || '';
 			}
 		}
 
@@ -210,6 +201,7 @@ export default function ThemeSettingsApp() {
 	const handleAddCard = () => {
 		const newCard = {
 			product_id: 0,
+			show_custom_text: false,
 			tag: 'PRE-ORDER',
 			title: '',
 			description: '',
@@ -375,7 +367,7 @@ export default function ThemeSettingsApp() {
 						</h1>
 					</div>
 					<p style={ { margin: '6px 0 0 46px', color: '#9ca3af', fontSize: '13px' } }>
-						{ __( 'Configure dynamic scroll-activated product cards (unlimited repeater), background 60fps video scrubbing, and hero typography.', 'raka-preorder-theme' ) }
+						{ __( 'Configure dynamic scroll-activated product cards (unlimited repeater), custom statement text mode, and hero video scrubbing.', 'raka-preorder-theme' ) }
 					</p>
 				</div>
 				<div style={ { display: 'flex', gap: '10px' } }>
@@ -491,7 +483,7 @@ export default function ThemeSettingsApp() {
 											{ __( 'Hero Scroll Product Cards (Repeater)', 'raka-preorder-theme' ) }
 										</h2>
 										<p style={ { color: '#6b7280', fontSize: '13px', margin: 0 } }>
-											{ __( 'Add as many product cards as you like. They will automatically animate in sequence as the visitor scrolls down.', 'raka-preorder-theme' ) }
+											{ __( 'Add as many cards as you like. Toggle between WooCommerce Product Card (with Add to Cart) or Custom Statement Text.', 'raka-preorder-theme' ) }
 										</p>
 									</div>
 									<Button
@@ -511,7 +503,7 @@ export default function ThemeSettingsApp() {
 										} }
 									>
 										<i className="ri-add-line" style={ { fontSize: '16px' } } />
-										{ __( 'Add Product Card', 'raka-preorder-theme' ) }
+										{ __( 'Add Card', 'raka-preorder-theme' ) }
 									</Button>
 								</div>
 
@@ -531,11 +523,11 @@ export default function ThemeSettingsApp() {
 											{ __( 'No Hero Product Cards Added Yet', 'raka-preorder-theme' ) }
 										</h3>
 										<p style={ { color: '#6b7280', fontSize: '13px', maxWidth: '420px', margin: '0 auto 16px auto' } }>
-											{ __( 'Click the button below to add your first product card to appear during the front page scroll.', 'raka-preorder-theme' ) }
+											{ __( 'Click the button below to add your first card to appear during the front page scroll.', 'raka-preorder-theme' ) }
 										</p>
 										<Button variant="primary" onClick={ handleAddCard }>
 											<i className="ri-add-line" style={ { marginRight: '6px' } } />
-											{ __( 'Add First Product Card', 'raka-preorder-theme' ) }
+											{ __( 'Add First Card', 'raka-preorder-theme' ) }
 										</Button>
 									</div>
 								) }
@@ -546,7 +538,7 @@ export default function ThemeSettingsApp() {
 										const isExpanded = activeCardIndex === idx;
 										const selectedProd = wcData.products.find( ( p ) => p.id === Number( card.product_id ) );
 										const displayTitle = card.title || ( selectedProd ? selectedProd.title : `Card #${ idx + 1 } (No Product Selected)` );
-										const displayTag = card.tag || 'PRE-ORDER';
+										const displayTag = card.tag || ( card.show_custom_text ? 'ORIGIN' : 'PRE-ORDER' );
 										const displayPrice = card.price || ( selectedProd ? selectedProd.price : '' );
 										const displayImage = card.image_url || ( selectedProd ? selectedProd.image_url : '' );
 
@@ -589,7 +581,7 @@ export default function ThemeSettingsApp() {
 														>
 															#{ idx + 1 }
 														</span>
-														{ displayImage && (
+														{ displayImage && ! card.show_custom_text && (
 															<img
 																src={ displayImage }
 																alt=""
@@ -607,17 +599,17 @@ export default function ThemeSettingsApp() {
 														</strong>
 														<span
 															style={ {
-																background: '#e0f2fe',
-																color: '#0369a1',
+																background: card.show_custom_text ? '#fef3c7' : '#e0f2fe',
+																color: card.show_custom_text ? '#92400e' : '#0369a1',
 																padding: '2px 8px',
 																borderRadius: '4px',
 																fontSize: '11px',
 																fontWeight: 600,
 															} }
 														>
-															{ displayTag }
+															{ card.show_custom_text ? 'TEXT STATEMENT' : displayTag }
 														</span>
-														{ displayPrice && (
+														{ displayPrice && ! card.show_custom_text && (
 															<span style={ { fontSize: '12px', fontWeight: 600, color: '#059669' } }>
 																{ displayPrice }
 															</span>
@@ -718,18 +710,61 @@ export default function ThemeSettingsApp() {
 												{ /* Card Item Body / Controls */ }
 												{ isExpanded && (
 													<div style={ { padding: '24px' } }>
-														{ /* Product Selection */ }
-														<div style={ { background: '#f8fafc', padding: '16px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '20px' } }>
-															<Select2Control
-																label={ __( 'Select WooCommerce Product', 'raka-preorder-theme' ) }
-																icon="ri-shopping-bag-3-line"
-																value={ card.product_id }
-																options={ productOptions }
-																onChange={ ( val ) => handleCardChange( idx, 'product_id', val ) }
-																placeholder={ __( '-- Search & Pick Product (or leave empty for custom) --', 'raka-preorder-theme' ) }
-																help={ __( 'Selecting a product automatically populates Title, Price, Description, Thumbnail, and Link.', 'raka-preorder-theme' ) }
+														{ /* Toggle Mode: Custom Text vs Product Card */ }
+														<div
+															style={ {
+																background: card.show_custom_text ? '#fffbeb' : '#f0fdf4',
+																border: card.show_custom_text ? '1px solid #fde68a' : '1px solid #bbf7d0',
+																borderRadius: '8px',
+																padding: '14px 18px',
+																marginBottom: '20px',
+																display: 'flex',
+																alignItems: 'center',
+																justifyContent: 'space-between',
+															} }
+														>
+															<div style={ { display: 'flex', alignItems: 'center', gap: '10px' } }>
+																<i
+																	className={ card.show_custom_text ? 'ri-article-line' : 'ri-shopping-cart-2-line' }
+																	style={ {
+																		fontSize: '20px',
+																		color: card.show_custom_text ? '#d97706' : '#16a34a',
+																	} }
+																/>
+																<div>
+																	<strong style={ { fontSize: '13px', color: '#1f2937', display: 'block' } }>
+																		{ card.show_custom_text
+																			? __( 'Custom Statement / Atmospheric Text Mode', 'raka-preorder-theme' )
+																			: __( 'WooCommerce Product Card Mode (With Direct Add to Cart & Buy)', 'raka-preorder-theme' ) }
+																	</strong>
+																	<span style={ { fontSize: '12px', color: '#6b7280' } }>
+																		{ card.show_custom_text
+																			? __( 'Displays clean editorial typography without product buy button.', 'raka-preorder-theme' )
+																			: __( 'Displays product thumbnail, price tag, direct "Add to Cart / Pre-Order" button, and details link.', 'raka-preorder-theme' ) }
+																	</span>
+																</div>
+															</div>
+															<ToggleControl
+																checked={ !! card.show_custom_text }
+																onChange={ ( val ) => handleCardChange( idx, 'show_custom_text', val ) }
+																label={ card.show_custom_text ? __( 'Custom Text ON', 'raka-preorder-theme' ) : __( 'Product Card', 'raka-preorder-theme' ) }
 															/>
 														</div>
+
+														{ /* Product Selection (if in Product Card mode) */ }
+														{ ! card.show_custom_text && (
+															<div style={ { background: '#f8fafc', padding: '16px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '20px' } }>
+																<Select2Control
+																	label={ __( 'Select WooCommerce Product', 'raka-preorder-theme' ) }
+																	icon="ri-shopping-bag-3-line"
+																	value={ card.product_id }
+																	options={ productOptions }
+																	onChange={ ( val ) => handleCardChange( idx, 'product_id', val ) }
+																	placeholder={ __( '-- Search & Pick Product --', 'raka-preorder-theme' ) }
+																	help={ __( 'Selecting a product automatically fills in Title, Price, Description, Thumbnail, and Link.', 'raka-preorder-theme' ) }
+																/>
+															</div>
+														) }
 
 														{ /* Row 1: Tag + Position */ }
 														<Flex gap={ 4 } style={ { marginBottom: '18px' } }>
@@ -738,7 +773,7 @@ export default function ThemeSettingsApp() {
 																	label={ __( 'Top Badge / Tag', 'raka-preorder-theme' ) }
 																	value={ card.tag ?? '' }
 																	onChange={ ( val ) => handleCardChange( idx, 'tag', val ) }
-																	placeholder={ __( 'e.g. PRE-ORDER, NEW ARRIVAL, HOT DEAL', 'raka-preorder-theme' ) }
+																	placeholder={ card.show_custom_text ? 'ORIGIN' : 'PRE-ORDER' }
 																/>
 															</FlexItem>
 															<FlexItem isBlock>
@@ -751,30 +786,36 @@ export default function ThemeSettingsApp() {
 															</FlexItem>
 														</Flex>
 
-														{ /* Row 2: Custom Title + Price */ }
+														{ /* Row 2: Custom Title + Price (if not custom text) */ }
 														<Flex gap={ 4 } style={ { marginBottom: '18px' } }>
 															<FlexItem isBlock>
 																<TextControl
-																	label={ __( 'Custom Title (Leave blank to use Product Name)', 'raka-preorder-theme' ) }
+																	label={ card.show_custom_text
+																		? __( 'Headline / Statement Title', 'raka-preorder-theme' )
+																		: __( 'Custom Title (Leave blank to use Product Name)', 'raka-preorder-theme' ) }
 																	value={ card.title ?? '' }
 																	onChange={ ( val ) => handleCardChange( idx, 'title', val ) }
 																	placeholder={ selectedProd ? selectedProd.title : __( 'e.g. Vortex 8K Keyboard', 'raka-preorder-theme' ) }
 																/>
 															</FlexItem>
-															<FlexItem isBlock>
-																<TextControl
-																	label={ __( 'Custom Price Tag (Leave blank to use Product Price)', 'raka-preorder-theme' ) }
-																	value={ card.price ?? '' }
-																	onChange={ ( val ) => handleCardChange( idx, 'price', val ) }
-																	placeholder={ selectedProd ? selectedProd.price : '฿4,990' }
-																/>
-															</FlexItem>
+															{ ! card.show_custom_text && (
+																<FlexItem isBlock>
+																	<TextControl
+																		label={ __( 'Custom Price Tag (Leave blank to use Product Price)', 'raka-preorder-theme' ) }
+																		value={ card.price ?? '' }
+																		onChange={ ( val ) => handleCardChange( idx, 'price', val ) }
+																		placeholder={ selectedProd ? selectedProd.price : '฿4,990' }
+																	/>
+																</FlexItem>
+															) }
 														</Flex>
 
-														{ /* Row 3: Description */ }
+														{ /* Row 3: Description / Statement */ }
 														<div style={ { marginBottom: '18px' } }>
 															<TextareaControl
-																label={ __( 'Description / Key Features (Leave blank to use Product Excerpt)', 'raka-preorder-theme' ) }
+																label={ card.show_custom_text
+																	? __( 'Editorial Body Copy / Statement Text', 'raka-preorder-theme' )
+																	: __( 'Description / Key Features (Leave blank to use Product Excerpt)', 'raka-preorder-theme' ) }
 																rows={ 3 }
 																value={ card.description ?? '' }
 																onChange={ ( val ) => handleCardChange( idx, 'description', val ) }
@@ -786,10 +827,10 @@ export default function ThemeSettingsApp() {
 														<Flex gap={ 4 } style={ { marginBottom: '18px' } }>
 															<FlexItem isBlock>
 																<TextControl
-																	label={ __( 'CTA Button Text', 'raka-preorder-theme' ) }
-																	value={ card.button_text ?? 'Pre-Order Now' }
+																	label={ __( 'CTA Button / Link Text', 'raka-preorder-theme' ) }
+																	value={ card.button_text ?? ( card.show_custom_text ? 'Explore' : 'Pre-Order Now' ) }
 																	onChange={ ( val ) => handleCardChange( idx, 'button_text', val ) }
-																	placeholder="Pre-Order Now"
+																	placeholder={ card.show_custom_text ? 'Explore' : 'Pre-Order Now' }
 																/>
 															</FlexItem>
 															<FlexItem isBlock>
@@ -802,105 +843,143 @@ export default function ThemeSettingsApp() {
 															</FlexItem>
 														</Flex>
 
-														{ /* Row 5: Custom Image URL */ }
-														<div>
-															<TextControl
-																label={ __( 'Custom Image URL (Optional override)', 'raka-preorder-theme' ) }
-																value={ card.image_url ?? '' }
-																onChange={ ( val ) => handleCardChange( idx, 'image_url', val ) }
-																placeholder={ selectedProd ? selectedProd.image_url : 'https://.../product.jpg' }
-																help={ __( 'Leave blank to automatically use the product featured image.', 'raka-preorder-theme' ) }
-															/>
-														</div>
+														{ /* Row 5: Custom Image URL (if product mode) */ }
+														{ ! card.show_custom_text && (
+															<div>
+																<TextControl
+																	label={ __( 'Custom Image URL (Optional override)', 'raka-preorder-theme' ) }
+																	value={ card.image_url ?? '' }
+																	onChange={ ( val ) => handleCardChange( idx, 'image_url', val ) }
+																	placeholder={ selectedProd ? selectedProd.image_url : 'https://.../product.jpg' }
+																	help={ __( 'Leave blank to automatically use the product featured image.', 'raka-preorder-theme' ) }
+																/>
+															</div>
+														) }
 
 														{ /* Card Live Preview Box */ }
 														<div
 															style={ {
 																marginTop: '20px',
 																padding: '16px 20px',
-																background: '#0f172a',
+																background: '#09090b',
 																borderRadius: '12px',
-																border: '1px solid #334155',
+																border: '1px solid #27272a',
 																color: '#fff',
 															} }
 														>
-															<div style={ { fontSize: '11px', textTransform: 'uppercase', tracking: '0.1em', color: '#94a3b8', marginBottom: '12px', fontWeight: 600 } }>
+															<div style={ { fontSize: '11px', textTransform: 'uppercase', tracking: '0.1em', color: '#a1a1aa', marginBottom: '12px', fontWeight: 600 } }>
 																<i className="ri-eye-line" style={ { marginRight: '5px' } } />
-																{ __( 'Live Front-End Card Preview', 'raka-preorder-theme' ) } ({ card.position || 'left' })
+																{ __( 'Live Front-End Card Preview', 'raka-preorder-theme' ) } &bull; { card.show_custom_text ? 'Editorial Mode' : 'Product Card Mode' } ({ card.position || 'left' })
 															</div>
-															<div
-																style={ {
-																	background: 'rgba(255, 255, 255, 0.08)',
-																	backdropFilter: 'blur(12px)',
-																	border: '1px solid rgba(255, 255, 255, 0.15)',
-																	borderRadius: '16px',
-																	padding: '18px 20px',
-																	display: 'flex',
-																	gap: '16px',
-																	alignItems: 'center',
-																} }
-															>
-																{ displayImage && (
-																	<img
-																		src={ displayImage }
-																		alt=""
-																		style={ {
-																			width: '64px',
-																			height: '64px',
-																			borderRadius: '10px',
-																			objectFit: 'cover',
-																			border: '1px solid rgba(255,255,255,0.2)',
-																			flexShrink: 0,
-																		} }
-																	/>
-																) }
-																<div style={ { flex: 1, minWidth: 0 } }>
-																	<div style={ { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' } }>
-																		<span
-																			style={ {
-																				background: 'rgba(16, 185, 129, 0.2)',
-																				color: '#34d399',
-																				border: '1px solid rgba(16, 185, 129, 0.3)',
-																				padding: '2px 8px',
-																				borderRadius: '20px',
-																				fontSize: '10px',
-																				fontWeight: 700,
-																				letterSpacing: '0.05em',
-																				textTransform: 'uppercase',
-																			} }
-																		>
-																			{ displayTag }
-																		</span>
-																		{ displayPrice && (
-																			<span style={ { fontSize: '12px', fontWeight: 700, color: '#f8fafc' } }>
-																				{ displayPrice }
-																			</span>
-																		) }
-																	</div>
-																	<h4 style={ { margin: '0 0 4px 0', fontSize: '15px', fontWeight: 700, color: '#fff' } }>
-																		{ displayTitle }
-																	</h4>
-																	<p style={ { margin: 0, fontSize: '12px', color: '#cbd5e1', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' } }>
-																		{ card.description || ( selectedProd ? selectedProd.description : 'Product features and specs description will appear here...' ) }
-																	</p>
-																</div>
-																<button
-																	type="button"
+															
+															{ card.show_custom_text ? (
+																/* Custom Text Preview */
+																<div
 																	style={ {
-																		background: '#fff',
-																		color: '#0f172a',
-																		border: 'none',
-																		borderRadius: '8px',
-																		padding: '8px 14px',
-																		fontSize: '12px',
-																		fontWeight: 700,
-																		cursor: 'pointer',
-																		flexShrink: 0,
+																		background: 'rgba(255, 255, 255, 0.08)',
+																		backdropFilter: 'blur(16px)',
+																		border: '1px solid rgba(255, 255, 255, 0.15)',
+																		borderRadius: '16px',
+																		padding: '20px 24px',
 																	} }
 																>
-																	{ card.button_text || 'Pre-Order Now' } &rarr;
-																</button>
-															</div>
+																	<div style={ { fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '8px', fontWeight: 600 } }>
+																		{ displayTag }
+																	</div>
+																	<h3 style={ { margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#fff' } }>
+																		{ displayTitle }
+																	</h3>
+																	<p style={ { margin: '0 0 14px 0', fontSize: '13px', color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 } }>
+																		{ card.description || 'Editorial narrative statement describing your craft, story, or special hardware technology...' }
+																	</p>
+																	<span style={ { fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', fontWeight: 600 } }>
+																		{ card.button_text || 'Explore' } &rarr;
+																	</span>
+																</div>
+															) : (
+																/* Product Card Preview */
+																<div
+																	style={ {
+																		background: 'rgba(255, 255, 255, 0.08)',
+																		backdropFilter: 'blur(16px)',
+																		border: '1px solid rgba(255, 255, 255, 0.15)',
+																		borderRadius: '16px',
+																		padding: '18px 20px',
+																		display: 'flex',
+																		gap: '16px',
+																		alignItems: 'center',
+																	} }
+																>
+																	{ displayImage && (
+																		<img
+																			src={ displayImage }
+																			alt=""
+																			style={ {
+																				width: '68px',
+																				height: '68px',
+																				borderRadius: '12px',
+																				objectFit: 'cover',
+																				border: '1px solid rgba(255,255,255,0.2)',
+																				flexShrink: 0,
+																			} }
+																		/>
+																	) }
+																	<div style={ { flex: 1, minWidth: 0 } }>
+																		<div style={ { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' } }>
+																			<span
+																				style={ {
+																					background: 'rgba(16, 185, 129, 0.2)',
+																					color: '#34d399',
+																					border: '1px solid rgba(16, 185, 129, 0.3)',
+																					padding: '2px 8px',
+																					borderRadius: '20px',
+																					fontSize: '10px',
+																					fontWeight: 700,
+																					letterSpacing: '0.05em',
+																					textTransform: 'uppercase',
+																				} }
+																			>
+																				{ displayTag }
+																			</span>
+																			{ displayPrice && (
+																				<span style={ { fontSize: '13px', fontWeight: 700, color: '#f8fafc' } }>
+																					{ displayPrice }
+																				</span>
+																			) }
+																		</div>
+																		<h4 style={ { margin: '0 0 4px 0', fontSize: '15px', fontWeight: 700, color: '#fff' } }>
+																			{ displayTitle }
+																		</h4>
+																		<p style={ { margin: 0, fontSize: '12px', color: '#cbd5e1', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' } }>
+																			{ card.description || ( selectedProd ? selectedProd.description : 'Product features and specs description will appear here...' ) }
+																		</p>
+																	</div>
+																	<div style={ { display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end', flexShrink: 0 } }>
+																		<button
+																			type="button"
+																			style={ {
+																				background: '#fff',
+																				color: '#09090b',
+																				border: 'none',
+																				borderRadius: '8px',
+																				padding: '8px 14px',
+																				fontSize: '11px',
+																				fontWeight: 700,
+																				cursor: 'pointer',
+																				display: 'inline-flex',
+																				alignItems: 'center',
+																				gap: '5px',
+																			} }
+																		>
+																			<i className="ri-shopping-bag-3-line" />
+																			<span>{ card.button_text || 'Pre-Order Now' }</span>
+																		</button>
+																		<span style={ { fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: 600 } }>
+																			View Details &rarr;
+																		</span>
+																	</div>
+																</div>
+															) }
 														</div>
 													</div>
 												) }
@@ -927,7 +1006,7 @@ export default function ThemeSettingsApp() {
 											} }
 										>
 											<i className="ri-add-circle-line" style={ { fontSize: '18px', marginRight: '6px' } } />
-											{ __( '+ Add Another Product Card', 'raka-preorder-theme' ) }
+											{ __( '+ Add Another Card', 'raka-preorder-theme' ) }
 										</Button>
 									</div>
 								) }

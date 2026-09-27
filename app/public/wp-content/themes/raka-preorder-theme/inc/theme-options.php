@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Register the Theme Options admin menu and submenu.
  */
 function raka_register_theme_options_menu() {
-	// Top-level menu in Admin sidebar
+	// Top-level menu in Admin sidebar: "Theme Settings"
 	add_menu_page(
-		__( 'Hero Banner Settings', 'raka-preorder-theme' ),
+		__( 'Theme Settings', 'raka-preorder-theme' ),
 		__( 'Theme Settings', 'raka-preorder-theme' ),
 		'manage_options',
 		'raka-theme-settings',
@@ -28,18 +28,8 @@ function raka_register_theme_options_menu() {
 	// Sub-menu for Hero Banner Settings
 	add_submenu_page(
 		'raka-theme-settings',
-		__( 'Hero Banner Settings', 'raka-preorder-theme' ),
-		__( 'Hero Banner Settings', 'raka-preorder-theme' ),
-		'manage_options',
-		'raka-theme-settings',
-		'raka_render_theme_options_page'
-	);
-
-	// Also add under Appearance (themes.php) for convenience
-	add_submenu_page(
-		'themes.php',
-		__( 'Hero Banner Settings', 'raka-preorder-theme' ),
-		__( 'Hero Banner Settings', 'raka-preorder-theme' ),
+		__( 'Hero Banner & Product Cards', 'raka-preorder-theme' ),
+		__( 'Hero Banner', 'raka-preorder-theme' ),
 		'manage_options',
 		'raka-theme-settings',
 		'raka_render_theme_options_page'
@@ -251,9 +241,12 @@ function raka_rest_get_settings() {
 			if ( function_exists( 'wc_get_product' ) ) {
 				$product = wc_get_product( $p->ID );
 				if ( $product ) {
-					$price = wp_strip_all_tags( wc_price( $product->get_price() ) );
-					$short_desc = $product->get_short_description() ?: wp_trim_words( $product->get_description(), 20 );
-					$img_id = $product->get_image_id();
+					$raw_price  = wc_price( $product->get_price() );
+					$price      = html_entity_decode( wp_strip_all_tags( $raw_price ), ENT_QUOTES, 'UTF-8' );
+					$raw_desc   = $product->get_short_description() ?: $product->get_description();
+					$short_desc = html_entity_decode( wp_strip_all_tags( $raw_desc ), ENT_QUOTES, 'UTF-8' );
+					$short_desc = wp_trim_words( $short_desc, 22 );
+					$img_id     = $product->get_image_id();
 					if ( $img_id ) {
 						$img = wp_get_attachment_image_src( $img_id, 'medium' );
 						if ( $img ) {
@@ -264,7 +257,7 @@ function raka_rest_get_settings() {
 			}
 			$products[] = [
 				'id'          => $p->ID,
-				'title'       => $p->post_title,
+				'title'       => html_entity_decode( $p->post_title, ENT_QUOTES, 'UTF-8' ),
 				'price'       => $price,
 				'image_url'   => $image_url,
 				'permalink'   => $permalink,
@@ -331,16 +324,24 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 				continue;
 			}
 			$pos = sanitize_key( $card['position'] ?? 'left' );
+			$desc_clean = sanitize_textarea_field( (string) ( $card['description'] ?? '' ) );
+			$desc_clean = wp_strip_all_tags( $desc_clean );
+			$desc_clean = html_entity_decode( $desc_clean, ENT_QUOTES, 'UTF-8' );
+
+			$price_clean = sanitize_text_field( (string) ( $card['price'] ?? '' ) );
+			$price_clean = html_entity_decode( $price_clean, ENT_QUOTES, 'UTF-8' );
+
 			$clean_hero_cards[] = [
-				'product_id'  => absint( $card['product_id'] ?? 0 ),
-				'tag'         => sanitize_text_field( (string) ( $card['tag'] ?? '' ) ),
-				'title'       => sanitize_text_field( (string) ( $card['title'] ?? '' ) ),
-				'description' => sanitize_textarea_field( (string) ( $card['description'] ?? '' ) ),
-				'price'       => sanitize_text_field( (string) ( $card['price'] ?? '' ) ),
-				'url'         => esc_url_raw( trim( (string) ( $card['url'] ?? '' ) ) ),
-				'image_url'   => esc_url_raw( trim( (string) ( $card['image_url'] ?? '' ) ) ),
-				'button_text' => sanitize_text_field( (string) ( $card['button_text'] ?? __( 'Pre-Order Now', 'raka-preorder-theme' ) ) ),
-				'position'    => in_array( $pos, $allowed_positions, true ) ? $pos : 'left',
+				'product_id'        => absint( $card['product_id'] ?? 0 ),
+				'show_custom_text'  => ! empty( $card['show_custom_text'] ),
+				'tag'               => sanitize_text_field( (string) ( $card['tag'] ?? '' ) ),
+				'title'             => sanitize_text_field( (string) ( $card['title'] ?? '' ) ),
+				'description'       => $desc_clean,
+				'price'             => $price_clean,
+				'url'               => esc_url_raw( trim( (string) ( $card['url'] ?? '' ) ) ),
+				'image_url'         => esc_url_raw( trim( (string) ( $card['image_url'] ?? '' ) ) ),
+				'button_text'       => sanitize_text_field( (string) ( $card['button_text'] ?? __( 'Pre-Order Now', 'raka-preorder-theme' ) ) ),
+				'position'          => in_array( $pos, $allowed_positions, true ) ? $pos : 'left',
 			];
 		}
 	}

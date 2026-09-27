@@ -358,14 +358,15 @@ function raka_get_hero_cards(): array {
 			continue;
 		}
 
-		$product_id  = absint( $raw_card['product_id'] ?? 0 );
-		$product     = ( $product_id > 0 && function_exists( 'wc_get_product' ) ) ? wc_get_product( $product_id ) : null;
-		$position    = ! empty( $raw_card['position'] ) ? sanitize_key( $raw_card['position'] ) : $default_positions[ $index % 4 ];
-		$button_text = ! empty( $raw_card['button_text'] ) ? sanitize_text_field( $raw_card['button_text'] ) : __( 'Pre-Order Now', 'raka-preorder-theme' );
+		$show_custom_text = ! empty( $raw_card['show_custom_text'] );
+		$product_id       = absint( $raw_card['product_id'] ?? 0 );
+		$product          = ( $product_id > 0 && function_exists( 'wc_get_product' ) ) ? wc_get_product( $product_id ) : null;
+		$position         = ! empty( $raw_card['position'] ) ? sanitize_key( $raw_card['position'] ) : $default_positions[ $index % 4 ];
+		$button_text      = ! empty( $raw_card['button_text'] ) ? sanitize_text_field( $raw_card['button_text'] ) : __( 'Pre-Order Now', 'raka-preorder-theme' );
 
 		$tag         = ! empty( $raw_card['tag'] ) ? sanitize_text_field( $raw_card['tag'] ) : '';
 		$title       = ! empty( $raw_card['title'] ) ? sanitize_text_field( $raw_card['title'] ) : '';
-		$description = ! empty( $raw_card['description'] ) ? sanitize_textarea_field( $raw_card['description'] ) : '';
+		$description = ! empty( $raw_card['description'] ) ? wp_strip_all_tags( (string) $raw_card['description'] ) : '';
 		$price_html  = ! empty( $raw_card['price'] ) ? esc_html( $raw_card['price'] ) : '';
 		$url         = ! empty( $raw_card['url'] ) ? esc_url_raw( $raw_card['url'] ) : '';
 		$image_url   = ! empty( $raw_card['image_url'] ) ? esc_url_raw( $raw_card['image_url'] ) : '';
@@ -373,13 +374,15 @@ function raka_get_hero_cards(): array {
 
 		if ( $product ) {
 			if ( empty( $title ) ) {
-				$title = $product->get_name();
+				$title = html_entity_decode( $product->get_name(), ENT_QUOTES, 'UTF-8' );
 			}
 			if ( empty( $description ) ) {
-				$description = $product->get_short_description() ?: wp_trim_words( $product->get_description(), 24 );
+				$raw_desc    = $product->get_short_description() ?: $product->get_description();
+				$description = html_entity_decode( wp_strip_all_tags( $raw_desc ), ENT_QUOTES, 'UTF-8' );
+				$description = wp_trim_words( $description, 24 );
 			}
 			if ( empty( $price_html ) ) {
-				$price_html = $product->get_price_html();
+				$price_html = html_entity_decode( wp_strip_all_tags( wc_price( $product->get_price() ) ), ENT_QUOTES, 'UTF-8' );
 			}
 			if ( empty( $url ) ) {
 				$url = $product->get_permalink();
@@ -412,17 +415,18 @@ function raka_get_hero_cards(): array {
 		}
 
 		$resolved[] = [
-			'index'        => $index,
-			'product_id'   => $product_id,
-			'tag'          => $tag,
-			'title'        => $title,
-			'description'  => $description,
-			'price_html'   => $price_html,
-			'url'          => $url,
-			'image_url'    => $image_url,
-			'button_text'  => $button_text,
-			'position'     => $position,
-			'stock_status' => $stock_status,
+			'index'            => $index,
+			'product_id'       => $product_id,
+			'show_custom_text' => $show_custom_text,
+			'tag'              => $tag,
+			'title'            => $title,
+			'description'      => $description,
+			'price_html'       => $price_html,
+			'url'              => $url,
+			'image_url'        => $image_url,
+			'button_text'      => $button_text,
+			'position'         => $position,
+			'stock_status'     => $stock_status,
 		];
 	}
 

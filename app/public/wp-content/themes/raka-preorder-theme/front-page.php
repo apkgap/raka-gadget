@@ -88,55 +88,100 @@ $hero_section_height = max( 300, ( $total_cards + 1 ) * 100 ) . 'vh';
 				$pos_classes = 'items-end justify-end p-6 md:p-12 lg:p-16 pb-20 md:pb-28';
 			}
 		?>
-			<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
-				<<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a href="' . esc_url( $card['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block max-w-lg w-full p-6 md:p-7 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
-					<!-- Header: Tag + Price -->
-					<div class="flex items-center justify-between gap-3 mb-4">
+			<?php if ( ! empty( $card['show_custom_text'] ) ) : ?>
+				<!-- Custom Statement / Atmospheric Text Card Mode -->
+				<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
+					<<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a href="' . esc_url( $card['url'] ) . '"' : 'div'; ?> class="pointer-events-auto block max-w-lg w-full p-6 md:p-8 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
 						<?php if ( ! empty( $card['tag'] ) ) : ?>
-							<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] md:text-[11px] font-bold tracking-widest uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-hn">
-								<?php echo esc_html( $card['tag'] ); ?>
-							</span>
+							<div class="text-[11px] tracking-[0.25em] uppercase text-black/50 dark:text-white/50 mb-3 font-hn"><?php echo esc_html( $card['tag'] ); ?></div>
 						<?php endif; ?>
-						<?php if ( ! empty( $card['price_html'] ) ) : ?>
-							<div class="text-sm md:text-base font-bold text-neutral-900 dark:text-white font-hn">
-								<?php echo wp_kses_post( $card['price_html'] ); ?>
+						<?php if ( ! empty( $card['title'] ) ) : ?>
+							<h3 class="text-xl md:text-2xl font-black text-black dark:text-white mb-3 font-hn group-hover:translate-x-1 transition-transform leading-tight"><?php echo esc_html( $card['title'] ); ?></h3>
+						<?php endif; ?>
+						<?php if ( ! empty( $card['description'] ) ) : ?>
+							<p class="text-sm md:text-base leading-[1.7] text-black/80 dark:text-white/85 font-light font-hn">
+								<?php echo esc_html( $card['description'] ); ?>
+							</p>
+						<?php endif; ?>
+						<?php if ( ! empty( $card['url'] ) && '#' !== $card['url'] ) : ?>
+							<div class="mt-5 inline-flex items-center gap-2 text-xs uppercase tracking-widest text-black/60 dark:text-white/60 group-hover:text-black dark:group-hover:text-white font-hn">
+								<span><?php echo esc_html( ! empty( $card['button_text'] ) ? $card['button_text'] : __( 'Explore', 'raka-preorder-theme' ) ); ?></span> <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
 							</div>
 						<?php endif; ?>
-					</div>
-
-					<!-- Card Content: Image & Text -->
-					<div class="flex items-start gap-4 md:gap-5">
-						<?php if ( ! empty( $card['image_url'] ) ) : ?>
-							<div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 shrink-0 group-hover:scale-105 transition-transform duration-300">
-								<img src="<?php echo esc_url( $card['image_url'] ); ?>" alt="<?php echo esc_attr( $card['title'] ); ?>" class="w-full h-full object-cover" />
-							</div>
-						<?php endif; ?>
-						<div class="flex-1 min-w-0">
-							<?php if ( ! empty( $card['title'] ) ) : ?>
-								<h3 class="text-lg md:text-xl font-bold text-black dark:text-white font-hn group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-snug line-clamp-2">
-									<?php echo esc_html( $card['title'] ); ?>
-								</h3>
+					</<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a' : 'div'; ?>>
+				</div>
+			<?php else : ?>
+				<!-- WooCommerce Product Card Mode with Direct Add to Cart Action -->
+				<div id="hero-card-slide-<?php echo esc_attr( $idx ); ?>" class="hero-card-slide hero-sub-section absolute inset-0 z-20 gpu-accel flex <?php echo esc_attr( $pos_classes ); ?> pointer-events-none" style="opacity: 0; transform: translate3d(0, 100%, 0);">
+					<div class="pointer-events-auto block max-w-lg w-full p-6 md:p-7 rounded-3xl bg-white/90 dark:bg-black/85 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl theme-transition group hover:border-black/30 dark:hover:border-white/30 transition-all duration-300">
+						<!-- Header: Tag + Price -->
+						<div class="flex items-center justify-between gap-3 mb-4">
+							<?php if ( ! empty( $card['tag'] ) ) : ?>
+								<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] md:text-[11px] font-bold tracking-widest uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-hn">
+									<?php echo esc_html( $card['tag'] ); ?>
+								</span>
 							<?php endif; ?>
-							<?php if ( ! empty( $card['description'] ) ) : ?>
-								<p class="text-xs md:text-sm leading-relaxed text-black/70 dark:text-white/75 font-light font-hn mt-2 line-clamp-3">
-									<?php echo esc_html( $card['description'] ); ?>
-								</p>
+							<?php if ( ! empty( $card['price_html'] ) ) : ?>
+								<div class="text-sm md:text-base font-bold text-neutral-900 dark:text-white font-hn">
+									<?php echo esc_html( $card['price_html'] ); ?>
+								</div>
+							<?php endif; ?>
+						</div>
+
+						<!-- Card Content: Image & Text -->
+						<div class="flex items-start gap-4 md:gap-5">
+							<?php if ( ! empty( $card['image_url'] ) ) : ?>
+								<a href="<?php echo esc_url( $card['url'] ); ?>" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 shrink-0 group-hover:scale-105 transition-transform duration-300 block">
+									<img src="<?php echo esc_url( $card['image_url'] ); ?>" alt="<?php echo esc_attr( $card['title'] ); ?>" class="w-full h-full object-cover" />
+								</a>
+							<?php endif; ?>
+							<div class="flex-1 min-w-0">
+								<?php if ( ! empty( $card['title'] ) ) : ?>
+									<h3 class="text-lg md:text-xl font-bold text-black dark:text-white font-hn group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-snug line-clamp-2">
+										<a href="<?php echo esc_url( $card['url'] ); ?>">
+											<?php echo esc_html( $card['title'] ); ?>
+										</a>
+									</h3>
+								<?php endif; ?>
+								<?php if ( ! empty( $card['description'] ) ) : ?>
+									<p class="text-xs md:text-sm leading-relaxed text-black/70 dark:text-white/75 font-light font-hn mt-2 line-clamp-3">
+										<?php echo esc_html( $card['description'] ); ?>
+									</p>
+								<?php endif; ?>
+							</div>
+						</div>
+
+						<!-- Card CTA Action Footer: Direct Add to Cart + Details Link -->
+						<div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 flex items-center justify-between gap-3">
+							<?php if ( ! empty( $card['product_id'] ) ) : ?>
+								<button
+									type="button"
+									onclick="window.rakaCardAddToCart(<?php echo esc_attr( $card['product_id'] ); ?>, this)"
+									class="raka-hero-add-to-cart-btn inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-900 text-xs font-bold uppercase tracking-wider font-hn shadow-md hover:shadow-lg transition-all cursor-pointer"
+								>
+									<i class="ri-shopping-bag-3-line text-sm flex-shrink-0"></i>
+									<span><?php echo esc_html( ! empty( $card['button_text'] ) ? $card['button_text'] : __( 'Pre-Order Now', 'raka-preorder-theme' ) ); ?></span>
+								</button>
+							<?php else : ?>
+								<a
+									href="<?php echo esc_url( $card['url'] ); ?>"
+									class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold uppercase tracking-wider font-hn shadow-md hover:shadow-lg transition-all"
+								>
+									<span><?php echo esc_html( ! empty( $card['button_text'] ) ? $card['button_text'] : __( 'Pre-Order Now', 'raka-preorder-theme' ) ); ?></span>
+									<span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+								</a>
+							<?php endif; ?>
+
+							<?php if ( ! empty( $card['url'] ) && '#' !== $card['url'] ) : ?>
+								<a href="<?php echo esc_url( $card['url'] ); ?>" class="text-xs font-semibold text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white inline-flex items-center gap-1 font-hn transition-colors">
+									<span><?php esc_html_e( 'View Details', 'raka-preorder-theme' ); ?></span>
+									<span>&rarr;</span>
+								</a>
 							<?php endif; ?>
 						</div>
 					</div>
-
-					<!-- Card CTA Action Footer -->
-					<div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 flex items-center justify-between">
-						<span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold uppercase tracking-wider font-hn group-hover:shadow-md transition-all">
-							<?php echo esc_html( ! empty( $card['button_text'] ) ? $card['button_text'] : __( 'Pre-Order Now', 'raka-preorder-theme' ) ); ?>
-							<span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-						</span>
-						<span class="text-xs font-semibold text-black/50 dark:text-white/50 group-hover:text-black dark:group-hover:text-white font-hn">
-							<?php esc_html_e( 'View Details', 'raka-preorder-theme' ); ?>
-						</span>
-					</div>
-				</<?php echo ! empty( $card['url'] ) && '#' !== $card['url'] ? 'a' : 'div'; ?>>
-			</div>
+				</div>
+			<?php endif; ?>
 		<?php endforeach; ?>
 	</div>
 </section>
