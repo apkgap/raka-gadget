@@ -171,6 +171,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			            visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 			will-change: transform, opacity;
 		}
+
+		/* ── Hide WooCommerce Default Loop Injected Links ── */
+		.added_to_cart, a.added_to_cart {
+			display: none !important;
+		}
 	</style>
 	<?php wp_head(); ?>
 </head>

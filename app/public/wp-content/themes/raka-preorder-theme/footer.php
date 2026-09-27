@@ -338,9 +338,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		window.rakaCardAddToCart = function(productId, btn) {
 			if (!btn || btn.disabled) return;
 			btn.disabled = true;
-			const origContent = btn.innerHTML;
-			btn.innerHTML = '<i class="ri-loader-4-line animate-spin text-xs"></i><span>ADDING...</span>';
-			
+
+			const txtSpan = btn.querySelector('span');
+			const icoEl   = btn.querySelector('i');
+			const origTxt = txtSpan ? txtSpan.textContent : 'ADD TO CART';
+			const origIco = icoEl ? icoEl.className : 'ri-shopping-bag-3-line text-xs flex-shrink-0';
+
+			if (txtSpan) txtSpan.textContent = 'ADDING...';
+			if (icoEl) icoEl.className = 'ri-loader-4-line animate-spin text-xs flex-shrink-0';
+
 			const formData = new FormData();
 			formData.append('product_id', productId);
 			formData.append('quantity', 1);
@@ -351,12 +357,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 			})
 			.then(res => res.json())
 			.then(data => {
-				btn.innerHTML = '<i class="ri-check-line text-xs text-green-400"></i><span>ADDED!</span>';
-				if (window.jQuery) {
-					window.jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash, window.jQuery(btn)]);
-				}
+				if (txtSpan) txtSpan.textContent = 'ADDED!';
+				if (icoEl) icoEl.className = 'ri-check-line text-xs text-green-400 flex-shrink-0';
+
+				// Remove any WooCommerce default injected .added_to_cart links
 				setTimeout(() => {
-					btn.innerHTML = origContent;
+					const parent = btn.parentElement;
+					if (parent) {
+						parent.querySelectorAll('.added_to_cart').forEach(el => el.remove());
+					}
+				}, 10);
+
+				if (window.jQuery) {
+					window.jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash]);
+				}
+
+				setTimeout(() => {
+					if (txtSpan) txtSpan.textContent = origTxt;
+					if (icoEl) icoEl.className = origIco;
 					btn.disabled = false;
 				}, 1800);
 			})
