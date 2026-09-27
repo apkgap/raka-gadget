@@ -180,16 +180,24 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 				</h1>
 			</div>
 
-			<!-- Bottom Left: Caption & Contact Popup Button -->
-			<div id="hero-bottom-left-panel" class="absolute bottom-6 left-6 md:left-10 md:bottom-8 pointer-events-auto flex flex-col items-start gap-3.5 max-w-sm z-20">
-				<p id="hero-caption-text" class="text-[9px] md:text-[10px] tracking-[0.15em] uppercase leading-[1.8] text-black/80 dark:text-white/80 font-hn theme-transition">
-					<?php echo nl2br( esc_html( $hero_caption ) ); ?>
-				</p>
+			<!-- Side Typography / Vertical Editorial Caption (Left Flank) -->
+			<?php if ( ! empty( $hero_caption ) ) : ?>
+				<div id="hero-side-caption-panel" class="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none flex flex-col items-start gap-3">
+					<div id="hero-caption-line-top" class="w-6 md:w-8 h-[1px] bg-black/30 dark:bg-white/30 theme-transition"></div>
+					<p id="hero-caption-text" class="text-[9px] md:text-[10px] tracking-[0.2em] uppercase leading-[2] text-black/80 dark:text-white/80 font-hn theme-transition font-medium max-w-[220px]">
+						<?php echo nl2br( esc_html( $hero_caption ) ); ?>
+					</p>
+					<div id="hero-caption-line-bot" class="w-6 md:w-8 h-[1px] bg-black/30 dark:bg-white/30 theme-transition"></div>
+				</div>
+			<?php endif; ?>
+
+			<!-- Bottom Left: Contact Popup Button -->
+			<div id="hero-bottom-left-panel" class="absolute bottom-6 left-6 md:left-10 md:bottom-8 pointer-events-auto flex items-center z-20">
 				<button
 					id="hero-contact-trigger-btn"
 					type="button"
 					onclick="window.rakaOpenModal('contact')"
-					class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
+					class="group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/85 dark:bg-black/70 hover:bg-white dark:hover:bg-black/95 backdrop-blur-xl border border-black/10 dark:border-white/20 text-xs font-semibold tracking-wider uppercase text-neutral-900 dark:text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer"
 				>
 					<span id="hero-contact-btn-pulse" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
 					<span id="hero-contact-btn-text"><?php echo esc_html( ! empty( $contact_options['contact_title'] ) ? $contact_options['contact_title'] : __( 'Contact & Store', 'raka-preorder-theme' ) ); ?></span>
