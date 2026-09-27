@@ -14,13 +14,44 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Register the Theme Options admin menu and submenu.
  */
 function raka_register_theme_options_menu() {
-	// Submenu under Appearance (themes.php): "Theme Settings"
-	add_submenu_page(
-		'themes.php',
+	// Top-level menu in Admin sidebar: "Theme Settings"
+	add_menu_page(
 		__( 'Theme Settings', 'raka-preorder-theme' ),
 		__( 'Theme Settings', 'raka-preorder-theme' ),
 		'manage_options',
 		'raka-theme-settings',
+		'raka_render_theme_options_page',
+		'dashicons-art',
+		58
+	);
+
+	// Submenu 1: Product Cards (Repeater)
+	add_submenu_page(
+		'raka-theme-settings',
+		__( 'Product Cards (Repeater)', 'raka-preorder-theme' ),
+		__( 'Product Cards (Repeater)', 'raka-preorder-theme' ),
+		'manage_options',
+		'raka-theme-settings',
+		'raka_render_theme_options_page'
+	);
+
+	// Submenu 2: Hero Media & Title
+	add_submenu_page(
+		'raka-theme-settings',
+		__( 'Hero Media & Title', 'raka-preorder-theme' ),
+		__( 'Hero Media & Title', 'raka-preorder-theme' ),
+		'manage_options',
+		'raka-theme-settings-media',
+		'raka_render_theme_options_page'
+	);
+
+	// Submenu 3: Contact & Store Info
+	add_submenu_page(
+		'raka-theme-settings',
+		__( 'Contact & Store Info', 'raka-preorder-theme' ),
+		__( 'Contact & Store Info', 'raka-preorder-theme' ),
+		'manage_options',
+		'raka-theme-settings-contact',
 		'raka_render_theme_options_page'
 	);
 }
@@ -32,7 +63,7 @@ add_action( 'admin_menu', 'raka_register_theme_options_menu' );
  * @param string $hook The current admin page hook.
  */
 function raka_enqueue_theme_settings_assets( $hook ) {
-	$is_settings_page = ( isset( $_GET['page'] ) && 'raka-theme-settings' === $_GET['page'] )
+	$is_settings_page = ( isset( $_GET['page'] ) && 0 === strpos( (string) $_GET['page'], 'raka-theme-settings' ) )
 		|| false !== strpos( $hook, 'raka-theme-settings' );
 
 	if ( ! $is_settings_page ) {

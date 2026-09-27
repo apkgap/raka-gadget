@@ -547,6 +547,18 @@ export default function ThemeSettingsApp() {
 		},
 	];
 
+	// Detect initial active tab from page or tab URL parameter
+	const urlParams = new URLSearchParams( window.location.search );
+	const pageParam = urlParams.get( 'page' ) || '';
+	const tabParam  = urlParams.get( 'tab' ) || '';
+
+	let defaultTabName = 'hero_repeater';
+	if ( tabParam === 'hero_general' || tabParam === 'media' || pageParam === 'raka-theme-settings-media' ) {
+		defaultTabName = 'hero_general';
+	} else if ( tabParam === 'hero_contact' || tabParam === 'contact' || pageParam === 'raka-theme-settings-contact' ) {
+		defaultTabName = 'hero_contact';
+	}
+
 	return (
 		<div
 			style={ {
@@ -638,6 +650,7 @@ export default function ThemeSettingsApp() {
 				<TabPanel
 					className="raka-theme-settings-tab-panel"
 					activeClass="active-tab"
+					initialTabName={ defaultTabName }
 					tabs={ tabs }
 				>
 					{ ( tab ) => {
