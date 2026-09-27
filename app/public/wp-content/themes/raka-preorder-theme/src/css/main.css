@@ -136,6 +136,56 @@ body {
 	}
 }
 
+/* ── Dynamic Sticky / Fixed Header on Scroll ── */
+#obsidian-site-header {
+	transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+	            border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+	            box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+	            backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scrolled state: Frosted glass background, subtle border and elevated shadow */
+#obsidian-site-header.header-scrolled {
+	background-color: rgba(255, 255, 255, 0.92) !important;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+	backdrop-filter: blur(16px) !important;
+	-webkit-backdrop-filter: blur(16px) !important;
+	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
+	pointer-events: auto !important;
+}
+
+html.dark #obsidian-site-header.header-scrolled {
+	background-color: rgba(10, 10, 10, 0.92) !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Home page scrolled state: adapt mixed blend elements to clean contrast */
+body.home #obsidian-site-header.header-scrolled #obsidian-nav-brand,
+body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
+body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
+	mix-blend-mode: normal !important;
+	color: #171717 !important;
+}
+
+html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-brand,
+html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-1,
+html.dark body.home #obsidian-site-header.header-scrolled #obsidian-nav-center-2 {
+	color: #ffffff !important;
+}
+
+body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn {
+	mix-blend-mode: normal !important;
+}
+
+body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
+	background-color: #171717 !important;
+}
+
+html.dark body.home #obsidian-site-header.header-scrolled #obsidian-menu-btn span {
+	background-color: #ffffff !important;
+}
+
 /* ── Mega Menu Smooth Slide Engine ── */
 .menu-panels-grid {
 	display: grid !important;

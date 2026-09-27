@@ -21,7 +21,7 @@ $all_cats = get_terms( [
 ] );
 ?>
 
-<main id="archive-product-main" class="min-h-screen pt-20 md:pt-24 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
+<main id="archive-product-main" class="min-h-screen pt-6 md:pt-10 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
 	<div id="archive-product-container" class="container">
 
 		<!-- ── Archive Header ── -->

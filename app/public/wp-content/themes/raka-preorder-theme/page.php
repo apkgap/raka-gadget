@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 ?>
-<main id="obsidian-site-main" class="min-h-screen pt-28 pb-16 px-6 md:px-12 lg:px-16 text-inherit font-hn">
+<main id="obsidian-site-main" class="min-h-screen pt-6 md:pt-10 pb-16 px-6 md:px-12 lg:px-16 text-inherit font-hn">
 	<div id="obsidian-page-container" class="max-w-5xl mx-auto">
 		<?php
 		if ( have_posts() ) :

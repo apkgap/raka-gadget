@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<!-- ── Prominent Semantic Header Component ── -->
 		<header 
 			id="obsidian-site-header" 
-			class="fixed top-0 left-0 right-0 z-[60] transition-all duration-300 <?php echo $is_home ? 'pointer-events-none' : 'bg-white/90 dark:bg-obsidian/90 backdrop-blur-md border-b border-black/10 dark:border-white/10 pointer-events-auto shadow-xs'; ?>"
+			class="<?php echo $is_home ? 'fixed top-0 left-0 right-0 z-[60] bg-transparent transition-all duration-300 pointer-events-none' : 'sticky top-0 left-0 right-0 z-[60] bg-white dark:bg-obsidian border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
 		>
 			<nav id="obsidian-nav" class="flex items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 <?php echo $is_home ? 'pt-5 md:pt-7 pb-5 pointer-events-none' : 'py-4 md:py-5 pointer-events-auto'; ?>">
 				<!-- Left Brand -->

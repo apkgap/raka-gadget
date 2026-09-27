@@ -382,6 +382,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 				window.location.href = '<?php echo esc_url( wc_get_cart_url() ); ?>?add-to-cart=' + productId;
 			});
 		};
+
+		// ─── 4. Dynamic Sticky/Fixed Header on Scroll Controller ──────────────────
+		(function() {
+			const header = document.getElementById('obsidian-site-header');
+			if (!header) return;
+
+			function handleScroll() {
+				const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+				if (scrollY > 20) {
+					header.classList.add('header-scrolled');
+				} else {
+					header.classList.remove('header-scrolled');
+				}
+			}
+
+			window.addEventListener('scroll', handleScroll, { passive: true });
+			handleScroll();
+		})();
 	</script>
 
 	<?php wp_footer(); ?>
