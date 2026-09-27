@@ -176,6 +176,7 @@ function raka_get_featured_categories(): array {
 		}
 
 		$term_link = get_term_link( $term );
+		$icon_data = function_exists( 'raka_get_term_icon_data' ) ? raka_get_term_icon_data( $term->term_id ) : [ 'type' => 'none', 'remixicon' => '', 'media_id' => 0, 'media_url' => '' ];
 
 		$list[] = [
 			'id'          => $term->term_id,
@@ -185,6 +186,9 @@ function raka_get_featured_categories(): array {
 			'description' => $term->description,
 			'url'         => ! is_wp_error( $term_link ) ? $term_link : '#',
 			'image_url'   => $image_url,
+			'icon_type'   => $icon_data['type'],
+			'icon_class'  => ! empty( $icon_data['remixicon'] ) ? $icon_data['remixicon'] : '',
+			'media_icon'  => ! empty( $icon_data['media_url'] ) ? $icon_data['media_url'] : '',
 		];
 	}
 

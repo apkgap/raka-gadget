@@ -295,57 +295,42 @@ $cat_icon_map = [
 				<i id="raka-categories-close-icon" class="ri-close-line text-xl"></i>
 			</button>
 		</div>
-		<!-- Grid Content -->
+		<!-- Grid Content: Uniform Category Icon Cards -->
 		<div id="raka-categories-modal-body" class="overflow-y-auto p-6 sm:p-8">
 			<?php if ( ! empty( $featured_categories ) ) : ?>
 				<div id="raka-categories-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-5">
 					<?php
 					foreach ( $featured_categories as $cat ) :
-						$cat_slug = sanitize_title( $cat['slug'] );
-						$icon_cls = isset( $cat_icon_map[ $cat_slug ] ) ? $cat_icon_map[ $cat_slug ] : 'ri-apps-2-line';
+						$cat_slug  = sanitize_title( $cat['slug'] );
+						$icon_cls  = ! empty( $cat['icon_class'] ) ? $cat['icon_class'] : ( isset( $cat_icon_map[ $cat_slug ] ) ? $cat_icon_map[ $cat_slug ] : 'ri-apps-2-line' );
+						$media_src = ! empty( $cat['media_icon'] ) ? $cat['media_icon'] : '';
 						?>
 						<a
 							id="raka-cat-item-<?php echo esc_attr( $cat['id'] ); ?>"
 							href="<?php echo esc_url( $cat['url'] ); ?>"
-							class="group relative flex flex-col justify-between aspect-[4/5] rounded-3xl overflow-hidden bg-neutral-100 dark:bg-neutral-800/90 border border-black/10 dark:border-white/10 hover:border-blue-500/60 dark:hover:border-blue-400/60 shadow-md hover:shadow-2xl transition-all duration-300 p-5 sm:p-6 cursor-pointer"
+							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-100/90 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-blue-500/60 dark:hover:border-blue-400/60 shadow-md hover:shadow-2xl transition-all duration-300 p-5 sm:p-6 cursor-pointer"
 						>
-							<?php if ( ! empty( $cat['image_url'] ) ) : ?>
-								<img
-									id="raka-cat-img-<?php echo esc_attr( $cat['id'] ); ?>"
-									src="<?php echo esc_url( $cat['image_url'] ); ?>"
-									alt="<?php echo esc_attr( $cat['name'] ); ?>"
-									class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100"
-								/>
-								<div id="raka-cat-grad-<?php echo esc_attr( $cat['id'] ); ?>" class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-								<div id="raka-cat-top-meta-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 self-start">
-									<span id="raka-cat-badge-<?php echo esc_attr( $cat['id'] ); ?>" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/20 backdrop-blur-md text-white font-mono uppercase tracking-wider">
-										<?php echo esc_html( sprintf( _n( '%s Product', '%s Products', $cat['count'], 'raka-preorder-theme' ), number_format_i18n( $cat['count'] ) ) ); ?>
-									</span>
+							<!-- Top Icon & Count Badge -->
+							<div id="raka-cat-top-bar-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-between w-full">
+								<div id="raka-cat-ico-wrap-<?php echo esc_attr( $cat['id'] ); ?>" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-500/10 dark:bg-blue-400/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 dark:border-blue-400/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white dark:group-hover:bg-blue-500 dark:group-hover:text-white transition-all duration-300 shadow-sm">
+									<?php if ( ! empty( $media_src ) ) : ?>
+										<img id="raka-cat-media-<?php echo esc_attr( $cat['id'] ); ?>" src="<?php echo esc_url( $media_src ); ?>" alt="<?php echo esc_attr( $cat['name'] ); ?>" class="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
+									<?php else : ?>
+										<i id="raka-cat-ico-<?php echo esc_attr( $cat['id'] ); ?>" class="<?php echo esc_attr( $icon_cls ); ?> text-2xl sm:text-3xl"></i>
+									<?php endif; ?>
 								</div>
-								<div id="raka-cat-meta-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-between gap-2">
-									<h4 id="raka-cat-title-<?php echo esc_attr( $cat['id'] ); ?>" class="text-base sm:text-lg font-bold text-white font-hn group-hover:text-blue-300 transition-colors">
-										<?php echo esc_html( $cat['name'] ); ?>
-									</h4>
-									<i id="raka-cat-arr-<?php echo esc_attr( $cat['id'] ); ?>" class="ri-arrow-right-line text-lg text-white opacity-80 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
-								</div>
-							<?php else : ?>
-								<!-- Modern Aesthetic No-Image Category Card -->
-								<div id="raka-cat-noimg-bg-<?php echo esc_attr( $cat['id'] ); ?>" class="absolute inset-0 bg-gradient-to-br from-neutral-200/50 via-neutral-100 to-neutral-200/80 dark:from-neutral-800/80 dark:via-neutral-900 dark:to-neutral-800/90 group-hover:opacity-90 transition-opacity"></div>
-								<div id="raka-cat-top-icon-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-between">
-									<div id="raka-cat-ico-wrap-<?php echo esc_attr( $cat['id'] ); ?>" class="w-12 h-12 rounded-2xl bg-blue-500/10 dark:bg-blue-400/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 dark:border-blue-400/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-										<i id="raka-cat-ico-<?php echo esc_attr( $cat['id'] ); ?>" class="<?php echo esc_attr( $icon_cls ); ?> text-2xl"></i>
-									</div>
-									<span id="raka-cat-badge-<?php echo esc_attr( $cat['id'] ); ?>" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/5 dark:bg-white/10 text-neutral-700 dark:text-neutral-300 font-mono uppercase tracking-wider">
-										<?php echo esc_html( sprintf( _n( '%s Product', '%s Products', $cat['count'], 'raka-preorder-theme' ), number_format_i18n( $cat['count'] ) ) ); ?>
-									</span>
-								</div>
-								<div id="raka-cat-meta-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-between gap-2">
-									<h4 id="raka-cat-title-<?php echo esc_attr( $cat['id'] ); ?>" class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-hn group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-										<?php echo esc_html( $cat['name'] ); ?>
-									</h4>
-									<i id="raka-cat-arr-<?php echo esc_attr( $cat['id'] ); ?>" class="ri-arrow-right-line text-lg text-neutral-400 dark:text-white/50 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
-								</div>
-							<?php endif; ?>
+								<span id="raka-cat-badge-<?php echo esc_attr( $cat['id'] ); ?>" class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-mono uppercase tracking-wider">
+									<?php echo esc_html( sprintf( _n( '%s Product', '%s Products', $cat['count'], 'raka-preorder-theme' ), number_format_i18n( $cat['count'] ) ) ); ?>
+								</span>
+							</div>
+
+							<!-- Bottom Title & Arrow -->
+							<div id="raka-cat-meta-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-end justify-between gap-2 mt-4">
+								<h4 id="raka-cat-title-<?php echo esc_attr( $cat['id'] ); ?>" class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-hn group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+									<?php echo esc_html( $cat['name'] ); ?>
+								</h4>
+								<i id="raka-cat-arr-<?php echo esc_attr( $cat['id'] ); ?>" class="ri-arrow-right-line text-lg text-neutral-400 dark:text-white/50 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all shrink-0"></i>
+							</div>
 						</a>
 					<?php endforeach; ?>
 				</div>
