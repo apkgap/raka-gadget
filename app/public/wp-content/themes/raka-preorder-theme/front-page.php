@@ -310,8 +310,8 @@ $cat_icon_map = [
 							href="<?php echo esc_url( $cat['url'] ); ?>"
 							class="group relative flex flex-col justify-between aspect-square sm:aspect-[4/3.5] rounded-3xl overflow-hidden bg-neutral-100/90 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-red-500/60 dark:hover:border-red-400/60 shadow-md hover:shadow-2xl transition-all duration-300 p-5 sm:p-6 cursor-pointer"
 						>
-							<!-- Top Icon & Count Badge -->
-							<div id="raka-cat-top-bar-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-between w-full">
+							<!-- Top Icon -->
+							<div id="raka-cat-top-bar-<?php echo esc_attr( $cat['id'] ); ?>" class="relative z-10 flex items-center justify-start w-full">
 								<div id="raka-cat-ico-wrap-<?php echo esc_attr( $cat['id'] ); ?>" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white dark:group-hover:bg-red-500 dark:group-hover:text-white transition-all duration-300 shadow-sm">
 									<?php if ( ! empty( $media_src ) ) : ?>
 										<img id="raka-cat-media-<?php echo esc_attr( $cat['id'] ); ?>" src="<?php echo esc_url( $media_src ); ?>" alt="<?php echo esc_attr( $cat['name'] ); ?>" class="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
@@ -319,9 +319,6 @@ $cat_icon_map = [
 										<i id="raka-cat-ico-<?php echo esc_attr( $cat['id'] ); ?>" class="<?php echo esc_attr( $icon_cls ); ?> text-2xl sm:text-3xl"></i>
 									<?php endif; ?>
 								</div>
-								<span id="raka-cat-badge-<?php echo esc_attr( $cat['id'] ); ?>" class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-mono uppercase tracking-wider">
-									<?php echo esc_html( sprintf( _n( '%s Product', '%s Products', $cat['count'], 'raka-preorder-theme' ), number_format_i18n( $cat['count'] ) ) ); ?>
-								</span>
 							</div>
 
 							<!-- Bottom Title & Arrow -->
@@ -389,9 +386,6 @@ $cat_icon_map = [
 							<h4 id="raka-brand-name-<?php echo esc_attr( $brand['id'] ); ?>" class="text-sm sm:text-base font-bold text-neutral-900 dark:text-white font-hn group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
 								<?php echo esc_html( $brand['name'] ); ?>
 							</h4>
-							<span id="raka-brand-count-<?php echo esc_attr( $brand['id'] ); ?>" class="text-[10px] tracking-widest uppercase text-neutral-500 dark:text-white/50 font-mono mt-1 font-semibold">
-								<?php echo esc_html( sprintf( _n( '%s Item', '%s Items', $brand['count'], 'raka-preorder-theme' ), number_format_i18n( $brand['count'] ) ) ); ?>
-							</span>
 						</a>
 					<?php endforeach; ?>
 				</div>
