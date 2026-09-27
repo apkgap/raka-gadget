@@ -539,11 +539,11 @@ function raka_render_shop_sort_dropdown(): void {
 	];
 	$current_orderby = ! empty( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'menu_order';
 	?>
-	<div id="shop-sort-wrap" class="relative inline-flex items-center">
+	<div id="shop-sort-wrap" class="relative inline-flex items-center flex-1 sm:flex-initial">
 		<select
 			id="shop-sort-select"
 			onchange="window.location.href=this.value"
-			class="h-10 pl-3.5 pr-8 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono uppercase tracking-wider text-neutral-900 dark:text-white cursor-pointer focus:outline-none appearance-none transition-colors"
+			class="w-full sm:w-auto h-10 pl-3.5 pr-8 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono uppercase tracking-wider text-neutral-900 dark:text-white cursor-pointer focus:outline-none appearance-none transition-colors truncate"
 		>
 			<?php foreach ( $orderby_options as $key => $label ) :
 				$sort_url = add_query_arg( 'orderby', $key );

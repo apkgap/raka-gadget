@@ -49,9 +49,9 @@ $all_cats = get_terms( [
 			<div id="shop-products-content-wrap" class="flex-1 min-w-0 w-full">
 				
 				<!-- Top Bar: Result Count, Mobile Filter Trigger, and Sort Dropdown -->
-				<div id="shop-toolbar-bar" class="flex items-center justify-between gap-4 pb-4 border-b border-black/10 dark:border-white/10 mb-4">
-					<!-- Result Count -->
-					<div id="shop-result-count" class="text-xs sm:text-sm font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+				<div id="shop-toolbar-bar" class="flex items-center justify-between gap-3 pb-4 border-b border-black/10 dark:border-white/10 mb-4">
+					<!-- Result Count (Hidden on mobile) -->
+					<div id="shop-result-count" class="hidden sm:block text-xs sm:text-sm font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
 						<?php
 						global $wp_query;
 						$total_products = (int) $wp_query->found_posts;
@@ -60,13 +60,13 @@ $all_cats = get_terms( [
 					</div>
 
 					<!-- Right Controls: Mobile Filter Button & Sort Dropdown -->
-					<div id="shop-toolbar-controls" class="flex items-center gap-2.5">
+					<div id="shop-toolbar-controls" class="flex items-center justify-between sm:justify-end gap-2.5 w-full sm:w-auto">
 						<!-- Mobile Filter Trigger Button -->
 						<button
 							id="btn-mobile-filter-open"
 							type="button"
 							onclick="window.rakaOpenMobileFilters()"
-							class="lg:hidden inline-flex items-center gap-1.5 h-10 px-4 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-xs sm:text-sm font-mono font-semibold uppercase tracking-wider shadow-sm active:scale-95 transition-transform cursor-pointer"
+							class="lg:hidden inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-xs sm:text-sm font-mono font-semibold uppercase tracking-wider shadow-sm active:scale-95 transition-transform cursor-pointer flex-1 sm:flex-initial"
 						>
 							<i id="btn-mobile-filter-ico" class="ri-filter-3-line text-sm"></i>
 							<span id="btn-mobile-filter-txt">FILTERS</span>
