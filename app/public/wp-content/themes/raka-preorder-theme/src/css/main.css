@@ -59,6 +59,29 @@ body {
 #hero-overlay-png,
 #hero-overlay-png-wrap img {
 	filter: none !important;
+	object-fit: cover !important;
+	object-position: center top !important;
+	width: 100% !important;
+	height: 100% !important;
+}
+
+/* ── Hero Main Title Styling ── */
+#hero-main-title {
+	font-family: 'Helvetica Neue ME', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+	font-size: 20vw !important;
+	line-height: 0.75 !important;
+	letter-spacing: -0.04em !important;
+	font-weight: 900 !important;
+	text-transform: uppercase !important;
+	user-select: none !important;
+	text-align: center !important;
+	white-space: nowrap !important;
+}
+
+@media (min-width: 768px) {
+	#hero-main-title {
+		font-size: 22vw !important;
+	}
 }
 
 /* ── Admin Bar sticky adjustment ── */
@@ -66,6 +89,7 @@ body {
 	top: 32px;
 	height: calc(100vh - 32px);
 }
+
 @media screen and (max-width: 782px) {
 	.admin-bar #hero-pinned-viewport {
 		top: 46px;
@@ -113,9 +137,11 @@ body {
 	0% {
 		transform: rotate(0deg) scale(0.8);
 	}
+
 	50% {
 		transform: rotate(180deg) scale(1.25);
 	}
+
 	100% {
 		transform: rotate(360deg) scale(1);
 	}
@@ -124,9 +150,9 @@ body {
 /* Global smooth transitions */
 .theme-transition {
 	transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-	            color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-	            border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-	            box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+		color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── WordPress AdminBar Comprehensive Compatibility ── */
@@ -151,12 +177,14 @@ body {
 }
 
 @media screen and (max-width: 782px) {
+
 	.admin-bar #raka-site-header,
 	.admin-bar #obsidian-site-header,
 	.admin-bar #raka-site-header.header-scrolled,
 	.admin-bar #obsidian-site-header.header-scrolled {
 		top: 46px !important;
 	}
+
 	.admin-bar #raka-menu-overlay,
 	.admin-bar #obsidian-menu-overlay,
 	.admin-bar #raka-cart-drawer,
@@ -164,6 +192,7 @@ body {
 		top: 46px !important;
 		height: calc(100vh - 46px) !important;
 	}
+
 	.admin-bar #hero-pinned-viewport {
 		top: 46px !important;
 		height: calc(100vh - 46px) !important;
@@ -171,6 +200,7 @@ body {
 }
 
 @media screen and (max-width: 600px) {
+
 	/* Keep WordPress adminbar position fixed on very small screens for consistent layout */
 	#wpadminbar {
 		position: fixed !important;
@@ -181,9 +211,9 @@ body {
 #raka-site-header,
 #obsidian-site-header {
 	transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-	            border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-	            box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-	            backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+		backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Scrolled state: Frosted glass background, subtle border and elevated shadow */
@@ -273,8 +303,8 @@ html.dark body.front-page #obsidian-site-header.header-scrolled #obsidian-menu-b
 	grid-column: 1 / 2;
 	grid-row: 1 / 2;
 	transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-	            opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-	            visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+		opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	will-change: transform, opacity;
 }
 
@@ -348,6 +378,7 @@ html.dark #breadcrumbs .breadcrumb_last {
 }
 
 @media (min-width: 768px) {
+
 	.container,
 	.obsidian-container {
 		padding-left: 2em;
@@ -358,6 +389,7 @@ html.dark #breadcrumbs .breadcrumb_last {
 }
 
 @media (min-width: 1280px) {
+
 	.container,
 	.obsidian-container {
 		padding-left: 0;

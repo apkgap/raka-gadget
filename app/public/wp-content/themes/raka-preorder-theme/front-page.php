@@ -139,7 +139,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 
 <!-- ── ScrollVideoHero Component ── -->
 <section id="scroll-video-hero-section" class="relative" style="height: <?php echo esc_attr( $hero_section_height ); ?>;">
-	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-[#1a1a1a]" style="will-change: transform;">
+	<div id="hero-pinned-viewport" class="sticky top-0 w-full h-screen overflow-hidden bg-white dark:bg-obsidian theme-transition gpu-accel">
 
 		<!-- 1. Video Layer -->
 		<video
@@ -148,8 +148,8 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			muted
 			playsinline
 			preload="auto"
-			class="absolute inset-0 w-full h-full object-cover pointer-events-none"
-			style="opacity: 0;"
+			class="absolute inset-0 w-full h-full object-cover object-top gpu-accel pointer-events-none"
+			style="opacity: 0; will-change: transform, opacity;"
 		></video>
 
 		<!-- 2. Canvas Layer (Ultra Smooth WebCodecs Frame Blitter) -->
@@ -157,31 +157,31 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			id="hero-canvas"
 			width="1280"
 			height="720"
-			class="absolute inset-0 w-full h-full object-cover transition-opacity duration-200 pointer-events-none"
-			style="opacity: 0;"
+			class="absolute inset-0 w-full h-full object-cover object-top gpu-accel pointer-events-none transition-opacity duration-300"
+			style="opacity: 0; will-change: transform, opacity;"
 		></canvas>
 
 		<!-- 3. Hero Overlay Image (Figma asset: Pure white wings & gold angel) -->
-		<div id="hero-overlay-png-wrap" class="absolute inset-0 z-30 pointer-events-none">
+		<div id="hero-overlay-png-wrap" class="absolute inset-0 z-30 pointer-events-none gpu-accel transition-opacity duration-150">
 			<img
 				id="hero-overlay-png"
 				alt=""
-				class="w-full h-full object-cover"
+				class="w-full h-full object-cover object-top"
 				src="<?php echo esc_url( $hero_overlay_url ); ?>"
 			/>
 		</div>
 
 		<!-- 4. Hero Content (Section 1) -->
-		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col pointer-events-none">
+		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col pointer-events-none gpu-accel">
 			<!-- Centered Main Title -->
-			<div id="hero-title-container" class="flex justify-center mt-12 md:mt-14">
-				<h1 id="hero-main-title" class="text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition">
+			<div id="hero-title-container" class="w-full flex justify-center mt-12 md:mt-14 select-none pointer-events-none">
+				<h1 id="hero-main-title" class="text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition text-center whitespace-nowrap">
 					<?php echo esc_html( $hero_main_title ); ?>
 				</h1>
 			</div>
 
 			<!-- Bottom Left: Caption & Contact Popup Button -->
-			<div id="hero-bottom-left-panel" class="absolute bottom-6 left-6 md:left-10 md:bottom-8 pointer-events-auto flex flex-col items-start gap-3.5 max-w-sm">
+			<div id="hero-bottom-left-panel" class="absolute bottom-6 left-6 md:left-10 md:bottom-8 pointer-events-auto flex flex-col items-start gap-3.5 max-w-sm z-20">
 				<p id="hero-caption-text" class="text-[9px] md:text-[10px] tracking-[0.15em] uppercase leading-[1.8] text-black/80 dark:text-white/80 font-hn theme-transition">
 					<?php echo nl2br( esc_html( $hero_caption ) ); ?>
 				</p>
@@ -198,7 +198,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			</div>
 
 			<!-- Bottom Right: Categories & Brands Popup Buttons -->
-			<div id="hero-bottom-right-panel" class="absolute bottom-6 right-6 md:right-10 md:bottom-8 pointer-events-auto flex items-center flex-wrap gap-2.5 sm:gap-3.5">
+			<div id="hero-bottom-right-panel" class="absolute bottom-6 right-6 md:right-10 md:bottom-8 pointer-events-auto flex items-center flex-wrap gap-2.5 sm:gap-3.5 z-20">
 				<button
 					id="hero-categories-trigger-btn"
 					type="button"
