@@ -335,6 +335,11 @@ export default function ThemeSettingsApp() {
 		contact_hours: 'Mon - Sun: 10:00 - 20:00 (Daily)',
 		contact_address: '123/45 Gadget District, Bangkok 10110',
 		contact_note: 'For custom inquiries, private showroom sessions, or pre-order status, message us directly via LINE Official 24/7.',
+		flash_sale_limit: 4,
+		our_products_limit: 8,
+		flash_sale_title: 'FLASH SALE DEALS',
+		our_products_title: 'OUR PRODUCTS',
+		our_products_desc: 'Explore custom keyboards, precision ergonomic gaming mice, and studio-grade audio gear built for uncompromising performance.',
 	} );
 	const [ wcData, setWcData ] = useState( {
 		categories: [],
@@ -440,9 +445,9 @@ export default function ThemeSettingsApp() {
 			return;
 		}
 		const updated = [ ...heroCards ];
-		const temp = updated[ index ];
+		const item = updated[ index ];
 		updated[ index ] = updated[ targetIndex ];
-		updated[ targetIndex ] = temp;
+		updated[ targetIndex ] = item;
 		handleOptionChange( 'hero_cards', updated );
 		setActiveCardIndex( targetIndex );
 	};
@@ -528,6 +533,15 @@ export default function ThemeSettingsApp() {
 			),
 		},
 		{
+			name: 'homepage_sections',
+			title: (
+				<span style={ { display: 'inline-flex', alignItems: 'center', gap: '6px' } }>
+					<i className="ri-layout-grid-line" style={ { fontSize: '16px' } } />
+					{ __( 'Flash Sale & Our Products', 'raka-preorder-theme' ) }
+				</span>
+			),
+		},
+		{
 			name: 'hero_general',
 			title: (
 				<span style={ { display: 'inline-flex', alignItems: 'center', gap: '6px' } }>
@@ -553,7 +567,9 @@ export default function ThemeSettingsApp() {
 	const tabParam  = urlParams.get( 'tab' ) || '';
 
 	let defaultTabName = 'hero_repeater';
-	if ( tabParam === 'hero_general' || tabParam === 'media' || pageParam === 'raka-theme-settings-media' ) {
+	if ( tabParam === 'homepage_sections' || tabParam === 'products' || pageParam === 'raka-theme-settings-products' ) {
+		defaultTabName = 'homepage_sections';
+	} else if ( tabParam === 'hero_general' || tabParam === 'media' || pageParam === 'raka-theme-settings-media' ) {
 		defaultTabName = 'hero_general';
 	} else if ( tabParam === 'hero_contact' || tabParam === 'contact' || pageParam === 'raka-theme-settings-contact' ) {
 		defaultTabName = 'hero_contact';
@@ -654,6 +670,109 @@ export default function ThemeSettingsApp() {
 					tabs={ tabs }
 				>
 					{ ( tab ) => {
+						if ( tab.name === 'homepage_sections' ) {
+							return (
+								<CardBody style={ { padding: '28px 32px' } }>
+									<div style={ { marginBottom: '24px' } }>
+										<h2 style={ { margin: '0 0 4px 0', fontSize: '17px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' } }>
+											<i className="ri-layout-grid-line" style={ { color: '#ef4444' } } />
+											{ __( 'Flash Sale & Our Products Display Settings', 'raka-preorder-theme' ) }
+										</h2>
+										<p style={ { color: '#64748b', fontSize: '13px', margin: 0 } }>
+											{ __( 'Control the number of items and rows displayed on the homepage for Flash Sale Deals and Curated Catalog.', 'raka-preorder-theme' ) }
+										</p>
+									</div>
+
+									<div style={ { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' } }>
+										{ /* 1. Flash Sale Settings Box */ }
+										<div style={ { padding: '20px 24px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' } }>
+											<div style={ { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' } }>
+												<div style={ { width: '32px', height: '32px', borderRadius: '8px', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+													<i className="ri-flashlight-line" style={ { fontSize: '18px' } } />
+												</div>
+												<div>
+													<h3 style={ { margin: 0, fontSize: '15px', fontWeight: 700, color: '#0f172a' } }>
+														{ __( 'Flash Sale Section', 'raka-preorder-theme' ) }
+													</h3>
+													<p style={ { margin: 0, fontSize: '11px', color: '#64748b' } }>
+														{ __( 'Discounted items with countdown & urgency stock bar', 'raka-preorder-theme' ) }
+													</p>
+												</div>
+											</div>
+
+											<div style={ { display: 'flex', flexDirection: 'column', gap: '14px' } }>
+												<SelectControl
+													label={ __( 'Number of Products to Display (Rows)', 'raka-preorder-theme' ) }
+													value={ String( options.flash_sale_limit ?? 4 ) }
+													options={ [
+														{ label: __( '4 Products (1 Row - Recommended)', 'raka-preorder-theme' ), value: '4' },
+														{ label: __( '8 Products (2 Rows)', 'raka-preorder-theme' ), value: '8' },
+														{ label: __( '12 Products (3 Rows)', 'raka-preorder-theme' ), value: '12' },
+														{ label: __( '16 Products (4 Rows)', 'raka-preorder-theme' ), value: '16' },
+													] }
+													onChange={ ( val ) => handleOptionChange( 'flash_sale_limit', parseInt( val, 10 ) || 4 ) }
+													help={ __( 'Currently configured to show on the homepage flash sale grid.', 'raka-preorder-theme' ) }
+												/>
+
+												<TextControl
+													label={ __( 'Flash Sale Section Title', 'raka-preorder-theme' ) }
+													value={ options.flash_sale_title ?? 'FLASH SALE DEALS' }
+													onChange={ ( val ) => handleOptionChange( 'flash_sale_title', val ) }
+												/>
+											</div>
+										</div>
+
+										{ /* 2. Our Products Settings Box */ }
+										<div style={ { padding: '20px 24px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' } }>
+											<div style={ { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' } }>
+												<div style={ { width: '32px', height: '32px', borderRadius: '8px', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+													<i className="ri-layout-grid-fill" style={ { fontSize: '18px' } } />
+												</div>
+												<div>
+													<h3 style={ { margin: 0, fontSize: '15px', fontWeight: 700, color: '#0f172a' } }>
+														{ __( 'Our Products Section', 'raka-preorder-theme' ) }
+													</h3>
+													<p style={ { margin: 0, fontSize: '11px', color: '#64748b' } }>
+														{ __( 'Curated catalog grid with category filtering tabs', 'raka-preorder-theme' ) }
+													</p>
+												</div>
+											</div>
+
+											<div style={ { display: 'flex', flexDirection: 'column', gap: '14px' } }>
+												<SelectControl
+													label={ __( 'Number of Products to Display (Rows)', 'raka-preorder-theme' ) }
+													value={ String( options.our_products_limit ?? 8 ) }
+													options={ [
+														{ label: __( '4 Products (1 Row)', 'raka-preorder-theme' ), value: '4' },
+														{ label: __( '8 Products (2 Rows - Default)', 'raka-preorder-theme' ), value: '8' },
+														{ label: __( '12 Products (3 Rows)', 'raka-preorder-theme' ), value: '12' },
+														{ label: __( '16 Products (4 Rows)', 'raka-preorder-theme' ), value: '16' },
+														{ label: __( '20 Products (5 Rows)', 'raka-preorder-theme' ), value: '20' },
+														{ label: __( '24 Products (6 Rows)', 'raka-preorder-theme' ), value: '24' },
+													] }
+													onChange={ ( val ) => handleOptionChange( 'our_products_limit', parseInt( val, 10 ) || 8 ) }
+													help={ __( 'Currently set to 2 rows (8 products) on desktop.', 'raka-preorder-theme' ) }
+												/>
+
+												<TextControl
+													label={ __( 'Our Products Section Title', 'raka-preorder-theme' ) }
+													value={ options.our_products_title ?? 'OUR PRODUCTS' }
+													onChange={ ( val ) => handleOptionChange( 'our_products_title', val ) }
+												/>
+
+												<TextareaControl
+													label={ __( 'Section Description Text', 'raka-preorder-theme' ) }
+													rows={ 2 }
+													value={ options.our_products_desc ?? 'Explore custom keyboards, precision ergonomic gaming mice, and studio-grade audio gear built for uncompromising performance.' }
+													onChange={ ( val ) => handleOptionChange( 'our_products_desc', val ) }
+												/>
+											</div>
+										</div>
+									</div>
+								</CardBody>
+							);
+						}
+
 						if ( tab.name === 'hero_general' ) {
 							return (
 								<CardBody style={ { padding: '28px 32px' } }>

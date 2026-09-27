@@ -54,6 +54,16 @@ function raka_register_theme_options_menu() {
 		'raka-theme-settings-contact',
 		'raka_render_theme_options_page'
 	);
+
+	// Submenu 4: Flash Sale & Our Products
+	add_submenu_page(
+		'raka-theme-settings',
+		__( 'Flash Sale & Our Products', 'raka-preorder-theme' ),
+		__( 'Products & Deals', 'raka-preorder-theme' ),
+		'manage_options',
+		'raka-theme-settings-products',
+		'raka_render_theme_options_page'
+	);
 }
 add_action( 'admin_menu', 'raka_register_theme_options_menu' );
 
@@ -362,6 +372,23 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 				$clean_options[ $c_field ] = sanitize_text_field( (string) $raw_data[ $c_field ] );
 			}
 		}
+	}
+
+	// Section display counts and settings
+	if ( isset( $raw_data['flash_sale_limit'] ) ) {
+		$clean_options['flash_sale_limit'] = max( 1, min( 24, (int) $raw_data['flash_sale_limit'] ) );
+	}
+	if ( isset( $raw_data['our_products_limit'] ) ) {
+		$clean_options['our_products_limit'] = max( 1, min( 48, (int) $raw_data['our_products_limit'] ) );
+	}
+	if ( isset( $raw_data['flash_sale_title'] ) ) {
+		$clean_options['flash_sale_title'] = sanitize_text_field( (string) $raw_data['flash_sale_title'] );
+	}
+	if ( isset( $raw_data['our_products_title'] ) ) {
+		$clean_options['our_products_title'] = sanitize_text_field( (string) $raw_data['our_products_title'] );
+	}
+	if ( isset( $raw_data['our_products_desc'] ) ) {
+		$clean_options['our_products_desc'] = sanitize_textarea_field( (string) $raw_data['our_products_desc'] );
 	}
 
 	// Dynamic Repeater: hero_cards

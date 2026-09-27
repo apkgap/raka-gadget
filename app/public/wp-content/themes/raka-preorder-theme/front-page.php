@@ -45,9 +45,13 @@ $hero_section_height = max( 260, ( $max_stream_count * 80 ) + 100 ) . 'vh';
 $featured_categories = raka_get_featured_categories();
 $featured_brands     = raka_get_featured_brands();
 $contact_options     = raka_get_contact_options();
+$theme_options       = raka_get_all_options();
 
-$flash_sale_products = array_slice( raka_get_flash_sale_products( 4 ), 0, 4 );
-$homepage_catalog    = raka_get_homepage_catalog_products( 12 );
+$flash_sale_limit   = ! empty( $theme_options['flash_sale_limit'] ) ? (int) $theme_options['flash_sale_limit'] : 4;
+$our_products_limit = ! empty( $theme_options['our_products_limit'] ) ? (int) $theme_options['our_products_limit'] : 8;
+
+$flash_sale_products = array_slice( raka_get_flash_sale_products( $flash_sale_limit ), 0, $flash_sale_limit );
+$homepage_catalog    = raka_get_homepage_catalog_products( $our_products_limit );
 $catalog_products    = $homepage_catalog['products'];
 $catalog_categories  = $homepage_catalog['categories'];
 
