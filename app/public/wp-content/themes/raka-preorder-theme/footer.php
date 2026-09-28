@@ -8,6 +8,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+// ── Render Global Luxury Footer on Inner Pages ──
+if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
+	raka_render_site_footer();
+}
 ?>
 	</div><!-- #root -->
 
