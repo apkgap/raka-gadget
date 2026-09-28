@@ -629,17 +629,16 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 			};
 
 			window.updateBadges = function(count) {
-				const badges = document.querySelectorAll('.raka-cart-count-badge');
+				if (typeof count !== 'number') return;
+				const badges = document.querySelectorAll('.raka-cart-count-badge, #raka-cart-count, #overlay-cart-count');
 				badges.forEach(b => {
-					if (typeof count === 'number') {
-						b.textContent = count;
-						if (count > 0) {
-							b.classList.remove('scale-0');
-							b.classList.add('scale-100');
-						} else {
-							b.classList.remove('scale-100');
-							b.classList.add('scale-0');
-						}
+					b.textContent = count;
+					if (count > 0) {
+						b.classList.remove('scale-0');
+						b.classList.add('scale-100');
+					} else {
+						b.classList.remove('scale-100');
+						b.classList.add('scale-0');
 					}
 					// Pulse animation
 					b.classList.remove('scale-125');
@@ -647,6 +646,11 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 					b.classList.add('scale-125');
 					setTimeout(() => b.classList.remove('scale-125'), 300);
 				});
+
+				const drawerCount = document.getElementById('raka-cart-drawer-count');
+				if (drawerCount) {
+					drawerCount.textContent = count;
+				}
 			};
 
 			window.updateCartDrawerFragments = function(fragments) {
@@ -685,6 +689,44 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 			const updateCartDrawerFragments = window.updateCartDrawerFragments;
 			const updateBadges = window.updateBadges;
 
+			// Global Fetch Interceptor for WooCommerce Store API & AJAX requests
+			const originalFetch = window.fetch;
+			window.fetch = async function(...args) {
+				const res = await originalFetch.apply(this, args);
+				try {
+					const url = (typeof args[0] === 'string') ? args[0] : (args[0] && args[0].url ? args[0].url : '');
+					if (url.includes('/wc/store/') || url.includes('wc-ajax=') || url.includes('raka_')) {
+						const clone = res.clone();
+						clone.json().then(data => {
+							if (data) {
+								let cnt = null;
+								if (typeof data.items_count === 'number') {
+									cnt = data.items_count;
+								} else if (typeof data.cart_count === 'number') {
+									cnt = data.cart_count;
+								} else if (data.items && Array.isArray(data.items)) {
+									cnt = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+								}
+								if (cnt !== null) {
+									updateBadges(cnt);
+								}
+								if (data.fragments) {
+									updateCartDrawerFragments(data.fragments);
+								} else if (url.includes('/wc/store/')) {
+									fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
+										.then(r => r.json())
+										.then(d => {
+											if (d && d.fragments) updateCartDrawerFragments(d.fragments);
+										})
+										.catch(() => {});
+								}
+							}
+						}).catch(() => {});
+					}
+				} catch (err) {}
+				return res;
+			};
+
 			// Intercept Header & Overlay Cart buttons
 			const cartBtns = document.querySelectorAll('#raka-cart-btn, #overlay-cart-btn, a[href*="cart"]');
 			cartBtns.forEach(btn => {
@@ -704,12 +746,40 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 				}
 			});
 
-			// Auto-sync Cart page quantity inputs on change
-			let qtyDebounceTimer = null;
+			// Live Click/Change listeners for on-page Cart quantity buttons (both Classic Cart and WooCommerce Blocks)
+			function syncFromPageCart() {
+				const qtyInputs = document.querySelectorAll('.wc-block-components-quantity-selector__input, .woocommerce-cart-form input.qty');
+				if (qtyInputs.length > 0) {
+					let total = 0;
+					qtyInputs.forEach(inp => {
+						const v = parseInt(inp.value, 10);
+						if (!isNaN(v)) total += v;
+					});
+					if (total >= 0) updateBadges(total);
+				}
+			}
+
+			let syncDebounce = null;
+			document.addEventListener('click', function(e) {
+				if (e.target && e.target.closest('.wc-block-components-quantity-selector__button, .wc-block-cart-items-table__remove-item, .wc-block-cart__submit-button, button[name="update_cart"]')) {
+					clearTimeout(syncDebounce);
+					syncDebounce = setTimeout(() => {
+						syncFromPageCart();
+						fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
+							.then(r => r.json())
+							.then(d => {
+								if (d && d.fragments) updateCartDrawerFragments(d.fragments);
+							})
+							.catch(() => {});
+					}, 450);
+				}
+			});
+
 			document.addEventListener('change', function(e) {
-				if (e.target && e.target.matches('.woocommerce-cart-form input.qty, input[name*="cart["]')) {
-					clearTimeout(qtyDebounceTimer);
-					qtyDebounceTimer = setTimeout(() => {
+				if (e.target && e.target.matches('.woocommerce-cart-form input.qty, input[name*="cart["], .wc-block-components-quantity-selector__input')) {
+					clearTimeout(syncDebounce);
+					syncDebounce = setTimeout(() => {
+						syncFromPageCart();
 						const updateBtn = document.querySelector('button[name="update_cart"]');
 						if (updateBtn) {
 							updateBtn.disabled = false;
@@ -718,6 +788,16 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 					}, 400);
 				}
 			});
+
+			// MutationObserver for WooCommerce React Cart Block
+			const cartBlockEl = document.querySelector('.wp-block-woocommerce-cart, .wc-block-cart');
+			if (cartBlockEl && window.MutationObserver) {
+				const observer = new MutationObserver(() => {
+					clearTimeout(syncDebounce);
+					syncDebounce = setTimeout(syncFromPageCart, 300);
+				});
+				observer.observe(cartBlockEl, { childList: true, subtree: true, attributes: true, characterData: true });
+			}
 
 			// WooCommerce jQuery events
 			if (window.jQuery) {
@@ -734,7 +814,6 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 				});
 
 				window.jQuery(document.body).on('updated_cart_totals', function() {
-					// When cart totals are updated on /cart/ page, sync drawer fragments
 					fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
 						.then(r => r.json())
 						.then(d => {
