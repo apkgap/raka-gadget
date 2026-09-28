@@ -379,7 +379,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<div id="raka-our-products-header" class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-neutral-200 dark:border-neutral-800/80">
 			<div id="raka-our-products-title-wrap" class="space-y-2">
 				<span id="raka-our-products-tag" class="text-xs font-mono font-bold tracking-[0.2em] text-neutral-500 dark:text-neutral-400 uppercase">
-					<?php esc_html_e( 'CURATED CATALOG', 'raka-preorder-theme' ); ?>
+					<?php esc_html_e( '', 'raka-preorder-theme' ); ?>
 				</span>
 				<h2 id="raka-our-products-title" class="text-2xl sm:text-3xl md:text-4xl font-black font-hn tracking-tight text-neutral-950 dark:text-white">
 					<?php esc_html_e( 'OUR PRODUCTS', 'raka-preorder-theme' ); ?>

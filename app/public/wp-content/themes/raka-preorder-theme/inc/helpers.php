@@ -1752,165 +1752,201 @@ add_action( 'wc_ajax_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
 /**
  * Render the unified Luxury Gadget & Pre-Order Site Footer.
  */
+/**
+ * Render the unified Luxury Gadget & Pre-Order Site Footer (Obsidian Aesthetic).
+ */
 function raka_render_site_footer(): void {
 	$contact_options = function_exists( 'raka_get_contact_options' ) ? raka_get_contact_options() : [
 		'line_id'      => '@rakagadget',
 		'line_url'     => 'https://line.me/ti/p/@rakagadget',
 		'facebook_url' => 'https://facebook.com/rakagadget',
-		'address'      => '123/45 Gadget District, Bangkok 10110',
-		'hours'        => 'Mon - Sun: 10:00 - 20:00',
+		'email'        => 'support@raka-gadget.com',
+		'address'      => 'Bangkok, Thailand',
+		'hours'        => 'Mon - Sun: 10:00 - 20:00 (GMT+7)',
 	];
 	?>
-	<footer id="raka-site-footer" class="relative z-20 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white border-t border-neutral-200 dark:border-neutral-800/80 transition-colors duration-300 overflow-hidden">
-		<!-- Ambient Background Glow Accents -->
-		<div id="raka-footer-glow-bg" class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-gradient-to-b from-red-500/5 dark:from-red-500/10 to-transparent pointer-events-none blur-3xl"></div>
-
-		<!-- Main Multi-Column Footer Grid -->
-		<div id="raka-footer-main-grid-wrap" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-			<div id="raka-footer-main-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
+	<footer id="raka-site-footer" class="relative z-20 bg-white dark:bg-obsidian text-neutral-900 dark:text-white border-t border-black/10 dark:border-white/10 transition-colors duration-300 font-hn overflow-hidden">
+		
+		<!-- ── Top Brand & Concierge Bar ── -->
+		<div id="raka-footer-top-wrap" class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-14 sm:pt-20 pb-10 border-b border-black/10 dark:border-white/10">
+			<div id="raka-footer-top-grid" class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
 				
-				<!-- Col 1: Brand & Mission Statement -->
-				<div id="raka-footer-col-brand" class="lg:col-span-2 space-y-5">
-					<div id="raka-footer-brand-title-wrap" class="flex items-center gap-3">
-						<div id="raka-footer-brand-logo-badge" class="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center font-mono font-black text-base shadow-md shadow-red-600/20">
-							R
-						</div>
-						<div>
-							<h4 id="raka-footer-brand-name" class="text-lg font-black font-hn tracking-tight text-neutral-950 dark:text-white leading-none">
-								RAKA GADGET
-							</h4>
-							<span id="raka-footer-brand-sub" class="text-[10px] font-mono tracking-widest text-neutral-500 dark:text-neutral-400 uppercase">
-								PRE-ORDER & BESPOKE GEAR
-							</span>
-						</div>
+				<!-- Brand Heading & Tagline -->
+				<div id="raka-footer-brand-block" class="space-y-3">
+					<div id="raka-footer-eyebrow" class="flex items-center gap-3 text-[10px] sm:text-xs font-mono tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500">
+						<span id="raka-footer-tag-atelier">HARDWARE ATELIER</span>
+						<span id="raka-footer-tag-dot" class="opacity-40">/</span>
+						<span id="raka-footer-tag-loc">BANGKOK STUDIO</span>
 					</div>
-
-					<p id="raka-footer-brand-bio" class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-light font-hn leading-relaxed max-w-sm">
-						<?php esc_html_e( 'Curator and authorized distributor of premium custom mechanical keyboards, magnetic switches, esports gaming mice, and audiophile gear in Thailand.', 'raka-preorder-theme' ); ?>
+					<a id="raka-footer-brand-title" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="group inline-flex items-baseline gap-2.5 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-neutral-900 dark:text-white hover:opacity-75 transition-opacity font-hn">
+						<span id="raka-footer-brand-txt">OBSIDIAN</span>
+						<span id="raka-footer-brand-copy" class="text-xs sm:text-sm font-light font-mono opacity-50">©</span>
+					</a>
+					<p id="raka-footer-brand-bio" class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-light font-hn max-w-md leading-relaxed">
+						<?php esc_html_e( 'Curator and authorized direct distributor of bespoke mechanical keyboards, Hall Effect magnetic switches, tournament esports mice, and studio acoustics in Thailand.', 'raka-preorder-theme' ); ?>
 					</p>
-
-					<!-- Trust Value Points -->
-					<div id="raka-footer-trust-pills" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-						<div id="raka-footer-trust-1" class="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
-							<i id="raka-footer-trust-ico-1" class="ri-checkbox-circle-fill text-red-500 text-sm shrink-0"></i>
-							<span>100% Genuine Authorized</span>
-						</div>
-						<div id="raka-footer-trust-2" class="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
-							<i id="raka-footer-trust-ico-2" class="ri-shield-check-fill text-red-500 text-sm shrink-0"></i>
-							<span>QC Inspected & Verified</span>
-						</div>
-						<div id="raka-footer-trust-3" class="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
-							<i id="raka-footer-trust-ico-3" class="ri-truck-fill text-red-500 text-sm shrink-0"></i>
-							<span>Express Insured Shipping</span>
-						</div>
-						<div id="raka-footer-trust-4" class="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
-							<i id="raka-footer-trust-ico-4" class="ri-customer-service-2-fill text-red-500 text-sm shrink-0"></i>
-							<span>Dedicated Specialist Help</span>
-						</div>
-					</div>
 				</div>
 
-				<!-- Col 2: Shop & Categories -->
-				<div id="raka-footer-col-shop" class="space-y-4">
-					<h5 id="raka-footer-shop-heading" class="text-xs font-mono uppercase tracking-[0.15em] font-bold text-neutral-950 dark:text-white pb-1 border-b border-neutral-200 dark:border-neutral-800">
-						<?php esc_html_e( 'SHOP & CATALOG', 'raka-preorder-theme' ); ?>
-					</h5>
-					<ul id="raka-footer-shop-links" class="space-y-2.5 text-xs sm:text-sm font-hn font-light text-neutral-600 dark:text-neutral-400">
-						<li id="raka-footer-link-shop-1">
-							<a id="raka-footer-a-shop-1" href="<?php echo esc_url( home_url( '/shop/?filter_cat=keyboards' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200 flex items-center justify-between">
-								<span><?php esc_html_e( 'Custom Keyboards', 'raka-preorder-theme' ); ?></span>
+				<!-- Quick Channels (Minimalist Monochromatic Pills) -->
+				<div id="raka-footer-channels-wrap" class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+					<?php if ( ! empty( $contact_options['line_url'] ) ) : ?>
+						<a id="raka-footer-pill-line" href="<?php echo esc_url( $contact_options['line_url'] ); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-mono font-medium transition-all">
+							<i id="raka-footer-pill-ico-line" class="ri-line-fill text-sm text-[#06C755]"></i>
+							<span id="raka-footer-pill-txt-line"><?php echo esc_html( $contact_options['line_id'] ?: '@rakagadget' ); ?></span>
+						</a>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $contact_options['facebook_url'] ) ) : ?>
+						<a id="raka-footer-pill-fb" href="<?php echo esc_url( $contact_options['facebook_url'] ); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-mono font-medium transition-all">
+							<i id="raka-footer-pill-ico-fb" class="ri-facebook-circle-fill text-sm"></i>
+							<span id="raka-footer-pill-txt-fb">Facebook</span>
+						</a>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $contact_options['email'] ) ) : ?>
+						<a id="raka-footer-pill-mail" href="mailto:<?php echo esc_attr( $contact_options['email'] ); ?>" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-mono font-medium transition-all">
+							<i id="raka-footer-pill-ico-mail" class="ri-mail-line text-sm"></i>
+							<span id="raka-footer-pill-txt-mail"><?php echo esc_html( $contact_options['email'] ); ?></span>
+						</a>
+					<?php endif; ?>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- ── Main Editorial 4-Column Directory ── -->
+		<div id="raka-footer-dir-wrap" class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-14 sm:py-20">
+			<div id="raka-footer-dir-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+				
+				<!-- Column 1: Hardware Catalogue -->
+				<div id="raka-footer-dir-col-1" class="space-y-4">
+					<div id="raka-footer-heading-wrap-1" class="flex items-center gap-2 pb-2 border-b border-black/10 dark:border-white/10">
+						<span id="raka-footer-num-1" class="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">01.</span>
+						<h5 id="raka-footer-heading-1" class="text-xs font-mono uppercase tracking-[0.2em] font-bold text-neutral-950 dark:text-white">
+							<?php esc_html_e( 'CATALOGUE', 'raka-preorder-theme' ); ?>
+						</h5>
+					</div>
+					<ul id="raka-footer-links-1" class="space-y-3 text-xs sm:text-sm font-hn font-light text-neutral-600 dark:text-neutral-400">
+						<li id="raka-footer-li-1-1">
+							<a id="raka-footer-a-1-1" href="<?php echo esc_url( home_url( '/shop/?filter_cat=keyboards' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
+								<?php esc_html_e( 'Custom Keyboards', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-shop-2">
-							<a id="raka-footer-a-shop-2" href="<?php echo esc_url( home_url( '/shop/?filter_cat=switches' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200 flex items-center justify-between">
-								<span><?php esc_html_e( 'Switches & Keycaps', 'raka-preorder-theme' ); ?></span>
+						<li id="raka-footer-li-1-2">
+							<a id="raka-footer-a-1-2" href="<?php echo esc_url( home_url( '/shop/?filter_cat=switches' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
+								<?php esc_html_e( 'Magnetic Switches & Keycaps', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-shop-3">
-							<a id="raka-footer-a-shop-3" href="<?php echo esc_url( home_url( '/shop/?filter_cat=mice' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200 flex items-center justify-between">
-								<span><?php esc_html_e( 'Esports Mice', 'raka-preorder-theme' ); ?></span>
+						<li id="raka-footer-li-1-3">
+							<a id="raka-footer-a-1-3" href="<?php echo esc_url( home_url( '/shop/?filter_cat=mice' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
+								<?php esc_html_e( 'Esports Gaming Mice', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-shop-4">
-							<a id="raka-footer-a-shop-4" href="<?php echo esc_url( home_url( '/shop/?filter_cat=audio' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200 flex items-center justify-between">
-								<span><?php esc_html_e( 'Studio Audio & IEMs', 'raka-preorder-theme' ); ?></span>
+						<li id="raka-footer-li-1-4">
+							<a id="raka-footer-a-1-4" href="<?php echo esc_url( home_url( '/shop/?filter_cat=audio' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
+								<?php esc_html_e( 'Studio Audio & Audiophile IEMs', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-shop-5">
-							<a id="raka-footer-a-shop-5" href="<?php echo esc_url( home_url( '/#raka-flashsale-section' ) ); ?>" class="inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 font-bold hover:underline">
-								<i id="raka-footer-link-flash-ico" class="ri-flashlight-fill text-xs"></i>
-								<span><?php esc_html_e( 'Flash Sale Deals', 'raka-preorder-theme' ); ?></span>
+						<li id="raka-footer-li-1-5">
+							<a id="raka-footer-a-1-5" href="<?php echo esc_url( home_url( '/#raka-flashsale-section' ) ); ?>" class="inline-flex items-center gap-1.5 text-neutral-900 dark:text-white font-medium hover:underline">
+								<span id="raka-footer-flash-dot" class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
+								<span><?php esc_html_e( 'Limited Edition Drops', 'raka-preorder-theme' ); ?></span>
 							</a>
 						</li>
 					</ul>
 				</div>
 
-				<!-- Col 3: Customer Care & Policy -->
-				<div id="raka-footer-col-help" class="space-y-4">
-					<h5 id="raka-footer-help-heading" class="text-xs font-mono uppercase tracking-[0.15em] font-bold text-neutral-950 dark:text-white pb-1 border-b border-neutral-200 dark:border-neutral-800">
-						<?php esc_html_e( 'CUSTOMER CARE', 'raka-preorder-theme' ); ?>
-					</h5>
-					<ul id="raka-footer-help-links" class="space-y-2.5 text-xs sm:text-sm font-hn font-light text-neutral-600 dark:text-neutral-400">
-						<li id="raka-footer-link-help-1">
-							<a id="raka-footer-a-help-1" href="<?php echo esc_url( home_url( '/pre-order-policy' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200">
+				<!-- Column 2: Client Protocols & Care -->
+				<div id="raka-footer-dir-col-2" class="space-y-4">
+					<div id="raka-footer-heading-wrap-2" class="flex items-center gap-2 pb-2 border-b border-black/10 dark:border-white/10">
+						<span id="raka-footer-num-2" class="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">02.</span>
+						<h5 id="raka-footer-heading-2" class="text-xs font-mono uppercase tracking-[0.2em] font-bold text-neutral-950 dark:text-white">
+							<?php esc_html_e( 'PROTOCOLS', 'raka-preorder-theme' ); ?>
+						</h5>
+					</div>
+					<ul id="raka-footer-links-2" class="space-y-3 text-xs sm:text-sm font-hn font-light text-neutral-600 dark:text-neutral-400">
+						<li id="raka-footer-li-2-1">
+							<a id="raka-footer-a-2-1" href="<?php echo esc_url( home_url( '/pre-order-policy' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
 								<?php esc_html_e( 'Pre-Order Guidelines', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-help-2">
-							<a id="raka-footer-a-help-2" href="<?php echo esc_url( home_url( '/return-policy' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200">
+						<li id="raka-footer-li-2-2">
+							<a id="raka-footer-a-2-2" href="<?php echo esc_url( home_url( '/return-policy' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
 								<?php esc_html_e( 'Return & Defect Policy', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-help-3">
-							<a id="raka-footer-a-help-3" href="<?php echo esc_url( home_url( '/shipping-tracking' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200">
-								<?php esc_html_e( 'Track Shipment', 'raka-preorder-theme' ); ?>
+						<li id="raka-footer-li-2-3">
+							<a id="raka-footer-a-2-3" href="<?php echo esc_url( home_url( '/shipping-tracking' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
+								<?php esc_html_e( 'Track Consignment', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-help-4">
-							<a id="raka-footer-a-help-4" href="<?php echo esc_url( home_url( '/my-account' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200">
+						<li id="raka-footer-li-2-4">
+							<a id="raka-footer-a-2-4" href="<?php echo esc_url( home_url( '/my-account' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
 								<?php esc_html_e( 'My Orders & Account', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
-						<li id="raka-footer-link-help-5">
-							<a id="raka-footer-a-help-5" href="<?php echo esc_url( home_url( '/payment-methods' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200">
-								<?php esc_html_e( 'Payment & 0% Installments', 'raka-preorder-theme' ); ?>
+						<li id="raka-footer-li-2-5">
+							<a id="raka-footer-a-2-5" href="<?php echo esc_url( home_url( '/payment-methods' ) ); ?>" class="hover:text-black dark:hover:text-white hover:translate-x-1 inline-block transition-all duration-200">
+								<?php esc_html_e( 'Payment & 0% Plans', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
 					</ul>
 				</div>
 
-				<!-- Col 4: Official Showroom & Direct Contact -->
-				<div id="raka-footer-col-contact" class="space-y-4">
-					<h5 id="raka-footer-contact-heading" class="text-xs font-mono uppercase tracking-[0.15em] font-bold text-neutral-950 dark:text-white pb-1 border-b border-neutral-200 dark:border-neutral-800">
-						<?php esc_html_e( 'SHOWROOM & SUPPORT', 'raka-preorder-theme' ); ?>
-					</h5>
+				<!-- Column 3: Atelier Craftsmanship & Assurance -->
+				<div id="raka-footer-dir-col-3" class="space-y-4">
+					<div id="raka-footer-heading-wrap-3" class="flex items-center gap-2 pb-2 border-b border-black/10 dark:border-white/10">
+						<span id="raka-footer-num-3" class="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">03.</span>
+						<h5 id="raka-footer-heading-3" class="text-xs font-mono uppercase tracking-[0.2em] font-bold text-neutral-950 dark:text-white">
+							<?php esc_html_e( 'ASSURANCE', 'raka-preorder-theme' ); ?>
+						</h5>
+					</div>
+					<ul id="raka-footer-links-3" class="space-y-3 text-xs sm:text-sm font-mono text-neutral-600 dark:text-neutral-400">
+						<li id="raka-footer-li-3-1" class="flex items-center gap-2">
+							<i id="raka-footer-ico-3-1" class="ri-checkbox-circle-line text-sm opacity-60"></i>
+							<span>Direct Factory Sourced</span>
+						</li>
+						<li id="raka-footer-li-3-2" class="flex items-center gap-2">
+							<i id="raka-footer-ico-3-2" class="ri-shield-check-line text-sm opacity-60"></i>
+							<span>100% Genuine Hardware</span>
+						</li>
+						<li id="raka-footer-li-3-3" class="flex items-center gap-2">
+							<i id="raka-footer-ico-3-3" class="ri-survey-line text-sm opacity-60"></i>
+							<span>QC Verified & Inspected</span>
+						</li>
+						<li id="raka-footer-li-3-4" class="flex items-center gap-2">
+							<i id="raka-footer-ico-3-4" class="ri-truck-line text-sm opacity-60"></i>
+							<span>Insured Express Courier</span>
+						</li>
+						<li id="raka-footer-li-3-5" class="flex items-center gap-2">
+							<i id="raka-footer-ico-3-5" class="ri-user-star-line text-sm opacity-60"></i>
+							<span>Specialist Assistance</span>
+						</li>
+					</ul>
+				</div>
 
-					<div id="raka-footer-contact-details" class="space-y-3 text-xs sm:text-sm font-hn font-light text-neutral-600 dark:text-neutral-400">
-						<!-- Active Hours Badge -->
-						<div id="raka-footer-hours-pill" class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono font-medium">
-							<span id="raka-footer-green-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-							<span><?php echo esc_html( $contact_options['hours'] ?: 'Mon - Sun: 10:00 - 20:00' ); ?></span>
+				<!-- Column 4: Atelier Studio & Direct Concierge -->
+				<div id="raka-footer-dir-col-4" class="space-y-4">
+					<div id="raka-footer-heading-wrap-4" class="flex items-center gap-2 pb-2 border-b border-black/10 dark:border-white/10">
+						<span id="raka-footer-num-4" class="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">04.</span>
+						<h5 id="raka-footer-heading-4" class="text-xs font-mono uppercase tracking-[0.2em] font-bold text-neutral-950 dark:text-white">
+							<?php esc_html_e( 'ATELIER', 'raka-preorder-theme' ); ?>
+						</h5>
+					</div>
+					<div id="raka-footer-atelier-info" class="space-y-3.5 text-xs sm:text-sm font-hn font-light text-neutral-600 dark:text-neutral-400">
+						<div id="raka-footer-hours-block">
+							<div id="raka-footer-hours-lbl" class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-0.5">Service Hours</div>
+							<div id="raka-footer-hours-val" class="font-medium text-neutral-900 dark:text-white font-mono text-xs"><?php echo esc_html( $contact_options['hours'] ?: 'Mon - Sun: 10:00 - 20:00' ); ?></div>
 						</div>
-
-						<p id="raka-footer-addr" class="text-xs leading-relaxed text-neutral-700 dark:text-neutral-300">
-							<?php echo esc_html( $contact_options['address'] ?: '123/45 Gadget District, Bangkok 10110' ); ?>
-						</p>
-
-						<!-- Quick Contact Buttons -->
-						<div id="raka-footer-contact-actions" class="flex flex-col gap-2 pt-1">
-							<?php if ( ! empty( $contact_options['line_url'] ) ) : ?>
-								<a id="raka-footer-btn-line" href="<?php echo esc_url( $contact_options['line_url'] ); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-mono text-xs font-bold transition-colors shadow-sm">
-									<i id="raka-footer-line-ico" class="ri-line-fill text-sm"></i>
-									<span>LINE: <?php echo esc_html( $contact_options['line_id'] ?: '@rakagadget' ); ?></span>
-								</a>
-							<?php endif; ?>
-
-							<?php if ( ! empty( $contact_options['facebook_url'] ) ) : ?>
-								<a id="raka-footer-btn-fb" href="<?php echo esc_url( $contact_options['facebook_url'] ); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-mono text-xs font-medium transition-colors">
-									<i id="raka-footer-fb-ico" class="ri-facebook-circle-fill text-sm text-blue-600"></i>
-									<span>Facebook Official</span>
-								</a>
-							<?php endif; ?>
+						<div id="raka-footer-loc-block">
+							<div id="raka-footer-loc-lbl" class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-0.5">Location</div>
+							<div id="raka-footer-loc-val" class="leading-relaxed"><?php echo esc_html( $contact_options['address'] ?: 'Bangkok, Thailand' ); ?></div>
+						</div>
+						<div id="raka-footer-action-wrap" class="pt-2">
+							<a id="raka-footer-concierge-btn" href="<?php echo esc_url( $contact_options['line_url'] ?: 'https://line.me' ); ?>" target="_blank" rel="noopener noreferrer" class="group w-full inline-flex items-center justify-between px-4 py-3 rounded-xl bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 font-mono text-xs font-bold uppercase tracking-wider hover:opacity-85 transition-opacity shadow-sm">
+								<span id="raka-footer-btn-txt">CONNECT CONCIERGE</span>
+								<i id="raka-footer-btn-ico" class="ri-arrow-right-up-line text-sm transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></i>
+							</a>
 						</div>
 					</div>
 				</div>
@@ -1918,27 +1954,37 @@ function raka_render_site_footer(): void {
 			</div>
 		</div>
 
-		<!-- Bottom Copyright & Payment Methods Bar -->
-		<div id="raka-footer-bottom-bar" class="border-t border-neutral-200 dark:border-neutral-800/80 py-6 px-4 sm:px-6 lg:px-8 bg-neutral-50 dark:bg-black/60">
-			<div id="raka-footer-bottom-container" class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-neutral-500 dark:text-neutral-400">
-				<!-- Copyright & Security -->
-				<div id="raka-footer-copy-wrap" class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+		<!-- ── Bottom Coordinate & Legal Bar ── -->
+		<div id="raka-footer-bottom-bar" class="border-t border-black/10 dark:border-white/10 py-6 px-6 sm:px-8 lg:px-12 bg-neutral-50/50 dark:bg-neutral-950/80">
+			<div id="raka-footer-bottom-container" class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-neutral-400 dark:text-neutral-500">
+				
+				<!-- Left Copyright -->
+				<div id="raka-footer-copy-wrap" class="flex items-center gap-2 text-center md:text-left">
 					<span id="raka-footer-copyright-text">
-						&copy; <?php echo esc_html( date( 'Y' ) ); ?> RAKA GADGET. ALL RIGHTS RESERVED.
-					</span>
-					<span id="raka-footer-copy-sep" class="hidden sm:inline text-neutral-300 dark:text-neutral-700">|</span>
-					<span id="raka-footer-security-text" class="text-[11px] text-neutral-400 dark:text-neutral-500">
-						256-Bit SSL Encrypted Pre-Order Checkout
+						&copy; <?php echo esc_html( date( 'Y' ) ); ?> OBSIDIAN STUDIO. ALL RIGHTS RESERVED.
 					</span>
 				</div>
 
-				<!-- Back to Top Button -->
-				<button id="raka-footer-back-to-top" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:border-red-500 dark:hover:border-red-500 hover:text-red-600 dark:hover:text-red-400 transition-colors text-[11px] uppercase tracking-wider cursor-pointer">
+				<!-- Center Geolocation Coordinates -->
+				<div id="raka-footer-cities-wrap" class="hidden lg:flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-600">
+					<span>BKK</span>
+					<span>·</span>
+					<span>HKG</span>
+					<span>·</span>
+					<span>SZX</span>
+					<span>·</span>
+					<span>TYO</span>
+				</div>
+
+				<!-- Right Back to Top -->
+				<button id="raka-footer-back-to-top" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-black/10 dark:border-white/15 hover:border-black dark:hover:border-white text-neutral-800 dark:text-neutral-300 transition-colors text-xs uppercase tracking-widest cursor-pointer focus:outline-none">
 					<span id="raka-footer-top-txt"><?php esc_html_e( 'BACK TO TOP', 'raka-preorder-theme' ); ?></span>
-					<i id="raka-footer-top-ico" class="ri-arrow-up-line"></i>
+					<i id="raka-footer-top-ico" class="ri-arrow-up-line transition-transform group-hover:-translate-y-0.5"></i>
 				</button>
+				
 			</div>
 		</div>
+
 	</footer>
 	<?php
 }
