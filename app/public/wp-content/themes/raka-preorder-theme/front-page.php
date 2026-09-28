@@ -442,7 +442,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<!-- Bottom CTA Strip -->
 		<div id="raka-catalog-bottom-cta-wrap" class="mt-12 sm:mt-16 text-center">
 			<a id="raka-catalog-explore-btn" href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' ) ); ?>" class="inline-flex items-center justify-center gap-3 py-3.5 px-8 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-800 dark:hover:bg-neutral-700 font-mono text-xs sm:text-sm font-bold uppercase tracking-widest border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300">
-				<span id="raka-catalog-explore-txt"><?php esc_html_e( 'BROWSE ALL PRE-ORDERS & ACCESSORIES', 'raka-preorder-theme' ); ?></span>
+				<span id="raka-catalog-explore-txt"><?php esc_html_e( 'BROWSE ALL PRODUCTS & ACCESSORIES', 'raka-preorder-theme' ); ?></span>
 				<i id="raka-catalog-explore-ico" class="ri-arrow-right-up-line text-base text-red-500 dark:text-red-400"></i>
 			</a>
 		</div>
