@@ -528,6 +528,60 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 				}
 			};
 
+			// Update Cart Item Quantity with Live AJAX (+ / -)
+			window.rakaUpdateCartQty = function(cartItemKey, delta, btn) {
+				if (!cartItemKey) return;
+				const qtyEl = document.getElementById('cart-qty-val-' + cartItemKey);
+				const itemRow = document.getElementById('cart-item-' + cartItemKey);
+				let currentQty = qtyEl ? parseInt(qtyEl.textContent.trim(), 10) : 1;
+				if (isNaN(currentQty)) currentQty = 1;
+
+				const newQty = currentQty + delta;
+				if (newQty < 1) {
+					// If reduced below 1, remove item
+					window.rakaRemoveCartItem(cartItemKey, btn);
+					return;
+				}
+
+				if (qtyEl) qtyEl.textContent = newQty;
+				if (itemRow) itemRow.style.opacity = '0.5';
+
+				const formData = new FormData();
+				formData.append('cart_item_key', cartItemKey);
+				formData.append('quantity', newQty);
+
+				fetch('<?php echo esc_url( home_url( '/?wc-ajax=raka_update_cart_item_qty' ) ); ?>', {
+					method: 'POST',
+					body: formData
+				})
+				.then(res => res.json())
+				.then(data => {
+					if (data && data.fragments) {
+						updateCartDrawerFragments(data.fragments);
+					}
+					if (data && typeof data.cart_count === 'number') {
+						updateBadges(data.cart_count);
+					}
+					if (window.jQuery) {
+						window.jQuery(document.body).trigger('wc_fragment_refresh');
+					}
+					// If on cart page, trigger on-page cart refresh if present
+					if (window.location.pathname.includes('/cart')) {
+						const updateCartBtn = document.querySelector('button[name="update_cart"]');
+						if (updateCartBtn) {
+							updateCartBtn.disabled = false;
+							updateCartBtn.click();
+						}
+					}
+				})
+				.catch(() => {
+					if (itemRow) itemRow.style.opacity = '1';
+					if (window.jQuery) {
+						window.jQuery(document.body).trigger('wc_fragment_refresh');
+					}
+				});
+			};
+
 			// Remove Cart Item with Live AJAX
 			window.rakaRemoveCartItem = function(cartItemKey, btn) {
 				if (!cartItemKey) return;
@@ -541,10 +595,9 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 				}
 
 				const formData = new FormData();
-				formData.append('action', 'raka_remove_cart_item');
 				formData.append('cart_item_key', cartItemKey);
 
-				fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
+				fetch('<?php echo esc_url( home_url( '/?wc-ajax=raka_remove_cart_item' ) ); ?>', {
 					method: 'POST',
 					body: formData
 				})
@@ -552,10 +605,19 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 				.then(data => {
 					if (data && data.fragments) {
 						updateCartDrawerFragments(data.fragments);
-					} else {
-						// Trigger WC fragment refresh if needed
-						if (window.jQuery) {
-							window.jQuery(document.body).trigger('wc_fragment_refresh');
+					}
+					if (data && typeof data.cart_count === 'number') {
+						updateBadges(data.cart_count);
+					}
+					if (window.jQuery) {
+						window.jQuery(document.body).trigger('wc_fragment_refresh');
+					}
+					// If on cart page, trigger on-page cart refresh if present
+					if (window.location.pathname.includes('/cart')) {
+						const updateCartBtn = document.querySelector('button[name="update_cart"]');
+						if (updateCartBtn) {
+							updateCartBtn.disabled = false;
+							updateCartBtn.click();
 						}
 					}
 				})
@@ -642,6 +704,21 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 				}
 			});
 
+			// Auto-sync Cart page quantity inputs on change
+			let qtyDebounceTimer = null;
+			document.addEventListener('change', function(e) {
+				if (e.target && e.target.matches('.woocommerce-cart-form input.qty, input[name*="cart["]')) {
+					clearTimeout(qtyDebounceTimer);
+					qtyDebounceTimer = setTimeout(() => {
+						const updateBtn = document.querySelector('button[name="update_cart"]');
+						if (updateBtn) {
+							updateBtn.disabled = false;
+							updateBtn.click();
+						}
+					}, 400);
+				}
+			});
+
 			// WooCommerce jQuery events
 			if (window.jQuery) {
 				window.jQuery(document.body).on('added_to_cart', function(event, fragments) {
@@ -654,6 +731,41 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 
 				window.jQuery(document.body).on('wc_fragments_refreshed wc_fragments_loaded', function() {
 					// Auto sync if needed
+				});
+
+				window.jQuery(document.body).on('updated_cart_totals', function() {
+					// When cart totals are updated on /cart/ page, sync drawer fragments
+					fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
+						.then(r => r.json())
+						.then(d => {
+							if (d && d.fragments) updateCartDrawerFragments(d.fragments);
+						})
+						.catch(() => {});
+				});
+			}
+
+			// WooCommerce Block Cart store subscription (if React Gutenberg Cart is active)
+			if (window.wp && wp.data && wp.data.subscribe) {
+				let prevCartCount = null;
+				wp.data.subscribe(function() {
+					try {
+						const store = wp.data.select('wc/store/cart');
+						if (store && typeof store.getCartData === 'function') {
+							const cartData = store.getCartData();
+							if (cartData && typeof cartData.itemsCount === 'number') {
+								if (prevCartCount !== null && prevCartCount !== cartData.itemsCount) {
+									updateBadges(cartData.itemsCount);
+									fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
+										.then(r => r.json())
+										.then(d => {
+											if (d && d.fragments) updateCartDrawerFragments(d.fragments);
+										})
+										.catch(() => {});
+								}
+								prevCartCount = cartData.itemsCount;
+							}
+						}
+					} catch(e) {}
 				});
 			}
 		})();

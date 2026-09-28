@@ -1557,22 +1557,50 @@ function raka_get_cart_drawer_html(): string {
 								<?php endif; ?>
 							</div>
 
-							<div id="cart-meta-<?php echo esc_attr( $cart_item_key ); ?>" class="flex items-center justify-between pt-2">
-								<span id="cart-qty-<?php echo esc_attr( $cart_item_key ); ?>" class="text-[11px] sm:text-xs font-mono text-neutral-500 dark:text-neutral-400">
-									QTY: <?php echo esc_html( (string) $cart_item['quantity'] ); ?> × <?php echo wp_kses_post( $product_price ); ?>
-								</span>
+							<div id="cart-meta-<?php echo esc_attr( $cart_item_key ); ?>" class="flex items-center justify-between pt-2.5">
+								<!-- Quantity +/- Controls -->
+								<div id="cart-qty-ctrl-<?php echo esc_attr( $cart_item_key ); ?>" class="flex items-center rounded-lg border border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/5 p-0.5">
+									<button
+										id="cart-qty-minus-<?php echo esc_attr( $cart_item_key ); ?>"
+										type="button"
+										onclick="window.rakaUpdateCartQty('<?php echo esc_attr( $cart_item_key ); ?>', -1, this)"
+										class="w-6 h-6 flex items-center justify-center rounded text-neutral-600 dark:text-neutral-300 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer text-xs focus:outline-none"
+										title="Decrease quantity"
+										aria-label="Decrease quantity"
+									>
+										<i id="cart-qty-minus-ico-<?php echo esc_attr( $cart_item_key ); ?>" class="ri-subtract-line"></i>
+									</button>
+									<span id="cart-qty-val-<?php echo esc_attr( $cart_item_key ); ?>" class="w-7 text-center font-mono font-bold text-xs text-neutral-900 dark:text-white">
+										<?php echo esc_html( (string) $cart_item['quantity'] ); ?>
+									</span>
+									<button
+										id="cart-qty-plus-<?php echo esc_attr( $cart_item_key ); ?>"
+										type="button"
+										onclick="window.rakaUpdateCartQty('<?php echo esc_attr( $cart_item_key ); ?>', 1, this)"
+										class="w-6 h-6 flex items-center justify-center rounded text-neutral-600 dark:text-neutral-300 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer text-xs focus:outline-none"
+										title="Increase quantity"
+										aria-label="Increase quantity"
+									>
+										<i id="cart-qty-plus-ico-<?php echo esc_attr( $cart_item_key ); ?>" class="ri-add-line"></i>
+									</button>
+								</div>
 
-								<!-- Remove Action -->
-								<button
-									id="cart-remove-<?php echo esc_attr( $cart_item_key ); ?>"
-									type="button"
-									onclick="window.rakaRemoveCartItem('<?php echo esc_attr( $cart_item_key ); ?>', this)"
-									class="text-xs text-neutral-400 hover:text-red-500 transition-colors p-1 cursor-pointer focus:outline-none"
-									aria-label="Remove item"
-									title="Remove item"
-								>
-									<i id="cart-del-icon-<?php echo esc_attr( $cart_item_key ); ?>" class="ri-delete-bin-line text-sm"></i>
-								</button>
+								<!-- Price & Remove -->
+								<div id="cart-price-remove-<?php echo esc_attr( $cart_item_key ); ?>" class="flex items-center gap-3">
+									<span id="cart-price-<?php echo esc_attr( $cart_item_key ); ?>" class="text-xs sm:text-sm font-bold font-mono text-neutral-900 dark:text-white">
+										<?php echo wp_kses_post( $product_price ); ?>
+									</span>
+									<button
+										id="cart-remove-<?php echo esc_attr( $cart_item_key ); ?>"
+										type="button"
+										onclick="window.rakaRemoveCartItem('<?php echo esc_attr( $cart_item_key ); ?>', this)"
+										class="text-neutral-400 hover:text-red-500 transition-colors p-1 cursor-pointer focus:outline-none"
+										aria-label="Remove item"
+										title="Remove item"
+									>
+										<i id="cart-del-icon-<?php echo esc_attr( $cart_item_key ); ?>" class="ri-delete-bin-line text-sm"></i>
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -1611,6 +1639,44 @@ function raka_get_cart_drawer_html(): string {
 	<?php
 	return (string) ob_get_clean();
 }
+
+/**
+ * AJAX handler for updating cart item quantity in real-time.
+ */
+function raka_ajax_update_cart_item_qty(): void {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		wp_send_json_error( [ 'message' => 'WooCommerce is not available.' ], 400 );
+	}
+
+	$cart_item_key = isset( $_POST['cart_item_key'] ) ? sanitize_text_field( wp_unslash( $_POST['cart_item_key'] ) ) : '';
+	$quantity      = isset( $_POST['quantity'] ) ? wc_stock_amount( wp_unslash( $_POST['quantity'] ) ) : 0;
+
+	if ( empty( $cart_item_key ) || ! isset( WC()->cart->get_cart()[ $cart_item_key ] ) ) {
+		wp_send_json_error( [ 'message' => 'Cart item not found.' ], 404 );
+	}
+
+	if ( $quantity <= 0 ) {
+		WC()->cart->remove_cart_item( $cart_item_key );
+	} else {
+		WC()->cart->set_quantity( $cart_item_key, $quantity, true );
+	}
+
+	WC()->cart->calculate_totals();
+
+	$fragments = apply_filters( 'woocommerce_add_to_cart_fragments', [] );
+
+	wp_send_json( [
+		'success'    => true,
+		'cart_hash'  => WC()->cart->get_cart_hash(),
+		'fragments'  => $fragments,
+		'cart_count' => WC()->cart->get_cart_contents_count(),
+		'subtotal'   => WC()->cart->get_cart_subtotal(),
+		'total'      => WC()->cart->get_cart_total(),
+	] );
+}
+add_action( 'wp_ajax_raka_update_cart_item_qty', 'raka_ajax_update_cart_item_qty' );
+add_action( 'wp_ajax_nopriv_raka_update_cart_item_qty', 'raka_ajax_update_cart_item_qty' );
+add_action( 'wc_ajax_raka_update_cart_item_qty', 'raka_ajax_update_cart_item_qty' );
 
 /**
  * Render Complete Cart Drawer Wrapper Modal in theme footer.
@@ -1667,14 +1733,21 @@ function raka_ajax_remove_cart_item(): void {
 
 	if ( $cart_item_key && function_exists( 'WC' ) && WC()->cart ) {
 		WC()->cart->remove_cart_item( $cart_item_key );
-		if ( class_exists( 'WC_AJAX' ) ) {
-			WC_AJAX::get_refreshed_fragments();
-		}
+		WC()->cart->calculate_totals();
+
+		$fragments = apply_filters( 'woocommerce_add_to_cart_fragments', [] );
+		wp_send_json( [
+			'success'    => true,
+			'cart_hash'  => WC()->cart->get_cart_hash(),
+			'fragments'  => $fragments,
+			'cart_count' => WC()->cart->get_cart_contents_count(),
+		] );
 	}
 	wp_die();
 }
 add_action( 'wp_ajax_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
 add_action( 'wp_ajax_nopriv_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
+add_action( 'wc_ajax_raka_remove_cart_item', 'raka_ajax_remove_cart_item' );
 
 /**
  * Render the unified Luxury Gadget & Pre-Order Site Footer.
