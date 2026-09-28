@@ -1633,54 +1633,9 @@ function raka_render_site_footer(): void {
 		'hours'        => 'Mon - Sun: 10:00 - 20:00',
 	];
 	?>
-	<footer id="raka-closing-section" class="relative z-20 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white border-t border-neutral-200 dark:border-neutral-800/80 transition-colors duration-300 overflow-hidden">
+	<footer id="raka-site-footer" class="relative z-20 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white border-t border-neutral-200 dark:border-neutral-800/80 transition-colors duration-300 overflow-hidden">
 		<!-- Ambient Background Glow Accents -->
 		<div id="raka-footer-glow-bg" class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-gradient-to-b from-red-500/5 dark:from-red-500/10 to-transparent pointer-events-none blur-3xl"></div>
-
-		<!-- Top VIP Drop Alert Newsletter Strip -->
-		<div id="raka-footer-newsletter-wrap" class="border-b border-neutral-200 dark:border-neutral-800/80 py-10 sm:py-12 px-4 sm:px-6 lg:px-8">
-			<div id="raka-footer-newsletter-container" class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800/90 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-sm relative overflow-hidden">
-				<!-- Subtle Accent Line on Top -->
-				<div id="raka-footer-card-accent" class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-red-500 to-amber-500"></div>
-
-				<!-- Left Copy -->
-				<div id="raka-footer-newsletter-info" class="space-y-2 max-w-xl">
-					<div id="raka-footer-vip-tag-row" class="flex items-center gap-2">
-						<span id="raka-footer-vip-pulse" class="relative flex h-2 w-2">
-							<span id="raka-footer-vip-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-							<span id="raka-footer-vip-dot" class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-						</span>
-						<span id="raka-footer-vip-label" class="text-[11px] font-mono uppercase tracking-[0.2em] font-bold text-red-600 dark:text-red-400">
-							<?php esc_html_e( 'VIP DROP ALERTS', 'raka-preorder-theme' ); ?>
-						</span>
-					</div>
-					<h3 id="raka-footer-newsletter-title" class="text-xl sm:text-2xl lg:text-3xl font-black font-hn tracking-tight text-neutral-950 dark:text-white">
-						<?php esc_html_e( 'NEVER MISS A LIMITED DROP & PRE-ORDER', 'raka-preorder-theme' ); ?>
-					</h3>
-					<p id="raka-footer-newsletter-desc" class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-light font-hn">
-						<?php esc_html_e( 'Subscribe to receive instant notifications on custom keyboard group buys, limited switches, and exclusive flash sale drops.', 'raka-preorder-theme' ); ?>
-					</p>
-				</div>
-
-				<!-- Right Form / Quick Subscription -->
-				<div id="raka-footer-form-wrap" class="w-full lg:w-auto shrink-0">
-					<form id="raka-footer-newsletter-form" class="flex flex-col sm:flex-row items-stretch gap-2.5 w-full lg:min-w-[380px]" onsubmit="event.preventDefault(); const btn = this.querySelector('button'); btn.innerHTML='<span>SUBSCRIBED!</span><i class=\'ri-check-line\'></i>'; btn.classList.add('bg-green-600'); setTimeout(()=>{ btn.innerHTML='<span>JOIN DROPS</span><i class=\'ri-arrow-right-line\'></i>'; btn.classList.remove('bg-green-600'); }, 2500);">
-						<div id="raka-footer-input-wrap" class="relative flex-1">
-							<i id="raka-footer-input-icon" class="ri-mail-line absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
-							<input id="raka-footer-email-input" type="email" required placeholder="<?php esc_attr_e( 'Enter your email address...', 'raka-preorder-theme' ); ?>" class="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-neutral-800/90 border border-neutral-300 dark:border-neutral-700 text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:border-red-500 dark:focus:border-red-500 transition-colors shadow-inner" />
-						</div>
-						<button id="raka-footer-submit-btn" type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-neutral-950 hover:bg-red-600 dark:bg-white dark:hover:bg-red-600 dark:text-neutral-950 dark:hover:text-white text-white font-mono text-xs font-bold tracking-wider uppercase transition-all duration-300 shrink-0 shadow-md">
-							<span id="raka-footer-submit-txt"><?php esc_html_e( 'JOIN DROPS', 'raka-preorder-theme' ); ?></span>
-							<i id="raka-footer-submit-ico" class="ri-arrow-right-line text-xs"></i>
-						</button>
-					</form>
-					<p id="raka-footer-form-note" class="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono mt-2 flex items-center gap-1.5">
-						<i id="raka-footer-lock-ico" class="ri-shield-check-line text-xs text-red-500"></i>
-						<span><?php esc_html_e( 'No spam. Unsubscribe anytime with 1-click.', 'raka-preorder-theme' ); ?></span>
-					</p>
-				</div>
-			</div>
-		</div>
 
 		<!-- Main Multi-Column Footer Grid -->
 		<div id="raka-footer-main-grid-wrap" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
