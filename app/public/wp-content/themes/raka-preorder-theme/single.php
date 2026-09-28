@@ -17,7 +17,7 @@ while ( have_posts() ) :
 	$p_date = get_the_date( 'M d, Y' );
 ?>
 
-<main id="single-post-main" class="min-h-screen pt-6 md:pt-10 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300 font-hn">
+<main id="single-post-main" class="min-h-screen bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300 font-hn">
 	<div id="single-post-container" class="max-w-4xl mx-auto px-6 sm:px-8">
 
 		<!-- ── Breadcrumbs ── -->

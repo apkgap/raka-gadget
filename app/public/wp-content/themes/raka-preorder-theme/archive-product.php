@@ -21,7 +21,7 @@ $all_cats = get_terms( [
 ] );
 ?>
 
-<main id="archive-product-main" class="min-h-screen pt-6 md:pt-10 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
+<main id="archive-product-main" class="min-h-screen bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
 	<div id="archive-product-container" class="container">
 
 		<!-- ── Archive Header ── -->
@@ -39,7 +39,7 @@ $all_cats = get_terms( [
 
 		<!-- ── Main Shop Layout: Sidebar + Product Grid ── -->
 		<div id="shop-layout-wrap" class="flex flex-col lg:flex-row items-start gap-8 xl:gap-12">
-			
+
 			<!-- 1. Left Sticky Sidebar Filter (Desktop) -->
 			<div id="shop-desktop-sidebar-wrap" class="hidden lg:block w-64 xl:w-72 flex-shrink-0 sticky top-28 self-start">
 				<?php raka_render_shop_sidebar_filters( 'desktop' ); ?>
@@ -47,7 +47,7 @@ $all_cats = get_terms( [
 
 			<!-- 2. Right Products Content Area -->
 			<div id="shop-products-content-wrap" class="flex-1 min-w-0 w-full">
-				
+
 				<!-- Top Bar: Result Count, Mobile Filter Trigger, and Sort Dropdown -->
 				<div id="shop-toolbar-bar" class="flex items-center justify-between gap-3 pb-4 border-b border-black/10 dark:border-white/10 mb-4">
 					<!-- Result Count (Hidden on mobile) -->

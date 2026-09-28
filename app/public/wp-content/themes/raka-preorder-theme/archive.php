@@ -15,7 +15,7 @@ $archive_title = get_the_archive_title();
 $archive_desc  = get_the_archive_description();
 ?>
 
-<main id="raka-archive-main" class="min-h-screen pt-6 md:pt-10 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
+<main id="raka-archive-main" class="min-h-screen bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
 	<div id="raka-archive-container" class="container">
 
 		<!-- ── Archive Header ── -->

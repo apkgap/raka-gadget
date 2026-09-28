@@ -43,7 +43,7 @@ while ( have_posts() ) :
 	}
 ?>
 
-<main id="single-product-main" class="min-h-screen pt-6 md:pt-10 pb-12 md:pb-16 bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
+<main id="single-product-main" class="min-h-screen bg-white dark:bg-obsidian text-black dark:text-white transition-colors duration-300">
 	<div id="single-product-container" class="container">
 
 		<!-- ── Breadcrumbs ── -->
@@ -54,7 +54,7 @@ while ( have_posts() ) :
 
 			<!-- Left Column: Gallery & Image Display -->
 			<div id="product-gallery-col" class="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 sm:gap-6 sticky top-28">
-				
+
 				<!-- Thumbnails Strip -->
 				<?php if ( count( $all_images ) > 1 ) : ?>
 					<div id="product-thumbnails-list" class="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:max-h-[560px] pb-2 md:pb-0 scrollbar-none">
@@ -97,7 +97,7 @@ while ( have_posts() ) :
 
 			<!-- Right Column: Product Info, Options & Purchase Flow -->
 			<div id="product-details-col" class="lg:col-span-5 flex flex-col space-y-8">
-				
+
 				<!-- Meta: Brand & SKU -->
 				<div id="product-meta-header" class="flex items-center justify-between">
 					<?php
@@ -214,7 +214,7 @@ while ( have_posts() ) :
 				<!-- ── Purchase Action Block (Quantity + Add to Cart) ── -->
 				<div id="product-action-block" class="space-y-4 pt-2">
 					<div id="qty-cart-row" class="flex items-center gap-4">
-						
+
 						<!-- Quantity Selector -->
 						<div id="product-qty-picker" class="flex items-center rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 p-1">
 							<button id="btn-qty-minus" type="button" onclick="window.changeProductQty(-1)" class="w-10 h-10 flex items-center justify-center rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer focus:outline-none">
@@ -275,7 +275,7 @@ while ( have_posts() ) :
 
 				<!-- ── Expandable Details Accordions ── -->
 				<div id="product-accordions-wrap" class="space-y-3 pt-6">
-					
+
 					<!-- Accordion 1: Description & Specs -->
 					<details id="acc-specs" class="group rounded-xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-100/50 dark:bg-neutral-900/40 p-4 transition-all" open>
 						<summary id="sum-specs" class="flex items-center justify-between cursor-pointer list-none text-xs uppercase tracking-[0.2em] font-bold text-neutral-900 dark:text-white font-mono">
@@ -322,7 +322,7 @@ while ( have_posts() ) :
 			<div id="related-products-section" class="mt-28 md:mt-36 pt-16 border-t border-black/10 dark:border-white/10">
 				<div id="related-header-wrap" class="flex items-center justify-between mb-10">
 					<div id="related-titles">
-						<span id="related-sub" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono">// CURATED PAIRINGS</span>
+						<span id="related-sub" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono"></span>
 						<h2 id="related-main" class="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-neutral-900 dark:text-white font-hn">MORE FROM <?php echo esc_html( $brand_name ); ?></h2>
 					</div>
 					<a id="related-view-all" href="<?php echo esc_url( home_url( '/shop' ) ); ?>" class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-semibold text-neutral-800 dark:text-neutral-200 hover:opacity-50 transition-opacity font-mono">
@@ -492,16 +492,48 @@ while ( have_posts() ) :
 			formData.append('variation_id', varId);
 		}
 
+		// Append selected variation attributes
+		if (form) {
+			form.querySelectorAll('.variation-color-circle.ring-2, .variation-pill-btn.bg-black, .variation-pill-btn.dark\\:bg-white').forEach(btn => {
+				const attr = btn.getAttribute('data-attr');
+				const val = btn.getAttribute('data-val');
+				if (attr && val) {
+					formData.append('attribute_' + attr, val);
+				}
+			});
+		}
+
 		fetch('<?php echo esc_url( home_url( '/?wc-ajax=add_to_cart' ) ); ?>', {
 			method: 'POST',
 			body: formData
 		})
 		.then(res => res.json())
 		.then(data => {
+			if (data && data.error && data.product_url) {
+				window.location.href = data.product_url;
+				return;
+			}
+
+			// 1. Trigger WooCommerce jQuery events
+			if (window.jQuery && data && data.fragments) {
+				window.jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash]);
+			}
+
+			// 2. Direct Drawer Sync
+			if (data && data.fragments && typeof window.updateCartDrawerFragments === 'function') {
+				window.updateCartDrawerFragments(data.fragments);
+			}
+
+			// 3. Automatically Open Slide-Over Cart Drawer
+			if (typeof window.openRakaCart === 'function') {
+				window.openRakaCart();
+			}
+
+			// 4. Button Success State
 			if (cartBtn) {
 				cartBtn.disabled = false;
 				if (cartTxt) cartTxt.textContent = 'ADDED TO BAG!';
-				if (cartIcon) cartIcon.className = 'ri-check-line text-lg';
+				if (cartIcon) cartIcon.className = 'ri-check-line text-lg text-green-400';
 				setTimeout(() => {
 					if (cartTxt) cartTxt.textContent = 'ADD TO CART';
 					if (cartIcon) cartIcon.className = 'ri-shopping-bag-3-line text-lg';

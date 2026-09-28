@@ -840,9 +840,9 @@ $cat_icon_map = [
 </script>
 
 <!-- ── SECTION: ATMOSPHERIC CRAFTSMANSHIP STATEMENT (CLOSING SECTION) ── -->
-<section id="raka-closing-section" class="relative min-h-[75vh] bg-neutral-100 dark:bg-black text-neutral-950 dark:text-white flex flex-col justify-between overflow-hidden theme-transition transition-colors duration-300">
+<section id="raka-closing-section" class="relative bg-neutral-100 dark:bg-black text-neutral-950 dark:text-white flex flex-col justify-between overflow-hidden theme-transition transition-colors duration-300">
 	<!-- Main Typography Statement -->
-	<div id="raka-closing-main-body" class="flex-1 flex flex-col justify-center px-6 md:px-12 lg:px-16 py-16">
+	<div id="raka-closing-main-body" class="container">
 		<div id="raka-closing-subtitle" class="text-[10px] tracking-[0.3em] uppercase text-neutral-500 dark:text-white/30 mb-8 font-hn font-mono">
 			<?php esc_html_e( 'CRAFTSMANSHIP & PHILOSOPHY', 'raka-preorder-theme' ); ?>
 		</div>

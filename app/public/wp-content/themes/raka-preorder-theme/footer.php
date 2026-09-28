@@ -561,7 +561,7 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 				});
 			};
 
-			function updateBadges(count) {
+			window.updateBadges = function(count) {
 				const badges = document.querySelectorAll('.raka-cart-count-badge');
 				badges.forEach(b => {
 					if (typeof count === 'number') {
@@ -580,9 +580,9 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 					b.classList.add('scale-125');
 					setTimeout(() => b.classList.remove('scale-125'), 300);
 				});
-			}
+			};
 
-			function updateCartDrawerFragments(fragments) {
+			window.updateCartDrawerFragments = function(fragments) {
 				if (!fragments) return;
 
 				// Update Cart Drawer Content
@@ -610,10 +610,13 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 					const newSpan = temp.querySelector('span') || temp.firstChild;
 					if (newSpan) {
 						const cnt = parseInt(newSpan.textContent.trim(), 10);
-						if (!isNaN(cnt)) updateBadges(cnt);
+						if (!isNaN(cnt)) window.updateBadges(cnt);
 					}
 				}
-			}
+			};
+
+			const updateCartDrawerFragments = window.updateCartDrawerFragments;
+			const updateBadges = window.updateBadges;
 
 			// Intercept Header & Overlay Cart buttons
 			const cartBtns = document.querySelectorAll('#raka-cart-btn, #overlay-cart-btn, a[href*="cart"]');
