@@ -561,7 +561,7 @@ while ( have_posts() ) :
 			});
 		}
 
-		fetch('<?php echo esc_url( home_url( '/?wc-ajax=add_to_cart' ) ); ?>', {
+		fetch('<?php echo esc_url( home_url( '/?wc-ajax=raka_add_to_cart' ) ); ?>', {
 			method: 'POST',
 			body: formData
 		})

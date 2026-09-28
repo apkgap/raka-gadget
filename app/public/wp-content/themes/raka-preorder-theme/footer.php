@@ -419,7 +419,7 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 			formData.append('product_id', productId);
 			formData.append('quantity', 1);
 
-			fetch('<?php echo esc_url( home_url( '/?wc-ajax=add_to_cart' ) ); ?>', {
+			fetch('<?php echo esc_url( home_url( '/?wc-ajax=raka_add_to_cart' ) ); ?>', {
 				method: 'POST',
 				body: formData
 			})
@@ -427,6 +427,10 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 			.then(data => {
 				if (txtSpan) txtSpan.textContent = 'ADDED!';
 				if (icoEl) icoEl.className = 'ri-check-line text-xs text-green-400 flex-shrink-0';
+
+				if (data && data.fragments && typeof window.updateCartDrawerFragments === 'function') {
+					window.updateCartDrawerFragments(data.fragments);
+				}
 
 				// Remove any WooCommerce default injected .added_to_cart links
 				setTimeout(() => {

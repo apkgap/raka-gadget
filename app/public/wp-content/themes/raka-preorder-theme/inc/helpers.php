@@ -1429,6 +1429,61 @@ function raka_add_to_cart_fragments( array $fragments ): array {
 add_filter( 'woocommerce_add_to_cart_fragments', 'raka_add_to_cart_fragments' );
 
 /**
+ * Custom AJAX handler for adding products (simple & variable) to cart seamlessly.
+ */
+function raka_ajax_add_to_cart(): void {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		wp_send_json_error( [ 'message' => 'WooCommerce is not available.' ], 400 );
+	}
+
+	$product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+	$quantity     = isset( $_POST['quantity'] ) ? wc_stock_amount( wp_unslash( $_POST['quantity'] ) ) : 1;
+	$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
+	$variations   = [];
+
+	foreach ( $_POST as $key => $value ) {
+		if ( str_starts_with( $key, 'attribute_' ) ) {
+			$variations[ sanitize_text_field( $key ) ] = wp_unslash( $value );
+		}
+	}
+
+	$target_id = $variation_id ? $variation_id : $product_id;
+	$product   = wc_get_product( $target_id );
+	if ( ! $product ) {
+		wp_send_json_error( [ 'message' => 'Product not found.' ], 404 );
+	}
+
+	$cart_item_key = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variations );
+
+	if ( $cart_item_key ) {
+		do_action( 'woocommerce_ajax_added_to_cart', $product_id );
+
+		// Prepare fragments
+		$fragments = apply_filters( 'woocommerce_add_to_cart_fragments', [] );
+
+		wp_send_json( [
+			'success'    => true,
+			'cart_hash'  => WC()->cart->get_cart_hash(),
+			'fragments'  => $fragments,
+			'cart_count' => WC()->cart->get_cart_contents_count(),
+		] );
+	} else {
+		// If add to cart failed, get error notices
+		$notices = wc_get_notices( 'error' );
+		wc_clear_notices();
+		$message = ! empty( $notices ) ? reset( $notices )['notice'] : __( 'Could not add product to cart.', 'raka-preorder-theme' );
+		wp_send_json( [
+			'error'       => true,
+			'message'     => $message,
+			'product_url' => get_permalink( $product_id ),
+		], 200 );
+	}
+}
+add_action( 'wp_ajax_raka_add_to_cart', 'raka_ajax_add_to_cart' );
+add_action( 'wp_ajax_nopriv_raka_add_to_cart', 'raka_ajax_add_to_cart' );
+add_action( 'wc_ajax_raka_add_to_cart', 'raka_ajax_add_to_cart' );
+
+/**
  * Render inner content of Cart Drawer (items list, empty state, subtotal, actions).
  *
  * @return string
