@@ -390,70 +390,122 @@ while ( have_posts() ) :
 		qtyInput.value = val;
 	};
 
-	// 3. Variation Option Select Handler (Circles & Pills)
-	window.onVariationOptionSelect = function(btn) {
-		const attrSlug = btn.getAttribute('data-attr');
-		const val = btn.getAttribute('data-val');
+	// Helper to set an attribute option active on UI
+	function setOptionActive(attrSlug, val) {
 		const parentGroup = document.getElementById('attr-options-' + attrSlug);
+		if (!parentGroup) return;
 
-		if (parentGroup) {
-			// Handle circle color swatches
-			const circles = parentGroup.querySelectorAll('.variation-color-circle');
-			if (circles.length > 0) {
-				circles.forEach(b => {
+		// Circle Color Swatches
+		const circles = parentGroup.querySelectorAll('.variation-color-circle');
+		if (circles.length > 0) {
+			circles.forEach(b => {
+				const isCurrent = (b.getAttribute('data-val') || '').trim() === (val || '').trim();
+				if (isCurrent) {
+					b.classList.remove('opacity-85');
+					b.classList.add('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-white', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
+				} else {
 					b.classList.remove('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-white', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
 					b.classList.add('opacity-85');
-					const check = b.querySelector('.swatch-check-icon');
-					if (check) check.classList.replace('opacity-100', 'opacity-0');
-				});
+				}
+				const check = b.querySelector('.swatch-check-icon');
+				if (check) {
+					if (isCurrent) {
+						check.classList.remove('opacity-0');
+						check.classList.add('opacity-100');
+					} else {
+						check.classList.remove('opacity-100');
+						check.classList.add('opacity-0');
+					}
+				}
+			});
+		}
 
-				btn.classList.remove('opacity-85');
-				btn.classList.add('ring-2', 'ring-black', 'dark:ring-white', 'ring-offset-2', 'ring-offset-white', 'dark:ring-offset-obsidian', 'scale-110', 'shadow-md');
-				const activeCheck = btn.querySelector('.swatch-check-icon');
-				if (activeCheck) activeCheck.classList.replace('opacity-0', 'opacity-100');
-			}
-
-			// Handle regular text pill buttons
-			const pills = parentGroup.querySelectorAll('.variation-pill-btn');
-			if (pills.length > 0) {
-				pills.forEach(b => {
+		// Regular Text Pill Buttons
+		const pills = parentGroup.querySelectorAll('.variation-pill-btn');
+		if (pills.length > 0) {
+			pills.forEach(b => {
+				const isCurrent = (b.getAttribute('data-val') || '').trim() === (val || '').trim();
+				if (isCurrent) {
+					b.classList.remove('bg-transparent', 'text-neutral-700', 'dark:text-neutral-300', 'border-neutral-300', 'dark:border-neutral-700');
+					b.classList.add('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black', 'border-black', 'dark:border-white', 'shadow-sm');
+				} else {
 					b.classList.remove('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black', 'border-black', 'dark:border-white', 'shadow-sm');
 					b.classList.add('bg-transparent', 'text-neutral-700', 'dark:text-neutral-300', 'border-neutral-300', 'dark:border-neutral-700');
-				});
-				btn.classList.remove('bg-transparent', 'text-neutral-700', 'dark:text-neutral-300', 'border-neutral-300', 'dark:border-neutral-700');
-				btn.classList.add('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black', 'border-black', 'dark:border-white', 'shadow-sm');
-			}
+				}
+			});
 		}
 
 		// Update Selected Attribute Value Label in Real-time
 		const labelEl = document.getElementById('attr-selected-val-' + attrSlug);
 		if (labelEl) labelEl.textContent = val;
+	}
 
-		// Match variation
-		matchActiveVariation();
+	// 3. Variation Option Select Handler (Circles & Pills)
+	window.onVariationOptionSelect = function(btn) {
+		const clickedAttr = btn.getAttribute('data-attr');
+		const clickedVal = btn.getAttribute('data-val');
+
+		// 1. Mark clicked button active
+		setOptionActive(clickedAttr, clickedVal);
+
+		// 2. Resolve matching variation
+		resolveAndSyncVariation(clickedAttr, clickedVal);
 	};
 
-	function matchActiveVariation() {
+	function resolveAndSyncVariation(primaryAttr, primaryVal) {
 		if (!form || !variationsData.length) return;
 
-		// Collect currently selected attributes from active circles or pills
+		// Collect currently active selections
 		const selected = {};
-		form.querySelectorAll('.variation-color-circle.ring-2, .variation-pill-btn.bg-black, .variation-pill-btn.dark\\:bg-white').forEach(btn => {
-			const attr = btn.getAttribute('data-attr');
-			const val = btn.getAttribute('data-val');
-			selected['attribute_' + attr] = val;
+		if (primaryAttr && primaryVal) {
+			selected[primaryAttr] = primaryVal;
+			selected['attribute_' + primaryAttr] = primaryVal;
+		}
+
+		// Prioritize variations that match the clicked attribute
+		let candidates = variationsData;
+		if (primaryAttr && primaryVal) {
+			const filtered = variationsData.filter(v => {
+				const req = v.attributes[primaryAttr] || v.attributes['attribute_' + primaryAttr] || v.attributes[primaryAttr.toLowerCase()] || v.attributes['attribute_' + primaryAttr.toLowerCase()];
+				return !req || req.trim() === primaryVal.trim();
+			});
+			if (filtered.length > 0) candidates = filtered;
+		}
+
+		// Check currently active buttons for other attributes
+		const activeButtons = form.querySelectorAll('.variation-color-circle.ring-2, .variation-pill-btn.bg-black, .variation-pill-btn.dark\\:bg-white');
+		activeButtons.forEach(b => {
+			const a = b.getAttribute('data-attr');
+			const v = b.getAttribute('data-val');
+			if (a && v && a !== primaryAttr) {
+				selected[a] = v;
+				selected['attribute_' + a] = v;
+			}
 		});
 
-		// Find matching variation
-		const matched = variationsData.find(v => {
+		let matched = candidates.find(v => {
 			return Object.keys(v.attributes).every(k => {
-				const requiredVal = v.attributes[k];
-				if (!requiredVal) return true; // Any value matches
-				const cleanReq = requiredVal.trim();
-				const curVal = (selected[k] || selected['attribute_' + k] || '').trim();
-				return curVal === cleanReq;
+				const req = v.attributes[k];
+				if (!req) return true;
+				const cleanReq = req.trim();
+				const cur = (selected[k] || selected[k.replace(/^attribute_/, '')] || '').trim();
+				return cur === cleanReq;
 			});
-		}) || variationsData[0];
+		});
+
+		// If no exact match with currently active secondary buttons, pick first candidate & auto-sync other buttons!
+		if (!matched) {
+			matched = candidates[0] || variationsData[0];
+			if (matched && matched.attributes) {
+				Object.keys(matched.attributes).forEach(k => {
+					const val = matched.attributes[k];
+					const slug = k.replace(/^attribute_/, '');
+					if (val && slug !== primaryAttr) {
+						setOptionActive(slug, val);
+					}
+				});
+			}
+		}
 
 		if (matched) {
 			if (hiddenVarId) hiddenVarId.value = matched.variation_id;
@@ -488,12 +540,18 @@ while ( have_posts() ) :
 		const formData = new FormData();
 		formData.append('product_id', pId);
 		formData.append('quantity', qty);
+
 		if (varId) {
 			formData.append('variation_id', varId);
-		}
-
-		// Append selected variation attributes
-		if (form) {
+			const currentVar = variationsData.find(v => v.variation_id === varId);
+			if (currentVar && currentVar.attributes) {
+				Object.keys(currentVar.attributes).forEach(k => {
+					const key = k.startsWith('attribute_') ? k : 'attribute_' + k;
+					formData.append(key, currentVar.attributes[k]);
+				});
+			}
+		} else if (form) {
+			// Fallback if varId is somehow 0
 			form.querySelectorAll('.variation-color-circle.ring-2, .variation-pill-btn.bg-black, .variation-pill-btn.dark\\:bg-white').forEach(btn => {
 				const attr = btn.getAttribute('data-attr');
 				const val = btn.getAttribute('data-val');
@@ -509,8 +567,10 @@ while ( have_posts() ) :
 		})
 		.then(res => res.json())
 		.then(data => {
-			if (data && data.error && data.product_url) {
-				window.location.href = data.product_url;
+			if (data && data.error) {
+				if (data.product_url) {
+					window.location.href = '<?php echo esc_url( wc_get_cart_url() ); ?>?add-to-cart=' + (varId || pId) + '&quantity=' + qty;
+				}
 				return;
 			}
 
@@ -546,7 +606,7 @@ while ( have_posts() ) :
 	};
 
 	// Initial match on page load
-	matchActiveVariation();
+	resolveAndSyncVariation();
 })();
 </script>
 

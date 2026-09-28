@@ -183,6 +183,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<a
 						id="raka-cart-btn"
 						href="<?php echo esc_url( $cart_url ); ?>"
+						onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
 						class="relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						aria-label="Shopping Cart"
 						title="Shopping Cart"
@@ -252,6 +253,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<a
 							id="overlay-cart-btn"
 							href="<?php echo esc_url( $cart_url ); ?>"
+							onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
 							class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-neutral-800 dark:text-white/90 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-105 focus:outline-none cursor-pointer"
 							aria-label="Shopping Cart"
 							title="Shopping Cart"

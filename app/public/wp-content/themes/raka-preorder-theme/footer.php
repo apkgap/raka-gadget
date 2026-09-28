@@ -481,8 +481,9 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 			const panel    = document.getElementById('raka-cart-panel');
 			let isCartOpen = false;
 
-			window.openRakaCart = function() {
-				if (!drawer || !backdrop || !panel) return;
+			window.openRakaCart = function(e) {
+				if (e && typeof e.preventDefault === 'function') e.preventDefault();
+				if (!drawer || !backdrop || !panel) return false;
 				isCartOpen = true;
 				drawer.classList.remove('pointer-events-none');
 				drawer.classList.add('pointer-events-auto');
