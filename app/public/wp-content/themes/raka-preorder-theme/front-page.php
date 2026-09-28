@@ -296,7 +296,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			</div>
 
 			<!-- Live Countdown Timer -->
-			<div id="raka-flashsale-timer-wrap" 
+			<div id="raka-flashsale-timer-wrap"
 				class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white/90 dark:bg-neutral-900/90 border border-neutral-300 dark:border-neutral-800 rounded-2xl p-3 sm:p-4 shrink-0 shadow-sm"
 				x-data="{
 					remaining: <?php echo (int) $flash_sale_campaign['remaining_seconds']; ?>,
@@ -841,11 +841,6 @@ $cat_icon_map = [
 
 <!-- ── SECTION: ATMOSPHERIC CRAFTSMANSHIP STATEMENT (CLOSING SECTION) ── -->
 <section id="raka-closing-section" class="relative min-h-[75vh] bg-neutral-100 dark:bg-black text-neutral-950 dark:text-white flex flex-col justify-between overflow-hidden theme-transition transition-colors duration-300">
-	<!-- Top rule -->
-	<div id="raka-closing-top-rule-wrap" class="w-full px-6 md:px-12 lg:px-16 pt-16 md:pt-20">
-		<div id="raka-closing-top-rule" class="h-px bg-black/10 dark:bg-white/10 w-full"></div>
-	</div>
-
 	<!-- Main Typography Statement -->
 	<div id="raka-closing-main-body" class="flex-1 flex flex-col justify-center px-6 md:px-12 lg:px-16 py-16">
 		<div id="raka-closing-subtitle" class="text-[10px] tracking-[0.3em] uppercase text-neutral-500 dark:text-white/30 mb-8 font-hn font-mono">
@@ -859,30 +854,6 @@ $cat_icon_map = [
 		<p id="raka-closing-desc" class="mt-8 sm:mt-10 text-xs md:text-sm leading-[1.8] text-neutral-600 dark:text-white/40 font-light max-w-md font-hn">
 			Every pre-order is an entry into bespoke craftsmanship. From CNC-milled aluminum chassis to precision magnetic switches and studio acoustic dampening—no shortcuts, only purpose.
 		</p>
-	</div>
-
-	<!-- Lower Details Row -->
-	<div id="raka-closing-footer-wrap" class="px-6 md:px-12 lg:px-16 pb-12">
-		<div id="raka-closing-bot-rule" class="h-px bg-black/10 dark:bg-white/10 w-full mb-8"></div>
-		<div id="raka-closing-footer-grid" class="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-			<div id="raka-closing-atelier-col">
-				<div id="raka-closing-atelier-lbl" class="text-[10px] tracking-[0.3em] uppercase text-neutral-500 dark:text-white/30 mb-2 font-hn font-mono">Showroom & Custom Lab</div>
-				<div id="raka-closing-atelier-addr" class="text-sm text-neutral-700 dark:text-white/60 font-light leading-relaxed font-hn">
-					Bangkok, Thailand<br/>
-					Private sound test & showroom sessions available daily
-				</div>
-			</div>
-			<div id="raka-closing-action-col" class="flex flex-col items-start md:items-end gap-3">
-				<div id="raka-closing-action-lbl" class="text-[10px] tracking-[0.3em] uppercase text-neutral-500 dark:text-white/30 font-hn font-mono">Start your pre-order journey</div>
-				<a id="raka-closing-consult-link" href="<?php echo esc_url( $contact_options['line_url'] ?: 'https://line.me/ti/p/@rakagadget' ); ?>" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-3 text-neutral-900 dark:text-white/80 hover:text-red-600 dark:hover:text-white transition-colors duration-300">
-					<span id="raka-closing-consult-txt" class="text-sm font-light tracking-wide font-hn">Message our keyboard specialists</span>
-					<span id="raka-closing-consult-line" class="w-8 h-px bg-black/30 dark:bg-white/40 group-hover:w-12 group-hover:bg-red-600 dark:group-hover:bg-white transition-all duration-300"></span>
-				</a>
-			</div>
-			<div id="raka-closing-copy-col" class="text-right mt-4 md:mt-0 text-[10px] tracking-[0.2em] uppercase text-neutral-400 dark:text-white/20 font-hn font-mono">
-				RAKA PRE-ORDER &copy; <?php echo esc_html( date( 'Y' ) ); ?>
-			</div>
-		</div>
 	</div>
 </section>
 
