@@ -619,46 +619,117 @@ function raka_get_hero_cards(): array {
 function raka_get_flash_sale_campaign_data(): array {
 	$options = raka_get_all_options();
 
-	$enabled = isset( $options['flash_sale_enabled'] ) ? (bool) $options['flash_sale_enabled'] : true;
-	$title   = ! empty( $options['flash_sale_title'] ) ? $options['flash_sale_title'] : __( 'FLASH SALE', 'raka-preorder-theme' );
-	$tag     = ! empty( $options['flash_sale_tag'] ) ? $options['flash_sale_tag'] : __( 'LIMITED TIME DROPS', 'raka-preorder-theme' );
-	$desc    = ! empty( $options['flash_sale_desc'] ) ? $options['flash_sale_desc'] : __( 'Exclusive pre-order allocations at special introductory prices. Once stock is claimed, regular rates apply.', 'raka-preorder-theme' );
-
-	$start_str = ! empty( $options['flash_sale_start_time'] ) ? $options['flash_sale_start_time'] : '';
-	$end_str   = ! empty( $options['flash_sale_end_time'] ) ? $options['flash_sale_end_time'] : '';
+	$enabled       = isset( $options['flash_sale_enabled'] ) ? (bool) $options['flash_sale_enabled'] : true;
+	$title         = ! empty( $options['flash_sale_title'] ) ? $options['flash_sale_title'] : __( 'FLASH SALE', 'raka-preorder-theme' );
+	$tag           = ! empty( $options['flash_sale_tag'] ) ? $options['flash_sale_tag'] : __( 'LIMITED TIME DROPS', 'raka-preorder-theme' );
+	$desc          = ! empty( $options['flash_sale_desc'] ) ? $options['flash_sale_desc'] : __( 'Exclusive pre-order allocations at special introductory prices. Once stock is claimed, regular rates apply.', 'raka-preorder-theme' );
+	$schedule_mode = ! empty( $options['flash_sale_schedule_mode'] ) ? $options['flash_sale_schedule_mode'] : 'fixed';
 
 	$current_time = current_time( 'timestamp' ); // Respect WordPress site timezone
 
-	$start_ts = ! empty( $start_str ) ? strtotime( $start_str ) : 0;
-	$end_ts   = ! empty( $end_str ) ? strtotime( $end_str ) : 0;
+	$timer_label       = __( 'ENDS IN', 'raka-preorder-theme' );
+	$remaining_seconds = 0;
+	$status            = 'active';
+	$target_timestamp  = 0;
 
-	// If no end time is specified or invalid, default to tomorrow night (24-48 hours window)
-	if ( $end_ts <= 0 ) {
-		$end_ts = strtotime( 'tomorrow midnight' ) + ( 18 * 3600 );
-	}
-
-	$status = 'active';
 	if ( ! $enabled ) {
 		$status = 'disabled';
-	} elseif ( $start_ts > 0 && $current_time < $start_ts ) {
-		$status = 'upcoming';
-	} elseif ( $end_ts > 0 && $current_time >= $end_ts ) {
-		$status = 'ended';
+	} elseif ( 'daily' === $schedule_mode ) {
+		// Daily Recurring Mode
+		$daily_start = ! empty( $options['flash_sale_daily_start'] ) ? $options['flash_sale_daily_start'] : '18:00';
+		$daily_end   = ! empty( $options['flash_sale_daily_end'] ) ? $options['flash_sale_daily_end'] : '23:59';
+		$camp_start  = ! empty( $options['flash_sale_campaign_start_date'] ) ? $options['flash_sale_campaign_start_date'] : '';
+		$camp_end    = ! empty( $options['flash_sale_campaign_end_date'] ) ? $options['flash_sale_campaign_end_date'] : '';
+
+		$camp_start_ts = ! empty( $camp_start ) ? strtotime( $camp_start . ' 00:00:00' ) : 0;
+		$camp_end_ts   = ! empty( $camp_end ) ? strtotime( $camp_end . ' 23:59:59' ) : 0;
+
+		$today_ymd      = wp_date( 'Y-m-d', $current_time );
+		$today_start_ts = strtotime( $today_ymd . ' ' . $daily_start . ':00' );
+		$today_end_ts   = strtotime( $today_ymd . ' ' . $daily_end . ':00' );
+
+		// Overnight support (e.g. 20:00 to 02:00 next day)
+		if ( $today_end_ts <= $today_start_ts ) {
+			$today_end_ts += 86400;
+		}
+
+		if ( $camp_start_ts > 0 && $current_time < $camp_start_ts ) {
+			$status            = 'upcoming';
+			$target_timestamp  = $camp_start_ts;
+			$remaining_seconds = max( 0, $camp_start_ts - $current_time );
+			$timer_label       = __( 'STARTS IN', 'raka-preorder-theme' );
+		} elseif ( $camp_end_ts > 0 && $current_time > $camp_end_ts ) {
+			$status            = 'ended';
+			$remaining_seconds = 0;
+			$timer_label       = __( 'ENDED', 'raka-preorder-theme' );
+		} elseif ( $current_time < $today_start_ts ) {
+			// Today's daily flash sale hasn't started yet
+			$status            = 'upcoming_today';
+			$target_timestamp  = $today_start_ts;
+			$remaining_seconds = max( 0, $today_start_ts - $current_time );
+			$timer_label       = __( 'STARTS IN', 'raka-preorder-theme' );
+		} elseif ( $current_time >= $today_start_ts && $current_time < $today_end_ts ) {
+			// Daily flash sale is active now!
+			$status            = 'active';
+			$target_timestamp  = $today_end_ts;
+			$remaining_seconds = max( 0, $today_end_ts - $current_time );
+			$timer_label       = __( 'ENDS IN', 'raka-preorder-theme' );
+		} else {
+			// Today's flash sale finished, counts down to tomorrow's slot
+			$tomorrow_start_ts = $today_start_ts + 86400;
+			if ( $camp_end_ts > 0 && $tomorrow_start_ts > $camp_end_ts ) {
+				$status            = 'ended';
+				$remaining_seconds = 0;
+				$timer_label       = __( 'ENDED', 'raka-preorder-theme' );
+			} else {
+				$status            = 'next_drop';
+				$target_timestamp  = $tomorrow_start_ts;
+				$remaining_seconds = max( 0, $tomorrow_start_ts - $current_time );
+				$timer_label       = __( 'NEXT DROP IN', 'raka-preorder-theme' );
+			}
+		}
+	} else {
+		// Fixed Date & Time Mode
+		$start_str = ! empty( $options['flash_sale_start_time'] ) ? $options['flash_sale_start_time'] : '';
+		$end_str   = ! empty( $options['flash_sale_end_time'] ) ? $options['flash_sale_end_time'] : '';
+
+		$start_ts = ! empty( $start_str ) ? strtotime( $start_str ) : 0;
+		$end_ts   = ! empty( $end_str ) ? strtotime( $end_str ) : 0;
+
+		if ( $end_ts <= 0 ) {
+			$end_ts = strtotime( 'tomorrow midnight' ) + ( 18 * 3600 );
+		}
+
+		if ( $start_ts > 0 && $current_time < $start_ts ) {
+			$status            = 'upcoming';
+			$target_timestamp  = $start_ts;
+			$remaining_seconds = max( 0, $start_ts - $current_time );
+			$timer_label       = __( 'STARTS IN', 'raka-preorder-theme' );
+		} elseif ( $end_ts > 0 && $current_time >= $end_ts ) {
+			$status            = 'ended';
+			$target_timestamp  = $end_ts;
+			$remaining_seconds = 0;
+			$timer_label       = __( 'ENDED', 'raka-preorder-theme' );
+		} else {
+			$status            = 'active';
+			$target_timestamp  = $end_ts;
+			$remaining_seconds = max( 0, $end_ts - $current_time );
+			$timer_label       = __( 'ENDS IN', 'raka-preorder-theme' );
+		}
 	}
 
-	$is_active         = ( 'active' === $status );
-	$remaining_seconds = max( 0, $end_ts - $current_time );
+	$is_active = ( 'active' === $status );
 
 	return [
 		'enabled'           => $enabled,
 		'is_active'         => $is_active,
 		'status'            => $status,
+		'schedule_mode'     => $schedule_mode,
 		'title'             => $title,
 		'tag'               => $tag,
 		'desc'              => $desc,
-		'start_time'        => $start_str,
-		'end_time'          => $end_str ? $end_str : wp_date( 'Y-m-d\TH:i', $end_ts ),
-		'end_timestamp'     => $end_ts,
+		'timer_label'       => $timer_label,
+		'target_timestamp'  => $target_timestamp,
 		'current_timestamp' => $current_time,
 		'remaining_seconds' => $remaining_seconds,
 	];

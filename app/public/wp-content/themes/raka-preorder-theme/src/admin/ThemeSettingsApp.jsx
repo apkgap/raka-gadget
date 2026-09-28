@@ -336,11 +336,16 @@ export default function ThemeSettingsApp() {
 		contact_address: '123/45 Gadget District, Bangkok 10110',
 		contact_note: 'For custom inquiries, private showroom sessions, or pre-order status, message us directly via LINE Official 24/7.',
 		flash_sale_enabled: true,
+		flash_sale_schedule_mode: 'fixed',
 		flash_sale_limit: 4,
 		flash_sale_title: 'FLASH SALE',
 		flash_sale_tag: 'LIMITED TIME DROPS',
 		flash_sale_desc: 'Exclusive pre-order allocations at special introductory prices. Once stock is claimed, regular rates apply.',
 		flash_sale_end_time: '',
+		flash_sale_daily_start: '18:00',
+		flash_sale_daily_end: '23:59',
+		flash_sale_campaign_start_date: '',
+		flash_sale_campaign_end_date: '',
 		our_products_limit: 8,
 		our_products_title: 'OUR PRODUCTS',
 		our_products_desc: 'Explore custom keyboards, precision ergonomic gaming mice, and studio-grade audio gear built for uncompromising performance.',
@@ -712,27 +717,101 @@ export default function ThemeSettingsApp() {
 													onChange={ ( val ) => handleOptionChange( 'flash_sale_enabled', val ) }
 												/>
 
-												<div style={ { display: 'flex', flexDirection: 'column', gap: '4px' } }>
-													<label style={ { fontSize: '11px', fontWeight: 600, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.05em' } }>
-														{ __( 'Campaign End Date & Time (Countdown Target)', 'raka-preorder-theme' ) }
-													</label>
-													<input
-														type="datetime-local"
-														value={ options.flash_sale_end_time || '' }
-														onChange={ ( e ) => handleOptionChange( 'flash_sale_end_time', e.target.value ) }
-														style={ {
-															padding: '8px 12px',
-															border: '1px solid #cbd5e1',
-															borderRadius: '6px',
-															fontSize: '13px',
-															background: '#fff',
-															color: '#0f172a',
-															outline: 'none',
-														} }
-													/>
-													<p style={ { margin: 0, fontSize: '11px', color: '#64748b' } }>
-														{ __( 'Sets the real-time live countdown timer target on the homepage.', 'raka-preorder-theme' ) }
-													</p>
+												{ /* Schedule & Countdown Mode Switcher */ }
+												<div style={ { display: 'flex', flexDirection: 'column', gap: '10px', padding: '12px 14px', background: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' } }>
+													<div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' } }>
+														<label style={ { fontSize: '11px', fontWeight: 700, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.05em' } }>
+															{ __( 'Schedule & Timer Mode', 'raka-preorder-theme' ) }
+														</label>
+														<TabSwitcher
+															tabs={ [
+																{ id: 'fixed', label: __( 'Countdown Target', 'raka-preorder-theme' ), icon: 'ri-calendar-event-line' },
+																{ id: 'daily', label: __( 'Daily Slot & Expiry', 'raka-preorder-theme' ), icon: 'ri-time-line' },
+															] }
+															activeTab={ options.flash_sale_schedule_mode || 'fixed' }
+															onSelect={ ( mode ) => handleOptionChange( 'flash_sale_schedule_mode', mode ) }
+														/>
+													</div>
+
+													{ ( options.flash_sale_schedule_mode || 'fixed' ) === 'fixed' ? (
+														<div style={ { display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '4px' } }>
+															<label style={ { fontSize: '11px', fontWeight: 600, color: '#475569' } }>
+																{ __( 'Target End Date & Time (Countdown Target)', 'raka-preorder-theme' ) }
+															</label>
+															<input
+																type="datetime-local"
+																value={ options.flash_sale_end_time || '' }
+																onChange={ ( e ) => handleOptionChange( 'flash_sale_end_time', e.target.value ) }
+																style={ {
+																	padding: '8px 12px',
+																	border: '1px solid #cbd5e1',
+																	borderRadius: '6px',
+																	fontSize: '13px',
+																	background: '#fff',
+																	color: '#0f172a',
+																	outline: 'none',
+																} }
+															/>
+															<p style={ { margin: 0, fontSize: '11px', color: '#64748b' } }>
+																{ __( 'The live clock will count down to this specific end date and time continuously.', 'raka-preorder-theme' ) }
+															</p>
+														</div>
+													) : (
+														<div style={ { display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '4px' } }>
+															<div style={ { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' } }>
+																<div style={ { display: 'flex', flexDirection: 'column', gap: '4px' } }>
+																	<label style={ { fontSize: '11px', fontWeight: 600, color: '#475569' } }>
+																		{ __( 'Daily Start Time', 'raka-preorder-theme' ) }
+																	</label>
+																	<input
+																		type="time"
+																		value={ options.flash_sale_daily_start || '18:00' }
+																		onChange={ ( e ) => handleOptionChange( 'flash_sale_daily_start', e.target.value ) }
+																		style={ { padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: '#fff', color: '#0f172a' } }
+																	/>
+																</div>
+																<div style={ { display: 'flex', flexDirection: 'column', gap: '4px' } }>
+																	<label style={ { fontSize: '11px', fontWeight: 600, color: '#475569' } }>
+																		{ __( 'Daily End Time', 'raka-preorder-theme' ) }
+																	</label>
+																	<input
+																		type="time"
+																		value={ options.flash_sale_daily_end || '23:59' }
+																		onChange={ ( e ) => handleOptionChange( 'flash_sale_daily_end', e.target.value ) }
+																		style={ { padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: '#fff', color: '#0f172a' } }
+																	/>
+																</div>
+															</div>
+
+															<div style={ { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' } }>
+																<div style={ { display: 'flex', flexDirection: 'column', gap: '4px' } }>
+																	<label style={ { fontSize: '11px', fontWeight: 600, color: '#475569' } }>
+																		{ __( 'Campaign Start Date (Optional)', 'raka-preorder-theme' ) }
+																	</label>
+																	<input
+																		type="date"
+																		value={ options.flash_sale_campaign_start_date || '' }
+																		onChange={ ( e ) => handleOptionChange( 'flash_sale_campaign_start_date', e.target.value ) }
+																		style={ { padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: '#fff', color: '#0f172a' } }
+																	/>
+																</div>
+																<div style={ { display: 'flex', flexDirection: 'column', gap: '4px' } }>
+																	<label style={ { fontSize: '11px', fontWeight: 600, color: '#475569' } }>
+																		{ __( 'Campaign End Date (Expiry)', 'raka-preorder-theme' ) }
+																	</label>
+																	<input
+																		type="date"
+																		value={ options.flash_sale_campaign_end_date || '' }
+																		onChange={ ( e ) => handleOptionChange( 'flash_sale_campaign_end_date', e.target.value ) }
+																		style={ { padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: '#fff', color: '#0f172a' } }
+																	/>
+																</div>
+															</div>
+															<p style={ { margin: 0, fontSize: '11px', color: '#64748b' } }>
+																{ __( 'Runs Flash Sale during the daily time slot until the campaign end date.', 'raka-preorder-theme' ) }
+															</p>
+														</div>
+													) }
 												</div>
 
 												<SelectControl

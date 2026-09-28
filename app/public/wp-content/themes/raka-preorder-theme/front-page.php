@@ -327,7 +327,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 				<div id="raka-flashsale-timer-label-wrap" class="flex items-center gap-2">
 					<i id="raka-flashsale-timer-icon" class="ri-time-line text-red-500 dark:text-red-400 text-lg"></i>
 					<span id="raka-flashsale-timer-label" class="text-[11px] font-mono tracking-widest uppercase text-neutral-500 dark:text-neutral-400">
-						<?php esc_html_e( 'ENDS IN', 'raka-preorder-theme' ); ?>
+						<?php echo esc_html( $flash_sale_campaign['timer_label'] ); ?>
 					</span>
 				</div>
 				<div id="raka-flashsale-countdown-clock" class="flex items-center gap-1.5 font-mono">
