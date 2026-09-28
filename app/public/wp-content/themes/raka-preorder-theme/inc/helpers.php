@@ -285,7 +285,7 @@ function raka_get_featured_brands(): array {
 function raka_get_contact_options(): array {
 	return [
 		'title'        => raka_get_option( 'contact_title', __( 'Contact Raka Gadget', 'raka-preorder-theme' ) ),
-		'subtitle'     => raka_get_option( 'contact_subtitle', __( 'Pre-order inquiry, warranty service & support', 'raka-preorder-theme' ) ),
+		'subtitle'     => raka_get_option( 'contact_subtitle', __( 'Pre-order inquiry, order tracking & support', 'raka-preorder-theme' ) ),
 		'line_id'      => raka_get_option( 'contact_line_id', '@rakagadget' ),
 		'line_url'     => raka_get_option( 'contact_line_url', 'https://line.me/R/ti/p/@rakagadget' ),
 		'facebook_url' => raka_get_option( 'contact_facebook_url', 'https://facebook.com/rakagadget' ),
@@ -1668,8 +1668,8 @@ function raka_render_site_footer(): void {
 							<span>100% Genuine Authorized</span>
 						</div>
 						<div id="raka-footer-trust-2" class="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
-							<i id="raka-footer-trust-ico-2" class="ri-shield-star-fill text-red-500 text-sm shrink-0"></i>
-							<span>1-Year Local Warranty</span>
+							<i id="raka-footer-trust-ico-2" class="ri-shield-check-fill text-red-500 text-sm shrink-0"></i>
+							<span>QC Inspected & Verified</span>
 						</div>
 						<div id="raka-footer-trust-3" class="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
 							<i id="raka-footer-trust-ico-3" class="ri-truck-fill text-red-500 text-sm shrink-0"></i>
@@ -1729,8 +1729,8 @@ function raka_render_site_footer(): void {
 							</a>
 						</li>
 						<li id="raka-footer-link-help-2">
-							<a id="raka-footer-a-help-2" href="<?php echo esc_url( home_url( '/warranty' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200">
-								<?php esc_html_e( 'Warranty & Repair Claims', 'raka-preorder-theme' ); ?>
+							<a id="raka-footer-a-help-2" href="<?php echo esc_url( home_url( '/return-policy' ) ); ?>" class="hover:text-red-600 dark:hover:text-white transition-colors duration-200">
+								<?php esc_html_e( 'Return & Defect Policy', 'raka-preorder-theme' ); ?>
 							</a>
 						</li>
 						<li id="raka-footer-link-help-3">

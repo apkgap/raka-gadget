@@ -257,15 +257,15 @@ while ( have_posts() ) :
 				<div id="product-perks-grid" class="grid grid-cols-2 gap-4 pt-4 border-t border-black/10 dark:border-white/10 text-xs text-neutral-500 dark:text-neutral-400 font-mono">
 					<div id="perk-1" class="flex items-center gap-2.5">
 						<i id="perk-icon-1" class="ri-shield-check-line text-base text-neutral-800 dark:text-neutral-200"></i>
-						<span>100% AUTHENTIC ATK GEAR</span>
+						<span>100% AUTHENTIC GEAR</span>
 					</div>
 					<div id="perk-2" class="flex items-center gap-2.5">
 						<i id="perk-icon-2" class="ri-truck-line text-base text-neutral-800 dark:text-neutral-200"></i>
 						<span>FAST TRACK INSURED DELIVERY</span>
 					</div>
 					<div id="perk-3" class="flex items-center gap-2.5">
-						<i id="perk-icon-3" class="ri-award-line text-base text-neutral-800 dark:text-neutral-200"></i>
-						<span>1 YEAR OFFICIAL WARRANTY</span>
+						<i id="perk-icon-3" class="ri-global-line text-base text-neutral-800 dark:text-neutral-200"></i>
+						<span>DIRECT FACTORY SOURCED</span>
 					</div>
 					<div id="perk-4" class="flex items-center gap-2.5">
 						<i id="perk-icon-4" class="ri-refresh-line text-base text-neutral-800 dark:text-neutral-200"></i>
