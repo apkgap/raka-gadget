@@ -216,6 +216,13 @@ body {
 		backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Smooth nav transition */
+#raka-site-header #raka-nav,
+#obsidian-site-header #raka-nav {
+	transition: padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+		background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* Scrolled state: Frosted glass background, subtle border and elevated shadow */
 #raka-site-header.header-scrolled,
 #obsidian-site-header.header-scrolled {
@@ -229,6 +236,29 @@ body {
 	-webkit-backdrop-filter: blur(16px) !important;
 	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
 	pointer-events: auto !important;
+}
+
+/* Add comfortable breathing padding when sticky/scrolled on front page */
+#raka-site-header.header-scrolled #raka-nav,
+#obsidian-site-header.header-scrolled #raka-nav {
+	padding-top: 0.75rem !important; /* 12px */
+	padding-bottom: 0.75rem !important; /* 12px */
+}
+
+@media (min-width: 640px) {
+	#raka-site-header.header-scrolled #raka-nav,
+	#obsidian-site-header.header-scrolled #raka-nav {
+		padding-top: 0.875rem !important; /* 14px */
+		padding-bottom: 0.875rem !important; /* 14px */
+	}
+}
+
+@media (min-width: 768px) {
+	#raka-site-header.header-scrolled #raka-nav,
+	#obsidian-site-header.header-scrolled #raka-nav {
+		padding-top: 1rem !important; /* 16px */
+		padding-bottom: 1rem !important; /* 16px */
+	}
 }
 
 html.dark #raka-site-header.header-scrolled,
