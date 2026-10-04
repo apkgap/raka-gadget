@@ -208,18 +208,13 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 		return new WP_Error( 'not_found', 'ไม่พบข้อมูลการพรีออเดอร์จากข้อมูลที่ระบุ', [ 'status' => 404 ] );
 	}
 
-	// Security Verification (Turnstile CAPTCHA & Direct Order No Fallback)
+	// Security Verification (Turnstile CAPTCHA & Direct Lookup Fallback)
 	$turnstile_token   = sanitize_text_field( (string) ( $request->get_param( 'cf_turnstile_response' ) ?: $request->get_param( 'turnstile_token' ) ) );
 	$turnstile_enabled = function_exists( 'raka_is_turnstile_enabled' ) ? raka_is_turnstile_enabled() : true;
-	$is_direct_order   = ! empty( $order_no );
-
-	if ( $turnstile_enabled && empty( $turnstile_token ) && ! $is_direct_order ) {
-		return new WP_Error( 'turnstile_required', 'กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหา', [ 'status' => 403 ] );
-	}
 
 	$validated = false;
 
-	// 1. Check Cloudflare Turnstile Verification
+	// 1. Check Cloudflare Turnstile Verification if token provided
 	if ( ! empty( $turnstile_token ) ) {
 		$turnstile_secret = function_exists( 'raka_get_turnstile_secret' ) ? raka_get_turnstile_secret() : '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM';
 		$remote_ip        = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
@@ -241,7 +236,7 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 		}
 	}
 
-	// 2. Direct Validation Fallback (Order No / Phone / Citizen match)
+	// 2. Direct Validation Fallback (Valid matching Order No / Phone)
 	if ( ! $validated ) {
 		$first_meta     = get_post_meta( $posts[0]->ID );
 		$db_phone       = isset( $first_meta['_preorder_phone'][0] ) ? $first_meta['_preorder_phone'][0] : '';
@@ -252,16 +247,17 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 
 		if ( ! empty( $order_no ) && ! empty( $db_order_no ) && strtoupper( trim( (string) $db_order_no ) ) === strtoupper( trim( (string) $order_no ) ) ) {
 			$validated = true;
+		} elseif ( ! empty( $phone_clean ) && ! empty( $db_phone_clean ) && ( substr( $db_phone_clean, -4 ) === substr( $phone_clean, -4 ) || $db_phone_clean === $phone_clean ) ) {
+			$validated = true;
 		} elseif ( empty( $db_phone ) && empty( $db_citizen_id ) ) {
 			$validated = true;
-		} else {
-			if ( ! empty( $phone_clean ) && ! empty( $db_phone_clean ) && ( substr( $db_phone_clean, -4 ) === substr( $phone_clean, -4 ) || $db_phone_clean === $phone_clean ) ) {
-				$validated = true;
-			}
-			if ( ! empty( $citizen_id ) && ! empty( $db_citizen_id ) && $db_citizen_id === substr( $citizen_id, -4 ) ) {
-				$validated = true;
-			}
+		} elseif ( ! empty( $citizen_id ) && ! empty( $db_citizen_id ) && $db_citizen_id === substr( $citizen_id, -4 ) ) {
+			$validated = true;
 		}
+	}
+
+	if ( ! $validated && $turnstile_enabled ) {
+		return new WP_Error( 'turnstile_required', 'กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหา', [ 'status' => 403 ] );
 	}
 
 	if ( ! $validated ) {
