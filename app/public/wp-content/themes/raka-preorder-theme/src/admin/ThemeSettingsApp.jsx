@@ -349,6 +349,10 @@ export default function ThemeSettingsApp() {
 		our_products_limit: 8,
 		our_products_title: 'OUR PRODUCTS',
 		our_products_desc: 'Explore custom keyboards, precision ergonomic gaming mice, and studio-grade audio gear built for uncompromising performance.',
+		turnstile_enabled: true,
+		turnstile_sitekey: '0x4AAAAAAFNWAI83P9cCw0AU',
+		turnstile_secret: '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM',
+		turnstile_theme: 'auto',
 	});
 	const [wcData, setWcData] = useState({
 		categories: [],
@@ -568,6 +572,15 @@ export default function ThemeSettingsApp() {
 				</span>
 			),
 		},
+		{
+			name: 'security_settings',
+			title: (
+				<span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+					<i className="ri-shield-keyhole-line" style={{ fontSize: '16px', color: '#f59e0b' }} />
+					{__('Pre-Order & Security', 'raka-preorder-theme')}
+				</span>
+			),
+		},
 	];
 
 	// Detect initial active tab from page or tab URL parameter
@@ -582,6 +595,8 @@ export default function ThemeSettingsApp() {
 		defaultTabName = 'hero_general';
 	} else if (tabParam === 'hero_contact' || tabParam === 'contact' || pageParam === 'raka-theme-settings-contact') {
 		defaultTabName = 'hero_contact';
+	} else if (tabParam === 'security_settings' || tabParam === 'security' || pageParam === 'raka-theme-settings-security') {
+		defaultTabName = 'security_settings';
 	}
 
 	return (
@@ -1141,6 +1156,106 @@ export default function ThemeSettingsApp() {
 														)}
 													</div>
 												)}
+											</div>
+										</div>
+									</div>
+								</CardBody>
+							);
+						}
+
+						// Pre-Order & Security Tab
+						if (tab.name === 'security_settings') {
+							return (
+								<CardBody style={{ padding: '28px 32px' }}>
+									<div style={{ marginBottom: '24px' }}>
+										<h2 style={{ margin: '0 0 4px 0', fontSize: '17px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
+											<i className="ri-shield-check-fill" style={{ color: '#f59e0b', fontSize: '20px' }} />
+											{__('Cloudflare Turnstile & Pre-Order Security Settings', 'raka-preorder-theme')}
+										</h2>
+										<p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>
+											{__('Manage CAPTCHA bot protection keys for Pre-order status search and lookups.', 'raka-preorder-theme')}
+										</p>
+									</div>
+
+									<div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '28px', alignItems: 'start' }}>
+										{ /* Form Controls */}
+										<div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+											<div style={{ padding: '20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+												<h3 style={{ margin: '0 0 16px 0', fontSize: '14px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+													<i className="ri-key-2-line" style={{ color: '#f59e0b' }} />
+													{__('Turnstile API Credentials', 'raka-preorder-theme')}
+												</h3>
+
+												<div style={{ marginBottom: '16px' }}>
+													<ToggleControl
+														label={__('Enable Cloudflare Turnstile CAPTCHA', 'raka-preorder-theme')}
+														help={
+															options.turnstile_enabled !== false
+																? __('Turnstile is active on pre-order lookup forms.', 'raka-preorder-theme')
+																: __('Turnstile is disabled (open lookup).', 'raka-preorder-theme')
+														}
+														checked={options.turnstile_enabled !== false}
+														onChange={(val) => handleOptionChange('turnstile_enabled', val)}
+													/>
+												</div>
+
+												<div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+													<TextControl
+														label={__('Cloudflare Turnstile Sitekey (Public Key)', 'raka-preorder-theme')}
+														value={options.turnstile_sitekey ?? '0x4AAAAAAFNWAI83P9cCw0AU'}
+														onChange={(val) => handleOptionChange('turnstile_sitekey', val)}
+														placeholder="0x4AAAAAA..."
+														help={__('Used in the frontend widget to challenge visitors.', 'raka-preorder-theme')}
+													/>
+
+													<TextControl
+														label={__('Cloudflare Turnstile Secret Key (Private Key)', 'raka-preorder-theme')}
+														value={options.turnstile_secret ?? '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM'}
+														onChange={(val) => handleOptionChange('turnstile_secret', val)}
+														placeholder="0x4AAAAAA..."
+														help={__('Used on the server to verify tokens securely.', 'raka-preorder-theme')}
+													/>
+
+													<SelectControl
+														label={__('Turnstile Theme Appearance', 'raka-preorder-theme')}
+														value={options.turnstile_theme ?? 'auto'}
+														options={[
+															{ label: __('Auto (Follow System Dark/Light Mode)', 'raka-preorder-theme'), value: 'auto' },
+															{ label: __('Dark Theme (Obsidian Dark)', 'raka-preorder-theme'), value: 'dark' },
+															{ label: __('Light Theme (Clean White)', 'raka-preorder-theme'), value: 'light' },
+														]}
+														onChange={(val) => handleOptionChange('turnstile_theme', val)}
+													/>
+												</div>
+											</div>
+										</div>
+
+										{ /* Guidance & Status Panel */}
+										<div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+											<div style={{ background: '#09090b', color: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)' }}>
+												<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+													<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+														<span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+														<span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94a3b8' }}>
+															{__('Security Status', 'raka-preorder-theme')}
+														</span>
+													</div>
+													<span style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600 }}>CLOUDFLARE</span>
+												</div>
+
+												<h4 style={{ margin: '0 0 6px 0', fontSize: '15px', fontWeight: 700, color: '#fff' }}>
+													{__('Zero-Friction Bot Protection', 'raka-preorder-theme')}
+												</h4>
+												<p style={{ margin: '0 0 14px 0', fontSize: '12px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
+													{__('Cloudflare Turnstile stops scraping bots from querying customer orders without annoying legitimate buyers with image puzzles.', 'raka-preorder-theme')}
+												</p>
+
+												<div style={{ padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '11px', lineHeight: 1.6, color: '#e2e8f0' }}>
+													<strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>💡 วิธีตั้งค่า Cloudflare Dashboard:</strong>
+													1. ไปที่ Cloudflare Dashboard &gt; Turnstile<br />
+													2. เพิ่มโดเมน <code>raka-gadget.local</code> และโดเมนจริง<br />
+													3. นำ Sitekey และ Secret Key มาวางในฟอร์มด้านซ้าย แล้วกด Save All Changes
+												</div>
 											</div>
 										</div>
 									</div>

@@ -120,7 +120,7 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 
 	// 1. Check Cloudflare Turnstile Verification
 	if ( ! empty( $turnstile_token ) ) {
-		$turnstile_secret = '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM';
+		$turnstile_secret = function_exists( 'raka_get_turnstile_secret' ) ? raka_get_turnstile_secret() : '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM';
 		$remote_ip        = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
 		
 		$verify_res = wp_remote_post( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', [

@@ -64,6 +64,16 @@ function raka_register_theme_options_menu() {
 		'raka-theme-settings-products',
 		'raka_render_theme_options_page'
 	);
+
+	// Submenu 5: Pre-Order & Turnstile Security
+	add_submenu_page(
+		'raka-theme-settings',
+		__( 'Pre-Order & Security', 'raka-preorder-theme' ),
+		__( 'Pre-Order & Security', 'raka-preorder-theme' ),
+		'manage_options',
+		'raka-theme-settings-security',
+		'raka_render_theme_options_page'
+	);
 }
 add_action( 'admin_menu', 'raka_register_theme_options_menu' );
 
@@ -419,6 +429,21 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 	}
 	if ( isset( $raw_data['our_products_desc'] ) ) {
 		$clean_options['our_products_desc'] = sanitize_textarea_field( (string) $raw_data['our_products_desc'] );
+	}
+
+	// Cloudflare Turnstile Security Settings
+	if ( isset( $raw_data['turnstile_enabled'] ) ) {
+		$clean_options['turnstile_enabled'] = ! empty( $raw_data['turnstile_enabled'] );
+	}
+	if ( isset( $raw_data['turnstile_sitekey'] ) ) {
+		$clean_options['turnstile_sitekey'] = sanitize_text_field( (string) $raw_data['turnstile_sitekey'] );
+	}
+	if ( isset( $raw_data['turnstile_secret'] ) ) {
+		$clean_options['turnstile_secret'] = sanitize_text_field( (string) $raw_data['turnstile_secret'] );
+	}
+	if ( isset( $raw_data['turnstile_theme'] ) ) {
+		$theme_val = sanitize_key( (string) $raw_data['turnstile_theme'] );
+		$clean_options['turnstile_theme'] = in_array( $theme_val, [ 'auto', 'light', 'dark' ], true ) ? $theme_val : 'auto';
 	}
 
 	// Dynamic Repeater: hero_cards

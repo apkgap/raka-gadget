@@ -19,10 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function raka_render_preorder_tracker_v2(): string {
 	ob_start();
-	$turnstile_sitekey = '0x4AAAAAAFNWAI83P9cCw0AU';
+	$turnstile_enabled = function_exists( 'raka_is_turnstile_enabled' ) ? raka_is_turnstile_enabled() : true;
+	$turnstile_sitekey = function_exists( 'raka_get_turnstile_sitekey' ) ? raka_get_turnstile_sitekey() : '0x4AAAAAAFNWAI83P9cCw0AU';
+	$turnstile_theme   = function_exists( 'raka_get_turnstile_theme' ) ? raka_get_turnstile_theme() : 'auto';
 	?>
-	<!-- Cloudflare Turnstile API -->
-	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+	<?php if ( $turnstile_enabled ) : ?>
+		<!-- Cloudflare Turnstile API -->
+		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+	<?php endif; ?>
 
 	<div id="raka-tracker-v2" class="w-full text-left font-sans select-none text-neutral-900 dark:text-white transition-all duration-300">
 		

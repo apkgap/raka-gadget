@@ -34,6 +34,46 @@ function raka_get_all_options(): array {
 }
 
 /**
+ * Check if Cloudflare Turnstile is enabled.
+ *
+ * @return bool
+ */
+function raka_is_turnstile_enabled(): bool {
+	$options = raka_get_all_options();
+	return ! isset( $options['turnstile_enabled'] ) || ! empty( $options['turnstile_enabled'] );
+}
+
+/**
+ * Get Cloudflare Turnstile Sitekey.
+ *
+ * @return string
+ */
+function raka_get_turnstile_sitekey(): string {
+	$options = raka_get_all_options();
+	return ! empty( $options['turnstile_sitekey'] ) ? trim( (string) $options['turnstile_sitekey'] ) : '0x4AAAAAAFNWAI83P9cCw0AU';
+}
+
+/**
+ * Get Cloudflare Turnstile Secret Key.
+ *
+ * @return string
+ */
+function raka_get_turnstile_secret(): string {
+	$options = raka_get_all_options();
+	return ! empty( $options['turnstile_secret'] ) ? trim( (string) $options['turnstile_secret'] ) : '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM';
+}
+
+/**
+ * Get Cloudflare Turnstile Theme (auto, light, dark).
+ *
+ * @return string
+ */
+function raka_get_turnstile_theme(): string {
+	$options = raka_get_all_options();
+	return ! empty( $options['turnstile_theme'] ) ? trim( (string) $options['turnstile_theme'] ) : 'auto';
+}
+
+/**
  * Get structured hierarchical menu tree by theme location.
  *
  * @param string $theme_location Theme location key (default: 'primary-menu').
