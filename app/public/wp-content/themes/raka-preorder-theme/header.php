@@ -53,41 +53,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 			id="raka-site-header" 
 			class="<?php echo $is_home ? 'absolute top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300' : 'sticky top-0 left-0 right-0 z-50 bg-white/95 dark:bg-obsidian/95 backdrop-blur-md border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
 		>
-			<nav id="raka-nav" class="flex items-center justify-between px-3.5 sm:px-6 md:px-10 lg:px-16 <?php echo $is_home ? 'pt-3 sm:pt-4 md:pt-5 pb-3 sm:pb-4 pointer-events-none' : 'py-3.5 sm:py-4 md:py-5 pointer-events-auto'; ?>">
-				<!-- Left Slot: Pre-Order Menu -->
+			<nav id="raka-nav" class="flex items-center justify-between px-3 sm:px-6 md:px-10 lg:px-16 <?php echo $is_home ? 'py-2.5 sm:pt-3 md:pt-4 sm:pb-3 md:pb-3.5 pointer-events-none' : 'py-2.5 sm:py-3.5 md:py-4.5 pointer-events-auto'; ?>">
+				<!-- Left Slot: Compact Radar Pill on Mobile / Full Pre-Order Button on Desktop -->
 				<div id="raka-nav-left-slot" class="flex-1 flex items-center justify-start pointer-events-auto min-w-0">
 					<a
 						id="raka-nav-preorder-btn"
+						class="group relative inline-flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2.5 p-1.5 sm:pl-2 sm:pr-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wider uppercase text-neutral-900 dark:text-white bg-white/80 dark:bg-neutral-900/80 hover:bg-white dark:hover:bg-neutral-800 backdrop-blur-xl border border-black/10 hover:border-red-500/50 dark:border-white/15 dark:hover:border-red-500/50 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 font-hn cursor-pointer shrink-0"
 						href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
-						class="group relative inline-flex items-center gap-1.5 sm:gap-2.5 pl-1.5 pr-2.5 sm:pl-2 sm:pr-4 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wider uppercase text-neutral-900 dark:text-white bg-white/80 dark:bg-neutral-900/80 hover:bg-white dark:hover:bg-neutral-800 backdrop-blur-xl border border-black/10 hover:border-red-500/50 dark:border-white/15 dark:hover:border-red-500/50 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 font-hn cursor-pointer shrink-0"
 						aria-label="<?php esc_attr_e( 'Check Pre-Order Status', 'raka-preorder-theme' ); ?>"
+						title="<?php esc_attr_e( 'Check Pre-Order Status', 'raka-preorder-theme' ); ?>"
 					>
-						<!-- Glowing Icon Badge -->
-						<span id="raka-nav-preorder-icon-wrap" class="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] sm:text-sm shadow-md shadow-red-600/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+						<!-- Glowing Icon Badge with Ping Radar Animation -->
+						<span id="raka-nav-preorder-icon-wrap" class="relative w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs shadow-md shadow-red-600/30 group-hover:scale-110 transition-all duration-300 shrink-0">
 							<i id="raka-nav-preorder-ico" class="ri-radar-line"></i>
+							<span id="raka-nav-preorder-pulse" class="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30"></span>
 						</span>
-						<!-- Text & Accent -->
-						<span id="raka-nav-preorder-text" class="group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors"><?php esc_html_e( 'Check Pre-Order', 'raka-preorder-theme' ); ?></span>
+						<!-- Text & Accent (Hidden on mobile to give center logo maximum prominence) -->
+						<span id="raka-nav-preorder-text" class="hidden sm:inline-block group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors whitespace-nowrap"><?php esc_html_e( 'Pre-Order', 'raka-preorder-theme' ); ?></span>
 						<!-- Arrow Indicator -->
-						<i id="raka-nav-preorder-arrow" class="ri-arrow-right-up-line text-xs text-neutral-400 dark:text-neutral-500 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all hidden sm:inline-block"></i>
+						<i id="raka-nav-preorder-arrow" class="ri-arrow-right-up-line text-xs text-neutral-400 dark:text-neutral-500 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all hidden md:inline-block"></i>
 					</a>
 				</div>
 
-				<!-- Centered Brand Logo -->
+				<!-- Centered Brand Logo (Optimized scaling across Mobile, Tablet & Desktop) -->
 				<div id="raka-nav-brand" class="pointer-events-auto shrink-0 px-2 sm:px-4 flex items-center justify-center">
-					<a id="raka-brand-link" class="hover:opacity-80 transition-opacity flex items-center justify-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-						<img id="raka-brand-img-light" class="h-8 sm:h-9 md:h-11 lg:h-12 w-auto object-contain block dark:hidden transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
-						<img id="raka-brand-img-dark" class="h-8 sm:h-9 md:h-11 lg:h-12 w-auto object-contain hidden dark:block transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+					<a id="raka-brand-link" class="hover:opacity-80 transition-opacity flex items-center justify-center group" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+						<img id="raka-brand-img-light" class="h-7 sm:h-8 md:h-10 lg:h-11 w-auto object-contain block dark:hidden transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+						<img id="raka-brand-img-dark" class="h-7 sm:h-8 md:h-10 lg:h-11 w-auto object-contain hidden dark:block transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 					</a>
 				</div>
 
 				<!-- Right Controls (Compare + Account Dropdown + Cart + Theme Toggle + Hamburger) -->
 				<div id="raka-nav-controls" class="pointer-events-auto flex-1 flex items-center justify-end gap-1.5 sm:gap-2.5 md:gap-3.5 min-w-0">
-					<!-- Compare Button -->
+					<!-- Compare Button (Desktop only) -->
 					<a
 						id="raka-compare-btn"
-						href="<?php echo esc_url( home_url( '/compare' ) ); ?>"
 						class="relative hidden md:flex w-8 h-8 md:w-10 md:h-10 items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+						href="<?php echo esc_url( home_url( '/compare' ) ); ?>"
 						aria-label="<?php esc_attr_e( 'Compare Products', 'raka-preorder-theme' ); ?>"
 						title="<?php esc_attr_e( 'Compare Products', 'raka-preorder-theme' ); ?>"
 					>
@@ -98,14 +100,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div id="raka-account-wrapper" class="relative">
 						<button
 							id="raka-account-btn"
+							class="relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 							type="button"
 							onclick="window.toggleRakaAccountMenu(event)"
-							class="relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 							aria-label="<?php esc_attr_e( 'User Account', 'raka-preorder-theme' ); ?>"
 							title="<?php esc_attr_e( 'User Account', 'raka-preorder-theme' ); ?>"
 							aria-expanded="false"
 						>
-							<i id="raka-account-icon" class="ri-user-3-line text-base md:text-lg block"></i>
+							<i id="raka-account-icon" class="ri-user-3-line text-sm sm:text-base md:text-lg block"></i>
 						</button>
 
 						<!-- Account Submenu Dropdown Popup -->
@@ -130,15 +132,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 									</div>
 								</div>
 								<div id="raka-account-user-links" class="flex flex-col gap-1.5">
-									<a id="raka-account-link-dashboard" href="<?php echo esc_url( $my_account_url ); ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors font-hn">
+									<a id="raka-account-link-dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors font-hn" href="<?php echo esc_url( $my_account_url ); ?>">
 										<i id="raka-account-ico-dash" class="ri-dashboard-line text-base text-neutral-500 dark:text-neutral-400"></i>
 										<span><?php esc_html_e( 'My Account', 'raka-preorder-theme' ); ?></span>
 									</a>
-									<a id="raka-account-link-orders" href="<?php echo esc_url( $orders_url ); ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors font-hn">
+									<a id="raka-account-link-orders" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors font-hn" href="<?php echo esc_url( $orders_url ); ?>">
 										<i id="raka-account-ico-ord" class="ri-file-list-3-line text-base text-neutral-500 dark:text-neutral-400"></i>
 										<span><?php esc_html_e( 'My Orders', 'raka-preorder-theme' ); ?></span>
 									</a>
-									<a id="raka-account-link-logout" href="<?php echo esc_url( $logout_url ); ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors font-hn mt-1 border-t border-black/5 dark:border-white/5 pt-2.5">
+									<a id="raka-account-link-logout" class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors font-hn mt-1 border-t border-black/5 dark:border-white/5 pt-2.5" href="<?php echo esc_url( $logout_url ); ?>">
 										<i id="raka-account-ico-out" class="ri-logout-box-r-line text-base"></i>
 										<span><?php esc_html_e( 'Log Out', 'raka-preorder-theme' ); ?></span>
 									</a>
@@ -161,16 +163,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<div id="raka-account-guest-actions" class="flex flex-col gap-2">
 									<a
 										id="raka-account-btn-login"
-										href="<?php echo esc_url( $account_url ); ?>"
 										class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs font-bold font-hn tracking-wider uppercase shadow-md transition-all cursor-pointer"
+										href="<?php echo esc_url( $account_url ); ?>"
 									>
 										<i id="raka-account-ico-log" class="ri-login-box-line text-base"></i>
 										<span><?php esc_html_e( 'Sign In / Login', 'raka-preorder-theme' ); ?></span>
 									</a>
 									<a
 										id="raka-account-btn-register"
-										href="<?php echo esc_url( $account_url ); ?>"
 										class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-semibold font-hn border border-black/10 dark:border-white/20 transition-all cursor-pointer"
+										href="<?php echo esc_url( $account_url ); ?>"
 									>
 										<i id="raka-account-ico-reg" class="ri-user-add-line text-base"></i>
 										<span><?php esc_html_e( 'Create Account', 'raka-preorder-theme' ); ?></span>
@@ -183,9 +185,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<!-- Cart Button -->
 					<a
 						id="raka-cart-btn"
+						class="relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						href="<?php echo esc_url( $cart_url ); ?>"
 						onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
-						class="relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						aria-label="Shopping Cart"
 						title="Shopping Cart"
 					>
@@ -201,9 +203,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<!-- Theme Toggle Button -->
 					<button
 						id="raka-theme-btn"
+						class="relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						type="button"
 						onclick="window.toggleRakaTheme(event)"
-						class="relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-neutral-950 dark:text-white hover:text-black dark:hover:text-white bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/20 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
 						aria-label="Toggle dark / light mode"
 						title="Toggle theme"
 					>
@@ -214,8 +216,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<!-- Hamburger Button -->
 					<button
 						id="raka-menu-btn"
-						type="button"
 						class="relative w-7 sm:w-8 md:w-9 h-5 sm:h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer py-0.5 ml-0.5"
+						type="button"
 						aria-label="Open menu"
 					>
 						<span id="burger-top" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
