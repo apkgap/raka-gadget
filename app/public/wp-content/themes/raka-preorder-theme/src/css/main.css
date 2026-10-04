@@ -28,8 +28,8 @@ html.light #root {
 	background-color: #FFFFFF !important;
 }
 
-body {
-	font-family: 'Helvetica Neue ME', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+body, button, input, select, textarea {
+	font-family: 'Kanit', 'Prompt', 'Helvetica Neue ME', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	background: inherit;
 	color: inherit;
 	overflow-x: hidden;
