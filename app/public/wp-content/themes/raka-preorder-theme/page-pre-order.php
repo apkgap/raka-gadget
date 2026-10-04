@@ -23,6 +23,20 @@ $is_logged_in    = is_user_logged_in();
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> lang="en">
 <head>
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('raka_theme') || localStorage.getItem('obsidian_theme');
+        if (theme === 'dark' || (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        } else {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
   <meta charset="<?php bloginfo( 'charset' ); ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title><?php wp_title( '|', true, 'right' ); ?> <?php bloginfo( 'name' ); ?> — Pre-Order Hub</title>
@@ -728,6 +742,84 @@ $is_logged_in    = is_user_logged_in();
         width: 68px;
       }
     }
+
+    /* ═════════ DARK MODE ADAPTATIONS ═════════ */
+    html.dark {
+      --ink: #f5f5f5;
+      --ink-soft: #a1a1aa;
+      --line: #27272a;
+      --panel: #111111;
+      --box: #18181b;
+    }
+
+    html.dark body {
+      background: #09090b;
+      color: #f5f5f5;
+    }
+
+    html.dark .panel {
+      background: var(--panel);
+      box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    html.dark .hero__scrim {
+      background: linear-gradient(90deg, rgba(9, 9, 11, 0.85) 0%, rgba(9, 9, 11, 0.4) 45%, rgba(9, 9, 11, 0) 70%);
+    }
+
+    html.dark .stage__emblem {
+      background: #18181b;
+      border-color: #27272a;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    html.dark .squiggle {
+      color: #e4e4e7;
+    }
+
+    html.dark .pill-btn {
+      background: rgba(24, 24, 27, 0.88);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+
+    html.dark .pill-btn:hover {
+      background: rgba(39, 39, 42, 0.95);
+    }
+
+    html.dark .account {
+      background: rgba(24, 24, 27, 0.88);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+
+    html.dark .account:hover {
+      background: rgba(39, 39, 42, 0.95);
+    }
+
+    html.dark .arrow-fab {
+      background: #18181b;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 22px 50px -15px rgba(0, 0, 0, 0.9);
+    }
+
+    html.dark .arrow-fab i {
+      color: #ffffff;
+    }
+
+    html.dark .theme-ctrl-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    html.dark .theme-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
   </style>
 
   <script id="raka-global-theme-helpers">
@@ -818,7 +910,8 @@ $is_logged_in    = is_user_logged_in();
         <header class="topbar">
           <div id="raka-topbar-brand-wrap" class="nav-left flex items-center">
             <a id="raka-topbar-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand flex items-center">
-              <img id="raka-topbar-brand-img" src="<?php echo esc_url( $logo_horizontal ); ?>" alt="RAKA GADGET">
+              <img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="RAKA GADGET">
+              <img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="RAKA GADGET">
             </a>
           </div>
 
