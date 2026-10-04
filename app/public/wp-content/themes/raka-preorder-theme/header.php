@@ -74,9 +74,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</div>
 
 				<!-- Centered Brand Logo -->
-				<div id="raka-nav-brand" class="pointer-events-auto text-neutral-950 dark:text-white text-xs sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.25em] uppercase leading-tight text-center font-semibold theme-transition shrink-0 px-2 sm:px-4">
-					<a id="raka-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity">
-						<span id="raka-brand-txt">OBSIDIAN</span> <span id="raka-brand-copy" class="opacity-60 text-xs font-normal">©</span>
+				<div id="raka-nav-brand" class="pointer-events-auto shrink-0 px-2 sm:px-4 flex items-center justify-center">
+					<a id="raka-brand-link" class="hover:opacity-80 transition-opacity flex items-center justify-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+						<img id="raka-brand-img-light" class="h-6 sm:h-7 md:h-8 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+						<img id="raka-brand-img-dark" class="h-6 sm:h-7 md:h-8 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 					</a>
 				</div>
 
@@ -234,9 +235,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<!-- ── Overlay Top Bar (Dedicated Minimalist Close Header) ── -->
 				<div id="overlay-top-bar" class="w-full flex items-center justify-between pb-5 mb-4 md:mb-6 border-b border-black/10 dark:border-white/10 shrink-0">
 					<!-- Brand -->
-					<div id="overlay-brand" class="text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase leading-tight text-neutral-900 dark:text-white font-semibold">
-						<a id="overlay-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:opacity-80 transition-opacity flex items-center gap-1">
-							<span>OBSIDIAN</span> <span id="overlay-brand-copy" class="opacity-60 text-xs font-normal">©</span>
+					<div id="overlay-brand" class="shrink-0 flex items-center">
+						<a id="overlay-brand-link" class="hover:opacity-80 transition-opacity flex items-center gap-2" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+							<img id="overlay-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+							<img id="overlay-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 						</a>
 					</div>
 

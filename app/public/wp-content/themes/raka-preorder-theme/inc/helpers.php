@@ -1762,9 +1762,9 @@ function raka_render_site_footer(): void {
 						<span id="raka-footer-tag-dot" class="opacity-40">/</span>
 						<span id="raka-footer-tag-loc">BANGKOK STUDIO</span>
 					</div>
-					<a id="raka-footer-brand-title" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="group inline-flex items-baseline gap-2.5 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-neutral-900 dark:text-white hover:opacity-75 transition-opacity font-hn">
-						<span id="raka-footer-brand-txt">OBSIDIAN</span>
-						<span id="raka-footer-brand-copy" class="text-xs sm:text-sm font-light font-mono opacity-50">©</span>
+					<a id="raka-footer-brand-title" class="group inline-flex items-center gap-3 hover:opacity-80 transition-opacity" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+						<img id="raka-footer-brand-img-light" class="h-9 sm:h-11 md:h-12 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+						<img id="raka-footer-brand-img-dark" class="h-9 sm:h-11 md:h-12 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 					</a>
 					<p id="raka-footer-brand-bio" class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-light font-hn max-w-md leading-relaxed">
 						<?php esc_html_e( 'Curator and authorized direct distributor of bespoke mechanical keyboards, Hall Effect magnetic switches, tournament esports mice, and studio acoustics in Thailand.', 'raka-preorder-theme' ); ?>
