@@ -8,28 +8,46 @@ License: GNU General Public License v2 or later
 Text Domain: raka-preorder-theme
 */
 
-/* ─── Google Fonts ─────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-@import url('https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME');
-
-/* ─── Font Face ─────────────────────────────────────────── */
+/* ─── Local Font Face: Prompt (OFL Self-Hosted) ─────────── */
 @font-face {
-  font-family: 'Kanit';
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('assets/fonts/prompt/Prompt-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Prompt';
   font-style: normal;
   font-weight: 400;
-  src: url('assets/fonts/kanit/Kanit-Regular.ttf') format('truetype');
+  font-display: swap;
+  src: url('assets/fonts/prompt/Prompt-Regular.ttf') format('truetype');
 }
 @font-face {
-  font-family: 'Kanit';
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('assets/fonts/prompt/Prompt-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Prompt';
   font-style: normal;
   font-weight: 600;
-  src: url('assets/fonts/kanit/Kanit-Bold.ttf') format('truetype');
+  font-display: swap;
+  src: url('assets/fonts/prompt/Prompt-SemiBold.ttf') format('truetype');
 }
 @font-face {
-  font-family: 'Kanit';
+  font-family: 'Prompt';
   font-style: normal;
   font-weight: 700;
-  src: url('assets/fonts/kanit/Kanit-Bold.ttf') format('truetype');
+  font-display: swap;
+  src: url('assets/fonts/prompt/Prompt-Bold.ttf') format('truetype');
+}
+
+/* ─── Global Font Rule ──────────────────────────────────── */
+html, body, button, input, select, textarea {
+  font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 }
 
 /* ─── Reset & Base ──────────────────────────────────────── */

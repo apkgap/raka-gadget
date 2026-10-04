@@ -40,14 +40,9 @@ $is_logged_in    = is_user_logged_in();
   <meta charset="<?php bloginfo( 'charset' ); ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title><?php wp_title( '|', true, 'right' ); ?> <?php bloginfo( 'name' ); ?> — Pre-Order Hub</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
   <?php wp_head(); ?>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-
     :root {
       --ink: #0d0f0f;
       --ink-soft: #5b6260;
@@ -65,6 +60,10 @@ $is_logged_in    = is_user_logged_in();
       padding: 0;
     }
 
+    html, body, button, input, select, textarea {
+      font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
+    }
+
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -73,7 +72,6 @@ $is_logged_in    = is_user_logged_in();
     }
 
     body {
-      font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--ink);
       background: #eef2f1;
       -webkit-font-smoothing: antialiased;

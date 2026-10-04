@@ -37,7 +37,7 @@ function raka_render_preorder_tracker_v2(): string {
 		#raka-tracker-v2 h3,
 		#raka-tracker-v2 h4,
 		#raka-tracker-v2 p {
-			font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
+			font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 		}
 		#raka-tracker-v2 .font-mono {
 			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;

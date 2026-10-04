@@ -45,16 +45,8 @@ add_action( 'after_setup_theme', 'raka_preorder_theme_setup' );
  * Enqueue scripts and styles.
  */
 function raka_preorder_theme_scripts() {
-		// Enqueue Google Fonts (Kanit & Prompt for Thai typography)
-	wp_enqueue_style(
-		'raka-google-fonts',
-		'https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap',
-		[],
-		null
-	);
-
-	// Enqueue main stylesheet (loads Kanit font rules)
-	wp_enqueue_style( 'raka-preorder-theme-style', get_stylesheet_uri(), [], '1.0.0' );
+	// Enqueue main stylesheet (loads local Prompt @font-face rules)
+	wp_enqueue_style( 'raka-preorder-theme-style', get_stylesheet_uri(), [], '1.1.0' );
 
 	// Enqueue Main theme core styles
 	$main_css_path = get_template_directory() . '/assets/css/main.css';

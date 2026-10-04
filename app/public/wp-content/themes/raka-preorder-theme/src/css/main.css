@@ -1,4 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+/* ─── Local Font Face: Prompt (OFL Self-Hosted) ─────────── */
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../../assets/fonts/prompt/Prompt-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/prompt/Prompt-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../assets/fonts/prompt/Prompt-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../assets/fonts/prompt/Prompt-SemiBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../assets/fonts/prompt/Prompt-Bold.ttf') format('truetype');
+}
 
 @tailwind base;
 @tailwind components;
@@ -31,7 +66,7 @@ html.light #root {
 }
 
 body, button, input, select, textarea {
-	font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', Helvetica, Arial, -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 	background: inherit;
 	color: inherit;
 	overflow-x: hidden;
@@ -44,8 +79,8 @@ body, button, input, select, textarea {
 	background: transparent;
 }
 
-.font-hn {
-	font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif !important;
+.font-hn, .font-sans {
+	font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 }
 
 
