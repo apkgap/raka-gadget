@@ -28,45 +28,6 @@ function raka_render_preorder_tracker_v2(): string {
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 	<?php endif; ?>
 
-	<style>
-		#raka-tracker-v2,
-		#raka-tracker-v2 button,
-		#raka-tracker-v2 input,
-		#raka-tracker-v2 label,
-		#raka-tracker-v2 span,
-		#raka-tracker-v2 h3,
-		#raka-tracker-v2 h4,
-		#raka-tracker-v2 p {
-			font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
-		}
-		#raka-tracker-v2 button,
-		#raka-tracker-v2 button *,
-		#raka-tracker-v2 .btn,
-		#raka-tracker-v2 .btn * {
-			font-weight: 400 !important;
-		}
-		#raka-tracker-v2 .font-mono {
-			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-		}
-		#raka-track-primary-input {
-			padding-left: 46px !important;
-			padding-right: 16px !important;
-		}
-		.custom-tracker-scroll::-webkit-scrollbar {
-			width: 5px;
-		}
-		.custom-tracker-scroll::-webkit-scrollbar-track {
-			background: transparent;
-		}
-		.custom-tracker-scroll::-webkit-scrollbar-thumb {
-			background: rgba(150, 150, 150, 0.35);
-			border-radius: 9999px;
-		}
-		.custom-tracker-scroll::-webkit-scrollbar-thumb:hover {
-			background: rgba(150, 150, 150, 0.65);
-		}
-	</style>
-
 	<div id="raka-tracker-v2" class="w-full text-left font-hn select-none text-neutral-900 dark:text-white transition-all duration-300">
 		
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
