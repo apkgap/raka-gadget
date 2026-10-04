@@ -232,8 +232,9 @@ add_action( 'woocommerce_process_product_meta', 'raka_save_preorder_product_opti
 /**
  * Display Pre-order status in admin product list columns.
  */
-function raka_admin_product_stock_column_badge( string $status_html, WC_Product $product ): string {
-	if ( raka_is_product_preorder( $product ) ) {
+function raka_admin_product_stock_column_badge( $status_html, $product = null ): string {
+	$status_str = is_string( $status_html ) ? $status_html : '';
+	if ( $product && raka_is_product_preorder( $product ) ) {
 		$badge_text = raka_get_product_preorder_badge( $product );
 		$eta        = raka_get_product_preorder_eta( $product );
 		return sprintf(
@@ -242,7 +243,7 @@ function raka_admin_product_stock_column_badge( string $status_html, WC_Product 
 			esc_html( $eta )
 		);
 	}
-	return $status_html;
+	return $status_str;
 }
 add_filter( 'woocommerce_admin_stock_html', 'raka_admin_product_stock_column_badge', 20, 2 );
 
@@ -255,55 +256,62 @@ add_filter( 'woocommerce_admin_stock_html', 'raka_admin_product_stock_column_bad
 /**
  * Ensure pre-order items are always purchasable, even if stock quantity is 0.
  */
-function raka_preorder_is_purchasable( bool $purchasable, WC_Product $product ): bool {
-	if ( raka_is_product_preorder( $product ) ) {
+function raka_preorder_is_purchasable( $purchasable, $product = null ): bool {
+	if ( $product && raka_is_product_preorder( $product ) ) {
 		return true;
 	}
-	return $purchasable;
+	return (bool) $purchasable;
 }
 add_filter( 'woocommerce_is_purchasable', 'raka_preorder_is_purchasable', 20, 2 );
 
 /**
  * Bypass out-of-stock restriction for pre-order products.
  */
-function raka_preorder_is_in_stock( bool $is_in_stock, WC_Product $product ): bool {
-	if ( raka_is_product_preorder( $product ) ) {
+function raka_preorder_is_in_stock( $is_in_stock, $product = null ): bool {
+	if ( $product && raka_is_product_preorder( $product ) ) {
 		return true;
 	}
-	return $is_in_stock;
+	return (bool) $is_in_stock;
 }
 add_filter( 'woocommerce_product_is_in_stock', 'raka_preorder_is_in_stock', 20, 2 );
 
 /**
  * Allow backorders for pre-order products automatically.
  */
-function raka_preorder_backorders_allowed( bool $allowed, int $product_id, WC_Product $product ): bool {
-	if ( raka_is_product_preorder( $product ) ) {
+function raka_preorder_backorders_allowed( $allowed, $product_or_id = null, $product = null ): bool {
+	$target = ( $product instanceof WC_Product ) ? $product : ( ( $product_or_id instanceof WC_Product ) ? $product_or_id : ( is_numeric( $product_or_id ) ? wc_get_product( (int) $product_or_id ) : null ) );
+	if ( $target && raka_is_product_preorder( $target ) ) {
 		return true;
 	}
-	return $allowed;
+	return (bool) $allowed;
 }
 add_filter( 'woocommerce_product_backorders_allowed', 'raka_preorder_backorders_allowed', 20, 3 );
 
 /**
  * Silence standard backorder notice to replace with our custom UI.
+ * WooCommerce filter signature: apply_filters( 'woocommerce_product_backorders_require_notification', $notify, $product );
  */
-function raka_preorder_backorders_require_notification( bool $notify, int $product_id, WC_Product $product ): bool {
-	if ( raka_is_product_preorder( $product ) ) {
+function raka_preorder_backorders_require_notification( $notify, $product_or_id = null, $product = null ): bool {
+	$target = ( $product instanceof WC_Product ) ? $product : ( ( $product_or_id instanceof WC_Product ) ? $product_or_id : ( is_numeric( $product_or_id ) ? wc_get_product( (int) $product_or_id ) : null ) );
+	if ( $target && raka_is_product_preorder( $target ) ) {
 		return false;
 	}
-	return $notify;
+	return (bool) $notify;
 }
 add_filter( 'woocommerce_product_backorders_require_notification', 'raka_preorder_backorders_require_notification', 20, 3 );
 
 /**
  * Inject pre-order data into variable product JS array.
  */
-function raka_preorder_available_variation( array $data, WC_Product $product, WC_Product_Variation $variation ): array {
-	$data['is_preorder']     = raka_is_product_preorder( $variation );
-	$data['preorder_eta']    = raka_get_product_preorder_eta( $variation );
-	$data['preorder_badge']  = raka_get_product_preorder_badge( $variation );
-	return $data;
+function raka_preorder_available_variation( $data, $product = null, $variation = null ): array {
+	$res = is_array( $data ) ? $data : [];
+	$target_variation = ( $variation instanceof WC_Product_Variation ) ? $variation : ( ( $product instanceof WC_Product_Variation ) ? $product : null );
+	if ( $target_variation ) {
+		$res['is_preorder']    = raka_is_product_preorder( $target_variation );
+		$res['preorder_eta']   = raka_get_product_preorder_eta( $target_variation );
+		$res['preorder_badge'] = raka_get_product_preorder_badge( $target_variation );
+	}
+	return $res;
 }
 add_filter( 'woocommerce_available_variation', 'raka_preorder_available_variation', 20, 3 );
 
@@ -316,25 +324,29 @@ add_filter( 'woocommerce_available_variation', 'raka_preorder_available_variatio
 /**
  * Add [PRE-ORDER] tag and ETA to cart items.
  */
-function raka_preorder_cart_item_name( string $name, array $cart_item, string $cart_item_key ): string {
-	$product = $cart_item['data'] ?? null;
+function raka_preorder_cart_item_name( $name, $cart_item = [], $cart_item_key = '' ): string {
+	$name_str = is_string( $name ) ? $name : '';
+	$product  = is_array( $cart_item ) ? ( $cart_item['data'] ?? null ) : null;
 	if ( $product && raka_is_product_preorder( $product ) ) {
 		$badge = raka_get_product_preorder_badge( $product );
 		$eta   = raka_get_product_preorder_eta( $product );
-		$name  = '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 mr-1.5 align-middle">[' . esc_html( $badge ) . ']</span>' . $name;
+		$name_str = '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 mr-1.5 align-middle">[' . esc_html( $badge ) . ']</span>' . $name_str;
 		if ( ! empty( $eta ) ) {
-			$name .= '<div class="text-xs text-amber-600/90 font-mono mt-0.5 font-normal"><i class="ri-time-line text-[11px] mr-1"></i>ETA: ' . esc_html( $eta ) . '</div>';
+			$name_str .= '<div class="text-xs text-amber-600/90 font-mono mt-0.5 font-normal"><i class="ri-time-line text-[11px] mr-1"></i>ETA: ' . esc_html( $eta ) . '</div>';
 		}
 	}
-	return $name;
+	return $name_str;
 }
 add_filter( 'woocommerce_cart_item_name', 'raka_preorder_cart_item_name', 20, 3 );
 
 /**
  * Save pre-order metadata into Order Line Items.
  */
-function raka_preorder_add_order_item_meta( WC_Order_Item_Product $item, string $cart_item_key, array $values, WC_Order $order ): void {
-	$product = $values['data'] ?? null;
+function raka_preorder_add_order_item_meta( $item, $cart_item_key = '', $values = [], $order = null ): void {
+	if ( ! ( $item instanceof WC_Order_Item_Product ) ) {
+		return;
+	}
+	$product = is_array( $values ) ? ( $values['data'] ?? null ) : null;
 	if ( $product && raka_is_product_preorder( $product ) ) {
 		$badge = raka_get_product_preorder_badge( $product );
 		$eta   = raka_get_product_preorder_eta( $product );
