@@ -1052,7 +1052,7 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
           
           <!-- Pre-Order Form Mount -->
           <div class="stage__form-mount">
-            <?php echo do_shortcode( '[preorder_raka]' ); ?>
+            <?php echo do_shortcode( '[preorder_raka_v2]' ); ?>
           </div>
         </div>
 
