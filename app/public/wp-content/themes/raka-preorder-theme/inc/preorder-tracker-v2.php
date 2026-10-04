@@ -247,10 +247,6 @@ function raka_render_preorder_tracker_v2(): string {
 								callback: function(token) {
 									turnstileToken = token;
 									hideError();
-									const primaryVal = (primaryInput.value || '').trim();
-									if (primaryVal) {
-										doSearch();
-									}
 								},
 								'expired-callback': function() {
 									turnstileToken = '';
