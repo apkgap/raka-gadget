@@ -168,42 +168,40 @@ $is_logged_in    = is_user_logged_in();
       gap: clamp(12px, 1.8vw, 28px);
     }
 
-    .menu {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 4px;
-      margin: -6px -4px;
-      position: relative;
-      z-index: 50;
-      cursor: pointer;
-    }
-
-    .menu__bars {
+        /* Topbar Hamburger Menu Button */
+    #raka-menu-btn {
+      background: transparent;
+      border: none;
+      padding: 4px 2px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      width: 28px;
+      justify-content: space-between;
+      align-items: flex-end;
+      cursor: pointer;
+      width: clamp(26px, 2.2vw, 32px);
+      height: clamp(18px, 1.6vw, 22px);
+      transition: opacity .25s ease;
     }
 
-    .menu__bars span {
+    #raka-menu-btn:hover {
+      opacity: .7;
+    }
+
+    #raka-menu-btn span {
       display: block;
       height: 2px;
-      background: var(--ink);
+      background: #0d121c;
       border-radius: 2px;
       transform-origin: center;
       transition: transform .5s cubic-bezier(.16, 1, .3, 1), width .4s cubic-bezier(.16, 1, .3, 1), opacity .3s ease;
     }
 
-    .menu:hover .menu__bars span:nth-child(2) {
-      width: 70%;
+    html.dark #raka-menu-btn span {
+      background: #ffffff;
     }
 
-    .menu__label {
-      font-size: clamp(13px, 0.95vw, 15px);
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+    #raka-menu-btn:hover #burger-mid {
+      width: 100% !important;
     }
 
     /* Theme Controls in Topbar Right */
@@ -686,12 +684,8 @@ $is_logged_in    = is_user_logged_in();
         padding-top: 68px;
         border-radius: 26px;
       }
-      .menu__label {
-        display: none;
-      }
-      .menu__bars {
-        width: 24px;
-      }
+      
+      
       .stage {
         padding: 18px 0 16px;
       }
@@ -744,18 +738,10 @@ $is_logged_in    = is_user_logged_in();
       <!-- COLUMN 1: the white boxed container -->
       <div class="panel">
         <header class="topbar">
-          <div class="nav-left">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand">
-              <img src="<?php echo esc_url( $logo_horizontal ); ?>" alt="RAKA GADGET">
+          <div id="raka-topbar-brand-wrap" class="nav-left flex items-center">
+            <a id="raka-topbar-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand flex items-center">
+              <img id="raka-topbar-brand-img" src="<?php echo esc_url( $logo_horizontal ); ?>" alt="RAKA GADGET">
             </a>
-            <button class="menu" id="raka-menu-btn" aria-label="Open menu" aria-expanded="false">
-              <div class="menu__bars">
-                <span id="burger-top"></span>
-                <span id="burger-mid"></span>
-                <span id="burger-bot"></span>
-              </div>
-              <span class="menu__label">menu</span>
-            </button>
           </div>
 
           <!-- THEME HEADER CONTROLS (REPLACING STATIC SOCIAL PILL) -->
@@ -859,6 +845,18 @@ $is_logged_in    = is_user_logged_in();
             >
               <i id="theme-icon-sun" class="ri-sun-line text-sm sm:text-base text-amber-500"></i>
               <i id="theme-icon-moon" class="ri-moon-line text-sm sm:text-base hidden text-sky-400"></i>
+            </button>
+
+            <!-- Hamburger Menu Button -->
+            <button
+              id="raka-menu-btn"
+              class="relative w-7 sm:w-8 md:w-9 h-5 sm:h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer py-0.5 ml-1"
+              type="button"
+              aria-label="Open menu"
+            >
+              <span id="burger-top" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
+              <span id="burger-mid" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] w-[65%]"></span>
+              <span id="burger-bot" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-[85%]"></span>
             </button>
 
           </div>
@@ -1453,7 +1451,7 @@ $is_logged_in    = is_user_logged_in();
     /* ═════════ IIFE #1: Entry Animation Cleanup ═════════ */
     (function initAnimationCleanup() {
       const animSelectors = [
-        '.topbar .brand', '.topbar .menu', '.topbar .theme-topbar-controls',
+        '.topbar .brand', '.topbar .theme-topbar-controls',
         '.stage .stage__emblem', '.stage .headline', '.stage .squiggle',
         '.cards .card', '.side .pill-btn',
         '.side .account', '.side .arrow-fab'
