@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			id="raka-site-header" 
 			class="<?php echo $is_home ? 'absolute top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300' : 'sticky top-0 left-0 right-0 z-50 bg-white/95 dark:bg-obsidian/95 backdrop-blur-md border-b border-black/10 dark:border-white/10 transition-all duration-300 pointer-events-auto'; ?>"
 		>
-			<nav id="raka-nav" class="flex items-center justify-between px-3.5 sm:px-6 md:px-10 lg:px-16 <?php echo $is_home ? 'pt-4 sm:pt-5 md:pt-7 pb-4 sm:pb-5 pointer-events-none' : 'py-3.5 md:py-5 pointer-events-auto'; ?>">
+			<nav id="raka-nav" class="flex items-center justify-between px-3.5 sm:px-6 md:px-10 lg:px-16 <?php echo $is_home ? 'pt-2 sm:pt-2.5 md:pt-3 pb-2 sm:pb-2.5 pointer-events-none' : 'py-1.5 sm:py-2 md:py-2.5 pointer-events-auto'; ?>">
 				<!-- Left Slot: Pre-Order Menu -->
 				<div id="raka-nav-left-slot" class="flex-1 flex items-center justify-start pointer-events-auto min-w-0">
 					<a
@@ -76,8 +76,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<!-- Centered Brand Logo -->
 				<div id="raka-nav-brand" class="pointer-events-auto shrink-0 px-2 sm:px-4 flex items-center justify-center">
 					<a id="raka-brand-link" class="hover:opacity-80 transition-opacity flex items-center justify-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-						<img id="raka-brand-img-light" class="h-6 sm:h-7 md:h-8 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
-						<img id="raka-brand-img-dark" class="h-6 sm:h-7 md:h-8 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+						<img id="raka-brand-img-light" class="h-8 sm:h-9 md:h-11 lg:h-12 w-auto object-contain block dark:hidden transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+						<img id="raka-brand-img-dark" class="h-8 sm:h-9 md:h-11 lg:h-12 w-auto object-contain hidden dark:block transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
 					</a>
 				</div>
 
