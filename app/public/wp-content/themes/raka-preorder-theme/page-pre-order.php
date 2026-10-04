@@ -862,57 +862,7 @@ $is_logged_in    = is_user_logged_in();
           </div>
         </div>
 
-        <div class="cards">
-          <!-- CARD 1 -->
-          <div class="card">
-            <div class="card__top">
-              <h2 class="card__title">Evidence-based tracking for your gear</h2>
-              <span class="info" aria-hidden="true">i</span>
-            </div>
-            <div class="card__row">
-              <div class="bubble">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M8 5a4 4 0 1 1 4 4 4 4 0 0 0-4 4 4 4 0 1 0 4 4"/>
-                </svg>
-              </div>
-              <p class="card__note">100% Genuine guaranteed delivery.</p>
-            </div>
-          </div>
-
-          <!-- CARD 2 -->
-          <div class="card">
-            <div class="card__top">
-              <h2 class="card__title">Powered by our community</h2>
-            </div>
-            <div class="stats">
-              <div class="stat">
-                <span class="stat__num">99.8%</span>
-                <span class="stat__label">On-Time</span>
-              </div>
-              <div class="stats__div"></div>
-              <div class="stat stat--muted">
-                <span class="stat__num">24k+</span>
-                <span class="stat__label">Orders</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 3 -->
-          <div class="card">
-            <div class="card__top">
-              <h2 class="card__title">Official Showcase</h2>
-            </div>
-            <div class="teaser">
-              <p class="teaser__text">Preview the<br />flagship gear</p>
-              <div class="teaser__thumb">
-                <img src="https://images.higgs.ai/?default=1&amp;output=webp&amp;url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_233659_e22fa9db-261e-4bf3-82c2-b5626c27e820.png&amp;w=1920&amp;q=85" loading="lazy" alt="Raka preview">
-                <button class="play" aria-label="Play video">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       <!-- COLUMN 2: floating controls over the video -->
