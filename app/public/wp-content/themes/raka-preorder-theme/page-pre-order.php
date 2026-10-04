@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$video_url       = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
+$video_url       = get_template_directory_uri() . '/assets/images/a9-air.mp4';
 $logo_horizontal = get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png';
 $logo_icon       = get_template_directory_uri() . '/assets/images/logo-raka-icon.png';
 $shop_url        = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' );
@@ -122,8 +122,9 @@ $is_logged_in    = is_user_logged_in();
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: right center;
       z-index: -2;
-      transform-origin: center;
+      transform-origin: right center;
       animation: in-bg 1.35s cubic-bezier(.16, 1, .3, 1) both;
     }
 
