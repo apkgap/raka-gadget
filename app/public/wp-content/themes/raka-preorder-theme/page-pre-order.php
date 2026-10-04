@@ -117,6 +117,7 @@ $is_logged_in    = is_user_logged_in();
       width: 100%;
       overflow: hidden;
       isolation: isolate;
+      background: #000000;
     }
 
     .hero__bg {
@@ -124,10 +125,10 @@ $is_logged_in    = is_user_logged_in();
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: right center;
+      object-fit: contain;
+      object-position: left center;
       z-index: -2;
-      transform-origin: right center;
+      transform-origin: left center;
       animation: in-bg 1.35s cubic-bezier(.16, 1, .3, 1) both;
     }
 
