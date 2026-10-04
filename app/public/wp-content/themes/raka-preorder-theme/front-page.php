@@ -212,35 +212,13 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			</div>
 
 			<!-- Bottom Left: Caption Text Only -->
-			<div id="hero-bottom-left-panel" class="absolute bottom-20 sm:bottom-6 md:bottom-8 left-4 sm:left-6 md:left-10 right-4 sm:right-auto pointer-events-auto flex flex-col items-start gap-2 max-w-sm z-20">
+			<div id="hero-bottom-left-panel" class="absolute bottom-5 sm:bottom-6 md:bottom-8 left-4 sm:left-6 md:left-10 right-4 sm:right-auto pointer-events-auto flex flex-col items-start gap-2 max-w-sm z-20">
 				<p id="hero-caption-text" class="text-[10px] md:text-[11px] tracking-[0.14em] uppercase leading-relaxed text-black/85 dark:text-white/85 font-hn font-medium theme-transition max-w-[280px] sm:max-w-none">
 					<?php echo nl2br( esc_html( $hero_caption ) ); ?>
 				</p>
 			</div>
 
-			<!-- Bottom Right: Categories & Brands Popup Buttons -->
-			<div id="hero-bottom-right-panel" class="absolute bottom-4 sm:bottom-6 md:bottom-8 left-4 right-4 sm:left-auto sm:right-6 md:right-10 pointer-events-auto flex items-center justify-center sm:justify-end gap-2.5 sm:gap-3 z-30">
-				<button
-					id="hero-categories-trigger-btn"
-					type="button"
-					onclick="window.rakaOpenModal('categories')"
-					class="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer whitespace-nowrap"
-				>
-					<i id="hero-categories-btn-icon" class="ri-grid-fill text-sm sm:text-base text-neutral-800 dark:text-neutral-200 opacity-80 group-hover:opacity-100 group-hover:rotate-12 transition-transform"></i>
-					<span id="hero-categories-btn-text"><?php esc_html_e( 'Categories', 'raka-preorder-theme' ); ?></span>
-				</button>
-
-				<button
-					id="hero-brands-trigger-btn"
-					type="button"
-					onclick="window.rakaOpenModal('brands')"
-					class="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-black backdrop-blur-2xl border border-black/15 dark:border-white/25 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer whitespace-nowrap"
-				>
-					<i id="hero-brands-btn-icon" class="ri-fire-fill text-sm sm:text-base text-amber-500 group-hover:scale-125 transition-transform"></i>
-					<span id="hero-brands-btn-text"><?php esc_html_e( 'Brands', 'raka-preorder-theme' ); ?></span>
-				</button>
 			</div>
-		</div>
 
 		<!-- 5. Dual Column Continuous Slide-Up Stream (Left & Right Flanks) -->
 		<div id="hero-streams-container" class="absolute inset-0 z-20 pointer-events-none overflow-hidden">
@@ -529,6 +507,31 @@ $cat_icon_map = [
 	'promo'       => 'ri-gift-line',
 ];
 ?>
+
+<!-- ── Fixed Floating Bottom-Right Pills: Categories & Brands Trigger ── -->
+<div id="raka-floating-pills-bar" class="fixed bottom-4 sm:bottom-6 right-3.5 sm:right-6 md:right-8 z-40 flex items-center gap-2 sm:gap-2.5 pointer-events-auto">
+	<button
+		id="hero-categories-trigger-btn"
+		class="group inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-neutral-900 backdrop-blur-2xl border border-black/15 dark:border-white/20 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer whitespace-nowrap"
+		type="button"
+		onclick="window.rakaOpenModal('categories')"
+		aria-label="<?php esc_attr_e( 'Categories', 'raka-preorder-theme' ); ?>"
+	>
+		<i id="hero-categories-btn-icon" class="ri-grid-fill text-xs sm:text-base text-neutral-800 dark:text-neutral-200 opacity-80 group-hover:opacity-100 group-hover:rotate-12 transition-transform"></i>
+		<span id="hero-categories-btn-text"><?php esc_html_e( 'Categories', 'raka-preorder-theme' ); ?></span>
+	</button>
+
+	<button
+		id="hero-brands-trigger-btn"
+		class="group inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/95 dark:bg-black/90 hover:bg-white dark:hover:bg-neutral-900 backdrop-blur-2xl border border-black/15 dark:border-white/20 text-xs sm:text-sm font-bold tracking-wider uppercase text-neutral-950 dark:text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 font-hn cursor-pointer whitespace-nowrap"
+		type="button"
+		onclick="window.rakaOpenModal('brands')"
+		aria-label="<?php esc_attr_e( 'Brands', 'raka-preorder-theme' ); ?>"
+	>
+		<i id="hero-brands-btn-icon" class="ri-fire-fill text-xs sm:text-base text-amber-500 group-hover:scale-125 transition-transform"></i>
+		<span id="hero-brands-btn-text"><?php esc_html_e( 'Brands', 'raka-preorder-theme' ); ?></span>
+	</button>
+</div>
 
 <!-- 1. Categories Modal -->
 <div id="raka-categories-modal" class="raka-popup-modal fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/60 dark:bg-black/85 backdrop-blur-2xl transition-all duration-300 opacity-0 pointer-events-none">
