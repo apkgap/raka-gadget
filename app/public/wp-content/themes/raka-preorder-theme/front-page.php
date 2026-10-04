@@ -212,14 +212,14 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			</div>
 
 			<!-- Bottom Left: Caption Text Only -->
-			<div id="hero-bottom-left-panel" class="absolute bottom-5 sm:bottom-6 md:bottom-8 left-4 sm:left-6 md:left-10 right-4 sm:right-auto pointer-events-auto flex flex-col items-start gap-2 max-w-sm z-20">
+			<div id="hero-bottom-left-panel" class="absolute bottom-20 sm:bottom-6 md:bottom-8 left-4 sm:left-6 md:left-10 right-4 sm:right-auto pointer-events-auto flex flex-col items-start gap-2 max-w-sm z-20">
 				<p id="hero-caption-text" class="text-[10px] md:text-[11px] tracking-[0.14em] uppercase leading-relaxed text-black/85 dark:text-white/85 font-hn font-medium theme-transition max-w-[280px] sm:max-w-none">
 					<?php echo nl2br( esc_html( $hero_caption ) ); ?>
 				</p>
 			</div>
 
 			<!-- Bottom Right: Categories & Brands Popup Buttons -->
-			<div id="hero-bottom-right-panel" class="absolute bottom-5 sm:bottom-6 md:bottom-8 left-4 right-4 sm:left-auto sm:right-6 md:right-10 pointer-events-auto flex items-center justify-between sm:justify-end gap-2 sm:gap-3 z-20">
+			<div id="hero-bottom-right-panel" class="absolute bottom-4 sm:bottom-6 md:bottom-8 left-4 right-4 sm:left-auto sm:right-6 md:right-10 pointer-events-auto flex items-center justify-center sm:justify-end gap-2.5 sm:gap-3 z-30">
 				<button
 					id="hero-categories-trigger-btn"
 					type="button"
