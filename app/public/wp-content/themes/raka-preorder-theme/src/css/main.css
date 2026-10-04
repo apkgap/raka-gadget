@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -28,13 +31,24 @@ html.light #root {
 	background-color: #FFFFFF !important;
 }
 
-body, button, input, select, textarea, p, span, h1, h2, h3, h4, h5, h6, a, div {
+body, button, input, select, textarea {
 	font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', Helvetica, Arial, -apple-system, BlinkMacSystemFont, sans-serif;
+	background: inherit;
+	color: inherit;
+	overflow-x: hidden;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+	width: 0px;
+	background: transparent;
 }
 
 .font-hn {
 	font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif !important;
 }
+
 
 .gpu-accel {
 	transform: translate3d(0, 0, 0);

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function raka_render_preorder_tracker_v2(): string {
 	ob_start();
 	?>
-	<div id="raka-tracker-v2" class="w-full text-left font-sans text-neutral-900 dark:text-white transition-all duration-300">
+	<div id="raka-tracker-v2" class="w-full text-left font-sans select-none text-neutral-900 dark:text-white transition-all duration-300">
 		
 		<!-- ── SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3.5">
@@ -40,7 +40,7 @@ function raka_render_preorder_tracker_v2(): string {
 					<label for="raka-track-phone" class="block text-[11px] uppercase tracking-wider font-bold text-neutral-600 dark:text-neutral-400 font-hn">
 						<?php esc_html_e( 'Verification / ยืนยันตัวตน', 'raka-preorder-theme' ); ?>
 					</label>
-					<span class="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono">
+					<span class="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal">
 						<?php esc_html_e( 'เบอร์โทร หรือ บัตร ปชช. 4 ตัวท้าย', 'raka-preorder-theme' ); ?>
 					</span>
 				</div>

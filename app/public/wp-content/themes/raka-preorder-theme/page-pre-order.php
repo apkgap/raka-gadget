@@ -50,6 +50,9 @@ $is_logged_in    = is_user_logged_in();
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
   <?php wp_head(); ?>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+    @import url('https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME');
+
     :root {
       --ink: #0d0f0f;
       --ink-soft: #5b6260;
@@ -286,9 +289,10 @@ $is_logged_in    = is_user_logged_in();
     .headline {
       margin: 0;
       font-size: clamp(24px, 2.7vw, 38px);
-      line-height: 1.1;
-      letter-spacing: -.04em;
-      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif;
+      font-weight: 500;
     }
 
     .headline b {
