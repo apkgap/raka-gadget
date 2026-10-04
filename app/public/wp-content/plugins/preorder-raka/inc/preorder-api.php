@@ -44,128 +44,22 @@ function preorder_raka_register_rest_routes() {
 add_action( 'rest_api_init', 'preorder_raka_register_rest_routes' );
 
 /**
- * Get Pre-order Status detail.
+ * Format a single preorder item response array.
+ *
+ * @param int|WP_Post $post Preorder post or ID.
+ * @return array
  */
-function preorder_raka_get_status( WP_REST_Request $request ) {
-	$post_id    = $request->get_param( 'post_id' );
-	$order_no   = sanitize_text_field( (string) $request->get_param( 'order_no' ) );
-	$phone      = sanitize_text_field( (string) $request->get_param( 'phone' ) );
-	$citizen_id = sanitize_text_field( (string) $request->get_param( 'citizen_id' ) );
-
-	$args = [
-		'post_type'              => 'preorder',
-		'post_status'            => 'publish',
-		'numberposts'            => 1,
-		'no_found_rows'          => true,
-		'update_post_term_cache' => false,
-	];
-
-	if ( ! empty( $post_id ) ) {
-		$args['include'] = [ intval( $post_id ) ];
-	} elseif ( ! empty( $order_no ) ) {
-		$args['meta_query'] = [
-			[
-				'key'     => '_preorder_no',
-				'value'   => $order_no,
-				'compare' => '=',
-			]
-		];
-	} elseif ( ! empty( $phone ) ) {
-		$phone_digits = preg_replace( '/[^0-9]/', '', $phone );
-		$args['meta_query'] = [
-			'relation' => 'OR',
-			[
-				'key'     => '_preorder_phone',
-				'value'   => $phone,
-				'compare' => '=',
-			],
-			[
-				'key'     => '_preorder_phone',
-				'value'   => $phone_digits,
-				'compare' => 'LIKE',
-			],
-		];
-		$args['orderby'] = 'date';
-		$args['order']   = 'DESC';
-	} else {
-		return new WP_Error( 'missing_params', 'กรุณาระบุหมายเลขคำสั่งซื้อหรือเบอร์โทรศัพท์สำหรับค้นหา', [ 'status' => 400 ] );
+function preorder_raka_format_single_item( $post ) {
+	$preorder = is_object( $post ) ? $post : get_post( $post );
+	if ( ! $preorder ) {
+		return [];
 	}
+	$pid = $preorder->ID;
 
-	$posts = get_posts( $args );
-
-	if ( empty( $posts ) ) {
-		return new WP_Error( 'not_found', 'ไม่พบข้อมูลการพรีออเดอร์จากข้อมูลที่ระบุ', [ 'status' => 404 ] );
-	}
-
-	$preorder = $posts[0];
-	$pid      = $preorder->ID;
-
-	// Fetch all post meta at once in 1 SQL query for maximum performance
 	$all_meta = get_post_meta( $pid );
 	$get_meta = function( $key, $default = '' ) use ( $all_meta ) {
 		return isset( $all_meta[ $key ][0] ) ? maybe_unserialize( $all_meta[ $key ][0] ) : $default;
 	};
-
-	// Security Verification (Turnstile CAPTCHA & Phone/Citizen Fallback)
-	$turnstile_token     = sanitize_text_field( (string) ( $request->get_param( 'cf_turnstile_response' ) ?: $request->get_param( 'turnstile_token' ) ) );
-	$turnstile_enabled   = function_exists( 'raka_is_turnstile_enabled' ) ? raka_is_turnstile_enabled() : true;
-
-	if ( $turnstile_enabled && empty( $turnstile_token ) ) {
-		return new WP_Error( 'turnstile_required', 'กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหา', [ 'status' => 403 ] );
-	}
-
-	$db_phone        = $get_meta( '_preorder_phone' );
-	$db_citizen_id   = $get_meta( '_preorder_citizen_id_last4' );
-	$db_order_no     = $get_meta( '_preorder_no' );
-
-	// Clean inputs for comparison
-	$phone_clean    = preg_replace( '/[^0-9]/', '', $phone );
-	$db_phone_clean = preg_replace( '/[^0-9]/', '', $db_phone );
-
-	$validated = false;
-
-	// 1. Check Cloudflare Turnstile Verification
-	if ( ! empty( $turnstile_token ) ) {
-		$turnstile_secret = function_exists( 'raka_get_turnstile_secret' ) ? raka_get_turnstile_secret() : '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM';
-		$remote_ip        = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
-		
-		$verify_res = wp_remote_post( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', [
-			'body'    => [
-				'secret'   => $turnstile_secret,
-				'response' => $turnstile_token,
-				'remoteip' => $remote_ip,
-			],
-			'timeout' => 5,
-		] );
-
-		if ( ! is_wp_error( $verify_res ) ) {
-			$verify_body = json_decode( wp_remote_retrieve_body( $verify_res ), true );
-			if ( ! empty( $verify_body['success'] ) ) {
-				$validated = true;
-			}
-		}
-	}
-
-	// 2. Direct Validation Fallback
-	if ( ! $validated ) {
-		if ( empty( $db_phone ) && empty( $db_citizen_id ) ) {
-			$validated = true;
-		} else {
-			if ( ! empty( $phone_clean ) && ! empty( $db_phone_clean ) && ( substr( $db_phone_clean, -4 ) === substr( $phone_clean, -4 ) || $db_phone_clean === $phone_clean ) ) {
-				$validated = true;
-			}
-			if ( ! empty( $citizen_id ) && ! empty( $db_citizen_id ) && $db_citizen_id === substr( $citizen_id, -4 ) ) {
-				$validated = true;
-			}
-			if ( ! empty( $order_no ) && ! empty( $db_order_no ) && strtoupper( trim( (string) $db_order_no ) ) === strtoupper( trim( (string) $order_no ) ) ) {
-				$validated = true;
-			}
-		}
-	}
-
-	if ( ! $validated ) {
-		return new WP_Error( 'verification_required', 'กรุณายืนยันความปลอดภัยผ่าน CAPTCHA หรือกรอกเบอร์โทรศัพท์เพื่อดูสถานะ', [ 'status' => 403 ] );
-	}
 
 	$steps       = $get_meta( '_preorder_steps', [] );
 	$current_idx = $get_meta( '_preorder_current_step_idx', 0 );
@@ -197,40 +91,188 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	$qty      = intval( $get_meta( '_preorder_qty', 1 ) ) ?: 1;
 	$shipping = intval( $get_meta( '_preorder_shipping', 0 ) );
 	$total    = ( $price * $qty ) + $shipping;
+	$db_phone = (string) $get_meta( '_preorder_phone' );
+
+	$formatted_steps = array_map( function( $s ) {
+		if ( ! empty( $s['date'] ) && strpos( $s['date'], 'T' ) !== false ) {
+			$time = strtotime( $s['date'] );
+			if ( $time ) {
+				$months = [ '', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.' ];
+				$m = intval( date( 'n', $time ) );
+				$y = intval( date( 'Y', $time ) ) + 543;
+				$s['date'] = date( 'j', $time ) . ' ' . $months[$m] . ' ' . $y . ' ' . date( 'H:i', $time );
+			}
+		}
+		return $s;
+	}, $steps );
+
+	$cur_idx_int = intval( $current_idx );
+	$cur_status_title = ! empty( $formatted_steps[ $cur_idx_int ]['title'] ) ? $formatted_steps[ $cur_idx_int ]['title'] : ( ! empty( $formatted_steps[0]['title'] ) ? $formatted_steps[0]['title'] : 'รับคำสั่งซื้อเรียบร้อย' );
 
 	return [
+		'id'               => $pid,
+		'order_no'         => $get_meta( '_preorder_no' ) ?: 'PRE-' . $pid,
+		'product_name'     => $product_name ?: $preorder->post_title,
+		'image_url'        => $featured_image_url ? esc_url_raw( $featured_image_url ) : '',
+		'price'            => $price,
+		'qty'              => $qty,
+		'shipping'         => $shipping,
+		'total'            => $total,
+		'estimate_days'    => $get_meta( '_preorder_estimate_days' ) ?: '7-14 วัน',
+		'address'          => $get_meta( '_preorder_address' ),
+		'courier'          => $get_meta( '_preorder_courier' ) ?: 'kerry',
+		'tracking_no'      => $get_meta( '_preorder_tracking' ),
+		'tracking_link'    => $get_meta( '_preorder_tracking_link' ),
+		'facebook'         => $get_meta( '_preorder_facebook' ),
+		'line'             => $get_meta( '_preorder_line' ),
+		'steps'            => $formatted_steps,
+		'current_step_idx' => $cur_idx_int,
+		'current_status'   => $cur_status_title,
+		'phone'            => ! empty( $db_phone ) ? substr( $db_phone, 0, 3 ) . '-xxx-' . substr( $db_phone, -4 ) : '',
+		'created_at'       => get_the_date( 'j M Y', $pid ),
+	];
+}
+
+/**
+ * Get Pre-order Status detail.
+ */
+function preorder_raka_get_status( WP_REST_Request $request ) {
+	$post_id    = $request->get_param( 'post_id' );
+	$order_no   = sanitize_text_field( (string) $request->get_param( 'order_no' ) );
+	$phone      = sanitize_text_field( (string) $request->get_param( 'phone' ) );
+	$citizen_id = sanitize_text_field( (string) $request->get_param( 'citizen_id' ) );
+
+	$args = [
+		'post_type'              => 'preorder',
+		'post_status'            => 'publish',
+		'numberposts'            => 1,
+		'no_found_rows'          => true,
+		'update_post_term_cache' => false,
+	];
+
+	$is_phone_query = false;
+
+	if ( ! empty( $post_id ) ) {
+		$args['include'] = [ intval( $post_id ) ];
+	} elseif ( ! empty( $order_no ) ) {
+		$args['meta_query'] = [
+			[
+				'key'     => '_preorder_no',
+				'value'   => $order_no,
+				'compare' => '=',
+			]
+		];
+	} elseif ( ! empty( $phone ) ) {
+		$is_phone_query = true;
+		$phone_digits   = preg_replace( '/[^0-9]/', '', $phone );
+		$args['numberposts'] = 50;
+		$args['meta_query']  = [
+			'relation' => 'OR',
+			[
+				'key'     => '_preorder_phone',
+				'value'   => $phone,
+				'compare' => '=',
+			],
+			[
+				'key'     => '_preorder_phone',
+				'value'   => $phone_digits,
+				'compare' => 'LIKE',
+			],
+		];
+		$args['orderby'] = 'date';
+		$args['order']   = 'DESC';
+	} else {
+		return new WP_Error( 'missing_params', 'กรุณาระบุหมายเลขคำสั่งซื้อหรือเบอร์โทรศัพท์สำหรับค้นหา', [ 'status' => 400 ] );
+	}
+
+	$posts = get_posts( $args );
+
+	if ( empty( $posts ) ) {
+		return new WP_Error( 'not_found', 'ไม่พบข้อมูลการพรีออเดอร์จากข้อมูลที่ระบุ', [ 'status' => 404 ] );
+	}
+
+	// Security Verification (Turnstile CAPTCHA & Phone/Citizen Fallback)
+	$turnstile_token   = sanitize_text_field( (string) ( $request->get_param( 'cf_turnstile_response' ) ?: $request->get_param( 'turnstile_token' ) ) );
+	$turnstile_enabled = function_exists( 'raka_is_turnstile_enabled' ) ? raka_is_turnstile_enabled() : true;
+
+	if ( $turnstile_enabled && empty( $turnstile_token ) ) {
+		return new WP_Error( 'turnstile_required', 'กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหา', [ 'status' => 403 ] );
+	}
+
+	$validated = false;
+
+	// 1. Check Cloudflare Turnstile Verification
+	if ( ! empty( $turnstile_token ) ) {
+		$turnstile_secret = function_exists( 'raka_get_turnstile_secret' ) ? raka_get_turnstile_secret() : '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM';
+		$remote_ip        = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		
+		$verify_res = wp_remote_post( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+			'body'    => [
+				'secret'   => $turnstile_secret,
+				'response' => $turnstile_token,
+				'remoteip' => $remote_ip,
+			],
+			'timeout' => 5,
+		] );
+
+		if ( ! is_wp_error( $verify_res ) ) {
+			$verify_body = json_decode( wp_remote_retrieve_body( $verify_res ), true );
+			if ( ! empty( $verify_body['success'] ) ) {
+				$validated = true;
+			}
+		}
+	}
+
+	// 2. Direct Validation Fallback
+	if ( ! $validated ) {
+		$first_meta     = get_post_meta( $posts[0]->ID );
+		$db_phone       = isset( $first_meta['_preorder_phone'][0] ) ? $first_meta['_preorder_phone'][0] : '';
+		$db_citizen_id  = isset( $first_meta['_preorder_citizen_id_last4'][0] ) ? $first_meta['_preorder_citizen_id_last4'][0] : '';
+		$db_order_no    = isset( $first_meta['_preorder_no'][0] ) ? $first_meta['_preorder_no'][0] : '';
+		$phone_clean    = preg_replace( '/[^0-9]/', '', $phone );
+		$db_phone_clean = preg_replace( '/[^0-9]/', '', $db_phone );
+
+		if ( empty( $db_phone ) && empty( $db_citizen_id ) ) {
+			$validated = true;
+		} else {
+			if ( ! empty( $phone_clean ) && ! empty( $db_phone_clean ) && ( substr( $db_phone_clean, -4 ) === substr( $phone_clean, -4 ) || $db_phone_clean === $phone_clean ) ) {
+				$validated = true;
+			}
+			if ( ! empty( $citizen_id ) && ! empty( $db_citizen_id ) && $db_citizen_id === substr( $citizen_id, -4 ) ) {
+				$validated = true;
+			}
+			if ( ! empty( $order_no ) && ! empty( $db_order_no ) && strtoupper( trim( (string) $db_order_no ) ) === strtoupper( trim( (string) $order_no ) ) ) {
+				$validated = true;
+			}
+		}
+	}
+
+	if ( ! $validated ) {
+		return new WP_Error( 'verification_required', 'กรุณายืนยันความปลอดภัยผ่าน CAPTCHA หรือกรอกเบอร์โทรศัพท์เพื่อดูสถานะ', [ 'status' => 403 ] );
+	}
+
+	// If phone search, return full list
+	if ( $is_phone_query ) {
+		$items = [];
+		foreach ( $posts as $p ) {
+			$items[] = preorder_raka_format_single_item( $p );
+		}
+		return [
+			'success' => true,
+			'mode'    => 'list',
+			'phone'   => $phone,
+			'count'   => count( $items ),
+			'items'   => $items,
+			'data'    => $items[0],
+		];
+	}
+
+	// Single order search
+	$single_item = preorder_raka_format_single_item( $posts[0] );
+	return [
 		'success' => true,
-		'data'    => [
-			'id'               => $pid,
-			'order_no'         => $get_meta( '_preorder_no' ) ?: 'PRE-' . $pid,
-			'product_name'     => $product_name ?: $preorder->post_title,
-			'image_url'        => $featured_image_url ? esc_url_raw( $featured_image_url ) : '',
-			'price'            => $price,
-			'qty'              => $qty,
-			'shipping'         => $shipping,
-			'total'            => $total,
-			'estimate_days'    => $get_meta( '_preorder_estimate_days' ) ?: '7-14 วัน',
-			'address'          => $get_meta( '_preorder_address' ),
-			'courier'          => $get_meta( '_preorder_courier' ) ?: 'kerry',
-			'tracking_no'      => $get_meta( '_preorder_tracking' ),
-			'tracking_link'    => $get_meta( '_preorder_tracking_link' ),
-			'facebook'         => $get_meta( '_preorder_facebook' ),
-			'line'             => $get_meta( '_preorder_line' ),
-			'steps'            => array_map( function( $s ) {
-				if ( ! empty( $s['date'] ) && strpos( $s['date'], 'T' ) !== false ) {
-					$time = strtotime( $s['date'] );
-					if ( $time ) {
-						$months = [ '', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.' ];
-						$m = intval( date( 'n', $time ) );
-						$y = intval( date( 'Y', $time ) ) + 543;
-						$s['date'] = date( 'j', $time ) . ' ' . $months[$m] . ' ' . $y . ' ' . date( 'H:i', $time );
-					}
-				}
-				return $s;
-			}, $steps ),
-			'current_step_idx' => intval( $current_idx ),
-			'phone'            => ! empty( $db_phone ) ? substr( $db_phone, 0, 3 ) . '-xxx-' . substr( $db_phone, -4 ) : '',
-		]
+		'mode'    => 'single',
+		'data'    => $single_item,
 	];
 }
 
