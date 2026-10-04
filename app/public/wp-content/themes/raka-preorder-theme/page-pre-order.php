@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: Pre-Order Standalone Hero
- * Standalone full-viewport Hero layout tailored for Raka Pre-Order Tracking without redundant logo/menu.
+ * Full-viewport Hero layout tailored with RAKA branding and navigation.
  *
  * @package raka-preorder-theme
  */
@@ -9,7 +9,12 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
+
+$video_url       = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
+$logo_horizontal = get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png';
+$logo_icon       = get_template_directory_uri() . '/assets/images/logo-raka-icon.png';
+$shop_url        = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' );
+$account_url     = home_url( '/account' );
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> lang="en">
@@ -31,7 +36,7 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       --box: #f5f7f6;
       --radius-panel: 30px;
       --radius-box: 18px;
-      --pad: clamp(18px, 2.2vw, 34px);
+      --pad: clamp(16px, 2vw, 32px);
     }
 
     *, *::before, *::after {
@@ -54,6 +59,10 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    html.nav-lock, body.nav-lock {
+      overflow: hidden !important;
     }
 
     img {
@@ -137,34 +146,72 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       flex: 0 0 auto;
     }
 
-    .live-badge {
+    .brand {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 5px 12px;
-      border-radius: 999px;
-      background: var(--box);
-      border: 1px solid var(--line);
-      font-size: clamp(10.5px, 0.8vw, 12px);
-      font-weight: 700;
-      letter-spacing: 0.08em;
+    }
+
+    .brand img {
+      height: clamp(22px, 1.8vw, 28px);
+      width: auto;
+      object-fit: contain;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 2vw, 36px);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 4px;
+      margin: -6px -4px;
+      position: relative;
+      z-index: 130;
+      cursor: pointer;
+    }
+
+    .menu__bars {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 30px;
+    }
+
+    .menu__bars span {
+      display: block;
+      height: 2px;
+      background: var(--ink);
+      border-radius: 2px;
+      transform-origin: center;
+      transition: transform .5s cubic-bezier(.16, 1, .3, 1), width .4s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .menu:hover .menu__bars span:nth-child(2) {
+      width: 70%;
+    }
+
+    .menu.is-active .menu__bars span {
+      width: 100%;
+    }
+
+    .menu.is-active .menu__bars span:nth-child(1) {
+      transform: translateY(3.5px) rotate(45deg);
+    }
+
+    .menu.is-active .menu__bars span:nth-child(2) {
+      transform: translateY(-3.5px) rotate(-45deg);
+    }
+
+    .menu__label {
+      font-size: clamp(13px, 0.95vw, 15px);
+      font-weight: 600;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: var(--ink);
-    }
-
-    .live-badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background-color: #ef4444;
-      display: inline-block;
-      box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
-      animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
     }
 
     .connect {
@@ -173,11 +220,11 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       gap: clamp(8px, .7vw, 12px);
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 6px 6px 6px clamp(14px, 1.3vw, 22px);
+      padding: 5px 6px 5px clamp(12px, 1.1vw, 18px);
     }
 
     .connect__label {
-      font-size: clamp(10px, .78vw, 12.5px);
+      font-size: clamp(10px, .78vw, 12px);
       font-weight: 600;
       letter-spacing: .09em;
       text-transform: uppercase;
@@ -186,12 +233,12 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
 
     .socials {
       display: flex;
-      gap: 6px;
+      gap: 5px;
     }
 
     .social {
-      width: clamp(28px, 2.15vw, 36px);
-      height: clamp(28px, 2.15vw, 36px);
+      width: clamp(26px, 2vw, 32px);
+      height: clamp(26px, 2vw, 32px);
       border-radius: 50%;
       background: var(--ink);
       color: #fff;
@@ -220,15 +267,34 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       justify-content: center;
       text-align: center;
       position: relative;
-      padding: clamp(10px, 1.5vh, 20px) 0;
+      padding: clamp(10px, 1.4vh, 20px) 0;
       width: 100%;
+    }
+
+    .stage__emblem {
+      width: clamp(48px, 4.2vw, 68px);
+      height: clamp(48px, 4.2vw, 68px);
+      border-radius: 50%;
+      background: var(--box);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      margin-bottom: clamp(8px, 1.2vh, 14px);
+      box-shadow: 0 8px 24px -10px rgba(0,0,0,0.12);
+      flex: 0 0 auto;
+    }
+
+    .stage__emblem img {
+      width: 60%;
+      height: 60%;
+      object-fit: contain;
     }
 
     .headline {
       margin: 0;
-      font-size: clamp(26px, 3vw, 44px);
-      line-height: 1.08;
-      letter-spacing: -.045em;
+      font-size: clamp(24px, 2.7vw, 38px);
+      line-height: 1.1;
+      letter-spacing: -.04em;
       font-weight: 400;
     }
 
@@ -237,8 +303,8 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .squiggle {
-      width: clamp(150px, 16vw, 260px);
-      margin: clamp(6px, 1vh, 12px) auto clamp(12px, 1.6vh, 18px);
+      width: clamp(140px, 15vw, 240px);
+      margin: clamp(5px, 0.8vh, 10px) auto clamp(10px, 1.4vh, 16px);
       display: block;
       color: var(--ink);
     }
@@ -255,19 +321,19 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       flex: 0 0 auto;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(10px, .95vw, 18px);
-      margin-top: clamp(10px, 1.4vh, 18px);
+      gap: clamp(8px, 0.85vw, 14px);
+      margin-top: clamp(8px, 1.2vh, 14px);
     }
 
     .card {
       background: var(--box);
       border-radius: var(--radius-box);
-      padding: clamp(12px, 1.1vw, 20px);
+      padding: clamp(10px, 1vw, 16px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: clamp(10px, 1.4vh, 18px);
-      min-height: clamp(130px, 16vh, 180px);
+      gap: clamp(8px, 1.2vh, 14px);
+      min-height: clamp(120px, 14vh, 160px);
       border: 1px solid var(--line);
     }
 
@@ -275,11 +341,11 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
 
     .card__title {
-      font-size: clamp(12.5px, 0.95vw, 15px);
+      font-size: clamp(11.5px, 0.88vw, 13.5px);
       font-weight: 600;
       line-height: 1.3;
       letter-spacing: -.015em;
@@ -290,14 +356,14 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .info {
-      width: clamp(20px, 1.5vw, 24px);
-      height: clamp(20px, 1.5vw, 24px);
+      width: clamp(18px, 1.4vw, 22px);
+      height: clamp(18px, 1.4vw, 22px);
       border-radius: 50%;
       background: var(--ink);
       color: #fff;
       display: grid;
       place-items: center;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       font-style: italic;
       flex: 0 0 auto;
@@ -310,8 +376,8 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .bubble {
-      width: clamp(30px, 2.5vw, 40px);
-      height: clamp(30px, 2.5vw, 40px);
+      width: clamp(28px, 2.2vw, 36px);
+      height: clamp(28px, 2.2vw, 36px);
       border: 1px solid #d9dedc;
       border-radius: 50%;
       display: grid;
@@ -326,7 +392,7 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .card__note {
-      font-size: clamp(11px, .8vw, 13px);
+      font-size: clamp(10.5px, 0.75vw, 12px);
       line-height: 1.4;
       color: var(--ink-soft);
       margin: 0;
@@ -342,7 +408,7 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .stat__num {
-      font-size: clamp(24px, 2.6vw, 40px);
+      font-size: clamp(22px, 2.3vw, 34px);
       font-weight: 700;
       letter-spacing: -.05em;
       line-height: 1;
@@ -355,7 +421,7 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     .stat__label {
       display: block;
       margin-top: 4px;
-      font-size: clamp(10px, .75vw, 12px);
+      font-size: clamp(9.5px, 0.7vw, 11px);
       color: var(--ink-soft);
     }
 
@@ -374,7 +440,7 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .teaser__text {
-      font-size: clamp(12px, .9vw, 14.5px);
+      font-size: clamp(11.5px, 0.85vw, 13.5px);
       line-height: 1.3;
       color: var(--ink);
       margin: 0;
@@ -382,9 +448,9 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
 
     .teaser__thumb {
       position: relative;
-      width: clamp(64px, 5.5vw, 90px);
+      width: clamp(56px, 4.8vw, 76px);
       aspect-ratio: 1/1.06;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       flex: 0 0 auto;
       background: #e3ecea;
@@ -400,8 +466,8 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       position: absolute;
       inset: 0;
       margin: auto;
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: var(--ink);
       color: #fff;
@@ -416,10 +482,10 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .play svg {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       fill: currentColor;
-      margin-left: 2px;
+      margin-left: 1px;
     }
 
     /* ═════════ 9. COLUMN 2 — FLOATING CONTROLS OVER VIDEO ═════════ */
@@ -439,8 +505,8 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .pill-btn {
-      width: clamp(42px, 3.4vw, 56px);
-      height: clamp(42px, 3.4vw, 56px);
+      width: clamp(40px, 3.2vw, 52px);
+      height: clamp(40px, 3.2vw, 52px);
       border-radius: 50%;
       background: rgba(255, 255, 255, .92);
       -webkit-backdrop-filter: blur(10px);
@@ -464,12 +530,12 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     .account {
       display: flex;
       align-items: center;
-      gap: clamp(8px, .7vw, 14px);
+      gap: clamp(6px, .6vw, 10px);
       background: rgba(255, 255, 255, .92);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-radius: 999px;
-      padding: 5px 5px 5px clamp(12px, 1vw, 18px);
+      padding: 4px 6px 4px clamp(10px, 0.9vw, 16px);
       box-shadow: 0 10px 26px -14px rgba(10, 28, 24, .45);
       transition: transform .2s ease, background-color .2s ease;
       cursor: pointer;
@@ -481,38 +547,40 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     }
 
     .account__plus {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       flex: 0 0 auto;
     }
 
     .account__label {
-      font-size: clamp(13px, 1vw, 16px);
+      font-size: clamp(12px, 0.9vw, 15px);
       color: #7d8785;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .account__avatar {
-      width: clamp(34px, 2.7vw, 44px);
-      height: clamp(34px, 2.7vw, 44px);
+      width: clamp(28px, 2.3vw, 38px);
+      height: clamp(28px, 2.3vw, 38px);
       border-radius: 50%;
       overflow: hidden;
       background: linear-gradient(150deg, #dfe7e5, #c3d2cf);
       flex: 0 0 auto;
+      display: grid;
+      place-items: center;
     }
 
     .account__avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      width: 65%;
+      height: 65%;
+      object-fit: contain;
     }
 
     .arrow-fab {
       position: absolute;
       right: clamp(10px, 2.2vw, 44px);
       bottom: clamp(10px, 2.2vw, 44px);
-      width: clamp(64px, 5.6vw, 96px);
-      height: clamp(64px, 5.6vw, 96px);
+      width: clamp(58px, 5vw, 86px);
+      height: clamp(58px, 5vw, 86px);
       border-radius: 50%;
       background: #fff;
       display: grid;
@@ -530,41 +598,31 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       height: 34%;
     }
 
-    /* ═════════ 10. PAGE-LOAD ENTRY ANIMATION ═════════ */
+    /* ═════════ 10. ENTRY ANIMATIONS ═════════ */
     @keyframes in-up {
-      from {
-        opacity: 0;
-        transform: translate3d(0, 18px, 0);
-      }
-      to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-      }
+      from { opacity: 0; transform: translate3d(0, 18px, 0); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0); }
     }
 
     @keyframes in-fade {
       from { opacity: 0; }
-      to { opacity: 1; }
+      to   { opacity: 1; }
     }
 
     @keyframes in-bg {
-      from {
-        opacity: 0;
-        transform: scale(1.06);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(1.06); }
+      to   { opacity: 1; transform: scale(1); }
     }
 
     @keyframes in-draw {
       from { stroke-dashoffset: 420; }
-      to { stroke-dashoffset: 0; }
+      to   { stroke-dashoffset: 0; }
     }
 
-    .topbar .live-badge,
+    .topbar .brand,
+    .topbar .menu,
     .topbar .connect,
+    .stage .stage__emblem,
     .stage .headline,
     .stage .squiggle,
     .cards .card,
@@ -574,10 +632,12 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       animation: in-up .78s cubic-bezier(.16, 1, .3, 1) both;
     }
 
-    .topbar .live-badge  { animation-delay: .06s; }
-    .topbar .connect     { animation-delay: .18s; }
-    .stage .headline     { animation-delay: .24s; }
-    .stage .squiggle     { animation-delay: .34s; }
+    .topbar .brand       { animation-delay: .06s; }
+    .topbar .menu        { animation-delay: .14s; }
+    .topbar .connect     { animation-delay: .22s; }
+    .stage .stage__emblem{ animation-delay: .18s; }
+    .stage .headline     { animation-delay: .28s; }
+    .stage .squiggle     { animation-delay: .38s; }
     .cards .card:nth-child(1) { animation-delay: .42s; }
     .cards .card:nth-child(2) { animation-delay: .52s; }
     .cards .card:nth-child(3) { animation-delay: .62s; }
@@ -593,6 +653,211 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
 
     .anim-done {
       animation: none !important;
+    }
+
+    /* ═════════ 11. NAV OVERLAY (RAKA DRAWER MENU) ═════════ */
+    .navmenu {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      visibility: hidden;
+      transition: visibility 0s linear .5s;
+    }
+
+    .navmenu.is-open {
+      visibility: visible;
+      transition-delay: 0s;
+    }
+
+    .navmenu__scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 22, 19, .34);
+      -webkit-backdrop-filter: blur(9px) saturate(1.1);
+      backdrop-filter: blur(9px) saturate(1.1);
+      opacity: 0;
+      transition: opacity .5s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .navmenu.is-open .navmenu__scrim {
+      opacity: 1;
+    }
+
+    .navmenu__sheet {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: min(430px, 88vw);
+      background: var(--panel);
+      border-radius: 0 clamp(20px, 2.4vw, 34px) clamp(20px, 2.4vw, 34px) 0;
+      padding: clamp(20px, 3vw, 38px) clamp(20px, 3vw, 38px) max(clamp(18px, 2.4vw, 32px), env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      transform: translate3d(-102%, 0, 0);
+      transition: transform .62s cubic-bezier(.16, 1, .3, 1);
+      box-shadow: 44px 0 90px -44px rgba(8, 24, 20, .5);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      will-change: transform;
+    }
+
+    .navmenu.is-open .navmenu__sheet {
+      transform: translate3d(0, 0, 0);
+    }
+
+    .navmenu:not(.is-open) .navmenu__sheet {
+      transition-duration: .44s;
+    }
+
+    .navmenu__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex: 0 0 auto;
+    }
+
+    .navmenu__brand img {
+      height: clamp(22px, 1.8vw, 28px);
+      width: auto;
+      object-fit: contain;
+    }
+
+    .navmenu__close {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      transition: transform .4s cubic-bezier(.16, 1, .3, 1), background .3s ease;
+    }
+
+    .navmenu__close:hover {
+      background: var(--box);
+      transform: rotate(90deg);
+    }
+
+    .navmenu__close svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .navmenu__list {
+      list-style: none;
+      margin: clamp(20px, 3.5vh, 38px) 0 0;
+      padding: 0;
+      flex: 1 1 auto;
+    }
+
+    .navmenu__list li {
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .45s ease, transform .6s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .navmenu.is-open .navmenu__list li {
+      opacity: 1;
+      transform: none;
+    }
+
+    .navmenu.is-open .navmenu__list li:nth-child(1) { transition-delay: .13s; }
+    .navmenu.is-open .navmenu__list li:nth-child(2) { transition-delay: .19s; }
+    .navmenu.is-open .navmenu__list li:nth-child(3) { transition-delay: .25s; }
+    .navmenu.is-open .navmenu__list li:nth-child(4) { transition-delay: .31s; }
+    .navmenu.is-open .navmenu__list li:nth-child(5) { transition-delay: .37s; }
+    .navmenu.is-open .navmenu__list li:nth-child(6) { transition-delay: .43s; }
+
+    .navmenu__link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: clamp(12px, 1.6vh, 18px) 2px;
+      font-size: clamp(19px, 3.8vw, 26px);
+      font-weight: 600;
+      letter-spacing: -.03em;
+      transition: padding-left .4s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .navmenu__link:hover {
+      padding-left: 12px;
+    }
+
+    .navmenu__link svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity .35s ease, transform .35s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .navmenu__link:hover svg {
+      opacity: 1;
+      transform: none;
+    }
+
+    .navmenu__foot {
+      flex: 0 0 auto;
+      margin-top: clamp(18px, 2.8vh, 30px);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(12px, 1.8vh, 18px);
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .45s ease, transform .6s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .navmenu.is-open .navmenu__foot {
+      opacity: 1;
+      transform: none;
+      transition-delay: .5s;
+    }
+
+    .navmenu__foot-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: clamp(12px, 1.1vw, 20px);
+      background: var(--ink);
+      color: #fff;
+      border-radius: 999px;
+      padding: 7px 7px 7px clamp(20px, 1.8vw, 30px);
+      font-size: clamp(14px, 1.1vw, 17px);
+      font-weight: 600;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px -14px rgba(0, 0, 0, .6);
+    }
+
+    .cta__icon {
+      width: clamp(30px, 2.4vw, 38px);
+      height: clamp(30px, 2.4vw, 38px);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .cta__icon svg {
+      width: 48%;
+      height: 48%;
     }
 
     /* ═════════ 13. RESPONSIVE ═════════ */
@@ -615,7 +880,10 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
         display: none;
       }
       .connect {
-        padding: 6px;
+        padding: 5px;
+      }
+      .panel {
+        padding-top: clamp(60px, 8vw, 84px);
       }
     }
 
@@ -633,63 +901,56 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       }
       .panel {
         padding: 16px;
+        padding-top: 68px;
         border-radius: 26px;
+      }
+      .menu__label {
+        display: none;
+      }
+      .menu__bars {
+        width: 24px;
       }
       .stage {
         padding: 18px 0 16px;
       }
       .headline {
-        font-size: clamp(24px, 7vw, 36px);
+        font-size: clamp(22px, 6.5vw, 32px);
       }
       .squiggle {
-        width: min(72%, 240px);
+        width: min(72%, 220px);
       }
       .cards {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       }
       .card {
         min-height: 0;
       }
       .side__top {
-        top: 22px;
-        right: 22px;
+        top: 20px;
+        right: 20px;
+      }
+      .navmenu__sheet {
+        width: 100%;
+        border-radius: 0;
+        padding-top: max(clamp(20px, 3vw, 38px), env(safe-area-inset-top));
       }
     }
 
     @media (max-width: 420px) {
       .headline {
-        font-size: clamp(22px, 7vw, 30px);
+        font-size: clamp(20px, 6.5vw, 28px);
       }
       .account__label {
         display: none;
       }
       .stats {
-        gap: 12px;
+        gap: 10px;
       }
       .stat__num {
-        font-size: clamp(22px, 7vw, 32px);
+        font-size: clamp(20px, 6.5vw, 28px);
       }
       .teaser__thumb {
-        width: 76px;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .hero__inner {
-        padding: 8px;
-      }
-      .panel {
-        padding: 14px;
-      }
-      .social {
-        width: 30px;
-        height: 30px;
-      }
-      .socials {
-        gap: 5px;
-      }
-      .card {
-        padding: 12px;
+        width: 68px;
       }
     }
   </style>
@@ -706,9 +967,17 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       <!-- COLUMN 1: the white boxed container -->
       <div class="panel">
         <header class="topbar">
-          <div class="live-badge">
-            <span class="live-badge-dot"></span>
-            <span>Pre-Order Tracking Hub</span>
+          <div class="nav-left">
+            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand">
+              <img src="<?php echo esc_url( $logo_horizontal ); ?>" alt="RAKA GADGET">
+            </a>
+            <button class="menu" id="menu-btn" aria-label="Open menu" aria-expanded="false">
+              <div class="menu__bars">
+                <span></span>
+                <span></span>
+              </div>
+              <span class="menu__label">menu</span>
+            </button>
           </div>
           <div class="connect">
             <span class="connect__label">Follow along</span>
@@ -727,6 +996,9 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
         </header>
 
         <div class="stage">
+          <div class="stage__emblem">
+            <img src="<?php echo esc_url( $logo_icon ); ?>" alt="Raka">
+          </div>
           <h1 class="headline"><b>Track</b> your gear<br />with <b>Raka Pre-Order</b></h1>
           <svg class="squiggle" viewBox="0 0 320 26" aria-hidden="true">
             <path d="M2 20C34 4 60 3 88 12s52 12 80 3 54-12 82-3 46 10 68 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -794,22 +1066,22 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
       <!-- COLUMN 2: floating controls over the video -->
       <div class="side">
         <div class="side__top">
-          <a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' ) ); ?>" class="pill-btn" aria-label="Explore Shop">
+          <a href="<?php echo esc_url( $shop_url ); ?>" class="pill-btn" aria-label="Explore Shop">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>
             </svg>
           </a>
-          <a href="<?php echo esc_url( home_url( '/account' ) ); ?>" class="account">
+          <a href="<?php echo esc_url( $account_url ); ?>" class="account">
             <svg class="account__plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
               <path d="M12 5v14M5 12h14"/>
             </svg>
             <span class="account__label">Account</span>
             <div class="account__avatar">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=160&amp;h=160&amp;fit=crop&amp;crop=faces&amp;q=80" alt="">
+              <img src="<?php echo esc_url( $logo_icon ); ?>" alt="Account">
             </div>
           </a>
         </div>
-        <a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' ) ); ?>" class="arrow-fab" aria-label="Explore more">
+        <a href="<?php echo esc_url( $shop_url ); ?>" class="arrow-fab" aria-label="Explore more">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M7 17L17 7M8 7h9v9"/>
           </svg>
@@ -818,12 +1090,59 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
     </div>
   </section>
 
+  <!-- NAV OVERLAY (RAKA DRAWER MENU) -->
+  <div class="navmenu" id="navmenu" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="navmenu__scrim" id="navmenu-scrim"></div>
+    <div class="navmenu__sheet">
+      <div class="navmenu__head">
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navmenu__brand">
+          <img src="<?php echo esc_url( $logo_horizontal ); ?>" alt="RAKA GADGET">
+        </a>
+        <button class="navmenu__close" id="navmenu-close" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M5 5l14 14M19 5L5 19"/>
+          </svg>
+        </button>
+      </div>
+      <ul class="navmenu__list">
+        <li><a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navmenu__link"><span>Home</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+        <li><a href="<?php echo esc_url( $shop_url ); ?>" class="navmenu__link"><span>Shop & Catalog</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+        <li><a href="<?php echo esc_url( home_url( '/pre-order' ) ); ?>" class="navmenu__link"><span>Pre-Order Tracking</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+        <li><a href="<?php echo esc_url( home_url( '/shop?category=keyboards' ) ); ?>" class="navmenu__link"><span>Keyboards & Mice</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+        <li><a href="<?php echo esc_url( home_url( '/shop?filter=brands' ) ); ?>" class="navmenu__link"><span>Official Brands</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+        <li><a href="<?php echo esc_url( $account_url ); ?>" class="navmenu__link"><span>My Account & Orders</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+      </ul>
+      <div class="navmenu__foot">
+        <span class="navmenu__foot-label">Follow along</span>
+        <div class="socials">
+          <a href="#" class="social" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" class="social" aria-label="Twitter">
+            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="#" class="social" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+        </div>
+        <a href="<?php echo esc_url( $shop_url ); ?>" class="cta">
+          Explore Catalog
+          <span class="cta__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>
+            </svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* ═════════ IIFE #1: Entry Animation Cleanup ═════════ */
     (function initAnimationCleanup() {
       const animSelectors = [
-        '.topbar .live-badge', '.topbar .connect',
-        '.stage .headline', '.stage .squiggle',
+        '.topbar .brand', '.topbar .menu', '.topbar .connect',
+        '.stage .stage__emblem', '.stage .headline', '.stage .squiggle',
         '.cards .card', '.side .pill-btn',
         '.side .account', '.side .arrow-fab'
       ];
@@ -835,6 +1154,83 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
             el.removeEventListener('animationend', handler);
           }
         });
+      });
+    })();
+
+    /* ═════════ IIFE #2: Nav Controller ═════════ */
+    (function initNavController() {
+      const menuBtn = document.getElementById('menu-btn');
+      const navmenu = document.getElementById('navmenu');
+      const closeBtn = document.getElementById('navmenu-close');
+      const scrim = document.getElementById('navmenu-scrim');
+      const navLinks = navmenu ? navmenu.querySelectorAll('.navmenu__link') : [];
+      let isOpen = false;
+
+      function setOpen(open) {
+        if (!navmenu || !menuBtn) return;
+        if (isOpen === open) return;
+        isOpen = open;
+
+        if (isOpen) {
+          navmenu.classList.add('is-open');
+          menuBtn.classList.add('is-active');
+          menuBtn.setAttribute('aria-expanded', 'true');
+          menuBtn.setAttribute('aria-label', 'Close menu');
+          document.documentElement.classList.add('nav-lock');
+          document.body.classList.add('nav-lock');
+
+          setTimeout(() => {
+            const firstLink = navmenu.querySelector('.navmenu__link');
+            if (firstLink) {
+              firstLink.focus();
+            } else if (closeBtn) {
+              closeBtn.focus();
+            }
+          }, 360);
+        } else {
+          navmenu.classList.remove('is-open');
+          menuBtn.classList.remove('is-active');
+          menuBtn.setAttribute('aria-expanded', 'false');
+          menuBtn.setAttribute('aria-label', 'Open menu');
+          document.documentElement.classList.remove('nav-lock');
+          document.body.classList.remove('nav-lock');
+          menuBtn.focus();
+        }
+      }
+
+      if (menuBtn) menuBtn.addEventListener('click', () => setOpen(!isOpen));
+      if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
+      if (scrim) scrim.addEventListener('click', () => setOpen(false));
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => setOpen(false));
+      });
+
+      document.addEventListener('keydown', e => {
+        if (!isOpen) return;
+
+        if (e.key === 'Escape') {
+          setOpen(false);
+          return;
+        }
+
+        if (e.key === 'Tab') {
+          const focusable = navmenu.querySelectorAll('a[href], button');
+          if (!focusable.length) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+
+          if (e.shiftKey) {
+            if (document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            }
+          } else {
+            if (document.activeElement === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          }
+        }
       });
     })();
   </script>
