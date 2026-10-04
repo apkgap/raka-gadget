@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80" fill="currentColor">
+            <g font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="46" letter-spacing="5">
+                <path d="M 15 15 L 35 60 L 55 15 L 43 15 L 35 44 L 27 15 Z" />
+                <path d="M 65 37.5 C 65 25 75 15 95 15 C 110 15 120 23 120 35 L 108 35 C 108 28 102 24 95 24 C 83 24 77 30 77 37.5 C 77 45 83 51 95 51 C 103 51 108 47 108 42 L 95 42 L 95 34 L 120 34 L 120 60 L 109 60 L 109 55 C 105 58 99 60 92 60 C 75 60 65 50 65 37.5 Z" />
+                <path d="M 130 15 L 142 15 L 165 48 L 165 15 L 176 15 L 176 60 L 164 60 L 141 27 L 141 60 L 130 60 Z" />
+                <text x="186" y="58" font-size="14" font-weight="600" letter-spacing="2" opacity="0.6">LAB</text>
+            </g>
+        </svg>

@@ -58,16 +58,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div id="raka-nav-left-slot" class="flex-1 flex items-center justify-start pointer-events-auto min-w-0">
 					<a
 						id="raka-nav-preorder-btn"
-						href="<?php echo esc_url( home_url( '/#hero-pinned-viewport' ) ); ?>"
+						href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 						class="group relative inline-flex items-center gap-1.5 sm:gap-2.5 pl-1.5 pr-2.5 sm:pl-2 sm:pr-4 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wider uppercase text-neutral-900 dark:text-white bg-white/80 dark:bg-neutral-900/80 hover:bg-white dark:hover:bg-neutral-800 backdrop-blur-xl border border-black/10 hover:border-red-500/50 dark:border-white/15 dark:hover:border-red-500/50 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 font-hn cursor-pointer shrink-0"
-						aria-label="<?php esc_attr_e( 'Pre-Order Catalog', 'raka-preorder-theme' ); ?>"
+						aria-label="<?php esc_attr_e( 'Check Pre-Order Status', 'raka-preorder-theme' ); ?>"
 					>
 						<!-- Glowing Icon Badge -->
 						<span id="raka-nav-preorder-icon-wrap" class="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] sm:text-sm shadow-md shadow-red-600/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
-							<i id="raka-nav-preorder-ico" class="ri-flashlight-fill"></i>
+							<i id="raka-nav-preorder-ico" class="ri-radar-line"></i>
 						</span>
 						<!-- Text & Accent -->
-						<span id="raka-nav-preorder-text" class="group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors"><?php esc_html_e( 'Pre-Order', 'raka-preorder-theme' ); ?></span>
+						<span id="raka-nav-preorder-text" class="group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors"><?php esc_html_e( 'Check Pre-Order', 'raka-preorder-theme' ); ?></span>
 						<!-- Arrow Indicator -->
 						<i id="raka-nav-preorder-arrow" class="ri-arrow-right-up-line text-xs text-neutral-400 dark:text-neutral-500 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all hidden sm:inline-block"></i>
 					</a>
@@ -765,5 +765,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			</div>
 		</div>
+
 
 

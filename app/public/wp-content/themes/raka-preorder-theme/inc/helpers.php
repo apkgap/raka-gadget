@@ -456,76 +456,35 @@ function raka_get_hero_cards(): array {
 	$options    = raka_get_all_options();
 	$hero_cards = $options['hero_cards'] ?? null;
 
-	// Fetch top Keyboards for the hero banner stream
-	$keyboard_products = [];
-	if ( function_exists( 'wc_get_products' ) ) {
-		$keyboard_products = wc_get_products( [
-			'category' => [ 'keyboards', 'keyboard' ],
-			'limit'    => 12,
-			'status'   => 'publish',
-			'orderby'  => 'menu_order date',
-			'order'    => 'DESC',
-		] );
-	}
-
-	// Populate from Keyboards category
-	if ( ! empty( $keyboard_products ) ) {
+	if ( empty( $hero_cards ) || ! is_array( $hero_cards ) ) {
+		// Fallback: Populate with newest ATK Mice and D-Glow Mousepads
+		$fallback_ids = [ 528, 1671, 487, 1694, 330, 1688, 390, 1659, 401, 1663, 442, 1692 ];
 		$sample_cards = [];
 		$positions    = [ 'left', 'right' ];
-		$tags         = [ 'HALL EFFECT 8K', 'PRE-ORDER', 'ESPORTS GRADE', 'ALUMINUM CNC', 'MAGNETIC SWITCH', 'LIMITED EDITION' ];
+		$tags         = [ 'NEW ARRIVAL 8K', 'PRE-ORDER', 'FLAGSHIP ERGO', 'TEMPERED GLASS', 'ULTRA-LIGHT 36G', 'LIMITED COLLAB', 'ESPORTS GRADE', 'ZERO FRICTION', 'SUPERLIGHT', 'CONTROL PORON', 'ERGONOMIC 8K', 'LIMITED EDITION' ];
 
-		foreach ( $keyboard_products as $idx => $prod ) {
+		foreach ( $fallback_ids as $idx => $prod_id ) {
+			$prod = function_exists( 'wc_get_product' ) ? wc_get_product( $prod_id ) : null;
+			if ( ! $prod ) {
+				continue;
+			}
+			$img_id  = $prod->get_image_id();
+			$img_url = $img_id ? wp_get_attachment_image_url( $img_id, 'medium_large' ) : '';
+
 			$sample_cards[] = [
-				'product_id'  => $prod->get_id(),
-				'tag'         => $tags[ $idx % count( $tags ) ],
-				'title'       => '',
-				'description' => '',
-				'price'       => '',
-				'url'         => '',
-				'image_url'   => '',
-				'button_text' => 'Pre-Order Now',
-				'position'    => $positions[ $idx % 2 ],
+				'product_id'        => $prod_id,
+				'show_custom_text'  => false,
+				'tag'               => $tags[ $idx % count( $tags ) ],
+				'title'             => html_entity_decode( $prod->get_name(), ENT_QUOTES, 'UTF-8' ),
+				'description'       => html_entity_decode( wp_strip_all_tags( $prod->get_short_description() ?: $prod->get_description() ), ENT_QUOTES, 'UTF-8' ),
+				'price'             => html_entity_decode( wp_strip_all_tags( wc_price( $prod->get_price() ) ), ENT_QUOTES, 'UTF-8' ),
+				'url'               => $prod->get_permalink(),
+				'image_url'         => $img_url,
+				'button_text'       => 'Pre-Order Now',
+				'position'          => $positions[ $idx % 2 ],
 			];
 		}
 		$hero_cards = $sample_cards;
-		if ( empty( $sample_cards ) ) {
-			$sample_cards = [
-				[
-					'product_id'  => 0,
-					'tag'         => 'FLAGSHIP PRE-ORDER',
-					'title'       => 'Vortex Pro 8K Wireless Keyboard',
-					'description' => 'Ultra-low latency 8,000Hz polling rate with Hall Effect magnetic switches and aerospace CNC aluminum body.',
-					'price'       => '฿4,990',
-					'url'         => '#',
-					'image_url'   => '',
-					'button_text' => 'Pre-Order Now',
-					'position'    => 'left',
-				],
-				[
-					'product_id'  => 0,
-					'tag'         => 'LIMITED EDITION',
-					'title'       => 'CyberPunk Glass Mousepad',
-					'description' => 'Micro-etched tempered glass surface engineered for pixel-perfect tracking and effortless glide.',
-					'price'       => '฿2,290',
-					'url'         => '#',
-					'image_url'   => '',
-					'button_text' => 'Pre-Order Now',
-					'position'    => 'right',
-				],
-				[
-					'product_id'  => 0,
-					'tag'         => 'CUSTOM SWITCHES',
-					'title'       => 'Aero Tactile Magnetic Switches',
-					'description' => 'Factory lubed linear switches with 0.1mm to 4.0mm adjustable actuation distance for esports dominance.',
-					'price'       => '฿1,150',
-					'url'         => '#',
-					'image_url'   => '',
-					'button_text' => 'Explore Specs',
-					'position'    => 'left',
-				],
-			];
-			$hero_cards = $sample_cards;
-		}
 	}
 
 	$resolved = [];
@@ -1150,9 +1109,8 @@ function raka_render_product_card( $product, array $args = [] ): void {
 	}
 
 	// Stock & Preorder Status
-	$is_in_stock     = $product->is_in_stock();
-	$is_on_backorder = $product->is_on_backorder();
-	$is_preorder     = ( false !== stripos( $p_title, 'preorder' ) || false !== stripos( $p_title, 'pre-order' ) || $is_on_backorder );
+	$is_preorder     = function_exists( 'raka_is_product_preorder' ) ? raka_is_product_preorder( $product ) : ( false !== stripos( $p_title, 'preorder' ) || false !== stripos( $p_title, 'pre-order' ) || $product->is_on_backorder() );
+	$is_in_stock     = $is_preorder || $product->is_in_stock();
 
 	// Flash Sale Args
 	$is_flash_sale = ! empty( $args['is_flash_sale'] );
@@ -1233,14 +1191,14 @@ function raka_render_product_card( $product, array $args = [] ): void {
 					<span id="p-badge-flash-<?php echo esc_attr( $card_id ); ?>" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-500/30">
 						-<?php echo (int) $discount_pct; ?>% OFF
 					</span>
-				<?php elseif ( ! $is_in_stock ) : ?>
-					<span id="p-badge-oos-<?php echo esc_attr( $card_id ); ?>" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
-						SOLD OUT
-					</span>
 				<?php elseif ( $is_preorder ) : ?>
 					<span id="p-badge-pre-<?php echo esc_attr( $card_id ); ?>" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
 						<span id="p-badge-dot-<?php echo esc_attr( $card_id ); ?>" class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-						PRE-ORDER
+						<?php echo esc_html( function_exists( 'raka_get_product_preorder_badge' ) ? raka_get_product_preorder_badge( $product ) : 'PRE-ORDER' ); ?>
+					</span>
+				<?php elseif ( ! $is_in_stock ) : ?>
+					<span id="p-badge-oos-<?php echo esc_attr( $card_id ); ?>" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+						SOLD OUT
 					</span>
 				<?php elseif ( ! empty( $cat_name ) ) : ?>
 					<span id="p-badge-cat-<?php echo esc_attr( $card_id ); ?>" class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700/50">
@@ -1329,7 +1287,30 @@ function raka_render_product_card( $product, array $args = [] ): void {
 				</div>
 				
 				<div id="p-action-wrap-<?php echo esc_attr( $card_id ); ?>" class="w-full sm:w-auto flex items-center justify-start sm:justify-end flex-shrink-0">
-					<?php if ( ! $is_in_stock ) : ?>
+					<?php if ( $is_preorder ) : ?>
+						<?php if ( $product->is_type( 'variable' ) ) : ?>
+							<a
+								id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>"
+								href="<?php echo esc_url( $p_link ); ?>"
+								style="border: 1px solid #000000;"
+								class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full bg-white text-black border border-black hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black font-mono uppercase tracking-wider text-xs font-bold shadow-sm active:scale-95 transition-all whitespace-nowrap group/btn"
+							>
+								<i id="p-btn-cart-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-time-line text-xs flex-shrink-0"></i>
+								<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap">PRE-ORDER</span>
+							</a>
+						<?php else : ?>
+							<button
+								id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>"
+								type="button"
+								onclick="window.rakaCardAddToCart(<?php echo (int) $p_id; ?>, this)"
+								style="border: 1px solid #000000;"
+								class="inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full bg-white text-black border border-black hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black font-mono uppercase tracking-wider text-xs font-bold shadow-sm active:scale-95 transition-all group/btn cursor-pointer whitespace-nowrap"
+							>
+								<i id="p-btn-cart-ico-<?php echo esc_attr( $card_id ); ?>" class="ri-time-line text-xs flex-shrink-0"></i>
+								<span id="p-btn-cart-txt-<?php echo esc_attr( $card_id ); ?>" class="whitespace-nowrap">PRE-ORDER</span>
+							</button>
+						<?php endif; ?>
+					<?php elseif ( ! $is_in_stock ) : ?>
 						<span id="p-btn-cart-<?php echo esc_attr( $card_id ); ?>" class="inline-flex items-center justify-center h-8 sm:h-9 px-3.5 sm:px-4 w-full sm:w-auto rounded-xl sm:rounded-full bg-neutral-200/70 dark:bg-neutral-800/70 text-neutral-400 dark:text-neutral-500 text-xs font-mono uppercase tracking-wider cursor-not-allowed select-none whitespace-nowrap">
 							SOLD OUT
 						</span>
@@ -1540,13 +1521,16 @@ function raka_get_cart_drawer_html(): string {
 						<!-- Details -->
 						<div id="cart-details-<?php echo esc_attr( $cart_item_key ); ?>" class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
 							<div id="cart-info-<?php echo esc_attr( $cart_item_key ); ?>" class="space-y-0.5">
-								<h5 id="cart-title-<?php echo esc_attr( $cart_item_key ); ?>" class="text-xs sm:text-sm font-bold uppercase tracking-tight text-neutral-900 dark:text-white truncate font-hn">
+								<?php
+								$item_name_html = apply_filters( 'woocommerce_cart_item_name', esc_html( $_product->get_name() ), $cart_item, $cart_item_key );
+								?>
+								<h5 id="cart-title-<?php echo esc_attr( $cart_item_key ); ?>" class="text-xs sm:text-sm font-bold uppercase tracking-tight text-neutral-900 dark:text-white font-hn">
 									<?php if ( $product_permalink ) : ?>
 										<a id="cart-link-<?php echo esc_attr( $cart_item_key ); ?>" href="<?php echo esc_url( $product_permalink ); ?>" class="hover:opacity-60 transition-opacity">
-											<?php echo esc_html( $_product->get_name() ); ?>
+											<?php echo $item_name_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 										</a>
 									<?php else : ?>
-										<?php echo esc_html( $_product->get_name() ); ?>
+										<?php echo $item_name_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 									<?php endif; ?>
 								</h5>
 

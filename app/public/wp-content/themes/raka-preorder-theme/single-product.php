@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-
 while ( have_posts() ) :
 	the_post();
 	global $product;
@@ -36,6 +35,12 @@ while ( have_posts() ) :
 	$cat_name = ( ! is_wp_error( $cats ) && ! empty( $cats ) ) ? $cats[0]->name : 'Peripherals';
 	$cat_link = ( ! is_wp_error( $cats ) && ! empty( $cats ) ) ? get_term_link( $cats[0] ) : home_url( '/shop' );
 
+	// Pre-order detection
+	$is_preorder    = function_exists( 'raka_is_product_preorder' ) ? raka_is_product_preorder( $product ) : false;
+	$preorder_eta   = function_exists( 'raka_get_product_preorder_eta' ) ? raka_get_product_preorder_eta( $product ) : 'รอสินค้า 7-14 วันทำการ';
+	$preorder_badge = function_exists( 'raka_get_product_preorder_badge' ) ? raka_get_product_preorder_badge( $product ) : 'PRE-ORDER';
+	$preorder_note  = get_post_meta( $product_id, '_raka_preorder_note', true );
+
 	$available_variations_json = '[]';
 	if ( $is_variable ) {
 		$variations_data = $product->get_available_variations();
@@ -55,13 +60,13 @@ while ( have_posts() ) :
 			<!-- Left Column: Gallery & Image Display -->
 			<div id="product-gallery-col" class="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 sm:gap-6 sticky top-28">
 
-				<!-- Thumbnails Strip -->
+				<!-- Thumbnails Strip (Left on desktop, bottom on mobile) -->
 				<?php if ( count( $all_images ) > 1 ) : ?>
-					<div id="product-thumbnails-list" class="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:max-h-[560px] pb-2 md:pb-0 scrollbar-none">
+					<div id="product-thumbnails-strip" class="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto max-h-[560px] pb-2 md:pb-0 scrollbar-thin">
 						<?php
 						$thumb_idx = 0;
 						foreach ( $all_images as $thumb_id ) :
-							$t_url = wp_get_attachment_image_url( $thumb_id, 'medium' );
+							$t_url = wp_get_attachment_image_url( $thumb_id, 'woocommerce_gallery_thumbnail' ) ?: wp_get_attachment_image_url( $thumb_id, 'thumbnail' );
 							$f_url = wp_get_attachment_image_url( $thumb_id, 'full' );
 							$active_cls = ( $thumb_idx === 0 ) ? 'border-black dark:border-white ring-1 ring-black dark:ring-white opacity-100' : 'border-neutral-200 dark:border-neutral-800 opacity-60 hover:opacity-100';
 						?>
@@ -134,6 +139,26 @@ while ( have_posts() ) :
 				<!-- Short Description -->
 				<div id="product-short-desc" class="text-sm text-neutral-600 dark:text-neutral-300 font-light leading-relaxed border-t border-b border-black/10 dark:border-white/10 py-5 font-hn">
 					<?php echo wp_kses_post( $product->get_short_description() ?: '<p>' . esc_html( $product_title ) . ' designed with flagship esports components, rapid response, and tournament precision.</p>' ); ?>
+				</div>
+
+				<!-- ── Pre-Order Notice Banner (Rendered when Pre-order state is active) ── -->
+				<div id="product-preorder-banner" class="<?php echo $is_preorder ? 'flex' : 'hidden'; ?> flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-black dark:bg-neutral-900 border border-black dark:border-neutral-700 text-white transition-all duration-300 shadow-sm">
+					<div id="preorder-banner-left" class="flex items-center gap-3">
+						<span id="preorder-pulse-dot" class="w-2.5 h-2.5 rounded-full bg-white animate-pulse flex-shrink-0"></span>
+						<div id="preorder-banner-text" class="flex flex-col">
+							<span id="preorder-badge-title" class="font-mono text-xs font-bold uppercase tracking-widest text-white">
+								<?php echo esc_html( $preorder_badge ); ?>
+							</span>
+							<span id="preorder-eta-info" class="text-xs sm:text-sm font-hn font-medium text-neutral-200">
+								<?php echo esc_html( $preorder_eta ); ?>
+							</span>
+						</div>
+					</div>
+					<?php if ( ! empty( $preorder_note ) ) : ?>
+						<span id="preorder-note-tag" class="text-[11px] font-mono text-neutral-300 border-t sm:border-t-0 sm:border-l border-white/20 pt-1 sm:pt-0 sm:pl-3">
+							<?php echo esc_html( $preorder_note ); ?>
+						</span>
+					<?php endif; ?>
 				</div>
 
 				<!-- ── Interactive Variation Form (for Variable Products) ── -->
@@ -211,7 +236,7 @@ while ( have_posts() ) :
 					</form>
 				<?php endif; ?>
 
-				<!-- ── Purchase Action Block (Quantity + Add to Cart) ── -->
+				<!-- ── Purchase Action Block (Quantity + Add to Cart / Pre-Order Button) ── -->
 				<div id="product-action-block" class="space-y-4 pt-2">
 					<div id="qty-cart-row" class="flex items-center gap-4">
 
@@ -226,15 +251,24 @@ while ( have_posts() ) :
 							</button>
 						</div>
 
-						<!-- Add to Cart Button -->
+						<!-- Add to Cart / Pre-Order Button -->
+						<?php
+						$btn_cls = $is_preorder
+							? 'bg-white text-black border-2 border-black hover:bg-neutral-100 font-bold shadow-sm'
+							: 'bg-black text-white dark:bg-white dark:text-black font-semibold shadow-lg';
+						$btn_txt = $is_preorder ? 'PRE-ORDER NOW' : 'ADD TO CART';
+						$btn_ico = $is_preorder ? 'ri-time-line text-black' : 'ri-shopping-bag-3-line';
+						?>
 						<button
 							id="btn-add-to-cart"
 							type="button"
 							onclick="window.executeAddToCart()"
-							class="flex-1 h-12 sm:h-14 px-8 rounded-xl bg-black text-white dark:bg-white dark:text-black font-semibold text-xs sm:text-sm uppercase tracking-[0.25em] flex items-center justify-center gap-3 transition-all duration-300 hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-lg font-hn"
+							data-is-preorder="<?php echo $is_preorder ? '1' : '0'; ?>"
+							style="<?php echo $is_preorder ? 'border: 2px solid #000000;' : ''; ?>"
+							class="flex-1 h-12 sm:h-14 px-8 rounded-xl <?php echo esc_attr( $btn_cls ); ?> text-xs sm:text-sm uppercase tracking-[0.25em] flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer font-hn"
 						>
-							<i id="icon-cart-btn" class="ri-shopping-bag-3-line text-lg"></i>
-							<span id="btn-cart-text">ADD TO CART</span>
+							<i id="icon-cart-btn" class="<?php echo esc_attr( $btn_ico ); ?> text-lg"></i>
+							<span id="btn-cart-text"><?php echo esc_html( $btn_txt ); ?></span>
 						</button>
 					</div>
 
@@ -268,34 +302,78 @@ while ( have_posts() ) :
 						<span>DIRECT FACTORY SOURCED</span>
 					</div>
 					<div id="perk-4" class="flex items-center gap-2.5">
-						<i id="perk-icon-4" class="ri-refresh-line text-base text-neutral-800 dark:text-neutral-200"></i>
-						<span>7-DAY DEFECT REPLACEMENT</span>
+						<i id="perk-icon-4" class="ri-headphone-line text-base text-neutral-800 dark:text-neutral-200"></i>
+						<span>OFFICIAL WARRANTY SUPPORT</span>
 					</div>
 				</div>
 
-				<!-- ── Expandable Details Accordions ── -->
-				<div id="product-accordions-wrap" class="space-y-3 pt-6">
+				<!-- ── Accordion Tabs: Specs, In-The-Box, Delivery ── -->
+				<div id="product-accordion-wrap" class="space-y-3 pt-4 border-t border-black/10 dark:border-white/10">
 
-					<!-- Accordion 1: Description & Specs -->
-					<details id="acc-specs" class="group rounded-xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-100/50 dark:bg-neutral-900/40 p-4 transition-all" open>
-						<summary id="sum-specs" class="flex items-center justify-between cursor-pointer list-none text-xs uppercase tracking-[0.2em] font-bold text-neutral-900 dark:text-white font-mono">
-							<span>PRODUCT SPECIFICATIONS</span>
+					<!-- 1. Specifications -->
+					<details id="acc-specs" class="group border-b border-black/10 dark:border-white/10 pb-4">
+						<summary id="summary-specs" class="flex items-center justify-between cursor-pointer list-none text-sm font-bold uppercase tracking-wider font-hn text-neutral-900 dark:text-white select-none">
+							<span id="title-specs">Specifications</span>
 							<i id="icon-acc-specs" class="ri-arrow-down-s-line text-lg transition-transform group-open:rotate-180"></i>
 						</summary>
-						<div id="content-specs" class="pt-4 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed font-light font-hn space-y-4">
-							<?php the_content(); ?>
+						<div id="content-specs" class="pt-4 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed font-light font-hn space-y-2">
+							<?php
+							$specs = $product->get_attributes();
+							if ( ! empty( $specs ) ) :
+							?>
+								<div id="specs-table" class="space-y-1.5 font-mono">
+									<?php foreach ( $specs as $spec_name => $spec_obj ) : ?>
+										<div class="flex items-center justify-between py-1 border-b border-black/5 dark:border-white/5">
+											<span class="text-neutral-400 uppercase text-[11px]"><?php echo esc_html( wc_attribute_label( $spec_name ) ); ?></span>
+											<span class="text-neutral-900 dark:text-white font-medium text-xs">
+												<?php
+												if ( is_object( $spec_obj ) && method_exists( $spec_obj, 'get_options' ) ) {
+													echo esc_html( implode( ', ', $spec_obj->get_options() ) );
+												} elseif ( is_string( $spec_obj ) ) {
+													echo esc_html( $spec_obj );
+												}
+												?>
+											</span>
+										</div>
+									<?php endforeach; ?>
+								</div>
+							<?php else : ?>
+								<p>Hall Effect Magnetic Sensor / Optical Microswitch options available. 8,000Hz Hyper-polling rate support.</p>
+							<?php endif; ?>
 						</div>
 					</details>
 
-					<!-- Accordion 2: Shipping & Support -->
-					<details id="acc-shipping" class="group rounded-xl border border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-100/50 dark:bg-neutral-900/40 p-4 transition-all">
-						<summary id="sum-shipping" class="flex items-center justify-between cursor-pointer list-none text-xs uppercase tracking-[0.2em] font-bold text-neutral-900 dark:text-white font-mono">
-							<span>DELIVERY & PRE-ORDER POLICIES</span>
+					<!-- 2. What's In The Box -->
+					<details id="acc-box" class="group border-b border-black/10 dark:border-white/10 pb-4">
+						<summary id="summary-box" class="flex items-center justify-between cursor-pointer list-none text-sm font-bold uppercase tracking-wider font-hn text-neutral-900 dark:text-white select-none">
+							<span id="title-box">What's In The Box</span>
+							<i id="icon-acc-box" class="ri-arrow-down-s-line text-lg transition-transform group-open:rotate-180"></i>
+						</summary>
+						<div id="content-box" class="pt-4 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed font-light font-hn">
+							<ul class="list-disc pl-5 space-y-1 font-mono text-xs">
+								<li>1x Main Hardware Device (<?php echo esc_html( $product_title ); ?>)</li>
+								<li>1x Braided USB-C to USB-A Charging & Data Cable (1.8m)</li>
+								<li>1x 2.4GHz Wireless Ultra-Low Latency Dongle</li>
+								<li>1x Extended PTFE Replacement Skates / Keycap Puller</li>
+								<li>1x Quick Start Guide & Official QC Warranty Card</li>
+							</ul>
+						</div>
+					</details>
+
+					<!-- 3. Shipping & Pre-Order Batch Info -->
+					<details id="acc-shipping" class="group border-b border-black/10 dark:border-white/10 pb-4" open>
+						<summary id="summary-shipping" class="flex items-center justify-between cursor-pointer list-none text-sm font-bold uppercase tracking-wider font-hn text-neutral-900 dark:text-white select-none">
+							<span id="title-shipping">Delivery & Pre-Order Dispatch</span>
 							<i id="icon-acc-shipping" class="ri-arrow-down-s-line text-lg transition-transform group-open:rotate-180"></i>
 						</summary>
 						<div id="content-shipping" class="pt-4 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed font-light font-hn space-y-2">
-							<p>All in-stock products ship within 24-48 hours via Kerry / Flash Express with insured tracking.</p>
-							<p>For Pre-Order batch items, estimated arrival dates are calculated upon official factory dispatch and updated in real-time.</p>
+							<?php if ( $is_preorder ) : ?>
+								<p class="font-semibold text-amber-600 dark:text-amber-400">
+									กำหนดการส่งมอบ (Pre-Order ETA): <?php echo esc_html( $preorder_eta ); ?>
+								</p>
+							<?php endif; ?>
+							<p>สินค้าพร้อมส่ง (In-stock) จัดส่งภายใน 24-48 ชั่วโมง ผ่าน Kerry / Flash Express พร้อมประกันความปลอดภัย</p>
+							<p>สำหรับสินค้ารอบ Pre-Order ระบบจะจัดส่งตามลำดับหมายเลขคำสั่งซื้อเมื่อสินค้าเข้าคลังสินค้าอย่างเป็นทางการ</p>
 						</div>
 					</details>
 				</div>
@@ -303,39 +381,47 @@ while ( have_posts() ) :
 			</div>
 		</div>
 
-		<!-- ── Related Products Section (ATK Gear) ── -->
+		<!-- ── Related Products Section (Same Brand / Category) ── -->
 		<?php
-		$related_products = wc_get_products( [
-			'limit'   => 4,
-			'exclude' => [ $product_id ],
-			'tax_query' => [
+		$related_args = [
+			'post_type'      => 'product',
+			'posts_per_page' => 4,
+			'post__not_in'   => [ $product_id ],
+			'tax_query'      => [
+				'relation' => 'OR',
 				[
 					'taxonomy' => 'product_brand',
 					'field'    => 'term_id',
-					'terms'    => ! is_wp_error( $brands ) && ! empty( $brands ) ? $brands[0]->term_id : 20,
+					'terms'    => wp_list_pluck( (array) $brands, 'term_id' ),
+				],
+				[
+					'taxonomy' => 'product_cat',
+					'field'    => 'term_id',
+					'terms'    => wp_list_pluck( (array) $cats, 'term_id' ),
 				],
 			],
-		] );
-
-		if ( ! empty( $related_products ) ) :
+		];
+		$related_query = new WP_Query( $related_args );
+		if ( $related_query->have_posts() ) :
 		?>
-			<div id="related-products-section" class="mt-28 md:mt-36 pt-16 border-t border-black/10 dark:border-white/10">
-				<div id="related-header-wrap" class="flex items-center justify-between mb-10">
-					<div id="related-titles">
-						<span id="related-sub" class="text-[10px] tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-500 font-mono"></span>
-						<h2 id="related-main" class="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-neutral-900 dark:text-white font-hn">MORE FROM <?php echo esc_html( $brand_name ); ?></h2>
+			<div id="product-related-section" class="mt-20 sm:mt-28 pt-12 border-t border-black/10 dark:border-white/10">
+				<div id="related-header-wrap" class="flex items-center justify-between mb-8 sm:mb-12">
+					<div id="related-header-left">
+						<span id="related-sub-tag" class="text-xs uppercase font-mono tracking-widest text-neutral-400">RECOMMENDED GEAR</span>
+						<h3 id="related-heading" class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-neutral-900 dark:text-white font-hn mt-1">COMPLETE YOUR LOADOUT</h3>
 					</div>
-					<a id="related-view-all" href="<?php echo esc_url( home_url( '/shop' ) ); ?>" class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-semibold text-neutral-800 dark:text-neutral-200 hover:opacity-50 transition-opacity font-mono">
-						<span>VIEW CATALOGUE</span>
-						<i id="related-arrow" class="ri-arrow-right-line text-sm transition-transform group-hover:translate-x-1"></i>
+					<a id="related-view-all-link" href="<?php echo esc_url( $cat_link ); ?>" class="text-xs uppercase font-mono tracking-wider font-semibold hover:opacity-50 transition-opacity">
+						VIEW ALL &rarr;
 					</a>
 				</div>
-
-				<div id="related-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+				<div id="related-products-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
 					<?php
-					foreach ( $related_products as $rel_p ) :
-						raka_render_product_card( $rel_p );
-					endforeach;
+					while ( $related_query->have_posts() ) :
+						$related_query->the_post();
+						$rel_product = wc_get_product( get_the_ID() );
+						raka_render_product_card( $rel_product, [ 'id_prefix' => 'related' ] );
+					endwhile;
+					wp_reset_postdata();
 					?>
 				</div>
 			</div>
@@ -344,45 +430,41 @@ while ( have_posts() ) :
 	</div>
 </main>
 
-<!-- ── Client Script: Interactive Variations & Gallery Switcher ── -->
-<script id="product-interaction-script">
-(function initProductSingle() {
-	const mainImg = document.getElementById('product-active-image');
-	const form = document.getElementById('product-variation-form');
-	const priceEl = document.getElementById('product-active-price');
-	const skuEl = document.getElementById('product-dynamic-sku');
-	const hiddenVarId = document.getElementById('hidden-variation-id');
-	const qtyInput = document.getElementById('product-qty-input');
+<!-- ── Single Product Client Logic ── -->
+<script id="single-product-inline-script">
+(function() {
+	// 1. Gallery Thumbnail Switcher
+	window.selectProductImage = function(src, btn) {
+		const mainImg = document.getElementById('product-active-image');
+		if (mainImg) mainImg.src = src;
 
-	let variationsData = [];
-	if (form) {
-		try {
-			variationsData = JSON.parse(form.getAttribute('data-variations') || '[]');
-		} catch (e) {
-			variationsData = [];
-		}
-	}
-
-	// 1. Image selection from thumbnail strip
-	window.selectProductImage = function(imgUrl, clickedBtn) {
-		if (mainImg) {
-			mainImg.style.opacity = '0.3';
-			setTimeout(() => {
-				mainImg.src = imgUrl;
-				mainImg.style.opacity = '1';
-			}, 150);
-		}
-		document.querySelectorAll('.product-thumb-btn').forEach(btn => {
-			btn.classList.remove('border-black', 'dark:border-white', 'ring-1', 'ring-black', 'dark:ring-white', 'opacity-100');
-			btn.classList.add('border-neutral-200', 'dark:border-neutral-800', 'opacity-60');
+		document.querySelectorAll('.product-thumb-btn').forEach(el => {
+			el.classList.remove('border-black', 'dark:border-white', 'ring-1', 'ring-black', 'dark:ring-white', 'opacity-100');
+			el.classList.add('border-neutral-200', 'dark:border-neutral-800', 'opacity-60');
 		});
-		if (clickedBtn) {
-			clickedBtn.classList.remove('border-neutral-200', 'dark:border-neutral-800', 'opacity-60');
-			clickedBtn.classList.add('border-black', 'dark:border-white', 'ring-1', 'ring-black', 'dark:ring-white', 'opacity-100');
+
+		if (btn) {
+			btn.classList.remove('border-neutral-200', 'dark:border-neutral-800', 'opacity-60');
+			btn.classList.add('border-black', 'dark:border-white', 'ring-1', 'ring-black', 'dark:ring-white', 'opacity-100');
 		}
 	};
 
-	// 2. Quantity Change Handler
+	// 2. Interactive Variation Management
+	const form = document.getElementById('product-variation-form');
+	let variationsData = [];
+	try {
+		variationsData = form ? JSON.parse(form.getAttribute('data-variations') || '[]') : [];
+	} catch(e) {
+		variationsData = [];
+	}
+
+	const hiddenVarId = document.getElementById('hidden-variation-id');
+	const priceEl     = document.getElementById('product-active-price');
+	const skuEl       = document.getElementById('product-dynamic-sku');
+	const mainImg     = document.getElementById('product-active-image');
+	const qtyInput    = document.getElementById('product-qty-input');
+
+	// Quantity controls
 	window.changeProductQty = function(delta) {
 		if (!qtyInput) return;
 		let val = parseInt(qtyInput.value, 10) || 1;
@@ -518,6 +600,33 @@ while ( have_posts() ) :
 			if (matched.image && matched.image.src && mainImg) {
 				mainImg.src = matched.image.src;
 			}
+
+			// Pre-order button dynamic sync
+			const isVarPreorder = matched.is_preorder || !matched.is_in_stock;
+			const cartBtn = document.getElementById('btn-add-to-cart');
+			const cartTxt = document.getElementById('btn-cart-text');
+			const cartIcon = document.getElementById('icon-cart-btn');
+			const preBanner = document.getElementById('product-preorder-banner');
+
+			if (cartBtn && cartTxt && cartIcon) {
+				if (isVarPreorder) {
+					cartBtn.className = 'flex-1 h-12 sm:h-14 px-8 rounded-xl bg-white text-black border-2 border-black hover:bg-neutral-100 font-bold text-xs sm:text-sm uppercase tracking-[0.25em] flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-sm font-hn';
+					cartTxt.textContent = 'PRE-ORDER NOW';
+					cartIcon.className = 'ri-time-line text-lg text-black';
+					cartBtn.setAttribute('data-is-preorder', '1');
+					cartBtn.style.border = '2px solid #000000';
+					if (preBanner) preBanner.classList.remove('hidden');
+					if (preBanner) preBanner.classList.add('flex');
+				} else {
+					cartBtn.className = 'flex-1 h-12 sm:h-14 px-8 rounded-xl bg-black text-white dark:bg-white dark:text-black font-semibold text-xs sm:text-sm uppercase tracking-[0.25em] flex items-center justify-center gap-3 transition-all duration-300 hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-lg font-hn';
+					cartTxt.textContent = 'ADD TO CART';
+					cartIcon.className = 'ri-shopping-bag-3-line text-lg';
+					cartBtn.setAttribute('data-is-preorder', '0');
+					cartBtn.style.border = '';
+					if (preBanner) preBanner.classList.remove('flex');
+					if (preBanner) preBanner.classList.add('hidden');
+				}
+			}
 		}
 	}
 
@@ -530,10 +639,11 @@ while ( have_posts() ) :
 		const pId = <?php echo (int) $product_id; ?>;
 		const varId = hiddenVarId ? parseInt(hiddenVarId.value, 10) : 0;
 		const qty = qtyInput ? parseInt(qtyInput.value, 10) : 1;
+		const isPreorder = cartBtn ? (cartBtn.getAttribute('data-is-preorder') === '1') : false;
 
 		if (cartBtn) {
 			cartBtn.disabled = true;
-			if (cartTxt) cartTxt.textContent = 'ADDING...';
+			if (cartTxt) cartTxt.textContent = isPreorder ? 'PRE-ORDERING...' : 'ADDING...';
 			if (cartIcon) cartIcon.className = 'ri-loader-4-line animate-spin text-lg';
 		}
 
@@ -592,11 +702,11 @@ while ( have_posts() ) :
 			// 4. Button Success State
 			if (cartBtn) {
 				cartBtn.disabled = false;
-				if (cartTxt) cartTxt.textContent = 'ADDED TO BAG!';
+				if (cartTxt) cartTxt.textContent = isPreorder ? 'PRE-ORDER ADDED!' : 'ADDED TO BAG!';
 				if (cartIcon) cartIcon.className = 'ri-check-line text-lg text-green-400';
 				setTimeout(() => {
-					if (cartTxt) cartTxt.textContent = 'ADD TO CART';
-					if (cartIcon) cartIcon.className = 'ri-shopping-bag-3-line text-lg';
+					if (cartTxt) cartTxt.textContent = isPreorder ? 'PRE-ORDER NOW' : 'ADD TO CART';
+					if (cartIcon) cartIcon.className = isPreorder ? 'ri-time-line text-lg text-black' : 'ri-shopping-bag-3-line text-lg';
 				}, 2000);
 			}
 		})

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" width="300" height="80" fill="currentColor">
+            <g font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="42" letter-spacing="4">
+                <path d="M 20 60 L 45 15 L 70 60 L 55 60 L 45 38 L 35 60 Z M 39 48 L 51 48 L 45 35 Z" />
+                <path d="M 75 15 L 125 15 L 125 27 L 106 27 L 106 60 L 94 60 L 94 27 L 75 27 Z" />
+                <path d="M 135 15 L 147 15 L 147 34 L 168 15 L 184 15 L 160 37 L 186 60 L 170 60 L 147 40 L 147 60 L 135 60 Z" />
+                <text x="198" y="58" font-size="20" font-weight="700" letter-spacing="3" opacity="0.8">GEAR</text>
+            </g>
+        </svg>

@@ -376,3 +376,22 @@ html.dark #breadcrumbs .breadcrumb_last {
 	margin-right: auto;
 	padding: 0 !important;
 }
+
+
+/* Pre-Order Button Monochrome Styles */
+#btn-add-to-cart[data-is-preorder="1"] {
+	border: 2px solid #000000 !important;
+	background-color: #ffffff !important;
+	color: #000000 !important;
+}
+#btn-add-to-cart[data-is-preorder="1"]:hover {
+	background-color: #f5f5f5 !important;
+}
+html.dark #btn-add-to-cart[data-is-preorder="1"] {
+	border: 2px solid #ffffff !important;
+	background-color: #000000 !important;
+	color: #ffffff !important;
+}
+html.dark #btn-add-to-cart[data-is-preorder="1"]:hover {
+	background-color: #171717 !important;
+}

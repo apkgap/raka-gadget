@@ -132,7 +132,7 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 				$product_name = $linked_prod->post_title;
 			}
 			if ( empty( $price ) ) {
-				$price = get_post_meta( $product_id, '_preorder_price', true );
+				$price = get_post_meta( $product_id, '_price', true ) ?: get_post_meta( $product_id, '_preorder_price', true );
 			}
 			if ( empty( $featured_image_url ) ) {
 				$featured_image_url = get_the_post_thumbnail_url( $product_id, 'large' );
@@ -272,6 +272,33 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
  * Get List of Pre-order Products for Admin dropdown.
  */
 function preorder_raka_get_products() {
+	$data = [];
+
+	// 1. Fetch WooCommerce Products if WooCommerce is active
+	if ( function_exists( 'wc_get_products' ) ) {
+		$wc_products = wc_get_products([
+			'status'  => 'publish',
+			'limit'   => -1,
+			'orderby' => 'name',
+			'order'   => 'ASC',
+		]);
+
+		foreach ( $wc_products as $prod ) {
+			$is_preorder = get_post_meta( $prod->get_id(), '_raka_is_preorder', true ) === 'yes' || 'preorder' === $prod->get_stock_status();
+			$title = $prod->get_name();
+			if ( $is_preorder ) {
+				$title = '[PRE-ORDER] ' . $title;
+			}
+			$data[] = [
+				'id'          => $prod->get_id(),
+				'title'       => $title,
+				'price'       => (int) $prod->get_price(),
+				'is_preorder' => $is_preorder,
+			];
+		}
+	}
+
+	// 2. Also include legacy preorder_product CPT
 	$posts = get_posts([
 		'post_type'   => 'preorder_product',
 		'post_status' => 'publish',
@@ -280,12 +307,11 @@ function preorder_raka_get_products() {
 		'order'       => 'ASC',
 	]);
 
-	$data = [];
 	foreach ( $posts as $p ) {
 		$data[] = [
 			'id'    => $p->ID,
 			'title' => $p->post_title,
-			'price' => get_post_meta( $p->ID, '_preorder_price', true ),
+			'price' => (int) get_post_meta( $p->ID, '_preorder_price', true ),
 		];
 	}
 
@@ -294,5 +320,6 @@ function preorder_raka_get_products() {
 		'data'    => $data,
 	];
 }
+
 
 

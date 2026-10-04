@@ -409,10 +409,11 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 
 			const txtSpan = btn.querySelector('span');
 			const icoEl   = btn.querySelector('i');
-			const origTxt = txtSpan ? txtSpan.textContent : 'ADD TO CART';
+			const origTxt = txtSpan ? txtSpan.textContent.trim() : 'ADD TO CART';
 			const origIco = icoEl ? icoEl.className : 'ri-shopping-bag-3-line text-xs flex-shrink-0';
+			const isPre = origTxt.toUpperCase().includes('PRE-ORDER');
 
-			if (txtSpan) txtSpan.textContent = 'ADDING...';
+			if (txtSpan) txtSpan.textContent = isPre ? 'ORDERING...' : 'ADDING...';
 			if (icoEl) icoEl.className = 'ri-loader-4-line animate-spin text-xs flex-shrink-0';
 
 			const formData = new FormData();
@@ -425,7 +426,7 @@ if ( ! is_front_page() && function_exists( 'raka_render_site_footer' ) ) {
 			})
 			.then(res => res.json())
 			.then(data => {
-				if (txtSpan) txtSpan.textContent = 'ADDED!';
+				if (txtSpan) txtSpan.textContent = isPre ? 'PRE-ORDER ADDED!' : 'ADDED!';
 				if (icoEl) icoEl.className = 'ri-check-line text-xs text-green-400 flex-shrink-0';
 
 				if (data && data.fragments && typeof window.updateCartDrawerFragments === 'function') {
