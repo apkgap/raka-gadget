@@ -126,9 +126,9 @@ $is_logged_in    = is_user_logged_in();
       width: 100%;
       height: 100%;
       object-fit: contain;
-      object-position: left center;
+      object-position: right center;
       z-index: -2;
-      transform-origin: left center;
+      transform-origin: right center;
       animation: in-bg 1.35s cubic-bezier(.16, 1, .3, 1) both;
     }
 
