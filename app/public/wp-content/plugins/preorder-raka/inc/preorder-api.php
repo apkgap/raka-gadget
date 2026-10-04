@@ -87,6 +87,23 @@ function preorder_raka_format_single_item( $post ) {
 		}
 	}
 
+	// Auto-lookup matching WooCommerce / Pre-order product image if image is still empty
+	if ( empty( $featured_image_url ) && ! empty( $product_name ) ) {
+		$search_query = trim( preg_replace( '/\s*\(.*?\)\s*/', ' ', $product_name ) );
+		$matched_prods = get_posts( [
+			'post_type'      => [ 'product', 'preorder_product' ],
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			's'              => $search_query ?: $product_name,
+		] );
+		if ( ! empty( $matched_prods ) ) {
+			$m_thumb = get_the_post_thumbnail_url( $matched_prods[0]->ID, 'large' );
+			if ( $m_thumb ) {
+				$featured_image_url = $m_thumb;
+			}
+		}
+	}
+
 	$price    = intval( $price );
 	$qty      = intval( $get_meta( '_preorder_qty', 1 ) ) ?: 1;
 	$shipping = intval( $get_meta( '_preorder_shipping', 0 ) );
@@ -326,6 +343,12 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	update_post_meta( $post_id, '_preorder_phone', $phone );
 	update_post_meta( $post_id, '_preorder_citizen_id_last4', substr( preg_replace( '/[^0-9]/', '', $citizen_id ), -4 ) );
 	update_post_meta( $post_id, '_preorder_product_id', $product_id );
+	if ( $product_id ) {
+		$p_thumb = get_post_thumbnail_id( $product_id );
+		if ( $p_thumb ) {
+			set_post_thumbnail( $post_id, $p_thumb );
+		}
+	}
 	update_post_meta( $post_id, '_preorder_product', $product_name );
 	update_post_meta( $post_id, '_preorder_price', $price );
 	update_post_meta( $post_id, '_preorder_qty', $qty );

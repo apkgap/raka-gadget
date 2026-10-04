@@ -295,25 +295,81 @@ function preorder_raka_render_details_metabox( $post ) {
 	$address            = get_post_meta( $post->ID, '_preorder_address', true );
 	$tracking           = get_post_meta( $post->ID, '_preorder_tracking', true );
 
-	$products = get_posts([
-		'post_type'   => 'preorder_product',
+	$products_wc = get_posts([
+		'post_type'   => 'product',
+		'post_status' => 'publish',
 		'numberposts' => -1,
+		'orderby'     => 'title',
+		'order'       => 'ASC',
 	]);
+
+	$products_pre = get_posts([
+		'post_type'   => 'preorder_product',
+		'post_status' => 'publish',
+		'numberposts' => -1,
+		'orderby'     => 'title',
+		'order'       => 'ASC',
+	]);
+
+	$all_dropdown_products = array_merge( $products_pre, $products_wc );
 	?>
 	<table id="preorder-raka-details-table" class="form-table" style="margin: 10px 0;">
 		<tbody>
 			<tr>
-				<th scope="row"><label for="preorder_raka_product_id"><?php esc_html_e( 'ผูกกับสินค้าพรีออเดอร์', 'preorder-raka' ); ?></label></th>
+				<th scope="row"><label for="preorder_raka_product_id"><?php esc_html_e( 'ผูกกับสินค้า (WooCommerce / Pre-order)', 'preorder-raka' ); ?></label></th>
 				<td>
-					<select id="preorder_raka_product_id" name="preorder_raka_product_id" style="width: 25em;">
-						<option value=""><?php esc_html_e( '-- ระบุสินค้าพรีออเดอร์ --', 'preorder-raka' ); ?></option>
-						<?php foreach ( $products as $prod ) : ?>
-							<option value="<?php echo esc_attr( $prod->ID ); ?>" <?php selected( $selected_prod_id, $prod->ID ); ?>>
-								<?php echo esc_html( $prod->post_title ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description" style="margin-top: 5px;"><?php esc_html_e( 'เลือกสินค้าพรีออเดอร์เพื่อดึงชื่อสินค้า ราคา และรูปภาพหลักมาใช้งานโดยอัตโนมัติ', 'preorder-raka' ); ?></p>
+					<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+						<select id="preorder_raka_product_id" name="preorder_raka_product_id" style="width: 28em; max-width: 100%;">
+							<option value=""><?php esc_html_e( '-- เลือกรหัสสินค้าเพื่อดึงข้อมูลอัตโนมัติ --', 'preorder-raka' ); ?></option>
+							<?php if ( ! empty( $products_pre ) ) : ?>
+								<optgroup label="<?php esc_attr_e( 'สินค้าเฉพาะพรีออเดอร์', 'preorder-raka' ); ?>">
+									<?php foreach ( $products_pre as $prod ) : 
+										$p_price = get_post_meta( $prod->ID, '_preorder_price', true );
+										$p_thumb = get_the_post_thumbnail_url( $prod->ID, 'medium' ) ?: '';
+									?>
+										<option value="<?php echo esc_attr( $prod->ID ); ?>" 
+											data-title="<?php echo esc_attr( $prod->post_title ); ?>" 
+											data-price="<?php echo esc_attr( $p_price ); ?>" 
+											data-thumb="<?php echo esc_attr( $p_thumb ); ?>"
+											<?php selected( $selected_prod_id, $prod->ID ); ?>
+										>
+											[Preorder] <?php echo esc_html( $prod->post_title ); ?> (฿<?php echo esc_html( number_format( (float) $p_price ) ); ?>)
+										</option>
+									<?php endforeach; ?>
+								</optgroup>
+							<?php endif; ?>
+							<?php if ( ! empty( $products_wc ) ) : ?>
+								<optgroup label="<?php esc_attr_e( 'สินค้าในร้าน (WooCommerce Products)', 'preorder-raka' ); ?>">
+									<?php foreach ( $products_wc as $prod ) : 
+										$p_price = get_post_meta( $prod->ID, '_price', true ) ?: get_post_meta( $prod->ID, '_regular_price', true );
+										$p_thumb = get_the_post_thumbnail_url( $prod->ID, 'medium' ) ?: '';
+									?>
+										<option value="<?php echo esc_attr( $prod->ID ); ?>" 
+											data-title="<?php echo esc_attr( $prod->post_title ); ?>" 
+											data-price="<?php echo esc_attr( $p_price ); ?>" 
+											data-thumb="<?php echo esc_attr( $p_thumb ); ?>"
+											<?php selected( $selected_prod_id, $prod->ID ); ?>
+										>
+											[Store] <?php echo esc_html( $prod->post_title ); ?> (฿<?php echo esc_html( number_format( (float) $p_price ) ); ?>)
+										</option>
+									<?php endforeach; ?>
+								</optgroup>
+							<?php endif; ?>
+						</select>
+						<div id="preorder_raka_product_preview" style="display: flex; align-items: center; gap: 8px;">
+							<?php 
+								$preview_thumb = '';
+								if ( $selected_prod_id ) {
+									$preview_thumb = get_the_post_thumbnail_url( $selected_prod_id, 'thumbnail' );
+								}
+								if ( ! $preview_thumb ) {
+									$preview_thumb = get_the_post_thumbnail_url( $post->ID, 'thumbnail' );
+								}
+							?>
+							<img id="preorder_raka_thumb_preview" src="<?php echo esc_url( $preview_thumb ); ?>" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc; <?php echo $preview_thumb ? '' : 'display: none;'; ?>" alt="Product Preview">
+						</div>
+					</div>
+					<p class="description" style="margin-top: 5px;"><?php esc_html_e( 'เมื่อเลือกสินค้า ระบบจะดึงชื่อสินค้า ราคา และรูปภาพมาเติมในช่องด้านล่างให้อัตโนมัติ', 'preorder-raka' ); ?></p>
 				</td>
 			</tr>
 			<tr>
@@ -405,6 +461,34 @@ function preorder_raka_render_details_metabox( $post ) {
 			</tr>
 		</tbody>
 	</table>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const prodSelect = document.getElementById('preorder_raka_product_id');
+			const titleInput = document.getElementById('preorder_raka_product');
+			const priceInput = document.getElementById('preorder_raka_price');
+			const thumbImg   = document.getElementById('preorder_raka_thumb_preview');
+
+			if (prodSelect) {
+				prodSelect.addEventListener('change', function() {
+					const opt = prodSelect.options[prodSelect.selectedIndex];
+					if (opt && opt.value) {
+						if (opt.dataset.title && titleInput && (!titleInput.value || confirm('ต้องการแทนที่ชื่อสินค้าด้วย \"' + opt.dataset.title + '\" หรือไม่?'))) {
+							titleInput.value = opt.dataset.title;
+						}
+						if (opt.dataset.price && priceInput) {
+							priceInput.value = opt.dataset.price;
+						}
+						if (opt.dataset.thumb && thumbImg) {
+							thumbImg.src = opt.dataset.thumb;
+							thumbImg.style.display = 'block';
+						} else if (thumbImg) {
+							thumbImg.style.display = 'none';
+						}
+					}
+				});
+			}
+		});
+	</script>
 	<?php
 }
 
@@ -593,6 +677,15 @@ function preorder_raka_save_post( $post_id ) {
 	foreach ( $fields as $post_key => $meta_key ) {
 		if ( isset( $_POST[ $post_key ] ) ) {
 			update_post_meta( $post_id, $meta_key, sanitize_text_field( $_POST[ $post_key ] ) );
+		}
+	}
+
+	// Auto-sync product thumbnail if not set
+	if ( ! empty( $_POST['preorder_raka_product_id'] ) ) {
+		$selected_prod_id = intval( $_POST['preorder_raka_product_id'] );
+		$thumb_id = get_post_thumbnail_id( $selected_prod_id );
+		if ( $thumb_id && ! has_post_thumbnail( $post_id ) ) {
+			set_post_thumbnail( $post_id, $thumb_id );
 		}
 	}
 

@@ -245,7 +245,7 @@ function raka_render_preorder_tracker_v2(): string {
 					<span id="raka-res-timeline-lbl" class="text-xs uppercase font-bold tracking-wider text-neutral-500 dark:text-neutral-400 block">
 						<?php esc_html_e( 'ไทม์ไลน์ความคืบหน้า (Timeline)', 'raka-preorder-theme' ); ?>
 					</span>
-					<div id="raka-res-timeline" class="space-y-3.5 border-l-2 border-neutral-200 dark:border-neutral-700 ml-2.5 pl-4 py-1">
+					<div id="raka-res-timeline" class="relative space-y-0 pl-1 py-1">
 						<!-- Dynamically injected via JS -->
 					</div>
 				</div>
@@ -629,45 +629,65 @@ function raka_render_preorder_tracker_v2(): string {
 				steps.forEach((step, idx) => {
 					const isPassed = idx < curIdx;
 					const isCurrent = idx === curIdx;
+					const isLast = idx === steps.length - 1;
 
 					const stepEl = document.createElement('div');
 					stepEl.id = 'raka-step-' + idx;
-					stepEl.className = 'relative flex items-start gap-3 text-xs sm:text-sm';
+					stepEl.className = 'relative flex items-start gap-3.5 pb-5 last:pb-1';
 
-					// Dot
-					const dot = document.createElement('div');
-					dot.id = 'raka-step-dot-' + idx;
-					dot.className = 'w-5 h-5 rounded-full flex items-center justify-center -ml-[23px] shrink-0 border-2 ' +
-						(isPassed ? 'bg-emerald-600 border-emerald-600 text-white' :
-						(isCurrent ? 'bg-red-600 border-red-600 text-white ring-4 ring-red-500/20' :
-						'bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600 text-transparent'));
-
-					if (isPassed) {
-						dot.innerHTML = '<i class="ri-check-line text-xs font-bold"></i>';
-					} else if (isCurrent) {
-						dot.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>';
+					// Connecting Line (Rendered between current dot and next dot)
+					if (!isLast) {
+						const line = document.createElement('div');
+						line.id = 'raka-step-line-' + idx;
+						line.className = 'absolute left-[11px] top-6 bottom-0 w-[2px] ' + 
+							(isPassed ? 'bg-emerald-500/80 dark:bg-emerald-500/60' : 'bg-neutral-200 dark:bg-neutral-700/80');
+						stepEl.appendChild(line);
 					}
 
-					// Content
+					// Circular Step Dot (Centered mathematically at X = 12px)
+					const dot = document.createElement('div');
+					dot.id = 'raka-step-dot-' + idx;
+					dot.className = 'relative z-10 w-6 h-6 rounded-full shrink-0 flex items-center justify-center border-2 transition-all ' +
+						(isPassed ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm' :
+						(isCurrent ? 'bg-red-600 border-red-600 text-white ring-4 ring-red-500/25 shadow-sm' :
+						'bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-transparent'));
+
+					if (isPassed) {
+						dot.innerHTML = '<i class="ri-check-line text-xs font-bold leading-none"></i>';
+					} else if (isCurrent) {
+						dot.innerHTML = '<div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>';
+					} else {
+						dot.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>';
+					}
+
+					// Content Column
 					const content = document.createElement('div');
 					content.id = 'raka-step-content-' + idx;
-					content.className = 'flex-1 min-w-0';
+					content.className = 'flex-1 min-w-0 pt-0.5';
 
 					const title = document.createElement('div');
 					title.id = 'raka-step-title-' + idx;
-					title.className = isCurrent ? 'font-bold text-neutral-900 dark:text-white text-sm sm:text-base' :
-						(isPassed ? 'font-semibold text-neutral-700 dark:text-neutral-300' : 'text-neutral-400 dark:text-neutral-500');
+					title.className = isCurrent ? 'font-bold text-neutral-900 dark:text-white text-sm sm:text-base leading-snug' :
+						(isPassed ? 'font-medium text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm leading-snug' : 'font-normal text-neutral-400 dark:text-neutral-500 text-xs sm:text-sm leading-snug');
 					title.textContent = step.title;
+					content.appendChild(title);
 
 					if (step.date) {
 						const dateSpan = document.createElement('span');
 						dateSpan.id = 'raka-step-date-' + idx;
-						dateSpan.className = 'block text-xs font-mono text-neutral-400 dark:text-neutral-500 mt-0.5';
+						dateSpan.className = 'block text-xs font-mono ' + (isCurrent ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-neutral-400 dark:text-neutral-500') + ' mt-0.5';
 						dateSpan.textContent = step.date;
 						content.appendChild(dateSpan);
 					}
 
-					content.insertBefore(title, content.firstChild);
+					if (step.desc) {
+						const descSpan = document.createElement('span');
+						descSpan.id = 'raka-step-desc-' + idx;
+						descSpan.className = 'block text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 leading-relaxed';
+						descSpan.textContent = step.desc;
+						content.appendChild(descSpan);
+					}
+
 					stepEl.appendChild(dot);
 					stepEl.appendChild(content);
 					resTimeline.appendChild(stepEl);
