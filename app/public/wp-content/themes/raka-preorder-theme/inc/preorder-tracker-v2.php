@@ -38,34 +38,34 @@ function raka_render_preorder_tracker_v2(): string {
 				<button
 					type="button"
 					id="raka-tab-btn-order"
-					class="py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10"
+					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10"
 					data-tab="order"
 				>
-					<i id="raka-tab-icon-order" class="ri-hashtag text-sm"></i>
+					<i id="raka-tab-icon-order" class="ri-hashtag text-sm sm:text-base"></i>
 					<span id="raka-tab-text-order"><?php esc_html_e( 'ค้นหาด้วยเลขออเดอร์', 'raka-preorder-theme' ); ?></span>
 				</button>
 				<button
 					type="button"
 					id="raka-tab-btn-phone"
-					class="py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
 					data-tab="phone"
 				>
-					<i id="raka-tab-icon-phone" class="ri-phone-line text-sm"></i>
+					<i id="raka-tab-icon-phone" class="ri-phone-line text-sm sm:text-base"></i>
 					<span id="raka-tab-text-phone"><?php esc_html_e( 'ค้นหาด้วยเบอร์โทร', 'raka-preorder-theme' ); ?></span>
 				</button>
 			</div>
 
 			<!-- Primary Input Group -->
-			<div id="raka-track-primary-group" class="space-y-1">
-				<label id="raka-track-primary-label" for="raka-track-primary-input" class="block text-[11px] uppercase tracking-wider font-bold text-neutral-600 dark:text-neutral-400 font-hn">
+			<div id="raka-track-primary-group" class="space-y-1.5">
+				<label id="raka-track-primary-label" for="raka-track-primary-input" class="block text-[11px] font-bold text-neutral-600 dark:text-neutral-400">
 					<?php esc_html_e( 'ORDER NUMBER / หมายเลขคำสั่งซื้อ', 'raka-preorder-theme' ); ?>
 				</label>
 				<div id="raka-track-primary-wrap" class="relative flex items-center">
-					<i id="raka-track-primary-icon" class="ri-hashtag text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none"></i>
+					<i id="raka-track-primary-icon" class="ri-hashtag text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none"></i>
 					<input
 						type="text"
 						id="raka-track-primary-input"
-						class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 transition-all"
+						class="w-full h-12 pl-11 pr-4 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-sm font-mono placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600/50 dark:focus:ring-red-500/50 transition-all"
 						placeholder="เช่น RAKA-PRE-312691"
 						autocomplete="off"
 					/>
@@ -73,7 +73,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Cloudflare Turnstile CAPTCHA Widget -->
-			<div id="raka-turnstile-wrapper" class="pt-1 flex flex-col items-center justify-center min-h-[65px] rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/5 p-2 overflow-hidden">
+			<div id="raka-turnstile-wrapper" class="flex flex-col items-center justify-center min-h-[65px] rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/5 p-2 overflow-hidden">
 				<div
 					id="raka-turnstile-widget"
 					class="cf-turnstile"
@@ -83,8 +83,8 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Error Alert Message -->
-			<div id="raka-tracker-error-msg" class="hidden p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
-				<i id="raka-tracker-error-icon" class="ri-error-warning-line text-base shrink-0"></i>
+			<div id="raka-tracker-error-msg" class="hidden p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs sm:text-sm flex items-center gap-2.5">
+				<i id="raka-tracker-error-icon" class="ri-error-warning-line text-lg shrink-0"></i>
 				<span id="raka-tracker-error-text" class="leading-tight"></span>
 			</div>
 
@@ -92,9 +92,9 @@ function raka_render_preorder_tracker_v2(): string {
 			<button
 				type="button"
 				id="raka-tracker-submit-btn"
-				class="w-full py-3 px-5 rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs sm:text-sm font-bold font-hn tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+				class="w-full h-12 px-6 rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-sm font-semibold flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:scale-[1.005] active:scale-[0.99] cursor-pointer"
 			>
-				<i id="raka-tracker-btn-icon" class="ri-search-2-line text-sm"></i>
+				<i id="raka-tracker-btn-icon" class="ri-search-2-line text-base"></i>
 				<span id="raka-tracker-btn-text"><?php esc_html_e( 'ค้นหารายการพรีออเดอร์', 'raka-preorder-theme' ); ?></span>
 			</button>
 		</div>
@@ -280,19 +280,19 @@ function raka_render_preorder_tracker_v2(): string {
 				hideError();
 
 				if (mode === 'order') {
-					tabBtnOrder.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
-					tabBtnPhone.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
 
 					primaryLabel.textContent = 'ORDER NUMBER / หมายเลขคำสั่งซื้อ';
-					primaryIcon.className = 'ri-hashtag text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none';
+					primaryIcon.className = 'ri-hashtag text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none';
 					primaryInput.placeholder = 'เช่น RAKA-PRE-312691';
 					primaryInput.type = 'text';
 				} else {
-					tabBtnOrder.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
-					tabBtnPhone.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
 
 					primaryLabel.textContent = 'PHONE NUMBER / เบอร์โทรศัพท์';
-					primaryIcon.className = 'ri-phone-line text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none';
+					primaryIcon.className = 'ri-phone-line text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none';
 					primaryInput.placeholder = 'เช่น 081-234-5678';
 					primaryInput.type = 'tel';
 				}
@@ -316,11 +316,11 @@ function raka_render_preorder_tracker_v2(): string {
 			function setLoading(loading) {
 				if (loading) {
 					submitBtn.disabled = true;
-					btnIcon.className = 'ri-loader-4-line text-sm animate-spin';
+					btnIcon.className = 'ri-loader-4-line text-base animate-spin';
 					btnText.textContent = 'กำลังตรวจสอบ...';
 				} else {
 					submitBtn.disabled = false;
-					btnIcon.className = 'ri-search-2-line text-sm';
+					btnIcon.className = 'ri-search-2-line text-base';
 					btnText.textContent = 'ค้นหารายการพรีออเดอร์';
 				}
 			}
