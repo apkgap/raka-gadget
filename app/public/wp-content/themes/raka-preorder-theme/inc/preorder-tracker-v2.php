@@ -29,6 +29,23 @@ function raka_render_preorder_tracker_v2(): string {
 	<?php endif; ?>
 
 	<style>
+		#raka-tracker-v2,
+		#raka-tracker-v2 button,
+		#raka-tracker-v2 input,
+		#raka-tracker-v2 label,
+		#raka-tracker-v2 span,
+		#raka-tracker-v2 h3,
+		#raka-tracker-v2 h4,
+		#raka-tracker-v2 p {
+			font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
+		}
+		#raka-tracker-v2 .font-mono {
+			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+		}
+		#raka-track-primary-input {
+			padding-left: 46px !important;
+			padding-right: 16px !important;
+		}
 		.custom-tracker-scroll::-webkit-scrollbar {
 			width: 5px;
 		}
@@ -44,7 +61,7 @@ function raka_render_preorder_tracker_v2(): string {
 		}
 	</style>
 
-	<div id="raka-tracker-v2" class="w-full text-left font-sans select-none text-neutral-900 dark:text-white transition-all duration-300">
+	<div id="raka-tracker-v2" class="w-full text-left font-hn select-none text-neutral-900 dark:text-white transition-all duration-300">
 		
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3.5">
@@ -76,12 +93,13 @@ function raka_render_preorder_tracker_v2(): string {
 				<label id="raka-track-primary-label" for="raka-track-primary-input" class="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
 					<?php esc_html_e( 'ORDER NUMBER / หมายเลขคำสั่งซื้อ', 'raka-preorder-theme' ); ?>
 				</label>
-				<div id="raka-track-primary-wrap" class="relative flex items-center">
-					<i id="raka-track-primary-icon" class="ri-hashtag text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none"></i>
+				<div id="raka-track-primary-wrap" class="relative flex items-center w-full">
+					<i id="raka-track-primary-icon" class="ri-hashtag text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none z-10"></i>
 					<input
 						type="text"
 						id="raka-track-primary-input"
-						class="w-full h-12 pl-11 pr-4 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-sm sm:text-base font-mono placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600/50 dark:focus:ring-red-500/50 transition-all"
+						class="w-full h-12 pl-12 pr-4 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-sm sm:text-base font-mono placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600/50 dark:focus:ring-red-500/50 transition-all"
+						style="padding-left: 46px !important; padding-right: 16px !important;"
 						placeholder="เช่น RAKA-PRE-312691"
 						autocomplete="off"
 					/>
