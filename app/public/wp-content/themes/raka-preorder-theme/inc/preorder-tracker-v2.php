@@ -2,7 +2,7 @@
 /**
  * Modern Pre-Order Tracker V2 Component.
  *
- * Lightweight, native vanilla JS AJAX search and timeline renderer.
+ * Lightweight, native vanilla JS AJAX search and timeline renderer with Tab Switcher (Order No / Phone).
  * Fully compatible with /wp-json/preorder-raka/v1/status.
  *
  * @package raka-preorder-theme
@@ -12,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Render Modern Pre-Order Tracker Component with Tab Switcher.
+ *
+ * @return string
+ */
 function raka_render_preorder_tracker_v2(): string {
 	ob_start();
 	?>
@@ -19,15 +24,39 @@ function raka_render_preorder_tracker_v2(): string {
 		
 		<!-- ── SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3.5">
-			<div class="space-y-1">
-				<label for="raka-track-order-no" class="block text-[11px] uppercase tracking-wider font-bold text-neutral-600 dark:text-neutral-400 font-hn">
-					<?php esc_html_e( 'Order Number / หมายเลขคำสั่งซื้อ', 'raka-preorder-theme' ); ?>
+			
+			<!-- Mode Selector Tab Switcher -->
+			<div id="raka-track-tab-wrap" class="grid grid-cols-2 p-1 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10">
+				<button
+					type="button"
+					id="raka-tab-btn-order"
+					class="py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10"
+					data-tab="order"
+				>
+					<i id="raka-tab-icon-order" class="ri-hashtag text-sm"></i>
+					<span id="raka-tab-text-order"><?php esc_html_e( 'ค้นหาด้วยเลขออเดอร์', 'raka-preorder-theme' ); ?></span>
+				</button>
+				<button
+					type="button"
+					id="raka-tab-btn-phone"
+					class="py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+					data-tab="phone"
+				>
+					<i id="raka-tab-icon-phone" class="ri-phone-line text-sm"></i>
+					<span id="raka-tab-text-phone"><?php esc_html_e( 'ค้นหาด้วยเบอร์โทร', 'raka-preorder-theme' ); ?></span>
+				</button>
+			</div>
+
+			<!-- Primary Input Group -->
+			<div id="raka-track-primary-group" class="space-y-1">
+				<label id="raka-track-primary-label" for="raka-track-primary-input" class="block text-[11px] uppercase tracking-wider font-bold text-neutral-600 dark:text-neutral-400 font-hn">
+					<?php esc_html_e( 'ORDER NUMBER / หมายเลขคำสั่งซื้อ', 'raka-preorder-theme' ); ?>
 				</label>
-				<div class="relative flex items-center">
-					<i class="ri-hashtag text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none"></i>
+				<div id="raka-track-primary-wrap" class="relative flex items-center">
+					<i id="raka-track-primary-icon" class="ri-hashtag text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none"></i>
 					<input
 						type="text"
-						id="raka-track-order-no"
+						id="raka-track-primary-input"
 						class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 transition-all"
 						placeholder="เช่น RAKA-PRE-312691"
 						autocomplete="off"
@@ -35,20 +64,21 @@ function raka_render_preorder_tracker_v2(): string {
 				</div>
 			</div>
 
-			<div class="space-y-1">
-				<div class="flex items-center justify-between">
-					<label for="raka-track-phone" class="block text-[11px] uppercase tracking-wider font-bold text-neutral-600 dark:text-neutral-400 font-hn">
-						<?php esc_html_e( 'Verification / ยืนยันตัวตน', 'raka-preorder-theme' ); ?>
+			<!-- Secondary / Verification Input Group -->
+			<div id="raka-track-verify-group" class="space-y-1">
+				<div id="raka-track-verify-header" class="flex items-center justify-between">
+					<label id="raka-track-verify-label" for="raka-track-verify-input" class="block text-[11px] uppercase tracking-wider font-bold text-neutral-600 dark:text-neutral-400 font-hn">
+						<?php esc_html_e( 'VERIFICATION / ยืนยันตัวตน', 'raka-preorder-theme' ); ?>
 					</label>
-					<span class="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal">
+					<span id="raka-track-verify-hint" class="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal">
 						<?php esc_html_e( 'เบอร์โทร หรือ บัตร ปชช. 4 ตัวท้าย', 'raka-preorder-theme' ); ?>
 					</span>
 				</div>
-				<div class="relative flex items-center">
-					<i class="ri-shield-check-line text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none"></i>
+				<div id="raka-track-verify-wrap" class="relative flex items-center">
+					<i id="raka-track-verify-icon" class="ri-shield-check-line text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none"></i>
 					<input
 						type="text"
-						id="raka-track-phone"
+						id="raka-track-verify-input"
 						class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 transition-all"
 						placeholder="กรอกเบอร์โทร หรือ เลขท้าย 4 หลัก"
 						autocomplete="off"
@@ -58,10 +88,11 @@ function raka_render_preorder_tracker_v2(): string {
 
 			<!-- Error Alert Message -->
 			<div id="raka-tracker-error-msg" class="hidden p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
-				<i class="ri-error-warning-line text-base shrink-0"></i>
+				<i id="raka-tracker-error-icon" class="ri-error-warning-line text-base shrink-0"></i>
 				<span id="raka-tracker-error-text" class="leading-tight"></span>
 			</div>
 
+			<!-- Search Submit Button -->
 			<button
 				type="button"
 				id="raka-tracker-submit-btn"
@@ -76,8 +107,8 @@ function raka_render_preorder_tracker_v2(): string {
 		<div id="raka-tracker-result-view" class="hidden w-full space-y-4">
 			
 			<!-- Top Header: Order ID & Back Button -->
-			<div class="flex items-center justify-between pb-2 border-b border-black/10 dark:border-white/10">
-				<div>
+			<div id="raka-res-header-bar" class="flex items-center justify-between pb-2 border-b border-black/10 dark:border-white/10">
+				<div id="raka-res-header-info">
 					<span id="raka-res-order-no" class="text-xs font-mono font-bold text-neutral-900 dark:text-white uppercase tracking-wider block"></span>
 					<h3 id="raka-res-product-title" class="text-sm font-bold font-hn text-neutral-900 dark:text-white truncate max-w-[200px] sm:max-w-xs"></h3>
 				</div>
@@ -86,8 +117,8 @@ function raka_render_preorder_tracker_v2(): string {
 					id="raka-tracker-reset-btn"
 					class="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white font-medium transition-colors cursor-pointer"
 				>
-					<i class="ri-arrow-left-s-line text-base"></i>
-					<span><?php esc_html_e( 'ค้นหาใหม่', 'raka-preorder-theme' ); ?></span>
+					<i id="raka-res-back-ico" class="ri-arrow-left-s-line text-base"></i>
+					<span id="raka-res-back-txt"><?php esc_html_e( 'ค้นหาใหม่', 'raka-preorder-theme' ); ?></span>
 				</button>
 			</div>
 
@@ -97,54 +128,54 @@ function raka_render_preorder_tracker_v2(): string {
 					<img id="raka-res-img" src="" alt="Product" class="w-full h-full object-cover hidden" />
 					<i id="raka-res-img-fallback" class="ri-shopping-bag-3-line text-2xl text-neutral-400"></i>
 				</div>
-				<div class="flex-1 min-w-0 flex flex-col justify-between self-stretch">
-					<div class="flex items-start justify-between gap-2">
+				<div id="raka-res-details-col" class="flex-1 min-w-0 flex flex-col justify-between self-stretch">
+					<div id="raka-res-title-row" class="flex items-start justify-between gap-2">
 						<h4 id="raka-res-prod-name" class="text-xs font-bold leading-tight line-clamp-2"></h4>
 						<span id="raka-res-total-price" class="text-xs sm:text-sm font-mono font-bold text-neutral-900 dark:text-white shrink-0"></span>
 					</div>
-					<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-500 dark:text-neutral-400 font-mono mt-1">
-						<span>จำนวน: <b id="raka-res-qty" class="text-neutral-800 dark:text-neutral-200">1</b></span>
-						<span>ค่าส่ง: <b id="raka-res-shipping" class="text-neutral-800 dark:text-neutral-200">฿0</b></span>
+					<div id="raka-res-meta-row" class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-500 dark:text-neutral-400 font-mono mt-1">
+						<span id="raka-res-qty-wrap">จำนวน: <b id="raka-res-qty" class="text-neutral-800 dark:text-neutral-200">1</b></span>
+						<span id="raka-res-ship-wrap">ค่าส่ง: <b id="raka-res-shipping" class="text-neutral-800 dark:text-neutral-200">฿0</b></span>
 						<span id="raka-res-eta-wrap" class="hidden text-amber-600 dark:text-amber-400">
-							<i class="ri-time-line text-[10px] mr-0.5"></i>ETA: <b id="raka-res-eta"></b>
+							<i id="raka-res-eta-ico" class="ri-time-line text-[10px] mr-0.5"></i>ETA: <b id="raka-res-eta"></b>
 						</span>
 					</div>
 				</div>
 			</div>
 
 			<!-- Status & Delivery Badge Card -->
-			<div class="grid grid-cols-2 gap-2.5 p-3 rounded-2xl bg-neutral-100/70 dark:bg-neutral-800/60 border border-black/5 dark:border-white/10 text-xs">
-				<div>
-					<span class="text-[10px] uppercase text-neutral-400 dark:text-neutral-500 font-mono block mb-0.5">
+			<div id="raka-res-status-grid" class="grid grid-cols-2 gap-2.5 p-3 rounded-2xl bg-neutral-100/70 dark:bg-neutral-800/60 border border-black/5 dark:border-white/10 text-xs">
+				<div id="raka-res-cur-status-wrap">
+					<span id="raka-res-cur-status-lbl" class="text-[10px] uppercase text-neutral-400 dark:text-neutral-500 font-mono block mb-0.5">
 						<?php esc_html_e( 'สถานะปัจจุบัน', 'raka-preorder-theme' ); ?>
 					</span>
 					<span id="raka-res-status-badge" class="font-bold text-red-600 dark:text-red-400 leading-tight block truncate"></span>
 				</div>
-				<div>
-					<span class="text-[10px] uppercase text-neutral-400 dark:text-neutral-500 font-mono block mb-0.5">
+				<div id="raka-res-shipment-wrap">
+					<span id="raka-res-shipment-lbl" class="text-[10px] uppercase text-neutral-400 dark:text-neutral-500 font-mono block mb-0.5">
 						<?php esc_html_e( 'พัสดุจัดส่ง', 'raka-preorder-theme' ); ?>
 					</span>
-					<div class="flex items-center gap-1.5">
+					<div id="raka-res-tracking-row" class="flex items-center gap-1.5">
 						<span id="raka-res-tracking-no" class="font-mono font-semibold text-neutral-900 dark:text-white truncate"></span>
 						<a id="raka-res-courier-link" href="#" target="_blank" rel="noopener noreferrer" class="hidden text-red-600 dark:text-red-400 hover:opacity-75 text-xs">
-							<i class="ri-external-link-line"></i>
+							<i id="raka-res-courier-ico" class="ri-external-link-line"></i>
 						</a>
 					</div>
 				</div>
 			</div>
 
-			<!-- Shipping Address & Contact Info (If available) -->
+			<!-- Shipping Address (If available) -->
 			<div id="raka-res-address-box" class="hidden p-3 rounded-2xl bg-neutral-100/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/10 text-xs space-y-1">
-				<div class="flex items-center gap-1.5 text-[10px] uppercase font-bold text-neutral-500 dark:text-neutral-400 font-hn">
-					<i class="ri-map-pin-line text-xs"></i>
-					<span><?php esc_html_e( 'ที่อยู่จัดส่งสินค้า', 'raka-preorder-theme' ); ?></span>
+				<div id="raka-res-addr-header" class="flex items-center gap-1.5 text-[10px] uppercase font-bold text-neutral-500 dark:text-neutral-400 font-hn">
+					<i id="raka-res-addr-ico" class="ri-map-pin-line text-xs"></i>
+					<span id="raka-res-addr-lbl"><?php esc_html_e( 'ที่อยู่จัดส่งสินค้า', 'raka-preorder-theme' ); ?></span>
 				</div>
 				<p id="raka-res-address-text" class="text-[11px] leading-relaxed text-neutral-700 dark:text-neutral-300 font-sans"></p>
 			</div>
 
 			<!-- Interactive Step Timeline -->
-			<div class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-				<span class="text-[10px] uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-hn block">
+			<div id="raka-res-timeline-wrap" class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+				<span id="raka-res-timeline-lbl" class="text-[10px] uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-hn block">
 					<?php esc_html_e( 'ไทม์ไลน์ความคืบหน้า (Timeline)', 'raka-preorder-theme' ); ?>
 				</span>
 				<div id="raka-res-timeline" class="space-y-2.5 border-l-2 border-neutral-200 dark:border-neutral-700/70 ml-2 pl-3 py-1">
@@ -161,35 +192,94 @@ function raka_render_preorder_tracker_v2(): string {
 			const container = document.getElementById('raka-tracker-v2');
 			if (!container) return;
 
-			const searchView   = document.getElementById('raka-tracker-search-view');
-			const resultView   = document.getElementById('raka-tracker-result-view');
-			const orderInput   = document.getElementById('raka-track-order-no');
-			const phoneInput   = document.getElementById('raka-track-phone');
-			const submitBtn    = document.getElementById('raka-tracker-submit-btn');
-			const btnIcon      = document.getElementById('raka-tracker-btn-icon');
-			const btnText      = document.getElementById('raka-tracker-btn-text');
-			const errorBox     = document.getElementById('raka-tracker-error-msg');
-			const errorText    = document.getElementById('raka-tracker-error-text');
-			const resetBtn     = document.getElementById('raka-tracker-reset-btn');
+			let currentMode = 'order'; // 'order' or 'phone'
 
-			const resOrderNo   = document.getElementById('raka-res-order-no');
-			const resTitle     = document.getElementById('raka-res-product-title');
-			const resStatus    = document.getElementById('raka-res-status-badge');
-			const resTrackNo   = document.getElementById('raka-res-tracking-no');
-			const resCourierLnk= document.getElementById('raka-res-courier-link');
-			const resTimeline  = document.getElementById('raka-res-timeline');
+			const tabBtnOrder   = document.getElementById('raka-tab-btn-order');
+			const tabBtnPhone   = document.getElementById('raka-tab-btn-phone');
+
+			const searchView    = document.getElementById('raka-tracker-search-view');
+			const resultView    = document.getElementById('raka-tracker-result-view');
+			
+			const primaryLabel  = document.getElementById('raka-track-primary-label');
+			const primaryIcon   = document.getElementById('raka-track-primary-icon');
+			const primaryInput  = document.getElementById('raka-track-primary-input');
+
+			const verifyLabel   = document.getElementById('raka-track-verify-label');
+			const verifyHint    = document.getElementById('raka-track-verify-hint');
+			const verifyInput   = document.getElementById('raka-track-verify-input');
+
+			const submitBtn     = document.getElementById('raka-tracker-submit-btn');
+			const btnIcon       = document.getElementById('raka-tracker-btn-icon');
+			const btnText       = document.getElementById('raka-tracker-btn-text');
+			const errorBox      = document.getElementById('raka-tracker-error-msg');
+			const errorText     = document.getElementById('raka-tracker-error-text');
+			const resetBtn      = document.getElementById('raka-tracker-reset-btn');
+
+			const resOrderNo    = document.getElementById('raka-res-order-no');
+			const resTitle      = document.getElementById('raka-res-product-title');
+			const resStatus     = document.getElementById('raka-res-status-badge');
+			const resTrackNo    = document.getElementById('raka-res-tracking-no');
+			const resCourierLnk = document.getElementById('raka-res-courier-link');
+			const resTimeline   = document.getElementById('raka-res-timeline');
 
 			// Product details elements
-			const resImg       = document.getElementById('raka-res-img');
-			const resImgFallback = document.getElementById('raka-res-img-fallback');
-			const resProdName  = document.getElementById('raka-res-prod-name');
-			const resTotalPrice= document.getElementById('raka-res-total-price');
-			const resQty       = document.getElementById('raka-res-qty');
-			const resShipping  = document.getElementById('raka-res-shipping');
-			const resEtaWrap   = document.getElementById('raka-res-eta-wrap');
-			const resEta       = document.getElementById('raka-res-eta');
-			const resAddressBox= document.getElementById('raka-res-address-box');
-			const resAddressTxt= document.getElementById('raka-res-address-text');
+			const resImg        = document.getElementById('raka-res-img');
+			const resImgFallback= document.getElementById('raka-res-img-fallback');
+			const resProdName   = document.getElementById('raka-res-prod-name');
+			const resTotalPrice = document.getElementById('raka-res-total-price');
+			const resQty        = document.getElementById('raka-res-qty');
+			const resShipping   = document.getElementById('raka-res-shipping');
+			const resEtaWrap    = document.getElementById('raka-res-eta-wrap');
+			const resEta        = document.getElementById('raka-res-eta');
+			const resAddressBox = document.getElementById('raka-res-address-box');
+			const resAddressTxt = document.getElementById('raka-res-address-text');
+
+			const activeTabClass = 'bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10';
+			const inactiveTabClass = 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white';
+
+			function switchMode(mode) {
+				currentMode = mode;
+				hideError();
+
+				if (mode === 'order') {
+					// Tab Buttons
+					tabBtnOrder.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+					tabBtnPhone.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+
+					// Primary Field
+					primaryLabel.textContent = 'ORDER NUMBER / หมายเลขคำสั่งซื้อ';
+					primaryIcon.className = 'ri-hashtag text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none';
+					primaryInput.placeholder = 'เช่น RAKA-PRE-312691';
+					primaryInput.type = 'text';
+
+					// Verification Field
+					verifyLabel.textContent = 'VERIFICATION / ยืนยันตัวตน';
+					verifyHint.textContent = 'เบอร์โทร หรือ บัตร ปชช. 4 ตัวท้าย';
+					verifyInput.placeholder = 'กรอกเบอร์โทร หรือ เลขท้าย 4 หลัก';
+				} else {
+					// Tab Buttons
+					tabBtnOrder.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+					tabBtnPhone.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+
+					// Primary Field
+					primaryLabel.textContent = 'PHONE NUMBER / เบอร์โทรศัพท์';
+					primaryIcon.className = 'ri-phone-line text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none';
+					primaryInput.placeholder = 'เช่น 081-234-5678';
+					primaryInput.type = 'tel';
+
+					// Verification Field
+					verifyLabel.textContent = 'VERIFICATION / ยืนยันตัวตน (ไม่บังคับ)';
+					verifyHint.textContent = 'เลขท้าย 4 ตัว บัตร ปชช. หรือเลขออเดอร์';
+					verifyInput.placeholder = 'กรอกเลขท้าย 4 ตัว หรือเลขออเดอร์ (ถ้ามี)';
+				}
+
+				primaryInput.value = '';
+				verifyInput.value = '';
+				primaryInput.focus();
+			}
+
+			tabBtnOrder.addEventListener('click', () => switchMode('order'));
+			tabBtnPhone.addEventListener('click', () => switchMode('phone'));
 
 			function showError(msg) {
 				errorText.textContent = msg || 'ไม่พบข้อมูลการพรีออเดอร์ กรุณาตรวจสอบข้อมูลอีกครั้ง';
@@ -219,12 +309,16 @@ function raka_render_preorder_tracker_v2(): string {
 
 			async function doSearch() {
 				hideError();
-				const orderNo = (orderInput.value || '').trim();
-				const phone   = (phoneInput.value || '').trim();
+				const primaryVal = (primaryInput.value || '').trim();
+				const verifyVal  = (verifyInput.value || '').trim();
 
-				if (!orderNo) {
-					showError('กรุณากรอกเลขคำสั่งซื้อ (Order Number)');
-					orderInput.focus();
+				if (!primaryVal) {
+					if (currentMode === 'order') {
+						showError('กรุณากรอกเลขคำสั่งซื้อ (Order Number)');
+					} else {
+						showError('กรุณากรอกเบอร์โทรศัพท์ (Phone Number)');
+					}
+					primaryInput.focus();
 					return;
 				}
 
@@ -232,10 +326,19 @@ function raka_render_preorder_tracker_v2(): string {
 
 				try {
 					const params = new URLSearchParams();
-					params.append('order_no', orderNo);
-					if (phone) {
-						params.append('phone', phone);
-						params.append('citizen_id', phone);
+
+					if (currentMode === 'order') {
+						params.append('order_no', primaryVal);
+						if (verifyVal) {
+							params.append('phone', verifyVal);
+							params.append('citizen_id', verifyVal);
+						}
+					} else {
+						params.append('phone', primaryVal);
+						if (verifyVal) {
+							params.append('order_no', verifyVal);
+							params.append('citizen_id', verifyVal);
+						}
 					}
 
 					const apiUrl = '/wp-json/preorder-raka/v1/status?' + params.toString();
@@ -247,10 +350,10 @@ function raka_render_preorder_tracker_v2(): string {
 
 					if (!res.ok || !data || data.code || !data.success) {
 						const errCode = data && data.code ? data.code : '';
-						let msg = 'ไม่พบข้อมูลคำสั่งซื้อนี้ กรุณาตรวจสอบเลขคำสั่งซื้ออีกครั้ง';
+						let msg = 'ไม่พบข้อมูลคำสั่งซื้อนี้ กรุณาตรวจสอบข้อมูลอีกครั้ง';
 						if (errCode === 'verification_required') {
 							msg = 'กรุณากรอกเบอร์โทรศัพท์ หรือเลขบัตรประชาชน 4 ตัวท้าย เพื่อยืนยันตัวตน';
-							phoneInput.focus();
+							verifyInput.focus();
 						}
 						showError(data && data.message ? data.message : msg);
 						setLoading(false);
@@ -371,17 +474,17 @@ function raka_render_preorder_tracker_v2(): string {
 			}
 
 			submitBtn.addEventListener('click', doSearch);
-			orderInput.addEventListener('keydown', (e) => {
+			primaryInput.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') doSearch();
 			});
-			phoneInput.addEventListener('keydown', (e) => {
+			verifyInput.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') doSearch();
 			});
 
 			resetBtn.addEventListener('click', () => {
 				resultView.classList.add('hidden');
 				searchView.classList.remove('hidden');
-				orderInput.focus();
+				primaryInput.focus();
 			});
 		})();
 	</script>

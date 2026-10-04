@@ -70,14 +70,31 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 				'compare' => '=',
 			]
 		];
+	} elseif ( ! empty( $phone ) ) {
+		$phone_digits = preg_replace( '/[^0-9]/', '', $phone );
+		$args['meta_query'] = [
+			'relation' => 'OR',
+			[
+				'key'     => '_preorder_phone',
+				'value'   => $phone,
+				'compare' => '=',
+			],
+			[
+				'key'     => '_preorder_phone',
+				'value'   => $phone_digits,
+				'compare' => 'LIKE',
+			],
+		];
+		$args['orderby'] = 'date';
+		$args['order']   = 'DESC';
 	} else {
-		return new WP_Error( 'missing_params', 'กรุณาระบุข้อมูลสำหรับค้นหา', [ 'status' => 400 ] );
+		return new WP_Error( 'missing_params', 'กรุณาระบุหมายเลขคำสั่งซื้อหรือเบอร์โทรศัพท์สำหรับค้นหา', [ 'status' => 400 ] );
 	}
 
 	$posts = get_posts( $args );
 
 	if ( empty( $posts ) ) {
-		return new WP_Error( 'not_found', 'ไม่พบข้อมูลการพรีออเดอร์', [ 'status' => 404 ] );
+		return new WP_Error( 'not_found', 'ไม่พบข้อมูลการพรีออเดอร์จากข้อมูลที่ระบุ', [ 'status' => 404 ] );
 	}
 
 	$preorder = $posts[0];
@@ -92,6 +109,7 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	// Security Verification
 	$db_phone      = $get_meta( '_preorder_phone' );
 	$db_citizen_id = $get_meta( '_preorder_citizen_id_last4' );
+	$db_order_no   = $get_meta( '_preorder_no' );
 
 	// Clean inputs for comparison
 	$phone_clean   = preg_replace( '/[^0-9]/', '', $phone );
@@ -106,6 +124,9 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 			$validated = true;
 		}
 		if ( ! empty( $citizen_id ) && ! empty( $db_citizen_id ) && $db_citizen_id === substr( $citizen_id, -4 ) ) {
+			$validated = true;
+		}
+		if ( ! empty( $order_no ) && ! empty( $db_order_no ) && strtoupper( trim( (string) $db_order_no ) ) === strtoupper( trim( (string) $order_no ) ) ) {
 			$validated = true;
 		}
 	}
