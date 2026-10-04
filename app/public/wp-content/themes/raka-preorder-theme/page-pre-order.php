@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: Pre-Order Standalone Hero
- * Full-viewport Hero layout tailored with RAKA branding and the theme's cinematic fullscreen menu overlay.
+ * Full-viewport Hero layout tailored with RAKA header controls, branding, and fullscreen menu overlay.
  *
  * @package raka-preorder-theme
  */
@@ -15,6 +15,10 @@ $logo_horizontal = get_template_directory_uri() . '/assets/images/logo-raka-hori
 $logo_icon       = get_template_directory_uri() . '/assets/images/logo-raka-icon.png';
 $shop_url        = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' );
 $account_url     = home_url( '/account' );
+$cart_url        = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart' );
+$cart_count      = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+$current_user    = wp_get_current_user();
+$is_logged_in    = is_user_logged_in();
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> lang="en">
@@ -137,12 +141,12 @@ $account_url     = home_url( '/account' );
       overscroll-behavior: contain;
     }
 
-    /* ═════════ 6. TOPBAR ═════════ */
+    /* ═════════ 6. TOPBAR (WITH THEME CONTROLS) ═════════ */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
       flex: 0 0 auto;
     }
 
@@ -161,7 +165,7 @@ $account_url     = home_url( '/account' );
     .nav-left {
       display: flex;
       align-items: center;
-      gap: clamp(14px, 2vw, 36px);
+      gap: clamp(12px, 1.8vw, 28px);
     }
 
     .menu {
@@ -202,47 +206,31 @@ $account_url     = home_url( '/account' );
       text-transform: uppercase;
     }
 
-    .connect {
+    /* Theme Controls in Topbar Right */
+    .theme-topbar-controls {
       display: flex;
       align-items: center;
-      gap: clamp(8px, .7vw, 12px);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 5px 6px 5px clamp(12px, 1.1vw, 18px);
+      gap: clamp(6px, 0.65vw, 10px);
     }
 
-    .connect__label {
-      font-size: clamp(10px, .78vw, 12px);
-      font-weight: 600;
-      letter-spacing: .09em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .socials {
+    .theme-ctrl-btn {
+      position: relative;
+      width: clamp(32px, 2.4vw, 38px);
+      height: clamp(32px, 2.4vw, 38px);
       display: flex;
-      gap: 5px;
-    }
-
-    .social {
-      width: clamp(26px, 2vw, 32px);
-      height: clamp(26px, 2vw, 32px);
+      align-items: center;
+      justify-content: center;
       border-radius: 50%;
-      background: var(--ink);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      transition: opacity .2s ease;
+      background: var(--box);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      transition: transform 0.25s ease, background-color 0.2s ease;
+      cursor: pointer;
     }
 
-    .social:hover {
-      opacity: 0.85;
-    }
-
-    .social svg {
-      width: 52%;
-      height: 52%;
-      fill: currentColor;
+    .theme-ctrl-btn:hover {
+      transform: scale(1.08);
+      background: #ffffff;
     }
 
     /* ═════════ 7. STAGE ═════════ */
@@ -609,7 +597,7 @@ $account_url     = home_url( '/account' );
 
     .topbar .brand,
     .topbar .menu,
-    .topbar .connect,
+    .topbar .theme-topbar-controls,
     .stage .stage__emblem,
     .stage .headline,
     .stage .squiggle,
@@ -622,7 +610,7 @@ $account_url     = home_url( '/account' );
 
     .topbar .brand       { animation-delay: .06s; }
     .topbar .menu        { animation-delay: .14s; }
-    .topbar .connect     { animation-delay: .22s; }
+    .topbar .theme-topbar-controls { animation-delay: .22s; }
     .stage .stage__emblem{ animation-delay: .18s; }
     .stage .headline     { animation-delay: .28s; }
     .stage .squiggle     { animation-delay: .38s; }
@@ -658,12 +646,6 @@ $account_url     = home_url( '/account' );
       }
       .arrow-fab {
         display: none;
-      }
-      .connect__label {
-        display: none;
-      }
-      .connect {
-        padding: 5px;
       }
       .panel {
         padding-top: clamp(60px, 8vw, 84px);
@@ -758,19 +740,110 @@ $account_url     = home_url( '/account' );
               <span class="menu__label">menu</span>
             </button>
           </div>
-          <div class="connect">
-            <span class="connect__label">Follow along</span>
-            <div class="socials">
-              <a href="#" class="social" aria-label="Facebook">
-                <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              </a>
-              <a href="#" class="social" aria-label="Twitter">
-                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              </a>
-              <a href="#" class="social" aria-label="Instagram">
-                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
+
+          <!-- THEME HEADER CONTROLS (REPLACING STATIC SOCIAL PILL) -->
+          <div class="theme-topbar-controls">
+            
+            <!-- User Account Dropdown -->
+            <div id="raka-account-menu-wrap" class="relative">
+              <button
+                id="raka-account-btn"
+                class="theme-ctrl-btn"
+                type="button"
+                aria-label="<?php esc_attr_e( 'Account Menu', 'raka-preorder-theme' ); ?>"
+                title="<?php esc_attr_e( 'Account', 'raka-preorder-theme' ); ?>"
+              >
+                <?php if ( $is_logged_in ) : ?>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 absolute top-1 right-1"></span>
+                <?php endif; ?>
+                <i class="ri-user-line text-sm sm:text-base"></i>
+              </button>
+
+              <!-- Account Dropdown Menu -->
+              <div
+                id="raka-account-dropdown"
+                class="absolute right-0 top-full mt-2 w-64 p-4 rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl transition-all duration-300 transform opacity-0 invisible translate-y-2 pointer-events-none z-50 text-neutral-900 dark:text-white"
+              >
+                <?php if ( $is_logged_in ) : 
+                  $my_account_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/account' );
+                  $logout_url     = function_exists( 'wc_logout_url' ) ? wc_logout_url() : wp_logout_url( home_url() );
+                  $orders_url     = function_exists( 'wc_get_account_endpoint_url' ) ? wc_get_account_endpoint_url( 'orders' ) : home_url( '/account' );
+                ?>
+                  <div class="flex items-center gap-3 pb-3 mb-3 border-b border-black/10 dark:border-white/10">
+                    <div class="w-9 h-9 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center font-bold text-xs shrink-0 border border-red-500/20">
+                      <?php echo esc_html( strtoupper( substr( $current_user->display_name, 0, 1 ) ) ); ?>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-xs font-bold truncate font-hn leading-tight"><?php echo esc_html( $current_user->display_name ); ?></p>
+                      <p class="text-[10px] text-neutral-500 dark:text-neutral-400 truncate font-mono mt-0.5"><?php echo esc_html( $current_user->user_email ); ?></p>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1 text-xs">
+                    <a class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium hover:bg-black/5 dark:hover:bg-white/10 transition-colors" href="<?php echo esc_url( $my_account_url ); ?>">
+                      <i class="ri-dashboard-line text-sm text-neutral-400"></i>
+                      <span><?php esc_html_e( 'My Account', 'raka-preorder-theme' ); ?></span>
+                    </a>
+                    <a class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium hover:bg-black/5 dark:hover:bg-white/10 transition-colors" href="<?php echo esc_url( $orders_url ); ?>">
+                      <i class="ri-file-list-3-line text-sm text-neutral-400"></i>
+                      <span><?php esc_html_e( 'My Orders', 'raka-preorder-theme' ); ?></span>
+                    </a>
+                    <a class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors mt-1 border-t border-black/5 dark:border-white/5 pt-2" href="<?php echo esc_url( $logout_url ); ?>">
+                      <i class="ri-logout-box-r-line text-sm"></i>
+                      <span><?php esc_html_e( 'Log Out', 'raka-preorder-theme' ); ?></span>
+                    </a>
+                  </div>
+                <?php else : 
+                  $login_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/account' );
+                ?>
+                  <div class="pb-3 mb-3 border-b border-black/10 dark:border-white/10">
+                    <h4 class="text-xs font-bold font-hn leading-tight"><?php esc_html_e( 'RAKA GADGET Account', 'raka-preorder-theme' ); ?></h4>
+                    <p class="text-[10px] text-neutral-500 dark:text-neutral-400 font-hn mt-0.5"><?php esc_html_e( 'Sign in to access order tracking & perks', 'raka-preorder-theme' ); ?></p>
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <a class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs font-bold tracking-wider uppercase transition-all shadow-md" href="<?php echo esc_url( $login_url ); ?>">
+                      <i class="ri-login-box-line text-sm"></i>
+                      <span><?php esc_html_e( 'Sign In / Login', 'raka-preorder-theme' ); ?></span>
+                    </a>
+                    <a class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-semibold border border-black/10 dark:border-white/20 transition-all" href="<?php echo esc_url( $login_url ); ?>">
+                      <i class="ri-user-add-line text-sm"></i>
+                      <span><?php esc_html_e( 'Register', 'raka-preorder-theme' ); ?></span>
+                    </a>
+                  </div>
+                <?php endif; ?>
+              </div>
             </div>
+
+            <!-- Cart Drawer Button -->
+            <a
+              id="raka-cart-btn"
+              class="theme-ctrl-btn"
+              href="<?php echo esc_url( $cart_url ); ?>"
+              onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
+              aria-label="Shopping Cart"
+              title="Shopping Cart"
+            >
+              <i id="raka-cart-icon" class="ri-shopping-bag-3-line text-sm sm:text-base"></i>
+              <span
+                id="raka-cart-count"
+                class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-[9px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
+              >
+                <?php echo esc_html( (string) $cart_count ); ?>
+              </span>
+            </a>
+
+            <!-- Theme Mode Switcher -->
+            <button
+              id="raka-theme-btn"
+              class="theme-ctrl-btn"
+              type="button"
+              onclick="window.toggleRakaTheme(event)"
+              aria-label="Toggle dark / light mode"
+              title="Toggle theme"
+            >
+              <i id="theme-icon-sun" class="ri-sun-line text-sm sm:text-base text-amber-500"></i>
+              <i id="theme-icon-moon" class="ri-moon-line text-sm sm:text-base hidden text-sky-400"></i>
+            </button>
+
           </div>
         </header>
 
@@ -1415,7 +1488,7 @@ $account_url     = home_url( '/account' );
     /* ═════════ IIFE #1: Entry Animation Cleanup ═════════ */
     (function initAnimationCleanup() {
       const animSelectors = [
-        '.topbar .brand', '.topbar .menu', '.topbar .connect',
+        '.topbar .brand', '.topbar .menu', '.topbar .theme-topbar-controls',
         '.stage .stage__emblem', '.stage .headline', '.stage .squiggle',
         '.cards .card', '.side .pill-btn',
         '.side .account', '.side .arrow-fab'
@@ -1431,680 +1504,8 @@ $account_url     = home_url( '/account' );
       });
     })();
 
-    /* ═════════ IIFE #2: Fullscreen Theme Navigation Controller ═════════ */
-    // ─── 2. Fullscreen Menu & Mega Menu Logic ─────────────────────────────────
-		(function initMenu() {
-			const menuBtn = document.getElementById('raka-menu-btn') || document.getElementById('obsidian-menu-btn');
-			const overlay = document.getElementById('raka-menu-overlay') || document.getElementById('obsidian-menu-overlay');
-			const burgerTop = document.getElementById('burger-top');
-			const burgerMid = document.getElementById('burger-mid');
-			const burgerBot = document.getElementById('burger-bot');
-			const navBottom = document.getElementById('nav-bottom-info');
-			const rootPanel = document.getElementById('menu-panel-root');
-			const megaTriggers = document.querySelectorAll('.mega-menu-trigger');
-			const megaPanels = document.querySelectorAll('.mega-panel');
-			const backButtons = document.querySelectorAll('.btn-mega-back');
-
-			if (!menuBtn || !overlay) return;
-
-			let isOpen = false;
-			let currentActiveMegaPanel = null;
-
-			function animateRootLinksIn() {
-				const linkTexts = rootPanel.querySelectorAll('.nav-link-text');
-				linkTexts.forEach((span, idx) => {
-					const trigger = span.closest('.mega-menu-trigger');
-					const delay = trigger ? trigger.getAttribute('data-delay') : (idx * 60 + 'ms');
-					span.style.transitionDelay = delay;
-					span.style.transform = 'translateY(0)';
-				});
-			}
-
-			function animateRootLinksOut() {
-				const linkTexts = rootPanel.querySelectorAll('.nav-link-text');
-				linkTexts.forEach((span) => {
-					span.style.transitionDelay = '0ms';
-					span.style.transform = 'translateY(110%)';
-				});
-			}
-
-			function openMegaPanel(panelId) {
-				const targetPanel = document.getElementById(panelId);
-				if (!targetPanel) return;
-
-				currentActiveMegaPanel = targetPanel;
-
-				// 1. Animate root menu out smoothly
-				if (rootPanel) {
-					rootPanel.style.opacity = '0';
-					rootPanel.style.transform = 'translate3d(0, -24px, 0)';
-					rootPanel.style.pointerEvents = 'none';
-					rootPanel.style.visibility = 'hidden';
-				}
-
-				// 2. Hide all other mega panels
-				megaPanels.forEach(panel => {
-					if (panel !== targetPanel) {
-						panel.style.opacity = '0';
-						panel.style.transform = 'translate3d(0, 28px, 0)';
-						panel.style.pointerEvents = 'none';
-						panel.style.visibility = 'hidden';
-					}
-				});
-
-				// 3. Slide target mega panel in seamlessly
-				targetPanel.style.visibility = 'visible';
-				targetPanel.style.opacity = '1';
-				targetPanel.style.transform = 'translate3d(0, 0, 0)';
-				targetPanel.style.pointerEvents = 'auto';
-			}
-
-			function backToRootMenu() {
-				if (currentActiveMegaPanel) {
-					// Slide current mega panel down and out
-					currentActiveMegaPanel.style.opacity = '0';
-					currentActiveMegaPanel.style.transform = 'translate3d(0, 28px, 0)';
-					currentActiveMegaPanel.style.pointerEvents = 'none';
-					currentActiveMegaPanel.style.visibility = 'hidden';
-					currentActiveMegaPanel = null;
-				}
-
-				// Slide root menu back into place
-				if (rootPanel) {
-					rootPanel.style.visibility = 'visible';
-					rootPanel.style.opacity = '1';
-					rootPanel.style.transform = 'translate3d(0, 0, 0)';
-					rootPanel.style.pointerEvents = 'auto';
-					animateRootLinksIn();
-				}
-			}
-
-			function resetMenuToRootInstant() {
-				if (currentActiveMegaPanel) {
-					currentActiveMegaPanel.style.opacity = '0';
-					currentActiveMegaPanel.style.transform = 'translate3d(0, 28px, 0)';
-					currentActiveMegaPanel.style.pointerEvents = 'none';
-					currentActiveMegaPanel.style.visibility = 'hidden';
-					currentActiveMegaPanel = null;
-				}
-				if (rootPanel) {
-					rootPanel.style.visibility = 'visible';
-					rootPanel.style.opacity = '1';
-					rootPanel.style.transform = 'translate3d(0, 0, 0)';
-					rootPanel.style.pointerEvents = 'auto';
-				}
-				animateRootLinksOut();
-			}
-
-			function toggleMenu(open) {
-				isOpen = typeof open === 'boolean' ? open : !isOpen;
-				menuBtn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
-
-				if (isOpen) {
-					document.body.style.overflow = 'hidden';
-					overlay.style.pointerEvents = 'auto';
-					overlay.style.clipPath = 'inset(0% 0% 0% 0%)';
-
-					// Burger icon -> X
-					burgerTop.style.transform = 'translateY(7.5px) rotate(45deg)';
-					burgerTop.style.width = '100%';
-					burgerMid.style.opacity = '0';
-					burgerMid.style.transform = 'scaleX(0)';
-					burgerBot.style.transform = 'translateY(-7.5px) rotate(-45deg)';
-					burgerBot.style.width = '100%';
-
-					// Ensure starting at root
-					if (!currentActiveMegaPanel) {
-						if (rootPanel) {
-							rootPanel.style.visibility = 'visible';
-							rootPanel.style.opacity = '1';
-							rootPanel.style.transform = 'translate3d(0, 0, 0)';
-							rootPanel.style.pointerEvents = 'auto';
-						}
-						animateRootLinksIn();
-					}
-
-					// Bottom info
-					if (navBottom) {
-						navBottom.style.transitionDelay = '450ms';
-						navBottom.style.opacity = '1';
-						navBottom.style.transform = 'translateY(0)';
-					}
-				} else {
-					document.body.style.overflow = '';
-					overlay.style.pointerEvents = 'none';
-					overlay.style.clipPath = 'inset(0% 0% 100% 0%)';
-
-					// Burger icon reset
-					burgerTop.style.transform = '';
-					burgerTop.style.width = '100%';
-					burgerMid.style.opacity = '1';
-					burgerMid.style.transform = '';
-					burgerBot.style.transform = '';
-					burgerBot.style.width = '80%';
-
-					// Reset links
-					animateRootLinksOut();
-
-					// Bottom info reset
-					if (navBottom) {
-						navBottom.style.transitionDelay = '0ms';
-						navBottom.style.opacity = '0';
-						navBottom.style.transform = 'translateY(20px)';
-					}
-
-					// Reset state after animation completes
-					setTimeout(() => {
-						if (!isOpen) {
-							resetMenuToRootInstant();
-						}
-					}, 700);
-				}
-			}
-
-			// Hamburger button click
-			menuBtn.addEventListener('click', () => toggleMenu());
-
-			// Dedicated Cancel / Close buttons inside overlay
-			const closeButtons = overlay.querySelectorAll('.btn-menu-close, #raka-menu-close-btn, #obsidian-menu-close-btn');
-			closeButtons.forEach(btn => {
-				btn.addEventListener('click', (e) => {
-					e.preventDefault();
-					toggleMenu(false);
-				});
-			});
-
-			// Trigger click: Slide to Mega Menu Panel
-			megaTriggers.forEach(trigger => {
-				trigger.addEventListener('click', (e) => {
-					e.preventDefault();
-					const target = trigger.getAttribute('data-mega-target');
-					if (target) {
-						openMegaPanel(target);
-					}
-				});
-			});
-
-			// Back buttons click: Slide back to Main Menu
-			backButtons.forEach(btn => {
-				btn.addEventListener('click', (e) => {
-					e.preventDefault();
-					backToRootMenu();
-				});
-			});
-
-			// Sublinks / Leaf anchors click: close overlay
-			const leafLinks = overlay.querySelectorAll('a[href^="#"], a:not([data-mega-target])');
-			leafLinks.forEach(link => {
-				link.addEventListener('click', () => {
-					toggleMenu(false);
-				});
-			});
-
-			// Keyboard ESC to close or go back
-			document.addEventListener('keydown', (e) => {
-				if (e.key === 'Escape' && isOpen) {
-					if (currentActiveMegaPanel) {
-						backToRootMenu();
-					} else {
-						toggleMenu(false);
-					}
-				}
-			});
-		})();
-
-		// ─── 3. Global Product Card AJAX Add to Cart Handler ───────────────────────
-		window.rakaCardAddToCart = function(productId, btn) {
-			if (!btn || btn.disabled) return;
-			btn.disabled = true;
-
-			const txtSpan = btn.querySelector('span');
-			const icoEl   = btn.querySelector('i');
-			const origTxt = txtSpan ? txtSpan.textContent.trim() : 'ADD TO CART';
-			const origIco = icoEl ? icoEl.className : 'ri-shopping-bag-3-line text-xs flex-shrink-0';
-			const isPre = origTxt.toUpperCase().includes('PRE-ORDER');
-
-			if (txtSpan) txtSpan.textContent = isPre ? 'ORDERING...' : 'ADDING...';
-			if (icoEl) icoEl.className = 'ri-loader-4-line animate-spin text-xs flex-shrink-0';
-
-			const formData = new FormData();
-			formData.append('product_id', productId);
-			formData.append('quantity', 1);
-
-			fetch('<?php echo esc_url( home_url( '/?wc-ajax=raka_add_to_cart' ) ); ?>', {
-				method: 'POST',
-				body: formData
-			})
-			.then(res => res.json())
-			.then(data => {
-				if (txtSpan) txtSpan.textContent = isPre ? 'PRE-ORDER ADDED!' : 'ADDED!';
-				if (icoEl) icoEl.className = 'ri-check-line text-xs text-green-400 flex-shrink-0';
-
-				if (data && data.fragments && typeof window.updateCartDrawerFragments === 'function') {
-					window.updateCartDrawerFragments(data.fragments);
-				}
-
-				// Remove any WooCommerce default injected .added_to_cart links
-				setTimeout(() => {
-					const parent = btn.parentElement;
-					if (parent) {
-						parent.querySelectorAll('.added_to_cart').forEach(el => el.remove());
-					}
-				}, 10);
-
-				if (window.jQuery) {
-					window.jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash]);
-				}
-
-				// Automatically open Slide-Over Cart Drawer upon adding
-				if (typeof window.openRakaCart === 'function') {
-					window.openRakaCart();
-				}
-
-				setTimeout(() => {
-					if (txtSpan) txtSpan.textContent = origTxt;
-					if (icoEl) icoEl.className = origIco;
-					btn.disabled = false;
-				}, 1800);
-			})
-			.catch(() => {
-				window.location.href = '<?php echo esc_url( wc_get_cart_url() ); ?>?add-to-cart=' + productId;
-			});
-		};
-
-		// ─── 4. Dynamic Sticky/Fixed Header on Scroll Controller ──────────────────
-		(function() {
-			const header = document.getElementById('raka-site-header') || document.getElementById('obsidian-site-header');
-			if (!header) return;
-
-			function handleScroll() {
-				const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-				if (scrollY > 20) {
-					header.classList.add('header-scrolled');
-				} else {
-					header.classList.remove('header-scrolled');
-				}
-			}
-
-			window.addEventListener('scroll', handleScroll, { passive: true });
-			handleScroll();
-		})();
-
-		// ─── 5. Luxury Slide-Over Cart Drawer Controller ──────────────────────────
-		(function() {
-			const drawer   = document.getElementById('raka-cart-drawer');
-			const backdrop = document.getElementById('raka-cart-backdrop');
-			const panel    = document.getElementById('raka-cart-panel');
-			let isCartOpen = false;
-
-			window.openRakaCart = function(e) {
-				if (e && typeof e.preventDefault === 'function') e.preventDefault();
-				if (!drawer || !backdrop || !panel) return false;
-				isCartOpen = true;
-				drawer.classList.remove('pointer-events-none');
-				drawer.classList.add('pointer-events-auto');
-				drawer.setAttribute('aria-hidden', 'false');
-
-				// Backdrop fade in
-				backdrop.classList.remove('opacity-0');
-				backdrop.classList.add('opacity-100');
-
-				// Panel slide in
-				panel.classList.remove('translate-x-full');
-				panel.classList.add('translate-x-0');
-
-				document.body.style.overflow = 'hidden';
-			};
-
-			window.closeRakaCart = function() {
-				if (!drawer || !backdrop || !panel) return;
-				isCartOpen = false;
-
-				// Panel slide out
-				panel.classList.remove('translate-x-0');
-				panel.classList.add('translate-x-full');
-
-				// Backdrop fade out
-				backdrop.classList.remove('opacity-100');
-				backdrop.classList.add('opacity-0');
-
-				drawer.classList.remove('pointer-events-auto');
-				drawer.classList.add('pointer-events-none');
-				drawer.setAttribute('aria-hidden', 'true');
-
-				// If fullscreen menu overlay is not open, unlock body scroll
-				const menuOverlay = document.getElementById('raka-menu-overlay') || document.getElementById('fullscreen-menu-overlay');
-				const isMenuOpen = menuOverlay && menuOverlay.style.pointerEvents === 'auto';
-				if (!isMenuOpen) {
-					document.body.style.overflow = '';
-				}
-			};
-
-			// Update Cart Item Quantity with Live AJAX (+ / -)
-			window.rakaUpdateCartQty = function(cartItemKey, delta, btn) {
-				if (!cartItemKey) return;
-				const qtyEl = document.getElementById('cart-qty-val-' + cartItemKey);
-				const itemRow = document.getElementById('cart-item-' + cartItemKey);
-				let currentQty = qtyEl ? parseInt(qtyEl.textContent.trim(), 10) : 1;
-				if (isNaN(currentQty)) currentQty = 1;
-
-				const newQty = currentQty + delta;
-				if (newQty < 1) {
-					// If reduced below 1, remove item
-					window.rakaRemoveCartItem(cartItemKey, btn);
-					return;
-				}
-
-				if (qtyEl) qtyEl.textContent = newQty;
-				if (itemRow) itemRow.style.opacity = '0.5';
-
-				const formData = new FormData();
-				formData.append('cart_item_key', cartItemKey);
-				formData.append('quantity', newQty);
-
-				fetch('<?php echo esc_url( home_url( '/?wc-ajax=raka_update_cart_item_qty' ) ); ?>', {
-					method: 'POST',
-					body: formData
-				})
-				.then(res => res.json())
-				.then(data => {
-					if (data && data.fragments) {
-						updateCartDrawerFragments(data.fragments);
-					}
-					if (data && typeof data.cart_count === 'number') {
-						updateBadges(data.cart_count);
-					}
-					if (window.jQuery) {
-						window.jQuery(document.body).trigger('wc_fragment_refresh');
-					}
-					// If on cart page, trigger on-page cart refresh if present
-					if (window.location.pathname.includes('/cart')) {
-						const updateCartBtn = document.querySelector('button[name="update_cart"]');
-						if (updateCartBtn) {
-							updateCartBtn.disabled = false;
-							updateCartBtn.click();
-						}
-					}
-				})
-				.catch(() => {
-					if (itemRow) itemRow.style.opacity = '1';
-					if (window.jQuery) {
-						window.jQuery(document.body).trigger('wc_fragment_refresh');
-					}
-				});
-			};
-
-			// Remove Cart Item with Live AJAX
-			window.rakaRemoveCartItem = function(cartItemKey, btn) {
-				if (!cartItemKey) return;
-				const itemRow = document.getElementById('cart-item-' + cartItemKey);
-				if (itemRow) {
-					itemRow.style.opacity = '0.4';
-					itemRow.style.pointerEvents = 'none';
-				}
-				if (btn) {
-					btn.innerHTML = '<i class="ri-loader-4-line animate-spin text-sm"></i>';
-				}
-
-				const formData = new FormData();
-				formData.append('cart_item_key', cartItemKey);
-
-				fetch('<?php echo esc_url( home_url( '/?wc-ajax=raka_remove_cart_item' ) ); ?>', {
-					method: 'POST',
-					body: formData
-				})
-				.then(res => res.json())
-				.then(data => {
-					if (data && data.fragments) {
-						updateCartDrawerFragments(data.fragments);
-					}
-					if (data && typeof data.cart_count === 'number') {
-						updateBadges(data.cart_count);
-					}
-					if (window.jQuery) {
-						window.jQuery(document.body).trigger('wc_fragment_refresh');
-					}
-					// If on cart page, trigger on-page cart refresh if present
-					if (window.location.pathname.includes('/cart')) {
-						const updateCartBtn = document.querySelector('button[name="update_cart"]');
-						if (updateCartBtn) {
-							updateCartBtn.disabled = false;
-							updateCartBtn.click();
-						}
-					}
-				})
-				.catch(() => {
-					if (window.jQuery) {
-						window.jQuery(document.body).trigger('wc_fragment_refresh');
-					}
-				});
-			};
-
-			window.updateBadges = function(count) {
-				if (typeof count !== 'number') return;
-				const badges = document.querySelectorAll('.raka-cart-count-badge, #raka-cart-count, #overlay-cart-count');
-				badges.forEach(b => {
-					b.textContent = count;
-					if (count > 0) {
-						b.classList.remove('scale-0');
-						b.classList.add('scale-100');
-					} else {
-						b.classList.remove('scale-100');
-						b.classList.add('scale-0');
-					}
-					// Pulse animation
-					b.classList.remove('scale-125');
-					void b.offsetWidth;
-					b.classList.add('scale-125');
-					setTimeout(() => b.classList.remove('scale-125'), 300);
-				});
-
-				const drawerCount = document.getElementById('raka-cart-drawer-count');
-				if (drawerCount) {
-					drawerCount.textContent = count;
-				}
-			};
-
-			window.updateCartDrawerFragments = function(fragments) {
-				if (!fragments) return;
-
-				// Update Cart Drawer Content
-				if (fragments['#raka-cart-drawer-content']) {
-					const drawerBody = document.getElementById('raka-cart-drawer-body');
-					if (drawerBody) {
-						drawerBody.innerHTML = fragments['#raka-cart-drawer-content'];
-					}
-				}
-
-				// Update Drawer Count
-				if (fragments['#raka-cart-drawer-count']) {
-					const temp = document.createElement('div');
-					temp.innerHTML = fragments['#raka-cart-drawer-count'];
-					const countEl = document.getElementById('raka-cart-drawer-count');
-					if (countEl && temp.firstChild) {
-						countEl.textContent = temp.firstChild.textContent.trim();
-					}
-				}
-
-				// Update Badges
-				if (fragments['#raka-cart-count']) {
-					const temp = document.createElement('div');
-					temp.innerHTML = fragments['#raka-cart-count'];
-					const newSpan = temp.querySelector('span') || temp.firstChild;
-					if (newSpan) {
-						const cnt = parseInt(newSpan.textContent.trim(), 10);
-						if (!isNaN(cnt)) window.updateBadges(cnt);
-					}
-				}
-			};
-
-			const updateCartDrawerFragments = window.updateCartDrawerFragments;
-			const updateBadges = window.updateBadges;
-
-			// Global Fetch Interceptor for WooCommerce Store API & AJAX requests
-			const originalFetch = window.fetch;
-			window.fetch = async function(...args) {
-				const res = await originalFetch.apply(this, args);
-				try {
-					const url = (typeof args[0] === 'string') ? args[0] : (args[0] && args[0].url ? args[0].url : '');
-					if (url.includes('/wc/store/') || url.includes('wc-ajax=') || url.includes('raka_')) {
-						const clone = res.clone();
-						clone.json().then(data => {
-							if (data) {
-								let cnt = null;
-								if (typeof data.items_count === 'number') {
-									cnt = data.items_count;
-								} else if (typeof data.cart_count === 'number') {
-									cnt = data.cart_count;
-								} else if (data.items && Array.isArray(data.items)) {
-									cnt = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-								}
-								if (cnt !== null) {
-									updateBadges(cnt);
-								}
-								if (data.fragments) {
-									updateCartDrawerFragments(data.fragments);
-								} else if (url.includes('/wc/store/')) {
-									fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
-										.then(r => r.json())
-										.then(d => {
-											if (d && d.fragments) updateCartDrawerFragments(d.fragments);
-										})
-										.catch(() => {});
-								}
-							}
-						}).catch(() => {});
-					}
-				} catch (err) {}
-				return res;
-			};
-
-			// Intercept Header & Overlay Cart buttons
-			const cartBtns = document.querySelectorAll('#raka-cart-btn, #overlay-cart-btn, a[href*="cart"]');
-			cartBtns.forEach(btn => {
-				// Only intercept if not checkout link
-				if (btn.id === 'raka-cart-btn' || btn.id === 'overlay-cart-btn') {
-					btn.addEventListener('click', function(e) {
-						e.preventDefault();
-						window.openRakaCart();
-					});
-				}
-			});
-
-			// Escape key to close cart
-			document.addEventListener('keydown', function(e) {
-				if (e.key === 'Escape' && isCartOpen) {
-					window.closeRakaCart();
-				}
-			});
-
-			// Live Click/Change listeners for on-page Cart quantity buttons (both Classic Cart and WooCommerce Blocks)
-			function syncFromPageCart() {
-				const qtyInputs = document.querySelectorAll('.wc-block-components-quantity-selector__input, .woocommerce-cart-form input.qty');
-				if (qtyInputs.length > 0) {
-					let total = 0;
-					qtyInputs.forEach(inp => {
-						const v = parseInt(inp.value, 10);
-						if (!isNaN(v)) total += v;
-					});
-					if (total >= 0) updateBadges(total);
-				}
-			}
-
-			let syncDebounce = null;
-			document.addEventListener('click', function(e) {
-				if (e.target && e.target.closest('.wc-block-components-quantity-selector__button, .wc-block-cart-items-table__remove-item, .wc-block-cart__submit-button, button[name="update_cart"]')) {
-					clearTimeout(syncDebounce);
-					syncDebounce = setTimeout(() => {
-						syncFromPageCart();
-						fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
-							.then(r => r.json())
-							.then(d => {
-								if (d && d.fragments) updateCartDrawerFragments(d.fragments);
-							})
-							.catch(() => {});
-					}, 450);
-				}
-			});
-
-			document.addEventListener('change', function(e) {
-				if (e.target && e.target.matches('.woocommerce-cart-form input.qty, input[name*="cart["], .wc-block-components-quantity-selector__input')) {
-					clearTimeout(syncDebounce);
-					syncDebounce = setTimeout(() => {
-						syncFromPageCart();
-						const updateBtn = document.querySelector('button[name="update_cart"]');
-						if (updateBtn) {
-							updateBtn.disabled = false;
-							updateBtn.click();
-						}
-					}, 400);
-				}
-			});
-
-			// MutationObserver for WooCommerce React Cart Block
-			const cartBlockEl = document.querySelector('.wp-block-woocommerce-cart, .wc-block-cart');
-			if (cartBlockEl && window.MutationObserver) {
-				const observer = new MutationObserver(() => {
-					clearTimeout(syncDebounce);
-					syncDebounce = setTimeout(syncFromPageCart, 300);
-				});
-				observer.observe(cartBlockEl, { childList: true, subtree: true, attributes: true, characterData: true });
-			}
-
-			// WooCommerce jQuery events
-			if (window.jQuery) {
-				window.jQuery(document.body).on('added_to_cart', function(event, fragments) {
-					if (fragments) updateCartDrawerFragments(fragments);
-				});
-
-				window.jQuery(document.body).on('removed_from_cart', function(event, fragments) {
-					if (fragments) updateCartDrawerFragments(fragments);
-				});
-
-				window.jQuery(document.body).on('wc_fragments_refreshed wc_fragments_loaded', function() {
-					// Auto sync if needed
-				});
-
-				window.jQuery(document.body).on('updated_cart_totals', function() {
-					fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
-						.then(r => r.json())
-						.then(d => {
-							if (d && d.fragments) updateCartDrawerFragments(d.fragments);
-						})
-						.catch(() => {});
-				});
-			}
-
-			// WooCommerce Block Cart store subscription (if React Gutenberg Cart is active)
-			if (window.wp && wp.data && wp.data.subscribe) {
-				let prevCartCount = null;
-				wp.data.subscribe(function() {
-					try {
-						const store = wp.data.select('wc/store/cart');
-						if (store && typeof store.getCartData === 'function') {
-							const cartData = store.getCartData();
-							if (cartData && typeof cartData.itemsCount === 'number') {
-								if (prevCartCount !== null && prevCartCount !== cartData.itemsCount) {
-									updateBadges(cartData.itemsCount);
-									fetch('<?php echo esc_url( home_url( '/?wc-ajax=get_refreshed_fragments' ) ); ?>')
-										.then(r => r.json())
-										.then(d => {
-											if (d && d.fragments) updateCartDrawerFragments(d.fragments);
-										})
-										.catch(() => {});
-								}
-								prevCartCount = cartData.itemsCount;
-							}
-						}
-					} catch(e) {}
-				});
-			}
-		})();
-	</script>
-
-	<?php wp_footer(); ?>
-</body>
-</html>
+    /* ═════════ IIFE #2: Fullscreen Theme Navigation & Header Controls ═════════ */
+    
   </script>
 
   <?php wp_footer(); ?>
