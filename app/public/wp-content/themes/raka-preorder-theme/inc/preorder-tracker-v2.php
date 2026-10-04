@@ -231,8 +231,11 @@ function raka_render_preorder_tracker_v2(): string {
 			const activeTabClass = 'bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10';
 			const inactiveTabClass = 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white';
 
+			const isTurnstileActive = <?php echo $turnstile_enabled ? 'true' : 'false'; ?>;
+
 			// Initialize Turnstile Explicitly
 			function renderTurnstile() {
+				if (!isTurnstileActive) return;
 				if (window.turnstile && document.getElementById('raka-turnstile-widget')) {
 					try {
 						if (turnstileWidgetId !== null) {
@@ -240,10 +243,14 @@ function raka_render_preorder_tracker_v2(): string {
 						} else {
 							turnstileWidgetId = window.turnstile.render('#raka-turnstile-widget', {
 								sitekey: '<?php echo esc_js( $turnstile_sitekey ); ?>',
-								theme: 'auto',
+								theme: '<?php echo esc_js( $turnstile_theme ); ?>',
 								callback: function(token) {
 									turnstileToken = token;
 									hideError();
+									const primaryVal = (primaryInput.value || '').trim();
+									if (primaryVal) {
+										doSearch();
+									}
 								},
 								'expired-callback': function() {
 									turnstileToken = '';
@@ -259,15 +266,17 @@ function raka_render_preorder_tracker_v2(): string {
 				}
 			}
 
-			if (window.turnstile) {
-				renderTurnstile();
-			} else {
-				const checkTurnstile = setInterval(() => {
-					if (window.turnstile) {
-						clearInterval(checkTurnstile);
-						renderTurnstile();
-					}
-				}, 200);
+			if (isTurnstileActive) {
+				if (window.turnstile) {
+					renderTurnstile();
+				} else {
+					const checkTurnstile = setInterval(() => {
+						if (window.turnstile) {
+							clearInterval(checkTurnstile);
+							renderTurnstile();
+						}
+					}, 200);
+				}
 			}
 
 			function switchMode(mode) {
@@ -343,6 +352,11 @@ function raka_render_preorder_tracker_v2(): string {
 				let activeToken = turnstileToken;
 				if (!activeToken && window.turnstile && turnstileWidgetId !== null) {
 					activeToken = window.turnstile.getResponse(turnstileWidgetId) || '';
+				}
+
+				if (isTurnstileActive && !activeToken) {
+					showError('กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหาครับ');
+					return;
 				}
 
 				setLoading(true);

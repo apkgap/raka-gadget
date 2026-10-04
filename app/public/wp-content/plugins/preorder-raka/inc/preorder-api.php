@@ -107,7 +107,13 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	};
 
 	// Security Verification (Turnstile CAPTCHA & Phone/Citizen Fallback)
-	$turnstile_token = sanitize_text_field( (string) ( $request->get_param( 'cf_turnstile_response' ) ?: $request->get_param( 'turnstile_token' ) ) );
+	$turnstile_token     = sanitize_text_field( (string) ( $request->get_param( 'cf_turnstile_response' ) ?: $request->get_param( 'turnstile_token' ) ) );
+	$turnstile_enabled   = function_exists( 'raka_is_turnstile_enabled' ) ? raka_is_turnstile_enabled() : true;
+
+	if ( $turnstile_enabled && empty( $turnstile_token ) ) {
+		return new WP_Error( 'turnstile_required', 'กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหา', [ 'status' => 403 ] );
+	}
+
 	$db_phone        = $get_meta( '_preorder_phone' );
 	$db_citizen_id   = $get_meta( '_preorder_citizen_id_last4' );
 	$db_order_no     = $get_meta( '_preorder_no' );
