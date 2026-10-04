@@ -725,6 +725,80 @@ $is_logged_in    = is_user_logged_in();
       }
     }
   </style>
+
+  <script id="raka-global-theme-helpers">
+    window.toggleRakaTheme = function(event) {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark') || !html.classList.contains('light');
+      const targetTheme = isDark ? 'light' : 'dark';
+
+      const themeBtn = document.getElementById('raka-theme-btn');
+      const sunIcon = document.getElementById('theme-icon-sun');
+      const moonIcon = document.getElementById('theme-icon-moon');
+
+      if (targetTheme === 'light') {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        if (sunIcon) { sunIcon.classList.remove('hidden'); sunIcon.classList.add('block'); }
+        if (moonIcon) { moonIcon.classList.remove('block'); moonIcon.classList.add('hidden'); }
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        if (sunIcon) { sunIcon.classList.remove('block'); sunIcon.classList.add('hidden'); }
+        if (moonIcon) { moonIcon.classList.remove('hidden'); moonIcon.classList.add('block'); }
+      }
+      localStorage.setItem('raka_theme', targetTheme);
+      localStorage.setItem('obsidian_theme', targetTheme);
+      window.dispatchEvent(new CustomEvent('raka-theme-changed', { detail: { theme: targetTheme } }));
+    };
+    window.toggleObsidianTheme = window.toggleRakaTheme;
+
+    window.toggleRakaAccountMenu = function(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const dropdown = document.getElementById('raka-account-dropdown');
+      const btn = document.getElementById('raka-account-btn');
+      if (!dropdown) return;
+
+      const isClosed = dropdown.classList.contains('opacity-0') || dropdown.classList.contains('invisible');
+      if (isClosed) {
+        dropdown.classList.remove('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+        dropdown.classList.add('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+      } else {
+        dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+        dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('raka-account-dropdown');
+      const btn = document.getElementById('raka-account-btn');
+      if (dropdown && !dropdown.contains(e.target) && (!btn || !btn.contains(e.target))) {
+        dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+        dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Auto sync icon state on initial load
+    (function initThemeSync() {
+      const isDark = document.documentElement.classList.contains('dark') || !document.documentElement.classList.contains('light');
+      const sunIcon = document.getElementById('theme-icon-sun');
+      const moonIcon = document.getElementById('theme-icon-moon');
+      if (isDark) {
+        if (sunIcon) { sunIcon.classList.remove('block'); sunIcon.classList.add('hidden'); }
+        if (moonIcon) { moonIcon.classList.remove('hidden'); moonIcon.classList.add('block'); }
+      } else {
+        if (sunIcon) { sunIcon.classList.remove('hidden'); sunIcon.classList.add('block'); }
+        if (moonIcon) { moonIcon.classList.remove('block'); moonIcon.classList.add('hidden'); }
+      }
+    })();
+  </script>
+
 </head>
 <body <?php body_class( 'mindora-preorder-body' ); ?>>
 
