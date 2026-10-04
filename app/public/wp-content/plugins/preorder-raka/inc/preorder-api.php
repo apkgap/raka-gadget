@@ -151,6 +151,78 @@ function preorder_raka_format_single_item( $post ) {
 }
 
 /**
+ * Identify if a preorder post is associated with a registered WordPress member.
+ *
+ * @param int $post_id Preorder post ID.
+ * @return int User ID if member, 0 if guest.
+ */
+function preorder_raka_get_post_member_id( int $post_id ): int {
+	// 1. Check direct user ID meta
+	$user_id = (int) get_post_meta( $post_id, '_preorder_user_id', true );
+	if ( ! $user_id ) {
+		$user_id = (int) get_post_meta( $post_id, '_customer_user', true );
+	}
+	if ( $user_id > 0 && get_userdata( $user_id ) ) {
+		return $user_id;
+	}
+
+	// 2. Check author if non-admin member
+	$post = get_post( $post_id );
+	if ( $post && ! empty( $post->post_author ) && (int) $post->post_author > 0 ) {
+		$author_id = (int) $post->post_author;
+		$user = get_userdata( $author_id );
+		if ( $user && ! in_array( 'administrator', (array) $user->roles, true ) ) {
+			return $author_id;
+		}
+	}
+
+	// 3. Match phone number with registered users in WP
+	$phone = get_post_meta( $post_id, '_preorder_phone', true );
+	if ( ! empty( $phone ) ) {
+		$clean_phone = preg_replace( '/[^0-9]/', '', (string) $phone );
+		if ( strlen( $clean_phone ) >= 9 ) {
+			$matched_users = get_users( [
+				'meta_query' => [
+					'relation' => 'OR',
+					[
+						'key'     => 'billing_phone',
+						'value'   => $clean_phone,
+						'compare' => 'LIKE',
+					],
+					[
+						'key'     => 'phone',
+						'value'   => $clean_phone,
+						'compare' => 'LIKE',
+					],
+					[
+						'key'     => 'user_phone',
+						'value'   => $clean_phone,
+						'compare' => 'LIKE',
+					],
+				],
+				'number' => 1,
+				'fields' => 'ID',
+			] );
+
+			if ( ! empty( $matched_users ) ) {
+				return (int) $matched_users[0];
+			}
+		}
+	}
+
+	// 4. Match email with registered users in WP
+	$email = get_post_meta( $post_id, '_preorder_email', true );
+	if ( ! empty( $email ) && is_email( $email ) ) {
+		$user = get_user_by( 'email', $email );
+		if ( $user ) {
+			return (int) $user->ID;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * Get Pre-order Status detail.
  */
 function preorder_raka_get_status( WP_REST_Request $request ) {
@@ -208,7 +280,7 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 		return new WP_Error( 'not_found', 'ไม่พบข้อมูลการพรีออเดอร์จากข้อมูลที่ระบุ', [ 'status' => 404 ] );
 	}
 
-	// Security Verification (Turnstile CAPTCHA & Direct Lookup Fallback)
+	// ── Security Verification (Turnstile CAPTCHA & Direct Lookup Fallback) ──
 	$turnstile_token   = sanitize_text_field( (string) ( $request->get_param( 'cf_turnstile_response' ) ?: $request->get_param( 'turnstile_token' ) ) );
 	$turnstile_enabled = function_exists( 'raka_is_turnstile_enabled' ) ? raka_is_turnstile_enabled() : true;
 
@@ -262,6 +334,53 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 
 	if ( ! $validated ) {
 		return new WP_Error( 'verification_required', 'กรุณายืนยันความปลอดภัยผ่าน CAPTCHA หรือกรอกเบอร์โทรศัพท์เพื่อดูสถานะ', [ 'status' => 403 ] );
+	}
+
+	// ── 3. Member Privacy & Access Control Enforcement ──
+	$require_member_login = function_exists( 'raka_is_member_login_required' ) 
+		? raka_is_member_login_required() 
+		: (bool) get_option( 'preorder_require_member_login', false );
+
+	if ( $require_member_login ) {
+		$member_user_id = preorder_raka_get_post_member_id( $posts[0]->ID );
+
+		if ( $member_user_id > 0 ) {
+			// Preorder belongs to a registered member!
+			$target_param = ! empty( $order_no ) ? ( 'order_no=' . rawurlencode( $order_no ) ) : ( 'phone=' . rawurlencode( $phone ) );
+			$target_url   = home_url( '/pre-order/?' . $target_param );
+
+			$login_url = function_exists( 'wc_get_page_permalink' ) && wc_get_page_id( 'myaccount' ) > 0
+				? add_query_arg( 'redirect_to', urlencode( $target_url ), wc_get_page_permalink( 'myaccount' ) )
+				: wp_login_url( $target_url );
+
+			if ( ! is_user_logged_in() ) {
+				return new WP_Error(
+					'member_login_required',
+					'คำสั่งซื้อนี้เป็นของสมาชิกเว็บไซต์ เพื่อความปลอดภัยกรุณาเข้าสู่ระบบก่อนตรวจสอบสถานะ',
+					[
+						'status'        => 401,
+						'require_login' => true,
+						'login_url'     => $login_url,
+						'order_no'      => $order_no ?: get_post_meta( $posts[0]->ID, '_preorder_no', true ),
+					]
+				);
+			}
+
+			$current_user_id = get_current_user_id();
+			$is_admin_or_staff = current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' );
+
+			if ( ! $is_admin_or_staff && $current_user_id !== $member_user_id ) {
+				return new WP_Error(
+					'member_forbidden',
+					'คุณไม่มีสิทธิ์เข้าถึงคำสั่งซื้อนี้ กรุณาเข้าสู่ระบบด้วยบัญชีสมาชิกที่เป็นเจ้าของคำสั่งซื้อ',
+					[
+						'status'        => 403,
+						'require_login' => true,
+						'login_url'     => $login_url,
+					]
+				);
+			}
+		}
 	}
 
 	// If phone search, return full list

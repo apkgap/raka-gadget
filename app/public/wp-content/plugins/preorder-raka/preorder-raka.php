@@ -292,8 +292,14 @@ function preorder_raka_render_details_metabox( $post ) {
 	$price              = get_post_meta( $post->ID, '_preorder_price', true );
 	$qty                = get_post_meta( $post->ID, '_preorder_qty', true ) ?: 1;
 	$shipping           = get_post_meta( $post->ID, '_preorder_shipping', true ) ?: 0;
+	$selected_user_id   = (int) get_post_meta( $post->ID, '_preorder_user_id', true );
 	$address            = get_post_meta( $post->ID, '_preorder_address', true );
 	$tracking           = get_post_meta( $post->ID, '_preorder_tracking', true );
+	$all_users          = get_users([
+		'number'  => 150,
+		'orderby' => 'display_name',
+		'order'   => 'ASC',
+	]);
 
 	$products_wc = get_posts([
 		'post_type'   => 'product',
@@ -370,6 +376,25 @@ function preorder_raka_render_details_metabox( $post ) {
 						</div>
 					</div>
 					<p class="description" style="margin-top: 5px;"><?php esc_html_e( 'เมื่อเลือกสินค้า ระบบจะดึงชื่อสินค้า ราคา และรูปภาพมาเติมในช่องด้านล่างให้อัตโนมัติ', 'preorder-raka' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="preorder_raka_user_id"><?php esc_html_e( 'ผูกกับสมาชิกเว็บไซต์ (Member Account)', 'preorder-raka' ); ?></label></th>
+				<td>
+					<select id="preorder_raka_user_id" name="preorder_raka_user_id" style="width: 28em; max-width: 100%;">
+						<option value="0"><?php esc_html_e( '-- ลูกค้าทั่วไป / ไม่ระบุ (Guest Order) --', 'preorder-raka' ); ?></option>
+						<?php if ( ! empty( $all_users ) ) : ?>
+							<?php foreach ( $all_users as $u ) : 
+								$u_phone = get_user_meta( $u->ID, 'billing_phone', true ) ?: get_user_meta( $u->ID, 'phone', true );
+								$u_label = sprintf( '#%d: %s (%s)%s', $u->ID, $u->display_name, $u->user_email, $u_phone ? ' - ' . $u_phone : '' );
+							?>
+								<option value="<?php echo esc_attr( $u->ID ); ?>" <?php selected( $selected_user_id, $u->ID ); ?>>
+									<?php echo esc_html( $u_label ); ?>
+								</option>
+							<?php endforeach; ?>
+						<?php endif; ?>
+					</select>
+					<p class="description" style="margin-top: 5px;"><?php esc_html_e( 'หากเลือกสมาชิก และเปิดระบบบังคับเข้าสู่ระบบ บุคคลอื่นจะไม่สามารถดูสถานะออเดอร์นี้ได้จนกว่าจะเข้าสู่ระบบด้วยบัญชีสมาชิกนี้', 'preorder-raka' ); ?></p>
 				</td>
 			</tr>
 			<tr>
@@ -672,6 +697,7 @@ function preorder_raka_save_post( $post_id ) {
 		'preorder_raka_line'            => '_preorder_line',
 		'preorder_raka_current_step_idx' => '_preorder_current_step_idx',
 		'preorder_raka_product_id'      => '_preorder_product_id',
+		'preorder_raka_user_id'         => '_preorder_user_id',
 	];
 
 	foreach ( $fields as $post_key => $meta_key ) {
