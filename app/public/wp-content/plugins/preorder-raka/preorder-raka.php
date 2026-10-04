@@ -704,6 +704,14 @@ function preorder_raka_enqueue_assets() {
 			);
 		}
 
+				// Google Fonts (Kanit & Prompt for Thai typography)
+		wp_enqueue_style(
+			'preorder-raka-google-fonts',
+			'https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap',
+			[],
+			null
+		);
+
 		// RemixIcon v4 — icon font for React UI
 		wp_enqueue_style(
 			'remixicon',

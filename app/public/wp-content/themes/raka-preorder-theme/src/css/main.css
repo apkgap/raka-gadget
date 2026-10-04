@@ -28,22 +28,12 @@ html.light #root {
 	background-color: #FFFFFF !important;
 }
 
-body, button, input, select, textarea {
-	font-family: 'Kanit', 'Prompt', 'Helvetica Neue ME', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	background: inherit;
-	color: inherit;
-	overflow-x: hidden;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
-::-webkit-scrollbar {
-	width: 0px;
-	background: transparent;
+body, button, input, select, textarea, p, span, h1, h2, h3, h4, h5, h6, a, div {
+	font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', Helvetica, Arial, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .font-hn {
-	font-family: 'Helvetica Neue ME', 'Helvetica Neue', sans-serif !important;
+	font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif !important;
 }
 
 .gpu-accel {
