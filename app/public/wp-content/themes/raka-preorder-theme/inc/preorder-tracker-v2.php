@@ -1,8 +1,8 @@
 <?php
 /**
- * Modern Pre-Order Tracker V2 Component.
+ * Modern Pre-Order Tracker V2 Component with Cloudflare Turnstile CAPTCHA.
  *
- * Lightweight, native vanilla JS AJAX search and timeline renderer with Tab Switcher (Order No / Phone).
+ * Lightweight, native vanilla JS AJAX search, Tab Switcher, and Turnstile integration.
  * Fully compatible with /wp-json/preorder-raka/v1/status.
  *
  * @package raka-preorder-theme
@@ -13,13 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Render Modern Pre-Order Tracker Component with Tab Switcher.
+ * Render Modern Pre-Order Tracker Component with Cloudflare Turnstile.
  *
  * @return string
  */
 function raka_render_preorder_tracker_v2(): string {
 	ob_start();
+	$turnstile_sitekey = '0x4AAAAAAFNWAI83P9cCw0AU';
 	?>
+	<!-- Cloudflare Turnstile API -->
+	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
 	<div id="raka-tracker-v2" class="w-full text-left font-sans select-none text-neutral-900 dark:text-white transition-all duration-300">
 		
 		<!-- ── SEARCH / INPUT VIEW ── -->
@@ -64,26 +68,14 @@ function raka_render_preorder_tracker_v2(): string {
 				</div>
 			</div>
 
-			<!-- Secondary / Verification Input Group -->
-			<div id="raka-track-verify-group" class="space-y-1">
-				<div id="raka-track-verify-header" class="flex items-center justify-between">
-					<label id="raka-track-verify-label" for="raka-track-verify-input" class="block text-[11px] uppercase tracking-wider font-bold text-neutral-600 dark:text-neutral-400 font-hn">
-						<?php esc_html_e( 'VERIFICATION / ยืนยันตัวตน', 'raka-preorder-theme' ); ?>
-					</label>
-					<span id="raka-track-verify-hint" class="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal">
-						<?php esc_html_e( 'เบอร์โทร หรือ บัตร ปชช. 4 ตัวท้าย', 'raka-preorder-theme' ); ?>
-					</span>
-				</div>
-				<div id="raka-track-verify-wrap" class="relative flex items-center">
-					<i id="raka-track-verify-icon" class="ri-shield-check-line text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none"></i>
-					<input
-						type="text"
-						id="raka-track-verify-input"
-						class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 transition-all"
-						placeholder="กรอกเบอร์โทร หรือ เลขท้าย 4 หลัก"
-						autocomplete="off"
-					/>
-				</div>
+			<!-- Cloudflare Turnstile CAPTCHA Widget -->
+			<div id="raka-turnstile-wrapper" class="pt-1 flex flex-col items-center justify-center min-h-[65px] rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/5 p-2 overflow-hidden">
+				<div
+					id="raka-turnstile-widget"
+					class="cf-turnstile"
+					data-sitekey="<?php echo esc_attr( $turnstile_sitekey ); ?>"
+					data-theme="auto"
+				></div>
 			</div>
 
 			<!-- Error Alert Message -->
@@ -193,6 +185,8 @@ function raka_render_preorder_tracker_v2(): string {
 			if (!container) return;
 
 			let currentMode = 'order'; // 'order' or 'phone'
+			let turnstileWidgetId = null;
+			let turnstileToken = '';
 
 			const tabBtnOrder   = document.getElementById('raka-tab-btn-order');
 			const tabBtnPhone   = document.getElementById('raka-tab-btn-phone');
@@ -203,10 +197,6 @@ function raka_render_preorder_tracker_v2(): string {
 			const primaryLabel  = document.getElementById('raka-track-primary-label');
 			const primaryIcon   = document.getElementById('raka-track-primary-icon');
 			const primaryInput  = document.getElementById('raka-track-primary-input');
-
-			const verifyLabel   = document.getElementById('raka-track-verify-label');
-			const verifyHint    = document.getElementById('raka-track-verify-hint');
-			const verifyInput   = document.getElementById('raka-track-verify-input');
 
 			const submitBtn     = document.getElementById('raka-tracker-submit-btn');
 			const btnIcon       = document.getElementById('raka-tracker-btn-icon');
@@ -237,44 +227,68 @@ function raka_render_preorder_tracker_v2(): string {
 			const activeTabClass = 'bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10';
 			const inactiveTabClass = 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white';
 
+			// Initialize Turnstile Explicitly
+			function renderTurnstile() {
+				if (window.turnstile && document.getElementById('raka-turnstile-widget')) {
+					try {
+						if (turnstileWidgetId !== null) {
+							window.turnstile.reset(turnstileWidgetId);
+						} else {
+							turnstileWidgetId = window.turnstile.render('#raka-turnstile-widget', {
+								sitekey: '<?php echo esc_js( $turnstile_sitekey ); ?>',
+								theme: 'auto',
+								callback: function(token) {
+									turnstileToken = token;
+									hideError();
+								},
+								'expired-callback': function() {
+									turnstileToken = '';
+								},
+								'error-callback': function() {
+									turnstileToken = '';
+								}
+							});
+						}
+					} catch (e) {
+						console.log('Turnstile load init:', e);
+					}
+				}
+			}
+
+			if (window.turnstile) {
+				renderTurnstile();
+			} else {
+				const checkTurnstile = setInterval(() => {
+					if (window.turnstile) {
+						clearInterval(checkTurnstile);
+						renderTurnstile();
+					}
+				}, 200);
+			}
+
 			function switchMode(mode) {
 				currentMode = mode;
 				hideError();
 
 				if (mode === 'order') {
-					// Tab Buttons
 					tabBtnOrder.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
 					tabBtnPhone.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
 
-					// Primary Field
 					primaryLabel.textContent = 'ORDER NUMBER / หมายเลขคำสั่งซื้อ';
 					primaryIcon.className = 'ri-hashtag text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none';
 					primaryInput.placeholder = 'เช่น RAKA-PRE-312691';
 					primaryInput.type = 'text';
-
-					// Verification Field
-					verifyLabel.textContent = 'VERIFICATION / ยืนยันตัวตน';
-					verifyHint.textContent = 'เบอร์โทร หรือ บัตร ปชช. 4 ตัวท้าย';
-					verifyInput.placeholder = 'กรอกเบอร์โทร หรือ เลขท้าย 4 หลัก';
 				} else {
-					// Tab Buttons
 					tabBtnOrder.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
 					tabBtnPhone.className = 'py-2.5 px-3 rounded-xl text-xs font-bold font-hn transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
 
-					// Primary Field
 					primaryLabel.textContent = 'PHONE NUMBER / เบอร์โทรศัพท์';
 					primaryIcon.className = 'ri-phone-line text-base text-neutral-400 dark:text-neutral-500 absolute left-3.5 pointer-events-none';
 					primaryInput.placeholder = 'เช่น 081-234-5678';
 					primaryInput.type = 'tel';
-
-					// Verification Field
-					verifyLabel.textContent = 'VERIFICATION / ยืนยันตัวตน (ไม่บังคับ)';
-					verifyHint.textContent = 'เลขท้าย 4 ตัว บัตร ปชช. หรือเลขออเดอร์';
-					verifyInput.placeholder = 'กรอกเลขท้าย 4 ตัว หรือเลขออเดอร์ (ถ้ามี)';
 				}
 
 				primaryInput.value = '';
-				verifyInput.value = '';
 				primaryInput.focus();
 			}
 
@@ -294,7 +308,7 @@ function raka_render_preorder_tracker_v2(): string {
 				if (loading) {
 					submitBtn.disabled = true;
 					btnIcon.className = 'ri-loader-4-line text-sm animate-spin';
-					btnText.textContent = 'กำลังค้นหา...';
+					btnText.textContent = 'กำลังตรวจสอบ...';
 				} else {
 					submitBtn.disabled = false;
 					btnIcon.className = 'ri-search-2-line text-sm';
@@ -310,7 +324,6 @@ function raka_render_preorder_tracker_v2(): string {
 			async function doSearch() {
 				hideError();
 				const primaryVal = (primaryInput.value || '').trim();
-				const verifyVal  = (verifyInput.value || '').trim();
 
 				if (!primaryVal) {
 					if (currentMode === 'order') {
@@ -322,6 +335,12 @@ function raka_render_preorder_tracker_v2(): string {
 					return;
 				}
 
+				// Get Turnstile token from widget if available
+				let activeToken = turnstileToken;
+				if (!activeToken && window.turnstile && turnstileWidgetId !== null) {
+					activeToken = window.turnstile.getResponse(turnstileWidgetId) || '';
+				}
+
 				setLoading(true);
 
 				try {
@@ -329,16 +348,12 @@ function raka_render_preorder_tracker_v2(): string {
 
 					if (currentMode === 'order') {
 						params.append('order_no', primaryVal);
-						if (verifyVal) {
-							params.append('phone', verifyVal);
-							params.append('citizen_id', verifyVal);
-						}
 					} else {
 						params.append('phone', primaryVal);
-						if (verifyVal) {
-							params.append('order_no', verifyVal);
-							params.append('citizen_id', verifyVal);
-						}
+					}
+
+					if (activeToken) {
+						params.append('cf_turnstile_response', activeToken);
 					}
 
 					const apiUrl = '/wp-json/preorder-raka/v1/status?' + params.toString();
@@ -349,13 +364,12 @@ function raka_render_preorder_tracker_v2(): string {
 					const data = await res.json();
 
 					if (!res.ok || !data || data.code || !data.success) {
-						const errCode = data && data.code ? data.code : '';
-						let msg = 'ไม่พบข้อมูลคำสั่งซื้อนี้ กรุณาตรวจสอบข้อมูลอีกครั้ง';
-						if (errCode === 'verification_required') {
-							msg = 'กรุณากรอกเบอร์โทรศัพท์ หรือเลขบัตรประชาชน 4 ตัวท้าย เพื่อยืนยันตัวตน';
-							verifyInput.focus();
+						const errMsg = data && data.message ? data.message : 'ไม่พบข้อมูลคำสั่งซื้อนี้ กรุณาตรวจสอบข้อมูลอีกครั้ง';
+						showError(errMsg);
+						if (window.turnstile && turnstileWidgetId !== null) {
+							window.turnstile.reset(turnstileWidgetId);
+							turnstileToken = '';
 						}
-						showError(data && data.message ? data.message : msg);
 						setLoading(false);
 						return;
 					}
@@ -477,14 +491,15 @@ function raka_render_preorder_tracker_v2(): string {
 			primaryInput.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') doSearch();
 			});
-			verifyInput.addEventListener('keydown', (e) => {
-				if (e.key === 'Enter') doSearch();
-			});
 
 			resetBtn.addEventListener('click', () => {
 				resultView.classList.add('hidden');
 				searchView.classList.remove('hidden');
 				primaryInput.focus();
+				if (window.turnstile && turnstileWidgetId !== null) {
+					window.turnstile.reset(turnstileWidgetId);
+					turnstileToken = '';
+				}
 			});
 		})();
 	</script>

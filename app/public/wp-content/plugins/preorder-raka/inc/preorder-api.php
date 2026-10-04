@@ -106,33 +106,59 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 		return isset( $all_meta[ $key ][0] ) ? maybe_unserialize( $all_meta[ $key ][0] ) : $default;
 	};
 
-	// Security Verification
-	$db_phone      = $get_meta( '_preorder_phone' );
-	$db_citizen_id = $get_meta( '_preorder_citizen_id_last4' );
-	$db_order_no   = $get_meta( '_preorder_no' );
+	// Security Verification (Turnstile CAPTCHA & Phone/Citizen Fallback)
+	$turnstile_token = sanitize_text_field( (string) ( $request->get_param( 'cf_turnstile_response' ) ?: $request->get_param( 'turnstile_token' ) ) );
+	$db_phone        = $get_meta( '_preorder_phone' );
+	$db_citizen_id   = $get_meta( '_preorder_citizen_id_last4' );
+	$db_order_no     = $get_meta( '_preorder_no' );
 
 	// Clean inputs for comparison
-	$phone_clean   = preg_replace( '/[^0-9]/', '', $phone );
+	$phone_clean    = preg_replace( '/[^0-9]/', '', $phone );
 	$db_phone_clean = preg_replace( '/[^0-9]/', '', $db_phone );
 
 	$validated = false;
 
-	if ( empty( $db_phone ) && empty( $db_citizen_id ) ) {
-		$validated = true;
-	} else {
-		if ( ! empty( $phone_clean ) && ! empty( $db_phone_clean ) && ( substr( $db_phone_clean, -4 ) === substr( $phone_clean, -4 ) || $db_phone_clean === $phone_clean ) ) {
-			$validated = true;
+	// 1. Check Cloudflare Turnstile Verification
+	if ( ! empty( $turnstile_token ) ) {
+		$turnstile_secret = '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM';
+		$remote_ip        = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		
+		$verify_res = wp_remote_post( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+			'body'    => [
+				'secret'   => $turnstile_secret,
+				'response' => $turnstile_token,
+				'remoteip' => $remote_ip,
+			],
+			'timeout' => 5,
+		] );
+
+		if ( ! is_wp_error( $verify_res ) ) {
+			$verify_body = json_decode( wp_remote_retrieve_body( $verify_res ), true );
+			if ( ! empty( $verify_body['success'] ) ) {
+				$validated = true;
+			}
 		}
-		if ( ! empty( $citizen_id ) && ! empty( $db_citizen_id ) && $db_citizen_id === substr( $citizen_id, -4 ) ) {
+	}
+
+	// 2. Direct Validation Fallback
+	if ( ! $validated ) {
+		if ( empty( $db_phone ) && empty( $db_citizen_id ) ) {
 			$validated = true;
-		}
-		if ( ! empty( $order_no ) && ! empty( $db_order_no ) && strtoupper( trim( (string) $db_order_no ) ) === strtoupper( trim( (string) $order_no ) ) ) {
-			$validated = true;
+		} else {
+			if ( ! empty( $phone_clean ) && ! empty( $db_phone_clean ) && ( substr( $db_phone_clean, -4 ) === substr( $phone_clean, -4 ) || $db_phone_clean === $phone_clean ) ) {
+				$validated = true;
+			}
+			if ( ! empty( $citizen_id ) && ! empty( $db_citizen_id ) && $db_citizen_id === substr( $citizen_id, -4 ) ) {
+				$validated = true;
+			}
+			if ( ! empty( $order_no ) && ! empty( $db_order_no ) && strtoupper( trim( (string) $db_order_no ) ) === strtoupper( trim( (string) $order_no ) ) ) {
+				$validated = true;
+			}
 		}
 	}
 
 	if ( ! $validated ) {
-		return new WP_Error( 'verification_required', 'กรุณายืนยันเบอร์โทรศัพท์หรือเลขบัตรประชาชน 4 ตัวท้ายให้ถูกต้อง เพื่อดูสถานะ', [ 'status' => 403 ] );
+		return new WP_Error( 'verification_required', 'กรุณายืนยันความปลอดภัยผ่าน CAPTCHA หรือกรอกเบอร์โทรศัพท์เพื่อดูสถานะ', [ 'status' => 403 ] );
 	}
 
 	$steps       = $get_meta( '_preorder_steps', [] );
