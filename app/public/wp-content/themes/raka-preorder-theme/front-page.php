@@ -205,7 +205,7 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<!-- 4. Hero Content (Section 1) -->
 		<div id="hero-section-1" class="absolute inset-0 z-10 flex flex-col pointer-events-none gpu-accel">
 			<!-- Centered Main Title -->
-			<div id="hero-title-container" class="w-full flex justify-center mt-12 md:mt-14 px-2 select-none pointer-events-none overflow-hidden">
+			<div id="hero-title-container" class="w-full flex justify-center mt-16 sm:mt-20 md:mt-24 px-2 select-none pointer-events-none overflow-hidden">
 				<h1 id="hero-main-title" class="text-[17vw] sm:text-[20vw] md:text-[22vw] font-black tracking-[-0.04em] leading-[0.75] text-black dark:text-white uppercase select-none font-hn theme-transition text-center whitespace-nowrap">
 					<?php echo esc_html( $hero_main_title ); ?>
 				</h1>
