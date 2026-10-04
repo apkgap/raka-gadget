@@ -446,6 +446,11 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 		$clean_options['turnstile_theme'] = in_array( $theme_val, [ 'auto', 'light', 'dark' ], true ) ? $theme_val : 'auto';
 	}
 
+	// Member Privacy & Access Control
+	if ( isset( $raw_data['preorder_require_member_login'] ) ) {
+		$clean_options['preorder_require_member_login'] = ! empty( $raw_data['preorder_require_member_login'] );
+	}
+
 	// Dynamic Repeater: hero_cards
 	$allowed_positions = [ 'left', 'right', 'center', 'bottom_left', 'bottom_right' ];
 	$clean_hero_cards  = [];

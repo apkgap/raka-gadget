@@ -215,6 +215,39 @@ function raka_render_preorder_tracker_v2(): string {
 
 		</div>
 
+		<!-- ── 4. MEMBER LOGIN REQUIRED VIEW ── -->
+		<div id="raka-tracker-login-view" class="hidden w-full p-6 sm:p-8 rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 text-center space-y-5 shadow-sm">
+			<div id="raka-login-icon-wrap" class="w-16 h-16 mx-auto rounded-2xl bg-red-600/10 dark:bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-600 dark:text-red-400 text-3xl">
+				<i id="raka-login-icon" class="ri-shield-user-line"></i>
+			</div>
+			<div id="raka-login-text-wrap" class="space-y-1.5 max-w-md mx-auto">
+				<h3 id="raka-login-title" class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
+					<?php esc_html_e( 'คำสั่งซื้อของสมาชิกเว็บไซต์', 'raka-preorder-theme' ); ?>
+				</h3>
+				<p id="raka-login-desc" class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+					<?php esc_html_e( 'รายการสั่งซื้อนี้ผูกกับบัญชีสมาชิก เพื่อความปลอดภัยและความเป็นส่วนตัวของข้อมูล กรุณาเข้าสู่ระบบก่อนตรวจสอบสถานะ', 'raka-preorder-theme' ); ?>
+				</p>
+			</div>
+			<div id="raka-login-btn-wrap" class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+				<a
+					id="raka-login-action-btn"
+					href="#"
+					class="w-full sm:w-auto h-11 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-normal flex items-center justify-center gap-2 shadow-sm transition-all duration-200 cursor-pointer"
+				>
+					<i id="raka-login-btn-ico" class="ri-login-box-line text-base"></i>
+					<span id="raka-login-btn-txt"><?php esc_html_e( 'เข้าสู่ระบบเพื่อดูสถานะ', 'raka-preorder-theme' ); ?></span>
+				</a>
+				<button
+					type="button"
+					id="raka-login-back-btn"
+					class="w-full sm:w-auto h-11 px-5 rounded-xl bg-white dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs sm:text-sm font-normal border border-black/10 dark:border-white/10 flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
+				>
+					<i id="raka-login-back-ico" class="ri-arrow-left-line text-sm"></i>
+					<span id="raka-login-back-txt"><?php esc_html_e( 'ค้นหารายการอื่น', 'raka-preorder-theme' ); ?></span>
+				</button>
+			</div>
+		</div>
+
 	</div>
 
 	<script>
@@ -239,6 +272,10 @@ function raka_render_preorder_tracker_v2(): string {
 			const listBackBtn   = document.getElementById('raka-list-back-btn');
 
 			const resultView    = document.getElementById('raka-tracker-result-view');
+			const loginView     = document.getElementById('raka-tracker-login-view');
+			const loginActionBtn= document.getElementById('raka-login-action-btn');
+			const loginBackBtn  = document.getElementById('raka-login-back-btn');
+			const loginDesc     = document.getElementById('raka-login-desc');
 			
 			const primaryLabel  = document.getElementById('raka-track-primary-label');
 			const primaryIcon   = document.getElementById('raka-track-primary-icon');
@@ -325,6 +362,7 @@ function raka_render_preorder_tracker_v2(): string {
 			function switchMode(mode) {
 				currentMode = mode;
 				hideError();
+				if (loginView) loginView.classList.add('hidden');
 
 				if (mode === 'order') {
 					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
@@ -420,6 +458,11 @@ function raka_render_preorder_tracker_v2(): string {
 					const data = await res.json();
 
 					if (!res.ok || !data || data.code || !data.success) {
+						if (data && (data.code === 'member_login_required' || (data.data && data.data.require_login))) {
+							renderLoginRequiredView(data);
+							setLoading(false);
+							return;
+						}
 						const errMsg = data && data.message ? data.message : 'ไม่พบข้อมูลคำสั่งซื้อนี้ กรุณาตรวจสอบข้อมูลอีกครั้ง';
 						showError(errMsg);
 						if (window.turnstile && turnstileWidgetId !== null) {
@@ -455,6 +498,24 @@ function raka_render_preorder_tracker_v2(): string {
 					showError('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง');
 				} finally {
 					setLoading(false);
+				}
+			}
+
+			// Render Member Login Required View
+			function renderLoginRequiredView(data) {
+				const loginUrl = (data.data && data.data.login_url) || data.login_url || '/my-account/';
+				const msg = data.message || 'คำสั่งซื้อนี้ผูกกับบัญชีสมาชิก เพื่อความปลอดภัยและความเป็นส่วนตัวของข้อมูล กรุณาเข้าสู่ระบบก่อนตรวจสอบสถานะ';
+				if (loginActionBtn) {
+					loginActionBtn.href = loginUrl;
+				}
+				if (loginDesc) {
+					loginDesc.textContent = msg;
+				}
+				searchView.classList.add('hidden');
+				listView.classList.add('hidden');
+				resultView.classList.add('hidden');
+				if (loginView) {
+					loginView.classList.remove('hidden');
 				}
 			}
 
@@ -708,9 +769,11 @@ function raka_render_preorder_tracker_v2(): string {
 			resetBtn.addEventListener('click', () => {
 				if (navigatedFromList && currentPhoneItems.length > 0) {
 					resultView.classList.add('hidden');
+					if (loginView) loginView.classList.add('hidden');
 					listView.classList.remove('hidden');
 				} else {
 					resultView.classList.add('hidden');
+					if (loginView) loginView.classList.add('hidden');
 					searchView.classList.remove('hidden');
 					cleanTrackerUrl();
 					primaryInput.focus();
@@ -720,6 +783,20 @@ function raka_render_preorder_tracker_v2(): string {
 					}
 				}
 			});
+
+			// Back button in member login required view
+			if (loginBackBtn) {
+				loginBackBtn.addEventListener('click', () => {
+					if (loginView) loginView.classList.add('hidden');
+					searchView.classList.remove('hidden');
+					cleanTrackerUrl();
+					primaryInput.focus();
+					if (window.turnstile && turnstileWidgetId !== null) {
+						window.turnstile.reset(turnstileWidgetId);
+						turnstileToken = '';
+					}
+				});
+			}
 
 			// Check URL parameters on page load for direct access
 			function checkUrlParams() {

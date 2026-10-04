@@ -353,6 +353,7 @@ export default function ThemeSettingsApp() {
 		turnstile_sitekey: '0x4AAAAAAFNWAI83P9cCw0AU',
 		turnstile_secret: '0x4AAAAAAFNWAKM9TKecHcitT5juwPWd4gM',
 		turnstile_theme: 'auto',
+		preorder_require_member_login: false,
 	});
 	const [wcData, setWcData] = useState({
 		categories: [],
@@ -1225,6 +1226,27 @@ export default function ThemeSettingsApp() {
 															{ label: __('Light Theme (Clean White)', 'raka-preorder-theme'), value: 'light' },
 														]}
 														onChange={(val) => handleOptionChange('turnstile_theme', val)}
+													/>
+												</div>
+											</div>
+
+											{ /* Member Orders Privacy & Access Control */}
+											<div style={{ padding: '20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+												<h3 style={{ margin: '0 0 16px 0', fontSize: '14px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+													<i className="ri-shield-user-line" style={{ color: '#6366f1' }} />
+													{__('Member Orders Privacy & Access Control', 'raka-preorder-theme')}
+												</h3>
+
+												<div style={{ marginBottom: '8px' }}>
+													<ToggleControl
+														label={__('บังคับเข้าสู่ระบบเมื่อเป็นคำสั่งซื้อของสมาชิก (Require Login for Member Orders)', 'raka-preorder-theme')}
+														help={
+															options.preorder_require_member_login
+																? __('เปิดใช้งาน: คำสั่งซื้อที่ผูกกับบัญชีสมาชิก (หรือเบอร์โทร/อีเมลที่ตรงกับสมาชิก) จะต้องเข้าสู่ระบบก่อนจึงจะดูสถานะได้', 'raka-preorder-theme')
+																: __('ปิดใช้งาน: ใครที่มีเลขที่คำสั่งซื้อสามารถค้นหาและดูสถานะได้ทันทีโดยไม่ต้องเข้าสู่ระบบ', 'raka-preorder-theme')
+														}
+														checked={!!options.preorder_require_member_login}
+														onChange={(val) => handleOptionChange('preorder_require_member_login', val)}
 													/>
 												</div>
 											</div>

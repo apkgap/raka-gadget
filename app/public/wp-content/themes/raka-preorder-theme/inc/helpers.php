@@ -74,6 +74,16 @@ function raka_get_turnstile_theme(): string {
 }
 
 /**
+ * Check if Member Login is required for member preorders.
+ *
+ * @return bool
+ */
+function raka_is_member_login_required(): bool {
+	$options = raka_get_all_options();
+	return ! empty( $options['preorder_require_member_login'] );
+}
+
+/**
  * Get structured hierarchical menu tree by theme location.
  *
  * @param string $theme_location Theme location key (default: 'primary-menu').
