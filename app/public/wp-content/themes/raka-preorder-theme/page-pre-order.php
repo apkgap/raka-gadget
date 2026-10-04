@@ -103,7 +103,7 @@ $is_logged_in    = is_user_logged_in();
       color: inherit;
     }
 
-    /* ═════════ 5. LAYOUT CSS ═════════ */
+    /* ═════════ 5. LAYOUT CSS (2-COLUMN ARCHITECTURE) ═════════ */
     .hero {
       position: relative;
       height: 100vh;
@@ -112,49 +112,65 @@ $is_logged_in    = is_user_logged_in();
       width: 100%;
       overflow: hidden;
       isolation: isolate;
-      background: #000000;
-    }
-
-    .hero__bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: right center;
-      z-index: -2;
-      transform-origin: right center;
-      animation: in-bg 1.35s cubic-bezier(.16, 1, .3, 1) both;
-    }
-
-    .hero__scrim {
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background: linear-gradient(90deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, .10) 45%, rgba(255, 255, 255, 0) 70%);
-      animation: in-fade 1s ease both .08s;
-    }
-
-    .hero__inner {
-      position: relative;
-      height: 100%;
-      width: 100%;
-      padding: clamp(10px, 1.1vw, 20px);
+      background: var(--panel);
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.72fr);
-      gap: clamp(10px, 1.1vw, 20px);
+      grid-template-columns: 100%;
+    }
+
+    @media (min-width: 1024px) {
+      .hero {
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      }
+    }
+
+    .hero__left {
+      position: relative;
+      background: var(--panel);
+      padding: clamp(16px, 2.2vw, 40px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border-right: 1px solid var(--line);
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .hero__right {
+      position: relative;
+      background: #000000;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+      .hero__right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .hero__video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      animation: in-bg 1.35s cubic-bezier(.16, 1, .3, 1) both;
     }
 
     .panel {
       position: relative;
       background: var(--panel);
-      border-radius: var(--radius-panel);
-      padding: var(--pad);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       min-height: 0;
-      box-shadow: 0 24px 60px -30px rgba(16, 32, 28, .28);
       overflow-y: auto;
       overscroll-behavior: contain;
     }
@@ -666,63 +682,29 @@ $is_logged_in    = is_user_logged_in();
     }
 
     /* ═════════ 13. RESPONSIVE ═════════ */
-    @media (max-width: 1100px) {
-      .hero__inner {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .side {
-        position: absolute;
-        inset: clamp(10px, 1.1vw, 20px);
-        pointer-events: none;
-      }
-      .side__top {
-        pointer-events: auto;
-      }
-      .arrow-fab {
-        display: none;
-      }
-      .panel {
-        padding-top: clamp(60px, 8vw, 84px);
-      }
-    }
-
-    @media (max-width: 820px) {
+    @media (max-width: 1023px) {
       .hero {
         height: auto;
         min-height: 100svh;
+        display: flex;
+        flex-direction: column;
       }
-      .hero__scrim {
-        background: linear-gradient(180deg, rgba(255, 255, 255, .35), rgba(255, 255, 255, .05));
-      }
-      .hero__inner {
-        padding: 12px;
-        min-height: calc(100svh - 24px);
-      }
-      .panel {
+      .hero__left {
+        border-right: none;
         padding: 16px;
-        padding-top: 68px;
-        border-radius: 26px;
+        min-height: 100svh;
       }
-      
-      
+      .hero__right {
+        display: none !important;
+      }
       .stage {
-        padding: 18px 0 16px;
+        padding: 24px 0 20px;
       }
       .headline {
         font-size: clamp(22px, 6.5vw, 32px);
       }
       .squiggle {
         width: min(72%, 220px);
-      }
-      .cards {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      }
-      .card {
-        min-height: 0;
-      }
-      .side__top {
-        top: 20px;
-        right: 20px;
       }
     }
 
@@ -899,182 +881,185 @@ $is_logged_in    = is_user_logged_in();
 </head>
 <body <?php body_class( 'mindora-preorder-body' ); ?>>
 
-  <section class="hero">
-    <!-- Background Video from assets/images/a9-horizontal.mp4 -->
-    <video class="hero__bg" autoplay muted loop playsinline preload="auto" poster="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_232824_93a0252b-e9f2-432f-9961-555a2e458100.png&w=1920&q=85">
-      <source src="<?php echo esc_url( $video_url ); ?>" type="video/mp4">
-    </video>
-    <div class="hero__scrim"></div>
-    <div class="hero__inner">
-      <!-- COLUMN 1: the white boxed container -->
-      <div class="panel">
-        <header class="topbar">
-          <div id="raka-topbar-brand-wrap" class="nav-left flex items-center">
-            <a id="raka-topbar-brand-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand flex items-center">
-              <img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="RAKA GADGET">
-              <img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="RAKA GADGET">
-            </a>
-          </div>
+  <section id="hero" class="hero">
+    
+    <!-- COLUMN 1 (LEFT): The Content & Pre-Order Tracker Container -->
+    <div id="raka-hero-left" class="hero__left panel">
+      
+      <!-- Topbar Header -->
+      <header id="raka-hero-topbar" class="topbar">
+        <div id="raka-topbar-brand-wrap" class="nav-left flex items-center">
+          <a id="raka-topbar-brand-link" class="brand flex items-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+            <img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="RAKA GADGET">
+            <img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="RAKA GADGET">
+          </a>
+        </div>
 
-          <!-- THEME HEADER CONTROLS (REPLACING STATIC SOCIAL PILL) -->
-          <div class="theme-topbar-controls">
-            
-            <!-- User Account Dropdown -->
-            <div id="raka-account-menu-wrap" class="relative">
-              <button
-                id="raka-account-btn"
-                class="theme-ctrl-btn"
-                type="button"
-                aria-label="<?php esc_attr_e( 'Account Menu', 'raka-preorder-theme' ); ?>"
-                title="<?php esc_attr_e( 'Account', 'raka-preorder-theme' ); ?>"
-              >
-                <?php if ( $is_logged_in ) : ?>
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 absolute top-1 right-1"></span>
-                <?php endif; ?>
-                <i class="ri-user-line text-sm sm:text-base"></i>
-              </button>
-
-              <!-- Account Dropdown Menu -->
-              <div
-                id="raka-account-dropdown"
-                class="absolute right-0 top-full mt-2 w-64 p-4 rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl transition-all duration-300 transform opacity-0 invisible translate-y-2 pointer-events-none z-50 text-neutral-900 dark:text-white"
-              >
-                <?php if ( $is_logged_in ) : 
-                  $my_account_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/account' );
-                  $logout_url     = function_exists( 'wc_logout_url' ) ? wc_logout_url() : wp_logout_url( home_url() );
-                  $orders_url     = function_exists( 'wc_get_account_endpoint_url' ) ? wc_get_account_endpoint_url( 'orders' ) : home_url( '/account' );
-                ?>
-                  <div class="flex items-center gap-3 pb-3 mb-3 border-b border-black/10 dark:border-white/10">
-                    <div class="w-9 h-9 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center font-bold text-xs shrink-0 border border-red-500/20">
-                      <?php echo esc_html( strtoupper( substr( $current_user->display_name, 0, 1 ) ) ); ?>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                      <p class="text-xs font-bold truncate font-hn leading-tight"><?php echo esc_html( $current_user->display_name ); ?></p>
-                      <p class="text-[10px] text-neutral-500 dark:text-neutral-400 truncate font-mono mt-0.5"><?php echo esc_html( $current_user->user_email ); ?></p>
-                    </div>
-                  </div>
-                  <div class="flex flex-col gap-1 text-xs">
-                    <a class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium hover:bg-black/5 dark:hover:bg-white/10 transition-colors" href="<?php echo esc_url( $my_account_url ); ?>">
-                      <i class="ri-dashboard-line text-sm text-neutral-400"></i>
-                      <span><?php esc_html_e( 'My Account', 'raka-preorder-theme' ); ?></span>
-                    </a>
-                    <a class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium hover:bg-black/5 dark:hover:bg-white/10 transition-colors" href="<?php echo esc_url( $orders_url ); ?>">
-                      <i class="ri-file-list-3-line text-sm text-neutral-400"></i>
-                      <span><?php esc_html_e( 'My Orders', 'raka-preorder-theme' ); ?></span>
-                    </a>
-                    <a class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors mt-1 border-t border-black/5 dark:border-white/5 pt-2" href="<?php echo esc_url( $logout_url ); ?>">
-                      <i class="ri-logout-box-r-line text-sm"></i>
-                      <span><?php esc_html_e( 'Log Out', 'raka-preorder-theme' ); ?></span>
-                    </a>
-                  </div>
-                <?php else : 
-                  $login_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/account' );
-                ?>
-                  <div class="pb-3 mb-3 border-b border-black/10 dark:border-white/10">
-                    <h4 class="text-xs font-bold font-hn leading-tight"><?php esc_html_e( 'RAKA GADGET Account', 'raka-preorder-theme' ); ?></h4>
-                    <p class="text-[10px] text-neutral-500 dark:text-neutral-400 font-hn mt-0.5"><?php esc_html_e( 'Sign in to access order tracking & perks', 'raka-preorder-theme' ); ?></p>
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <a class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs font-bold tracking-wider uppercase transition-all shadow-md" href="<?php echo esc_url( $login_url ); ?>">
-                      <i class="ri-login-box-line text-sm"></i>
-                      <span><?php esc_html_e( 'Sign In / Login', 'raka-preorder-theme' ); ?></span>
-                    </a>
-                    <a class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-semibold border border-black/10 dark:border-white/20 transition-all" href="<?php echo esc_url( $login_url ); ?>">
-                      <i class="ri-user-add-line text-sm"></i>
-                      <span><?php esc_html_e( 'Register', 'raka-preorder-theme' ); ?></span>
-                    </a>
-                  </div>
-                <?php endif; ?>
-              </div>
-            </div>
-
-            <!-- Cart Drawer Button -->
-            <a
-              id="raka-cart-btn"
-              class="theme-ctrl-btn"
-              href="<?php echo esc_url( $cart_url ); ?>"
-              onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
-              aria-label="Shopping Cart"
-              title="Shopping Cart"
-            >
-              <i id="raka-cart-icon" class="ri-shopping-bag-3-line text-sm sm:text-base"></i>
-              <span
-                id="raka-cart-count"
-                class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-[9px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
-              >
-                <?php echo esc_html( (string) $cart_count ); ?>
-              </span>
-            </a>
-
-            <!-- Theme Mode Switcher -->
-            <button
-              id="raka-theme-btn"
-              class="theme-ctrl-btn"
-              type="button"
-              onclick="window.toggleRakaTheme(event)"
-              aria-label="Toggle dark / light mode"
-              title="Toggle theme"
-            >
-              <i id="theme-icon-sun" class="ri-sun-line text-sm sm:text-base text-amber-500"></i>
-              <i id="theme-icon-moon" class="ri-moon-line text-sm sm:text-base hidden text-sky-400"></i>
-            </button>
-
-            <!-- Hamburger Menu Button -->
-            <button
-              id="raka-menu-btn"
-              class="relative w-7 sm:w-8 md:w-9 h-5 sm:h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer py-0.5 ml-1"
-              type="button"
-              aria-label="Open menu"
-            >
-              <span id="burger-top" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
-              <span id="burger-mid" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] w-[65%]"></span>
-              <span id="burger-bot" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-[85%]"></span>
-            </button>
-
-          </div>
-        </header>
-
-        <div class="stage">
-          <div class="stage__emblem">
-            <img src="<?php echo esc_url( $logo_icon ); ?>" alt="Raka">
-          </div>
-          <h1 class="headline"><b>Track</b> your gear<br />with <b>Raka Pre-Order</b></h1>
-          <svg class="squiggle" viewBox="0 0 320 26" aria-hidden="true">
-            <path d="M2 20C34 4 60 3 88 12s52 12 80 3 54-12 82-3 46 10 68 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
+        <!-- THEME HEADER CONTROLS -->
+        <div id="raka-topbar-controls" class="theme-topbar-controls">
           
-          <!-- Pre-Order Form Mount (V2) -->
-          <div class="stage__form-mount">
-            <?php echo do_shortcode( '[preorder_raka_v2]' ); ?>
-          </div>
-        </div>
+          <!-- User Account Dropdown -->
+          <div id="raka-account-menu-wrap" class="relative">
+            <button
+              id="raka-account-btn"
+              class="theme-ctrl-btn"
+              type="button"
+              aria-label="<?php esc_attr_e( 'Account Menu', 'raka-preorder-theme' ); ?>"
+              title="<?php esc_attr_e( 'Account', 'raka-preorder-theme' ); ?>"
+            >
+              <?php if ( $is_logged_in ) : ?>
+                <span id="raka-account-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 absolute top-1 right-1"></span>
+              <?php endif; ?>
+              <i id="raka-account-icon" class="ri-user-line text-sm sm:text-base"></i>
+            </button>
 
-        
-      </div>
-
-      <!-- COLUMN 2: floating controls over the video -->
-      <div class="side">
-        <div class="side__top">
-          <a href="<?php echo esc_url( $shop_url ); ?>" class="pill-btn" aria-label="Explore Shop">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>
-            </svg>
-          </a>
-          <a href="<?php echo esc_url( $account_url ); ?>" class="account">
-            <svg class="account__plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-              <path d="M12 5v14M5 12h14"/>
-            </svg>
-            <span class="account__label">Account</span>
-            <div class="account__avatar">
-              <img src="<?php echo esc_url( $logo_icon ); ?>" alt="Account">
+            <!-- Account Dropdown Menu -->
+            <div
+              id="raka-account-dropdown"
+              class="absolute right-0 top-full mt-2 w-64 p-4 rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur-2xl border border-black/10 dark:border-white/15 shadow-2xl transition-all duration-300 transform opacity-0 invisible translate-y-2 pointer-events-none z-50 text-neutral-900 dark:text-white"
+            >
+              <?php if ( $is_logged_in ) : 
+                $my_account_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/account' );
+                $logout_url     = function_exists( 'wc_logout_url' ) ? wc_logout_url() : wp_logout_url( home_url() );
+                $orders_url     = function_exists( 'wc_get_account_endpoint_url' ) ? wc_get_account_endpoint_url( 'orders' ) : home_url( '/account' );
+              ?>
+                <div id="raka-account-user-header" class="flex items-center gap-3 pb-3 mb-3 border-b border-black/10 dark:border-white/10">
+                  <div id="raka-account-avatar-char" class="w-9 h-9 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center font-bold text-xs shrink-0 border border-red-500/20">
+                    <?php echo esc_html( strtoupper( substr( $current_user->display_name, 0, 1 ) ) ); ?>
+                  </div>
+                  <div id="raka-account-user-meta" class="min-w-0 flex-1">
+                    <p id="raka-account-user-name" class="text-xs font-bold truncate font-hn leading-tight"><?php echo esc_html( $current_user->display_name ); ?></p>
+                    <p id="raka-account-user-email" class="text-[10px] text-neutral-500 dark:text-neutral-400 truncate font-mono mt-0.5"><?php echo esc_html( $current_user->user_email ); ?></p>
+                  </div>
+                </div>
+                <div id="raka-account-links" class="flex flex-col gap-1 text-xs">
+                  <a id="raka-link-myaccount" class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium hover:bg-black/5 dark:hover:bg-white/10 transition-colors" href="<?php echo esc_url( $my_account_url ); ?>">
+                    <i id="raka-icon-dashboard" class="ri-dashboard-line text-sm text-neutral-400"></i>
+                    <span><?php esc_html_e( 'My Account', 'raka-preorder-theme' ); ?></span>
+                  </a>
+                  <a id="raka-link-myorders" class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium hover:bg-black/5 dark:hover:bg-white/10 transition-colors" href="<?php echo esc_url( $orders_url ); ?>">
+                    <i id="raka-icon-orders" class="ri-file-list-3-line text-sm text-neutral-400"></i>
+                    <span><?php esc_html_e( 'My Orders', 'raka-preorder-theme' ); ?></span>
+                  </a>
+                  <a id="raka-link-logout" class="flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors mt-1 border-t border-black/5 dark:border-white/5 pt-2" href="<?php echo esc_url( $logout_url ); ?>">
+                    <i id="raka-icon-logout" class="ri-logout-box-r-line text-sm"></i>
+                    <span><?php esc_html_e( 'Log Out', 'raka-preorder-theme' ); ?></span>
+                  </a>
+                </div>
+              <?php else : 
+                $login_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/account' );
+              ?>
+                <div id="raka-account-guest-header" class="pb-3 mb-3 border-b border-black/10 dark:border-white/10">
+                  <h4 id="raka-account-guest-title" class="text-xs font-bold font-hn leading-tight"><?php esc_html_e( 'RAKA GADGET Account', 'raka-preorder-theme' ); ?></h4>
+                  <p id="raka-account-guest-sub" class="text-[10px] text-neutral-500 dark:text-neutral-400 font-hn mt-0.5"><?php esc_html_e( 'Sign in to access order tracking & perks', 'raka-preorder-theme' ); ?></p>
+                </div>
+                <div id="raka-account-guest-actions" class="flex flex-col gap-2">
+                  <a id="raka-guest-login-btn" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs font-bold tracking-wider uppercase transition-all shadow-md" href="<?php echo esc_url( $login_url ); ?>">
+                    <i id="raka-guest-login-ico" class="ri-login-box-line text-sm"></i>
+                    <span><?php esc_html_e( 'Sign In / Login', 'raka-preorder-theme' ); ?></span>
+                  </a>
+                  <a id="raka-guest-register-btn" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-neutral-900 dark:text-white text-xs font-semibold border border-black/10 dark:border-white/20 transition-all" href="<?php echo esc_url( $login_url ); ?>">
+                    <i id="raka-guest-register-ico" class="ri-user-add-line text-sm"></i>
+                    <span><?php esc_html_e( 'Register', 'raka-preorder-theme' ); ?></span>
+                  </a>
+                </div>
+              <?php endif; ?>
             </div>
+          </div>
+
+          <!-- Cart Drawer Button -->
+          <a
+            id="raka-cart-btn"
+            class="theme-ctrl-btn"
+            href="<?php echo esc_url( $cart_url ); ?>"
+            onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
+            aria-label="Shopping Cart"
+            title="Shopping Cart"
+          >
+            <i id="raka-cart-icon" class="ri-shopping-bag-3-line text-sm sm:text-base"></i>
+            <span
+              id="raka-cart-count"
+              class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-[9px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
+            >
+              <?php echo esc_html( (string) $cart_count ); ?>
+            </span>
           </a>
+
+          <!-- Theme Mode Switcher -->
+          <button
+            id="raka-theme-btn"
+            class="theme-ctrl-btn"
+            type="button"
+            onclick="window.toggleRakaTheme(event)"
+            aria-label="Toggle dark / light mode"
+            title="Toggle theme"
+          >
+            <i id="theme-icon-sun" class="ri-sun-line text-sm sm:text-base text-amber-500"></i>
+            <i id="theme-icon-moon" class="ri-moon-line text-sm sm:text-base hidden text-sky-400"></i>
+          </button>
+
+          <!-- Hamburger Menu Button -->
+          <button
+            id="raka-menu-btn"
+            class="relative w-7 sm:w-8 md:w-9 h-5 sm:h-6 flex flex-col justify-between items-end focus:outline-none cursor-pointer py-0.5 ml-1"
+            type="button"
+            aria-label="Open menu"
+          >
+            <span id="burger-top" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-full"></span>
+            <span id="burger-mid" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] w-[65%]"></span>
+            <span id="burger-bot" class="block h-[2px] bg-neutral-950 dark:bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] origin-center w-[85%]"></span>
+          </button>
+
         </div>
-        <a id="raka-side-cart-fab" href="<?php echo esc_url( $shop_url ); ?>" class="arrow-fab" aria-label="Shop Products">
-          <i id="raka-side-cart-fab-icon" class="ri-shopping-bag-3-line"></i>
+      </header>
+
+      <!-- Stage Center -->
+      <div id="raka-hero-stage" class="stage">
+        <div id="raka-stage-emblem" class="stage__emblem">
+          <img id="raka-stage-emblem-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Raka">
+        </div>
+        <h1 id="raka-hero-headline" class="headline"><b>Track</b> your gear<br />with <b>Raka Pre-Order</b></h1>
+        <svg id="raka-hero-squiggle" class="squiggle" viewBox="0 0 320 26" aria-hidden="true">
+          <path d="M2 20C34 4 60 3 88 12s52 12 80 3 54-12 82-3 46 10 68 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        
+        <!-- Pre-Order Form Mount (V2) -->
+        <div id="raka-stage-form-mount" class="stage__form-mount">
+          <?php echo do_shortcode( '[preorder_raka_v2]' ); ?>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- COLUMN 2 (RIGHT): Dedicated Video Column (No Overlap) -->
+    <div id="raka-hero-right" class="hero__right">
+      <video id="raka-hero-video" class="hero__video" autoplay muted loop playsinline preload="auto" poster="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_232824_93a0252b-e9f2-432f-9961-555a2e458100.png&w=1920&q=85">
+        <source src="<?php echo esc_url( $video_url ); ?>" type="video/mp4">
+      </video>
+
+      <!-- Floating Controls on Top Right of Video -->
+      <div id="raka-side-controls" class="side__top">
+        <a id="raka-explore-shop-btn" class="pill-btn" href="<?php echo esc_url( $shop_url ); ?>" aria-label="Explore Shop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>
+          </svg>
+        </a>
+        <a id="raka-side-account-btn" class="account" href="<?php echo esc_url( $account_url ); ?>">
+          <svg class="account__plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          <span id="raka-account-pill-label" class="account__label">Account</span>
+          <div id="raka-account-pill-avatar" class="account__avatar">
+            <img id="raka-account-avatar-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Account">
+          </div>
         </a>
       </div>
+
+      <a id="raka-side-cart-fab" class="arrow-fab" href="<?php echo esc_url( $shop_url ); ?>" aria-label="Shop Products">
+        <i id="raka-side-cart-fab-icon" class="ri-shopping-bag-3-line"></i>
+      </a>
     </div>
+
   </section>
 
   <!-- ══════════ FULL THEME NAVIGATION OVERLAY (CLONED FROM THEME HEADER) ══════════ -->
