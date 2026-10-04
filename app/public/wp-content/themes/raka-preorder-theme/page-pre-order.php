@@ -1467,8 +1467,228 @@ $is_logged_in    = is_user_logged_in();
       });
     })();
 
-    /* ═════════ IIFE #2: Fullscreen Theme Navigation & Header Controls ═════════ */
-    
+        /* ═════════ IIFE #2: Fullscreen Theme Navigation & Header Controls ═════════ */
+    (function initMenuAndControls() {
+      const menuBtn = document.getElementById('raka-menu-btn');
+      const overlay = document.getElementById('raka-menu-overlay');
+      const burgerTop = document.getElementById('burger-top');
+      const burgerMid = document.getElementById('burger-mid');
+      const burgerBot = document.getElementById('burger-bot');
+      const navBottom = document.getElementById('nav-bottom-info');
+      const rootPanel = document.getElementById('menu-panel-root');
+      const megaTriggers = document.querySelectorAll('.mega-menu-trigger');
+      const megaPanels = document.querySelectorAll('.mega-panel');
+      const backButtons = document.querySelectorAll('.btn-mega-back');
+
+      if (!menuBtn || !overlay) return;
+
+      let isOpen = false;
+      let currentActiveMegaPanel = null;
+
+      function animateRootLinksIn() {
+        if (!rootPanel) return;
+        const linkTexts = rootPanel.querySelectorAll('.nav-link-text');
+        linkTexts.forEach((span, idx) => {
+          const trigger = span.closest('.mega-menu-trigger');
+          const delay = trigger ? trigger.getAttribute('data-delay') : (idx * 60 + 'ms');
+          span.style.transitionDelay = delay;
+          span.style.transform = 'translateY(0)';
+        });
+      }
+
+      function animateRootLinksOut() {
+        if (!rootPanel) return;
+        const linkTexts = rootPanel.querySelectorAll('.nav-link-text');
+        linkTexts.forEach((span) => {
+          span.style.transitionDelay = '0ms';
+          span.style.transform = 'translateY(110%)';
+        });
+      }
+
+      function openMegaPanel(panelId) {
+        const targetPanel = document.getElementById(panelId);
+        if (!targetPanel) return;
+
+        currentActiveMegaPanel = targetPanel;
+
+        // 1. Animate root menu out smoothly
+        if (rootPanel) {
+          rootPanel.style.opacity = '0';
+          rootPanel.style.transform = 'translate3d(0, -24px, 0)';
+          rootPanel.style.pointerEvents = 'none';
+          rootPanel.style.visibility = 'hidden';
+        }
+
+        // 2. Hide all other mega panels
+        megaPanels.forEach(panel => {
+          if (panel !== targetPanel) {
+            panel.style.opacity = '0';
+            panel.style.transform = 'translate3d(0, 28px, 0)';
+            panel.style.pointerEvents = 'none';
+            panel.style.visibility = 'hidden';
+          }
+        });
+
+        // 3. Slide target mega panel in seamlessly
+        targetPanel.style.visibility = 'visible';
+        targetPanel.style.opacity = '1';
+        targetPanel.style.transform = 'translate3d(0, 0, 0)';
+        targetPanel.style.pointerEvents = 'auto';
+      }
+
+      function backToRootMenu() {
+        if (currentActiveMegaPanel) {
+          currentActiveMegaPanel.style.opacity = '0';
+          currentActiveMegaPanel.style.transform = 'translate3d(0, 28px, 0)';
+          currentActiveMegaPanel.style.pointerEvents = 'none';
+          currentActiveMegaPanel.style.visibility = 'hidden';
+          currentActiveMegaPanel = null;
+        }
+
+        // Slide root menu back into place
+        if (rootPanel) {
+          rootPanel.style.visibility = 'visible';
+          rootPanel.style.opacity = '1';
+          rootPanel.style.transform = 'translate3d(0, 0, 0)';
+          rootPanel.style.pointerEvents = 'auto';
+          animateRootLinksIn();
+        }
+      }
+
+      function resetMenuToRootInstant() {
+        if (currentActiveMegaPanel) {
+          currentActiveMegaPanel.style.opacity = '0';
+          currentActiveMegaPanel.style.transform = 'translate3d(0, 28px, 0)';
+          currentActiveMegaPanel.style.pointerEvents = 'none';
+          currentActiveMegaPanel.style.visibility = 'hidden';
+          currentActiveMegaPanel = null;
+        }
+        if (rootPanel) {
+          rootPanel.style.visibility = 'visible';
+          rootPanel.style.opacity = '1';
+          rootPanel.style.transform = 'translate3d(0, 0, 0)';
+          rootPanel.style.pointerEvents = 'auto';
+        }
+        animateRootLinksOut();
+      }
+
+      function toggleMenu(open) {
+        isOpen = typeof open === 'boolean' ? open : !isOpen;
+        menuBtn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+        menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+        if (isOpen) {
+          document.body.style.overflow = 'hidden';
+          overlay.style.pointerEvents = 'auto';
+          overlay.style.clipPath = 'inset(0% 0% 0% 0%)';
+
+          // Burger icon -> X
+          if (burgerTop) {
+            burgerTop.style.transform = 'translateY(7.5px) rotate(45deg)';
+            burgerTop.style.width = '100%';
+          }
+          if (burgerMid) {
+            burgerMid.style.opacity = '0';
+            burgerMid.style.transform = 'scaleX(0)';
+          }
+          if (burgerBot) {
+            burgerBot.style.transform = 'translateY(-7.5px) rotate(-45deg)';
+            burgerBot.style.width = '100%';
+          }
+
+          // Ensure starting at root
+          if (!currentActiveMegaPanel) {
+            if (rootPanel) {
+              rootPanel.style.visibility = 'visible';
+              rootPanel.style.opacity = '1';
+              rootPanel.style.transform = 'translate3d(0, 0, 0)';
+              rootPanel.style.pointerEvents = 'auto';
+            }
+            animateRootLinksIn();
+          }
+
+          // Bottom info
+          if (navBottom) {
+            navBottom.style.transitionDelay = '450ms';
+            navBottom.style.opacity = '1';
+            navBottom.style.transform = 'translateY(0)';
+          }
+        } else {
+          document.body.style.overflow = '';
+          overlay.style.pointerEvents = 'none';
+          overlay.style.clipPath = 'inset(0% 0% 100% 0%)';
+
+          // Burger icon reset
+          if (burgerTop) {
+            burgerTop.style.transform = '';
+            burgerTop.style.width = '100%';
+          }
+          if (burgerMid) {
+            burgerMid.style.opacity = '1';
+            burgerMid.style.transform = '';
+          }
+          if (burgerBot) {
+            burgerBot.style.transform = '';
+            burgerBot.style.width = '85%';
+          }
+
+          animateRootLinksOut();
+
+          if (navBottom) {
+            navBottom.style.transitionDelay = '0ms';
+            navBottom.style.opacity = '0';
+            navBottom.style.transform = 'translateY(20px)';
+          }
+
+          setTimeout(() => {
+            if (!isOpen) {
+              resetMenuToRootInstant();
+            }
+          }, 700);
+        }
+      }
+
+      // Hamburger button click
+      menuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleMenu();
+      });
+
+      // Dedicated Cancel / Close buttons inside overlay
+      const closeButtons = overlay.querySelectorAll('.btn-menu-close, #raka-menu-close-btn, #btn-close-overlay, #overlay-close-btn');
+      closeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleMenu(false);
+        });
+      });
+
+      // ESC key to close
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) {
+          toggleMenu(false);
+        }
+      });
+
+      // Trigger click: Slide to Mega Menu Panel
+      megaTriggers.forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = trigger.getAttribute('data-mega-target');
+          if (target) {
+            openMegaPanel(target);
+          }
+        });
+      });
+
+      // Back buttons click: Slide back to Main Menu
+      backButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          backToRootMenu();
+        });
+      });
+    })();
   </script>
 
   <?php wp_footer(); ?>
