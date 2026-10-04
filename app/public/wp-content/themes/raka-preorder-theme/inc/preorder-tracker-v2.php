@@ -222,6 +222,7 @@ function raka_render_preorder_tracker_v2(): string {
 			const container = document.getElementById('raka-tracker-v2');
 			if (!container) return;
 
+			const isTurnstileActive = <?php echo $turnstile_enabled ? 'true' : 'false'; ?>;
 			let currentMode = 'order'; // 'order' or 'phone'
 			let turnstileWidgetId = null;
 			let turnstileToken = '';
@@ -394,11 +395,6 @@ function raka_render_preorder_tracker_v2(): string {
 				let activeToken = turnstileToken;
 				if (!activeToken && window.turnstile && turnstileWidgetId !== null) {
 					activeToken = window.turnstile.getResponse(turnstileWidgetId) || '';
-				}
-
-				if (isTurnstileActive && !activeToken && currentMode !== 'order') {
-					showError('กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหาครับ');
-					return;
 				}
 
 				setLoading(true);
@@ -764,21 +760,7 @@ function raka_render_preorder_tracker_v2(): string {
 					if (initialVal) {
 						switchMode(targetMode);
 						primaryInput.value = initialVal;
-						
-						// Direct order link can search immediately
-						if (targetMode === 'order' || !isTurnstileActive) {
-							doSearch();
-						} else {
-							pendingUrlAutoSearch = true;
-							if (window.turnstile && turnstileWidgetId !== null) {
-								const curTok = window.turnstile.getResponse(turnstileWidgetId);
-								if (curTok) {
-									turnstileToken = curTok;
-									pendingUrlAutoSearch = false;
-									doSearch();
-								}
-							}
-						}
+						doSearch();
 					}
 				} catch (e) {
 					console.log('URL param check error:', e);
