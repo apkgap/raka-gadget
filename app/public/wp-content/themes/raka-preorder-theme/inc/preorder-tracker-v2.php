@@ -122,7 +122,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Dynamic List Container with custom scroll -->
-			<div id="raka-tracker-list-container" class="space-y-3 max-h-[58vh] sm:max-h-[64vh] overflow-y-auto pr-1.5 custom-tracker-scroll">
+			<div id="raka-tracker-list-container" class="space-y-3 max-h-[715px] overflow-y-auto pr-1.5 custom-tracker-scroll">
 				<!-- Dynamically populated via JS -->
 			</div>
 
@@ -148,7 +148,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Scrollable Container for Result Body -->
-			<div id="raka-res-scroll-body" class="space-y-3.5 max-h-[58vh] sm:max-h-[64vh] overflow-y-auto pr-1.5 custom-tracker-scroll">
+			<div id="raka-res-scroll-body" class="space-y-3.5 max-h-[715px] overflow-y-auto pr-1.5 custom-tracker-scroll">
 				
 				<!-- Product Details & Summary Card -->
 				<div id="raka-res-product-card" class="p-4 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/5 dark:border-white/10 flex gap-4 items-start">
@@ -273,7 +273,7 @@ function raka_render_preorder_tracker_v2(): string {
 			const activeTabClass = 'bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10';
 			const inactiveTabClass = 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white';
 
-			const isTurnstileActive = <?php echo $turnstile_enabled ? 'true' : 'false'; ?>;
+			let pendingUrlAutoSearch = false;
 
 			// Initialize Turnstile Explicitly
 			function renderTurnstile() {
@@ -289,6 +289,10 @@ function raka_render_preorder_tracker_v2(): string {
 								callback: function(token) {
 									turnstileToken = token;
 									hideError();
+									if (pendingUrlAutoSearch) {
+										pendingUrlAutoSearch = false;
+										doSearch();
+									}
 								},
 								'expired-callback': function() {
 									turnstileToken = '';
@@ -392,7 +396,7 @@ function raka_render_preorder_tracker_v2(): string {
 					activeToken = window.turnstile.getResponse(turnstileWidgetId) || '';
 				}
 
-				if (isTurnstileActive && !activeToken) {
+				if (isTurnstileActive && !activeToken && currentMode !== 'order') {
 					showError('กรุณากดติ๊กถูกในช่อง "Verify you are human" ก่อนค้นหาครับ');
 					return;
 				}
@@ -429,6 +433,19 @@ function raka_render_preorder_tracker_v2(): string {
 						setLoading(false);
 						return;
 					}
+
+					// Update URL in address bar cleanly without page reload
+					try {
+						const currentUrl = new URL(window.location.href);
+						if (currentMode === 'order') {
+							currentUrl.searchParams.set('order_no', primaryVal);
+							currentUrl.searchParams.delete('phone');
+						} else {
+							currentUrl.searchParams.set('phone', primaryVal);
+							currentUrl.searchParams.delete('order_no');
+						}
+						window.history.replaceState({ tracker: true }, '', currentUrl.toString());
+					} catch (e) {}
 
 					// Route based on mode and result structure
 					if (currentMode === 'phone' && data.mode === 'list' && Array.isArray(data.items)) {
@@ -659,6 +676,21 @@ function raka_render_preorder_tracker_v2(): string {
 				resultView.classList.remove('hidden');
 			}
 
+			function cleanTrackerUrl() {
+				try {
+					const cleanUrl = new URL(window.location.href);
+					cleanUrl.searchParams.delete('order_no');
+					cleanUrl.searchParams.delete('order');
+					cleanUrl.searchParams.delete('track');
+					cleanUrl.searchParams.delete('tracking');
+					cleanUrl.searchParams.delete('no');
+					cleanUrl.searchParams.delete('phone');
+					cleanUrl.searchParams.delete('tel');
+					cleanUrl.hash = '';
+					window.history.replaceState({}, '', cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
+				} catch(e) {}
+			}
+
 			submitBtn.addEventListener('click', doSearch);
 			primaryInput.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') doSearch();
@@ -668,6 +700,7 @@ function raka_render_preorder_tracker_v2(): string {
 			listBackBtn.addEventListener('click', () => {
 				listView.classList.add('hidden');
 				searchView.classList.remove('hidden');
+				cleanTrackerUrl();
 				primaryInput.focus();
 				if (window.turnstile && turnstileWidgetId !== null) {
 					window.turnstile.reset(turnstileWidgetId);
@@ -683,6 +716,7 @@ function raka_render_preorder_tracker_v2(): string {
 				} else {
 					resultView.classList.add('hidden');
 					searchView.classList.remove('hidden');
+					cleanTrackerUrl();
 					primaryInput.focus();
 					if (window.turnstile && turnstileWidgetId !== null) {
 						window.turnstile.reset(turnstileWidgetId);
@@ -690,6 +724,68 @@ function raka_render_preorder_tracker_v2(): string {
 					}
 				}
 			});
+
+			// Check URL parameters on page load for direct access
+			function checkUrlParams() {
+				try {
+					const searchParams = new URLSearchParams(window.location.search);
+					const orderParam = searchParams.get('order_no') || searchParams.get('order') || searchParams.get('track') || searchParams.get('tracking') || searchParams.get('no');
+					const phoneParam = searchParams.get('phone') || searchParams.get('tel');
+					
+					let initialVal = '';
+					let targetMode = 'order';
+
+					if (orderParam) {
+						initialVal = orderParam.trim();
+						targetMode = 'order';
+					} else if (phoneParam) {
+						initialVal = phoneParam.trim();
+						targetMode = 'phone';
+					} else {
+						// Check location.hash (e.g., #RAKA-PRE-312691 or #0952547497)
+						let hashVal = (window.location.hash || '').replace(/^#/, '').trim();
+						if (hashVal) {
+							if (hashVal.includes('=')) {
+								const hParams = new URLSearchParams(hashVal);
+								const hOrder = hParams.get('order_no') || hParams.get('order') || hParams.get('track');
+								const hPhone = hParams.get('phone') || hParams.get('tel');
+								if (hOrder) { initialVal = hOrder.trim(); targetMode = 'order'; }
+								else if (hPhone) { initialVal = hPhone.trim(); targetMode = 'phone'; }
+							} else if (/^0[0-9]{8,9}$/.test(hashVal.replace(/[^0-9]/g, '')) && !hashVal.toUpperCase().startsWith('RAKA')) {
+								initialVal = hashVal;
+								targetMode = 'phone';
+							} else if (hashVal.length >= 3) {
+								initialVal = hashVal;
+								targetMode = 'order';
+							}
+						}
+					}
+
+					if (initialVal) {
+						switchMode(targetMode);
+						primaryInput.value = initialVal;
+						
+						// Direct order link can search immediately
+						if (targetMode === 'order' || !isTurnstileActive) {
+							doSearch();
+						} else {
+							pendingUrlAutoSearch = true;
+							if (window.turnstile && turnstileWidgetId !== null) {
+								const curTok = window.turnstile.getResponse(turnstileWidgetId);
+								if (curTok) {
+									turnstileToken = curTok;
+									pendingUrlAutoSearch = false;
+									doSearch();
+								}
+							}
+						}
+					}
+				} catch (e) {
+					console.log('URL param check error:', e);
+				}
+			}
+
+			checkUrlParams();
 		})();
 	</script>
 	<?php

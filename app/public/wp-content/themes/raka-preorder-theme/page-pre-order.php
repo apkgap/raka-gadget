@@ -332,7 +332,7 @@ $is_logged_in    = is_user_logged_in();
 
     .stage__form-mount {
       width: 100%;
-      max-width: 520px;
+      max-width: 715px;
       margin: 0 auto;
       text-align: left;
     }
