@@ -581,9 +581,6 @@ html:not(.dark) #overlay-brand img#overlay-brand-img-dark {
 	font-weight: 400 !important;
 }
 
-#raka-tracker-v2 .font-mono {
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-}
 
 #raka-track-primary-input {
 	padding-left: 46px !important;
@@ -606,4 +603,3 @@ html:not(.dark) #overlay-brand img#overlay-brand-img-dark {
 .custom-tracker-scroll::-webkit-scrollbar-thumb:hover {
 	background: rgba(150, 150, 150, 0.65);
 }
-
