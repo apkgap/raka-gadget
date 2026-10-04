@@ -17,8 +17,10 @@ module.exports = {
         cementDark: '#121212',
       },
       fontFamily: {
-        hn: ['Helvetica Neue ME', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        kanit: ['Kanit', 'sans-serif'],
+        hn: ['"Helvetica Neue ME"', '"Helvetica Neue"', 'Prompt', 'Kanit', 'Inter', 'Helvetica', 'Arial', 'sans-serif'],
+        kanit: ['Kanit', 'Prompt', 'sans-serif'],
+        prompt: ['Prompt', 'Kanit', 'sans-serif'],
+        sans: ['"Helvetica Neue ME"', '"Helvetica Neue"', 'Prompt', 'Kanit', 'Inter', 'Helvetica', 'Arial', 'sans-serif'],
       },
     },
   },
