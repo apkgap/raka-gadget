@@ -551,7 +551,7 @@ $is_logged_in    = is_user_logged_in();
       object-fit: contain;
     }
 
-    .arrow-fab {
+        .arrow-fab {
       position: absolute;
       right: clamp(10px, 2.2vw, 44px);
       bottom: clamp(10px, 2.2vw, 44px);
@@ -559,14 +559,31 @@ $is_logged_in    = is_user_logged_in();
       height: clamp(58px, 5vw, 86px);
       border-radius: 50%;
       background: #fff;
-      display: grid;
-      place-items: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 18px 40px -20px rgba(10, 28, 24, .5);
-      transition: transform .3s ease;
+      transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .3s ease;
+      color: #0d121c;
+      text-decoration: none;
     }
 
     .arrow-fab:hover {
-      transform: rotate(45deg);
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 0 22px 45px -15px rgba(10, 28, 24, .6);
+      color: #0d121c;
+    }
+
+    .arrow-fab i {
+      font-size: clamp(24px, 2.2vw, 36px);
+      line-height: 1;
+      color: #0d121c;
+      display: block;
+      transition: transform .25s ease;
+    }
+
+    .arrow-fab:hover i {
+      transform: scale(1.08);
     }
 
     .arrow-fab svg {
@@ -883,10 +900,8 @@ $is_logged_in    = is_user_logged_in();
             </div>
           </a>
         </div>
-        <a href="<?php echo esc_url( $shop_url ); ?>" class="arrow-fab" aria-label="Explore more">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 17L17 7M8 7h9v9"/>
-          </svg>
+        <a id="raka-side-cart-fab" href="<?php echo esc_url( $shop_url ); ?>" class="arrow-fab" aria-label="Shop Products">
+          <i id="raka-side-cart-fab-icon" class="ri-shopping-bag-3-line"></i>
         </a>
       </div>
     </div>
