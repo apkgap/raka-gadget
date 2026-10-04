@@ -88,6 +88,20 @@ $is_logged_in    = is_user_logged_in();
       display: block;
     }
 
+    button,
+    button *,
+    .btn,
+    .btn *,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    a.button,
+    a.btn,
+    [role="button"],
+    [role="button"] * {
+      font-weight: 400 !important;
+    }
+
     button {
       font: inherit;
       color: inherit;

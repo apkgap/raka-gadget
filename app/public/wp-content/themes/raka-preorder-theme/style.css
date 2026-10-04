@@ -50,6 +50,20 @@ html, body, button, input, select, textarea {
   font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 }
 
+button,
+button *,
+.btn,
+.btn *,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+a.button,
+a.btn,
+[role="button"],
+[role="button"] * {
+  font-weight: 400 !important;
+}
+
 /* ─── Reset & Base ──────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;

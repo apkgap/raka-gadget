@@ -1,38 +1,42 @@
 /* ─── Local Font Face: Prompt (OFL Self-Hosted) ─────────── */
 @font-face {
-  font-family: 'Prompt';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('../../assets/fonts/prompt/Prompt-Light.ttf') format('truetype');
+	font-family: 'Prompt';
+	font-style: normal;
+	font-weight: 300;
+	font-display: swap;
+	src: url('../../assets/fonts/prompt/Prompt-Light.ttf') format('truetype');
 }
+
 @font-face {
-  font-family: 'Prompt';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../../assets/fonts/prompt/Prompt-Regular.ttf') format('truetype');
+	font-family: 'Prompt';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../../assets/fonts/prompt/Prompt-Regular.ttf') format('truetype');
 }
+
 @font-face {
-  font-family: 'Prompt';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../../assets/fonts/prompt/Prompt-Medium.ttf') format('truetype');
+	font-family: 'Prompt';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('../../assets/fonts/prompt/Prompt-Medium.ttf') format('truetype');
 }
+
 @font-face {
-  font-family: 'Prompt';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../../assets/fonts/prompt/Prompt-SemiBold.ttf') format('truetype');
+	font-family: 'Prompt';
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url('../../assets/fonts/prompt/Prompt-SemiBold.ttf') format('truetype');
 }
+
 @font-face {
-  font-family: 'Prompt';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../../assets/fonts/prompt/Prompt-Bold.ttf') format('truetype');
+	font-family: 'Prompt';
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url('../../assets/fonts/prompt/Prompt-Bold.ttf') format('truetype');
 }
 
 @tailwind base;
@@ -65,7 +69,11 @@ html.light #root {
 	background-color: #FFFFFF !important;
 }
 
-body, button, input, select, textarea {
+body,
+button,
+input,
+select,
+textarea {
 	font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 	background: inherit;
 	color: inherit;
@@ -74,12 +82,27 @@ body, button, input, select, textarea {
 	-moz-osx-font-smoothing: grayscale;
 }
 
+button,
+button *,
+.btn,
+.btn *,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+a.button,
+a.btn,
+[role="button"],
+[role="button"] * {
+	font-weight: 400 !important;
+}
+
 ::-webkit-scrollbar {
 	width: 0px;
 	background: transparent;
 }
 
-.font-hn, .font-sans {
+.font-hn,
+.font-sans {
 	font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 }
 
@@ -279,23 +302,31 @@ body, button, input, select, textarea {
 /* Add comfortable breathing padding when sticky/scrolled on front page */
 #raka-site-header.header-scrolled #raka-nav,
 #obsidian-site-header.header-scrolled #raka-nav {
-	padding-top: 0.75rem !important; /* 12px */
-	padding-bottom: 0.75rem !important; /* 12px */
+	padding-top: 0.75rem !important;
+	/* 12px */
+	padding-bottom: 0.75rem !important;
+	/* 12px */
 }
 
 @media (min-width: 640px) {
+
 	#raka-site-header.header-scrolled #raka-nav,
 	#obsidian-site-header.header-scrolled #raka-nav {
-		padding-top: 0.875rem !important; /* 14px */
-		padding-bottom: 0.875rem !important; /* 14px */
+		padding-top: 0.875rem !important;
+		/* 14px */
+		padding-bottom: 0.875rem !important;
+		/* 14px */
 	}
 }
 
 @media (min-width: 768px) {
+
 	#raka-site-header.header-scrolled #raka-nav,
 	#obsidian-site-header.header-scrolled #raka-nav {
-		padding-top: 1rem !important; /* 16px */
-		padding-bottom: 1rem !important; /* 16px */
+		padding-top: 1rem !important;
+		/* 16px */
+		padding-bottom: 1rem !important;
+		/* 16px */
 	}
 }
 
@@ -452,14 +483,17 @@ html.dark #breadcrumbs .breadcrumb_last {
 	background-color: #ffffff !important;
 	color: #000000 !important;
 }
+
 #btn-add-to-cart[data-is-preorder="1"]:hover {
 	background-color: #f5f5f5 !important;
 }
+
 html.dark #btn-add-to-cart[data-is-preorder="1"] {
 	border: 2px solid #ffffff !important;
 	background-color: #000000 !important;
 	color: #ffffff !important;
 }
+
 html.dark #btn-add-to-cart[data-is-preorder="1"]:hover {
 	background-color: #171717 !important;
 }
@@ -499,6 +533,7 @@ html:not(.dark) #overlay-brand img#overlay-brand-img-dark {
 }
 
 @media (min-width: 640px) {
+
 	#raka-nav-brand img,
 	#overlay-brand img {
 		height: 30px !important;
@@ -508,6 +543,7 @@ html:not(.dark) #overlay-brand img#overlay-brand-img-dark {
 }
 
 @media (min-width: 768px) {
+
 	#raka-nav-brand img,
 	#overlay-brand img {
 		height: 34px !important;
@@ -517,6 +553,7 @@ html:not(.dark) #overlay-brand img#overlay-brand-img-dark {
 }
 
 @media (min-width: 1024px) {
+
 	#raka-nav-brand img,
 	#overlay-brand img {
 		height: 38px !important;

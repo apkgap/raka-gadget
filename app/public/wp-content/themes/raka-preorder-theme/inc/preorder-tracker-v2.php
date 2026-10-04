@@ -39,6 +39,12 @@ function raka_render_preorder_tracker_v2(): string {
 		#raka-tracker-v2 p {
 			font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
 		}
+		#raka-tracker-v2 button,
+		#raka-tracker-v2 button *,
+		#raka-tracker-v2 .btn,
+		#raka-tracker-v2 .btn * {
+			font-weight: 400 !important;
+		}
 		#raka-tracker-v2 .font-mono {
 			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 		}
@@ -71,7 +77,7 @@ function raka_render_preorder_tracker_v2(): string {
 				<button
 					type="button"
 					id="raka-tab-btn-order"
-					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10"
+					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10"
 					data-tab="order"
 				>
 					<i id="raka-tab-icon-order" class="ri-hashtag text-sm sm:text-base"></i>
@@ -80,7 +86,7 @@ function raka_render_preorder_tracker_v2(): string {
 				<button
 					type="button"
 					id="raka-tab-btn-phone"
-					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
 					data-tab="phone"
 				>
 					<i id="raka-tab-icon-phone" class="ri-phone-line text-sm sm:text-base"></i>
@@ -126,7 +132,7 @@ function raka_render_preorder_tracker_v2(): string {
 			<button
 				type="button"
 				id="raka-tracker-submit-btn"
-				class="w-full h-12 px-6 rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-sm sm:text-base font-semibold flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:scale-[1.005] active:scale-[0.99] cursor-pointer"
+				class="w-full h-12 px-6 rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-sm sm:text-base font-normal flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:scale-[1.005] active:scale-[0.99] cursor-pointer"
 			>
 				<i id="raka-tracker-btn-icon" class="ri-search-2-line text-base sm:text-lg"></i>
 				<span id="raka-tracker-btn-text"><?php esc_html_e( 'ค้นหารายการพรีออเดอร์', 'raka-preorder-theme' ); ?></span>
@@ -147,7 +153,7 @@ function raka_render_preorder_tracker_v2(): string {
 				<button
 					type="button"
 					id="raka-list-back-btn"
-					class="inline-flex items-center gap-1 text-xs sm:text-sm text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white font-medium transition-colors cursor-pointer py-1 px-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
+					class="inline-flex items-center gap-1 text-xs sm:text-sm text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white font-normal transition-colors cursor-pointer py-1 px-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
 				>
 					<i id="raka-list-back-ico" class="ri-arrow-left-s-line text-base"></i>
 					<span id="raka-list-back-txt"><?php esc_html_e( 'ค้นหาใหม่', 'raka-preorder-theme' ); ?></span>
@@ -173,7 +179,7 @@ function raka_render_preorder_tracker_v2(): string {
 				<button
 					type="button"
 					id="raka-tracker-reset-btn"
-					class="inline-flex items-center gap-1 text-xs sm:text-sm text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white font-medium transition-colors cursor-pointer py-1 px-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
+					class="inline-flex items-center gap-1 text-xs sm:text-sm text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white font-normal transition-colors cursor-pointer py-1 px-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
 				>
 					<i id="raka-res-back-ico" class="ri-arrow-left-s-line text-base"></i>
 					<span id="raka-res-back-txt"><?php esc_html_e( 'ค้นหาใหม่', 'raka-preorder-theme' ); ?></span>
@@ -355,16 +361,16 @@ function raka_render_preorder_tracker_v2(): string {
 				hideError();
 
 				if (mode === 'order') {
-					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
-					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
 
 					primaryLabel.textContent = 'ORDER NUMBER / หมายเลขคำสั่งซื้อ';
 					primaryIcon.className = 'ri-hashtag text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none';
 					primaryInput.placeholder = 'เช่น RAKA-PRE-312691';
 					primaryInput.type = 'text';
 				} else {
-					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
-					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
 
 					primaryLabel.textContent = 'PHONE NUMBER / เบอร์โทรศัพท์';
 					primaryIcon.className = 'ri-phone-line text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none';
