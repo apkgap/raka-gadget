@@ -9,7 +9,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$video_url = get_template_directory_uri() . '/assets/images/a9-air.mp4';
+$video_url = get_template_directory_uri() . '/assets/images/a9-horizontal.mp4';
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> lang="en">
@@ -1003,7 +1003,7 @@ $video_url = get_template_directory_uri() . '/assets/images/a9-air.mp4';
 <body <?php body_class( 'mindora-preorder-body' ); ?>>
 
   <section class="hero">
-    <!-- Background Video from assets/images/a9-air.mp4 -->
+    <!-- Background Video from assets/images/a9-horizontal.mp4 -->
     <video class="hero__bg" autoplay muted loop playsinline preload="auto" poster="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_232824_93a0252b-e9f2-432f-9961-555a2e458100.png&w=1920&q=85">
       <source src="<?php echo esc_url( $video_url ); ?>" type="video/mp4">
     </video>
