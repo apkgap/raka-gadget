@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Require REST API logic
 require_once plugin_dir_path( __FILE__ ) . 'inc/preorder-api.php';
+require_once plugin_dir_path( __FILE__ ) . 'inc/class-preorder-export-import.php';
+Preorder_Raka_Export_Import::init();
 
 /**
  * Register Pre-order Custom Post Type.
