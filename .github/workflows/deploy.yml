@@ -22,9 +22,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          security: loose
-          security-mode: loose
           log-level: verbose
+          state-name: .plugins-sync-state.json
           local-dir: ./app/public/wp-content/plugins/
           server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/
           exclude: |
@@ -45,9 +44,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          security: loose
-          security-mode: loose
           log-level: verbose
+          state-name: .theme-sync-state.json
           local-dir: ./app/public/wp-content/themes/raka-preorder-theme/
           server-dir: ${{ secrets.FTP_THEME_DIR }}/raka-preorder-theme/
           exclude: |
