@@ -210,6 +210,7 @@ function raka_account_api_get_overview( WP_REST_Request $request ): WP_REST_Resp
 			'points_balance'   => $points_balance,
 			'tier'             => $tier,
 		],
+		'loyalty_system_enabled' => function_exists( 'raka_is_loyalty_enabled' ) ? raka_is_loyalty_enabled() : true,
 		'recent_orders' => $recent_orders,
 	];
 

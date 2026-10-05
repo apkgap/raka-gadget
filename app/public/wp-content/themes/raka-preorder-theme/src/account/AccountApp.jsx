@@ -117,7 +117,9 @@ export default function AccountApp() {
 
 	const tabs = [
 		{ id: 'dashboard', label: 'ภาพรวม', icon: 'ri-dashboard-3-line' },
-		{ id: 'rewards', label: 'ของรางวัล & แต้มสะสม', icon: 'ri-copper-coin-line', badge: overview?.stats?.points_balance },
+		...( overview?.loyalty_system_enabled !== false ? [
+			{ id: 'rewards', label: 'ของรางวัล & แต้มสะสม', icon: 'ri-copper-coin-line', badge: overview?.stats?.points_balance }
+		] : [] ),
 		{ id: 'orders', label: 'คำสั่งซื้อ & พรีออเดอร์', icon: 'ri-shopping-bag-3-line', badge: overview?.stats?.total_orders },
 		{ id: 'addresses', label: 'ที่อยู่จัดส่ง & ออกใบกำกับ', icon: 'ri-map-pin-user-line' },
 		{ id: 'security', label: 'ความปลอดภัย & Passkeys', icon: 'ri-shield-keyhole-line', badge: passkeys?.length },

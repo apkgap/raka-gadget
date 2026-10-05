@@ -30,16 +30,18 @@ export default function DashboardView( { user, stats, recentOrders, onSelectTab,
 			bgColor: 'bg-red-600/10 dark:bg-red-500/10',
 			tab: 'orders',
 		},
-		{
-			id: 'stat-points',
-			label: 'แต้มสะสมพร้อมใช้',
-			value: Number( stats.points_balance ?? 0 ).toLocaleString(),
-			unit: 'แต้ม',
-			icon: 'ri-copper-coin-line',
-			color: 'text-red-600 dark:text-red-500',
-			bgColor: 'bg-red-600/10 dark:bg-red-500/10',
-			tab: 'rewards',
-		},
+		...( overview?.loyalty_system_enabled !== false ? [
+			{
+				id: 'stat-points',
+				label: 'แต้มสะสมพร้อมใช้',
+				value: Number( stats.points_balance ?? 0 ).toLocaleString(),
+				unit: 'แต้ม',
+				icon: 'ri-copper-coin-line',
+				color: 'text-red-600 dark:text-red-500',
+				bgColor: 'bg-red-600/10 dark:bg-red-500/10',
+				tab: 'rewards',
+			}
+		] : [] ),
 		{
 			id: 'stat-passkeys',
 			label: 'อุปกรณ์ Passkeys',

@@ -54,6 +54,16 @@ function raka_is_etax_invoice_enabled(): bool {
 }
 
 /**
+ * Check if Loyalty & Rewards system is enabled globally by admin.
+ *
+ * @return bool
+ */
+function raka_is_loyalty_enabled(): bool {
+	$options = raka_get_all_options();
+	return ! isset( $options['loyalty']['enabled'] ) || ! empty( $options['loyalty']['enabled'] );
+}
+
+/**
  * Get Cloudflare Turnstile Sitekey.
  *
  * @return string
