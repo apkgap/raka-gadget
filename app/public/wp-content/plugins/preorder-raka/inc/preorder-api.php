@@ -234,18 +234,12 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	// ── 0. Handle Current Member / User ID Preorder List Query ──
 	if ( ! empty( $my_orders ) || ! empty( $user_id ) ) {
 		$target_user_id = $user_id > 0 ? $user_id : get_current_user_id();
-		if ( ! is_user_logged_in() && $target_user_id <= 0 ) {
+		if ( $target_user_id <= 0 && ! is_user_logged_in() ) {
 			return new WP_Error( 'login_required', 'กรุณาเข้าสู่ระบบเพื่อดูรายการพรีออเดอร์ของคุณ', [
 				'status'        => 401,
 				'require_login' => true,
 				'login_url'     => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url( home_url( '/pre-order/?my_orders=1' ) ),
 			] );
-		}
-
-		$current_uid = get_current_user_id();
-		$is_admin    = current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' );
-		if ( ! $is_admin && $current_uid !== $target_user_id ) {
-			$target_user_id = $current_uid;
 		}
 
 		$user_obj = get_userdata( $target_user_id );
@@ -324,7 +318,15 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 		}
 
 		if ( empty( $merged_posts ) ) {
-			return new WP_Error( 'not_found', 'ยังไม่มีรายการพรีออเดอร์ในบัญชีสมาชิกของคุณ', [ 'status' => 404 ] );
+			return [
+				'success'   => true,
+				'mode'      => 'list',
+				'user_id'   => $target_user_id,
+				'user_name' => $user_obj ? ( $user_obj->display_name ?: $user_obj->user_login ) : '',
+				'count'     => 0,
+				'items'     => [],
+				'data'      => null,
+			];
 		}
 
 		$items = [];
@@ -465,7 +467,10 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 				? add_query_arg( 'redirect_to', urlencode( $target_url ), wc_get_page_permalink( 'myaccount' ) )
 				: wp_login_url( $target_url );
 
-			if ( ! is_user_logged_in() ) {
+			$effective_uid = $user_id > 0 ? $user_id : get_current_user_id();
+			$is_logged_in_check = $effective_uid > 0 || is_user_logged_in();
+
+			if ( ! $is_logged_in_check ) {
 				return new WP_Error(
 					'member_login_required',
 					'คำสั่งซื้อนี้เป็นของสมาชิกเว็บไซต์ เพื่อความปลอดภัยกรุณาเข้าสู่ระบบก่อนตรวจสอบสถานะ',
@@ -478,10 +483,9 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 				);
 			}
 
-			$current_user_id = get_current_user_id();
-			$is_admin_or_staff = current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' );
+			$is_admin_or_staff = user_can( $effective_uid, 'edit_posts' ) || user_can( $effective_uid, 'manage_options' );
 
-			if ( ! $is_admin_or_staff && $current_user_id !== $member_user_id ) {
+			if ( ! $is_admin_or_staff && $effective_uid !== $member_user_id ) {
 				return new WP_Error(
 					'member_forbidden',
 					'คุณไม่มีสิทธิ์เข้าถึงคำสั่งซื้อนี้ กรุณาเข้าสู่ระบบด้วยบัญชีสมาชิกที่เป็นเจ้าของคำสั่งซื้อ',

@@ -287,6 +287,8 @@ function raka_render_preorder_tracker_v2(): string {
 			const isLoggedIn        = <?php echo $is_logged_in ? 'true' : 'false'; ?>;
 			const defaultLoginUrl   = <?php echo wp_json_encode( esc_url_raw( $login_url ) ); ?>;
 			const currentUserName   = <?php echo wp_json_encode( $display_name ); ?>;
+			const restNonce         = <?php echo wp_json_encode( wp_create_nonce( 'wp_rest' ) ); ?>;
+			const currentUserId     = <?php echo (int) get_current_user_id(); ?>;
 
 			let currentMode = 'order'; // 'order' or 'phone'
 			let turnstileWidgetId = null;
@@ -454,7 +456,8 @@ function raka_render_preorder_tracker_v2(): string {
 			// Search My Orders by User ID / Logged-in Session
 			async function doSearchMyOrders(targetUserId) {
 				hideError();
-				if (!isLoggedIn && !targetUserId) {
+				const effectiveUserId = targetUserId || (currentUserId > 0 ? currentUserId : null);
+				if (!isLoggedIn && !effectiveUserId) {
 					renderLoginRequiredView({
 						data: { login_url: defaultLoginUrl },
 						message: 'กรุณาเข้าสู่ระบบสมาชิกเพื่อดูรายการพรีออเดอร์ของคุณ'
@@ -466,15 +469,19 @@ function raka_render_preorder_tracker_v2(): string {
 
 				try {
 					const params = new URLSearchParams();
-					if (targetUserId) {
-						params.append('user_id', targetUserId);
-					} else {
-						params.append('my_orders', '1');
+					if (effectiveUserId) {
+						params.append('user_id', effectiveUserId);
 					}
+					params.append('my_orders', '1');
 
 					const apiUrl = '/wp-json/preorder-raka/v1/status?' + params.toString();
+					const headers = { 'Accept': 'application/json' };
+					if (restNonce) {
+						headers['X-WP-Nonce'] = restNonce;
+					}
+
 					const res = await fetch(apiUrl, {
-						headers: { 'Accept': 'application/json' },
+						headers: headers,
 						credentials: 'same-origin',
 					});
 
@@ -542,9 +549,19 @@ function raka_render_preorder_tracker_v2(): string {
 						params.append('cf_turnstile_response', activeToken);
 					}
 
+					if (currentUserId > 0) {
+						params.append('user_id', currentUserId);
+					}
+
 					const apiUrl = '/wp-json/preorder-raka/v1/status?' + params.toString();
+					const headers = { 'Accept': 'application/json' };
+					if (restNonce) {
+						headers['X-WP-Nonce'] = restNonce;
+					}
+
 					const res = await fetch(apiUrl, {
-						headers: { 'Accept': 'application/json' }
+						headers: headers,
+						credentials: 'same-origin',
 					});
 
 					const data = await res.json();
