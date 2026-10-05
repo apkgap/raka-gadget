@@ -215,36 +215,41 @@ function raka_render_preorder_tracker_v2(): string {
 			<div id="raka-res-scroll-body" style="max-height: clamp(230px, 38vh, 380px); overflow-y: auto;" class="space-y-2.5 sm:space-y-3 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				
 				<!-- Product Details & Summary Card -->
-				<div id="raka-res-product-card" class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900/90 border border-black/5 dark:border-white/10 flex gap-3 sm:gap-3.5 items-start shadow-xs">
-					<div id="raka-res-img-wrap" class="w-14 h-14 sm:w-18 sm:h-18 rounded-xl bg-white dark:bg-neutral-900 overflow-hidden shrink-0 border border-black/5 dark:border-white/10 flex items-center justify-center">
-						<img id="raka-res-img" src="" alt="Product" class="w-full h-full object-cover hidden" />
-						<i id="raka-res-img-fallback" class="ri-shopping-bag-3-line text-2xl sm:text-3xl text-neutral-400"></i>
+				<div id="raka-res-product-card" class="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900 border border-black/5 dark:border-white/10 flex gap-3 sm:gap-3.5 items-center shadow-xs">
+					<div id="raka-res-img-wrap" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-black/10 dark:border-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+						<img id="raka-res-img" src="" alt="Product" class="w-full h-full object-contain rounded-lg hidden" />
+						<i id="raka-res-img-fallback" class="ri-shopping-bag-3-line text-2xl text-neutral-400"></i>
 					</div>
-					<div id="raka-res-details-col" class="flex-1 min-w-0 flex flex-col justify-between self-stretch">
-						<div id="raka-res-title-row" class="flex items-start justify-between gap-2">
-							<h4 id="raka-res-prod-name" class="text-xs sm:text-sm md:text-base font-bold leading-tight line-clamp-2"></h4>
+					<div id="raka-res-details-col" class="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
+						<div id="raka-res-title-row" class="flex items-center justify-between gap-2">
+							<h4 id="raka-res-prod-name" class="text-xs sm:text-sm md:text-base font-bold text-neutral-900 dark:text-white leading-snug line-clamp-1"></h4>
 							<span id="raka-res-total-price" class="text-sm sm:text-base md:text-lg font-mono font-bold text-neutral-900 dark:text-white shrink-0"></span>
 						</div>
-						<div id="raka-res-meta-row" class="flex flex-wrap items-center gap-x-2.5 sm:gap-x-3 gap-y-1 text-xs text-neutral-600 dark:text-neutral-400 font-mono mt-1">
-							<span id="raka-res-qty-wrap">จำนวน: <b id="raka-res-qty" class="text-neutral-900 dark:text-neutral-100">1</b></span>
-							<span id="raka-res-ship-wrap">ค่าส่ง: <b id="raka-res-shipping" class="text-neutral-900 dark:text-neutral-100">฿0</b></span>
-							<span id="raka-res-eta-wrap" class="hidden text-amber-600 dark:text-amber-400 font-semibold">
-								<i id="raka-res-eta-ico" class="ri-time-line text-xs mr-0.5"></i>ETA: <b id="raka-res-eta"></b>
+						<div id="raka-res-meta-row" class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+							<span id="raka-res-qty-wrap" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/5">
+								<span>จำนวน:</span> <b id="raka-res-qty" class="font-bold text-neutral-900 dark:text-white">1 ชิ้น</b>
+							</span>
+							<span id="raka-res-ship-wrap" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/5">
+								<span>ค่าส่ง:</span> <b id="raka-res-shipping" class="font-bold text-neutral-900 dark:text-white">฿0</b>
+							</span>
+							<span id="raka-res-eta-wrap" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-semibold bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+								<i id="raka-res-eta-ico" class="ri-time-line text-xs"></i>
+								<span>ETA:</span> <b id="raka-res-eta" class="font-bold"></b>
 							</span>
 						</div>
 					</div>
 				</div>
 
 				<!-- Status & Delivery Badge Card -->
-				<div id="raka-res-status-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-neutral-900/60 border border-black/5 dark:border-white/10 text-xs sm:text-sm">
-					<div id="raka-res-cur-status-wrap">
-						<span id="raka-res-cur-status-lbl" class="text-[11px] sm:text-xs uppercase text-neutral-500 dark:text-neutral-400 font-mono block mb-0.5">
+				<div id="raka-res-status-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900 border border-black/5 dark:border-white/10 text-xs sm:text-sm shadow-xs">
+					<div id="raka-res-cur-status-wrap" class="flex flex-col justify-center">
+						<span id="raka-res-cur-status-lbl" class="text-[10px] sm:text-[11px] uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block mb-1">
 							<?php esc_html_e( 'สถานะปัจจุบัน', 'raka-preorder-theme' ); ?>
 						</span>
 						<span id="raka-res-status-badge" class="font-bold text-xs sm:text-sm text-red-600 dark:text-red-400 leading-tight block"></span>
 					</div>
-					<div id="raka-res-shipment-wrap">
-						<span id="raka-res-shipment-lbl" class="text-[11px] sm:text-xs uppercase text-neutral-500 dark:text-neutral-400 font-mono block mb-0.5">
+					<div id="raka-res-shipment-wrap" class="flex flex-col justify-center sm:border-l sm:border-black/5 sm:dark:border-white/5 sm:pl-3">
+						<span id="raka-res-shipment-lbl" class="text-[10px] sm:text-[11px] uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block mb-1">
 							<?php esc_html_e( 'พัสดุจัดส่ง', 'raka-preorder-theme' ); ?>
 						</span>
 						<div id="raka-res-tracking-row" class="flex items-center gap-1.5">
@@ -257,12 +262,12 @@ function raka_render_preorder_tracker_v2(): string {
 				</div>
 
 				<!-- Shipping Address (If available) -->
-				<div id="raka-res-address-box" class="hidden p-3.5 rounded-2xl bg-neutral-100/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/10 space-y-1">
-					<div id="raka-res-addr-header" class="flex items-center gap-1.5 text-xs uppercase font-bold text-neutral-600 dark:text-neutral-400">
-						<i id="raka-res-addr-ico" class="ri-map-pin-line text-sm"></i>
+				<div id="raka-res-address-box" class="hidden p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900 border border-black/5 dark:border-white/10 space-y-1 shadow-xs">
+					<div id="raka-res-addr-header" class="flex items-center gap-1.5 text-xs uppercase font-bold text-neutral-500 dark:text-neutral-400">
+						<i id="raka-res-addr-ico" class="ri-map-pin-line text-sm text-red-600 dark:text-red-400"></i>
 						<span id="raka-res-addr-lbl"><?php esc_html_e( 'ที่อยู่จัดส่งสินค้า', 'raka-preorder-theme' ); ?></span>
 					</div>
-					<p id="raka-res-address-text" class="text-xs sm:text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 font-sans"></p>
+					<p id="raka-res-address-text" class="text-xs sm:text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 font-sans"></p>
 				</div>
 
 				<!-- Interactive Step Timeline -->
@@ -733,12 +738,12 @@ function raka_render_preorder_tracker_v2(): string {
 									<h4 id="raka-list-card-name-${globalIdx}" class="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white line-clamp-1 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
 										${productName}
 									</h4>
-									<div id="raka-list-card-meta-${globalIdx}" class="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-0.5">
-										<span id="raka-list-card-price-${globalIdx}" class="text-xs sm:text-sm font-mono font-bold text-neutral-900 dark:text-white">
+									<div id="raka-list-card-meta-${globalIdx}" class="flex flex-wrap items-center gap-1.5 mt-1">
+										<span id="raka-list-card-price-${globalIdx}" class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-mono font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white border border-black/5 dark:border-white/5">
 											${formatPrice(totalVal)}
 										</span>
-										<span id="raka-list-card-qty-${globalIdx}" class="text-[10px] sm:text-[11px] font-mono text-neutral-500 dark:text-neutral-400">
-											(${item.qty || 1} ชิ้น)
+										<span id="raka-list-card-qty-${globalIdx}" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+											${item.qty || 1} ชิ้น
 										</span>
 									</div>
 								</div>
@@ -824,8 +829,8 @@ function raka_render_preorder_tracker_v2(): string {
 				// Price & Qty
 				const totalVal = item.total ? item.total : (Number(item.price || 0) * Number(item.qty || 1) + Number(item.shipping || 0));
 				resTotalPrice.textContent = formatPrice(totalVal);
-				resQty.textContent = item.qty || 1;
-				resShipping.textContent = item.shipping ? formatPrice(item.shipping) : '฿0';
+				resQty.textContent = (item.qty || 1) + ' ชิ้น';
+				resShipping.textContent = (item.shipping && Number(item.shipping) > 0) ? formatPrice(item.shipping) : 'ส่งฟรี';
 
 				// Thumbnail
 				if (item.image_url) {
