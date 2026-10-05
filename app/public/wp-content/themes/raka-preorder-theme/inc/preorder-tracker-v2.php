@@ -35,12 +35,30 @@ function raka_render_preorder_tracker_v2(): string {
 	<?php endif; ?>
 
 	<style id="raka-tracker-scroll-styles">
-		/* Desktop (1024px+): smooth contained scroll with spacious max-height */
+		/* Desktop (1024px+): full height filling stage */
 		@media (min-width: 1024px) {
+			#raka-tracker-v2 {
+				display: flex;
+				flex-direction: column;
+				flex: 1 1 auto;
+				height: 100%;
+				min-height: 0;
+			}
+			#raka-tracker-result-view.flex,
+			#raka-tracker-list-view.flex,
+			#raka-tracker-result-view:not(.hidden),
+			#raka-tracker-list-view:not(.hidden) {
+				display: flex !important;
+				flex-direction: column !important;
+				flex: 1 1 auto !important;
+				height: 100% !important;
+				min-height: 0 !important;
+			}
 			#raka-res-scroll-body,
 			#raka-tracker-list-container,
 			.custom-tracker-scroll {
-				max-height: clamp(380px, 55vh, 620px) !important;
+				flex: 1 1 auto !important;
+				max-height: clamp(480px, 68vh, 800px) !important;
 				overflow-y: auto !important;
 				-webkit-overflow-scrolling: touch !important;
 				overscroll-behavior: contain;
@@ -50,7 +68,7 @@ function raka_render_preorder_tracker_v2(): string {
 			}
 		}
 
-		/* Mobile & Tablet (<1024px): Natural document scroll, comfortable touch layout, no cramped box */
+		/* Mobile & Tablet (<1024px): Natural document scroll, comfortable touch layout */
 		@media (max-width: 1023px) {
 			#raka-tracker-list-view,
 			#raka-tracker-result-view {
@@ -89,7 +107,7 @@ function raka_render_preorder_tracker_v2(): string {
 		}
 	</style>
 
-	<div id="raka-tracker-v2" class="w-full text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 pb-16 sm:pb-8">
+	<div id="raka-tracker-v2" class="w-full h-full flex flex-col flex-1 text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 pb-16 sm:pb-8">
 
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3 sm:space-y-3.5">
