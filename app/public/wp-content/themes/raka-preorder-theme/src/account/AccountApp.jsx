@@ -248,6 +248,7 @@ export default function AccountApp() {
 						recentOrders={ overview?.recent_orders || [] }
 						onSelectTab={ setCurrentTab }
 						onViewOrder={ setSelectedOrder }
+						loyaltyEnabled={ overview?.loyalty_system_enabled !== false }
 					/>
 				) }
 

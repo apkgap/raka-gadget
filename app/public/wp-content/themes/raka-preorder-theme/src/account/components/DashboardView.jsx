@@ -1,4 +1,4 @@
-export default function DashboardView( { user, stats, recentOrders, onSelectTab, onViewOrder } ) {
+export default function DashboardView( { user, stats, recentOrders, onSelectTab, onViewOrder, loyaltyEnabled = true } ) {
 	const statCards = [
 		{
 			id: 'stat-orders',
@@ -30,7 +30,7 @@ export default function DashboardView( { user, stats, recentOrders, onSelectTab,
 			bgColor: 'bg-red-600/10 dark:bg-red-500/10',
 			tab: 'orders',
 		},
-		...( overview?.loyalty_system_enabled !== false ? [
+		...( loyaltyEnabled !== false ? [
 			{
 				id: 'stat-points',
 				label: 'แต้มสะสมพร้อมใช้',
