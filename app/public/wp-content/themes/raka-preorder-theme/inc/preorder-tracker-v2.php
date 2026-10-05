@@ -25,7 +25,6 @@ function raka_render_preorder_tracker_v2(): string {
 
 	$is_logged_in      = is_user_logged_in();
 	$current_user      = wp_get_current_user();
-	$current_uid       = get_current_user_id();
 	$display_name      = $current_user && ! empty( $current_user->display_name ) ? $current_user->display_name : ( $current_user ? $current_user->user_login : '' );
 	$myaccount_url     = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' );
 	$login_url         = add_query_arg( 'redirect_to', urlencode( home_url( '/pre-order/?my_orders=1' ) ), $myaccount_url );
@@ -40,85 +39,25 @@ function raka_render_preorder_tracker_v2(): string {
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3.5">
 			
-			<!-- Member Status Quick Bar -->
-			<?php if ( $is_logged_in ) : ?>
-				<div id="raka-user-preorder-banner" class="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-red-600/15 via-red-600/5 to-transparent border border-red-500/25 flex items-center justify-between gap-3 shadow-sm">
-					<div id="raka-user-banner-info" class="flex items-center gap-2.5 min-w-0">
-						<div id="raka-user-banner-avatar" class="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
-							<i id="raka-user-avatar-ico" class="ri-user-smile-line text-base"></i>
-						</div>
-						<div id="raka-user-banner-text" class="min-w-0">
-							<p id="raka-user-banner-name" class="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
-								<?php echo esc_html( $display_name ); ?>
-							</p>
-							<p id="raka-user-banner-sub" class="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
-								<?php esc_html_e( 'กดเพื่อดูรายการพรีออเดอร์ทั้งหมดในบัญชีของคุณ', 'raka-preorder-theme' ); ?>
-							</p>
-						</div>
-					</div>
-					<button
-						type="button"
-						id="raka-user-banner-btn"
-						class="shrink-0 h-8 sm:h-9 px-3 sm:px-4 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-					>
-						<i id="raka-user-banner-ico" class="ri-list-check-2 text-sm sm:text-base"></i>
-						<span><?php esc_html_e( 'ดูพรีออเดอร์ของฉัน', 'raka-preorder-theme' ); ?></span>
-					</button>
-				</div>
-			<?php else : ?>
-				<div id="raka-guest-login-banner" class="p-3 sm:p-3.5 rounded-2xl bg-neutral-100/80 dark:bg-neutral-800/60 border border-black/5 dark:border-white/10 flex items-center justify-between gap-3">
-					<div id="raka-guest-banner-info" class="flex items-center gap-2.5 min-w-0">
-						<div id="raka-guest-banner-iconwrap" class="w-8 h-8 rounded-xl bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-300 text-sm shrink-0">
-							<i id="raka-guest-banner-ico" class="ri-shield-user-line"></i>
-						</div>
-						<div id="raka-guest-banner-text" class="min-w-0">
-							<p id="raka-guest-banner-title" class="text-xs sm:text-sm font-semibold text-neutral-800 dark:text-neutral-200 truncate">
-								<?php esc_html_e( 'สมาชิกเว็บไซต์?', 'raka-preorder-theme' ); ?>
-							</p>
-							<p id="raka-guest-banner-sub" class="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
-								<?php esc_html_e( 'เข้าสู่ระบบเพื่อดูประวัติพรีออเดอร์ทั้งหมดของคุณ', 'raka-preorder-theme' ); ?>
-							</p>
-						</div>
-					</div>
-					<a
-						id="raka-guest-login-link"
-						href="<?php echo esc_url( $login_url ); ?>"
-						class="shrink-0 h-8 sm:h-9 px-3 sm:px-3.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-900 text-xs font-medium flex items-center gap-1 shadow-sm transition-all cursor-pointer"
-					>
-						<span><?php esc_html_e( 'เข้าสู่ระบบ', 'raka-preorder-theme' ); ?></span>
-						<i id="raka-guest-link-ico" class="ri-arrow-right-s-line text-sm"></i>
-					</a>
-				</div>
-			<?php endif; ?>
-
-			<!-- Mode Selector Tab Switcher (3 Tabs) -->
-			<div id="raka-track-tab-wrap" class="grid grid-cols-3 p-1 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 gap-1">
+			<!-- Mode Selector Tab Switcher -->
+			<div id="raka-track-tab-wrap" class="grid grid-cols-2 p-1 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10">
 				<button
 					type="button"
 					id="raka-tab-btn-order"
-					class="h-10 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10"
+					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10"
 					data-tab="order"
 				>
 					<i id="raka-tab-icon-order" class="ri-hashtag text-sm sm:text-base"></i>
-					<span id="raka-tab-text-order"><?php esc_html_e( 'เลขออเดอร์', 'raka-preorder-theme' ); ?></span>
+					<span id="raka-tab-text-order"><?php esc_html_e( 'ค้นหาด้วยเลขออเดอร์', 'raka-preorder-theme' ); ?></span>
 				</button>
 				<button
 					type="button"
 					id="raka-tab-btn-phone"
-					class="h-10 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+					class="h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
 					data-tab="phone"
 				>
 					<i id="raka-tab-icon-phone" class="ri-phone-line text-sm sm:text-base"></i>
-					<span id="raka-tab-text-phone"><?php esc_html_e( 'เบอร์โทร', 'raka-preorder-theme' ); ?></span>
-				</button>
-				<button
-					type="button"
-					id="raka-tab-btn-user"
-					class="h-10 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
-					data-tab="user"
-				>
-					<i id="raka-tab-icon-user" class="<?php echo $is_logged_in ? 'ri-user-star-line text-red-500' : 'ri-lock-line'; ?> text-sm sm:text-base"></i>
-					<span id="raka-tab-text-user"><?php echo $is_logged_in ? esc_html__( 'ของฉัน', 'raka-preorder-theme' ) : esc_html__( 'สมาชิก', 'raka-preorder-theme' ); ?></span>
+					<span id="raka-tab-text-phone"><?php esc_html_e( 'ค้นหาด้วยเบอร์โทร', 'raka-preorder-theme' ); ?></span>
 				</button>
 			</div>
 
@@ -156,16 +95,36 @@ function raka_render_preorder_tracker_v2(): string {
 				<span id="raka-tracker-error-text" class="leading-tight"></span>
 			</div>
 
-			<!-- Search Submit Button (Inline Centered) -->
-			<div id="raka-tracker-submit-wrap" class="flex items-center justify-center pt-2">
+			<!-- Search & My Preorders Buttons -->
+			<div id="raka-tracker-submit-wrap" class="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
 				<button
 					type="button"
 					id="raka-tracker-submit-btn"
-					class="inline-flex items-center justify-center gap-2 h-11 sm:h-12 px-8 sm:px-12 w-full sm:w-auto min-w-[200px] max-w-sm rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-sm sm:text-base font-normal shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+					class="inline-flex items-center justify-center gap-2 h-11 sm:h-12 px-6 sm:px-8 w-full sm:w-auto min-w-[200px] rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-sm sm:text-base font-normal shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
 				>
 					<i id="raka-tracker-btn-icon" class="ri-search-2-line text-base sm:text-lg"></i>
 					<span id="raka-tracker-btn-text"><?php esc_html_e( 'ค้นหารายการพรีออเดอร์', 'raka-preorder-theme' ); ?></span>
 				</button>
+				
+				<?php if ( $is_logged_in ) : ?>
+					<button
+						type="button"
+						id="raka-my-preorders-btn"
+						class="inline-flex items-center justify-center gap-2 h-11 sm:h-12 px-6 sm:px-8 w-full sm:w-auto min-w-[200px] rounded-2xl bg-red-600 hover:bg-red-700 active:scale-95 text-white text-sm sm:text-base font-normal shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+					>
+						<i id="raka-my-btn-icon" class="ri-shopping-bag-3-line text-base sm:text-lg"></i>
+						<span id="raka-my-btn-text"><?php esc_html_e( 'ดูรายการพรีออเดอร์ของฉัน', 'raka-preorder-theme' ); ?></span>
+					</button>
+				<?php else : ?>
+					<a
+						id="raka-my-preorders-btn"
+						href="<?php echo esc_url( $login_url ); ?>"
+						class="inline-flex items-center justify-center gap-2 h-11 sm:h-12 px-6 sm:px-8 w-full sm:w-auto min-w-[200px] rounded-2xl bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-sm sm:text-base font-normal shadow-sm transition-all duration-200 cursor-pointer"
+					>
+						<i id="raka-my-btn-icon" class="ri-user-line text-base sm:text-lg"></i>
+						<span id="raka-my-btn-text"><?php esc_html_e( 'ดูรายการพรีออเดอร์ของฉัน', 'raka-preorder-theme' ); ?></span>
+					</a>
+				<?php endif; ?>
 			</div>
 		</div>
 
@@ -329,7 +288,7 @@ function raka_render_preorder_tracker_v2(): string {
 			const defaultLoginUrl   = <?php echo wp_json_encode( esc_url_raw( $login_url ) ); ?>;
 			const currentUserName   = <?php echo wp_json_encode( $display_name ); ?>;
 
-			let currentMode = 'order'; // 'order', 'phone', or 'user'
+			let currentMode = 'order'; // 'order' or 'phone'
 			let turnstileWidgetId = null;
 			let turnstileToken = '';
 			let currentPhoneItems = [];
@@ -337,8 +296,7 @@ function raka_render_preorder_tracker_v2(): string {
 
 			const tabBtnOrder   = document.getElementById('raka-tab-btn-order');
 			const tabBtnPhone   = document.getElementById('raka-tab-btn-phone');
-			const tabBtnUser    = document.getElementById('raka-tab-btn-user');
-			const userBannerBtn = document.getElementById('raka-user-banner-btn');
+			const myOrdersBtn   = document.getElementById('raka-my-preorders-btn');
 
 			const searchView    = document.getElementById('raka-tracker-search-view');
 			const listView      = document.getElementById('raka-tracker-list-view');
@@ -352,7 +310,6 @@ function raka_render_preorder_tracker_v2(): string {
 			const loginBackBtn  = document.getElementById('raka-login-back-btn');
 			const loginDesc     = document.getElementById('raka-login-desc');
 			
-			const primaryGroup  = document.getElementById('raka-track-primary-group');
 			const primaryLabel  = document.getElementById('raka-track-primary-label');
 			const primaryIcon   = document.getElementById('raka-track-primary-icon');
 			const primaryInput  = document.getElementById('raka-track-primary-input');
@@ -440,42 +397,33 @@ function raka_render_preorder_tracker_v2(): string {
 				hideError();
 				if (loginView) loginView.classList.add('hidden');
 
-				if (tabBtnOrder) tabBtnOrder.className = 'h-10 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ' + (mode === 'order' ? activeTabClass : inactiveTabClass);
-				if (tabBtnPhone) tabBtnPhone.className = 'h-10 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ' + (mode === 'phone' ? activeTabClass : inactiveTabClass);
-				if (tabBtnUser)  tabBtnUser.className  = 'h-10 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ' + (mode === 'user' ? activeTabClass : inactiveTabClass);
-
 				if (mode === 'order') {
-					if (primaryGroup) primaryGroup.classList.remove('hidden');
+					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+
 					primaryLabel.textContent = 'ORDER NUMBER / หมายเลขคำสั่งซื้อ';
 					primaryIcon.className = 'ri-hashtag text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none';
 					primaryInput.placeholder = 'เช่น RAKA-PRE-312691';
 					primaryInput.type = 'text';
-					primaryInput.value = '';
-					primaryInput.focus();
-				} else if (mode === 'phone') {
-					if (primaryGroup) primaryGroup.classList.remove('hidden');
+				} else {
+					tabBtnOrder.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + inactiveTabClass;
+					tabBtnPhone.className = 'h-10 px-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ' + activeTabClass;
+
 					primaryLabel.textContent = 'PHONE NUMBER / เบอร์โทรศัพท์';
 					primaryIcon.className = 'ri-phone-line text-lg text-neutral-400 dark:text-neutral-500 absolute left-4 pointer-events-none';
 					primaryInput.placeholder = 'เช่น 081-234-5678';
 					primaryInput.type = 'tel';
-					primaryInput.value = '';
-					primaryInput.focus();
-				} else if (mode === 'user') {
-					if (!isLoggedIn) {
-						renderLoginRequiredView({
-							data: { login_url: defaultLoginUrl },
-							message: 'กรุณาเข้าสู่ระบบสมาชิกเพื่อดูรายการและประวัติพรีออเดอร์ทั้งหมดของคุณ'
-						});
-					} else {
-						doSearchMyOrders();
-					}
 				}
+
+				primaryInput.value = '';
+				primaryInput.focus();
 			}
 
-			if (tabBtnOrder) tabBtnOrder.addEventListener('click', () => switchMode('order'));
-			if (tabBtnPhone) tabBtnPhone.addEventListener('click', () => switchMode('phone'));
-			if (tabBtnUser)  tabBtnUser.addEventListener('click', () => switchMode('user'));
-			if (userBannerBtn) userBannerBtn.addEventListener('click', () => doSearchMyOrders());
+			tabBtnOrder.addEventListener('click', () => switchMode('order'));
+			tabBtnPhone.addEventListener('click', () => switchMode('phone'));
+			if (myOrdersBtn && myOrdersBtn.tagName === 'BUTTON') {
+				myOrdersBtn.addEventListener('click', () => doSearchMyOrders());
+			}
 
 			function showError(msg) {
 				errorText.textContent = msg || 'ไม่พบข้อมูลการพรีออเดอร์ กรุณาตรวจสอบข้อมูลอีกครั้ง';
