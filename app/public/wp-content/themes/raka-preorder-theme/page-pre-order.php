@@ -143,26 +143,24 @@ if ( $is_logged_in ) {
     /* ═════════ 5. LAYOUT CSS (2-COLUMN ARCHITECTURE) ═════════ */
     .hero {
       position: relative;
-      height: 100vh;
-      height: 100svh;
-      min-height: 540px;
       width: 100%;
-      overflow: hidden;
+      min-height: 100svh;
       isolation: isolate;
       background: var(--panel);
       display: grid;
       grid-template-columns: 100%;
     }
 
-    .admin-bar .hero {
-      height: calc(100vh - 32px) !important;
-      height: calc(100svh - 32px) !important;
-    }
-
-    @media screen and (max-width: 782px) {
+    @media (min-width: 1024px) {
+      .hero {
+        height: 100vh;
+        height: 100svh;
+        overflow: hidden;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      }
       .admin-bar .hero {
-        height: calc(100vh - 46px) !important;
-        height: calc(100svh - 46px) !important;
+        height: calc(100vh - 32px) !important;
+        height: calc(100svh - 32px) !important;
       }
     }
 
@@ -177,12 +175,6 @@ if ( $is_logged_in ) {
       .admin-bar #raka-cart-drawer {
         top: 46px !important;
         height: calc(100vh - 46px) !important;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .hero {
-        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
       }
     }
 
@@ -364,37 +356,38 @@ if ( $is_logged_in ) {
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      margin: auto 0;
+      margin: 0;
       text-align: center;
       position: relative;
-      padding: clamp(6px, 1vh, 16px) 0 clamp(16px, 2.5vh, 28px);
+      padding: clamp(6px, 1.2vh, 14px) 0 clamp(10px, 1.6vh, 18px);
       width: 100%;
     }
 
     .stage__emblem {
-      width: clamp(52px, 4.5vw, 68px);
-      height: clamp(52px, 4.5vw, 68px);
+      width: clamp(38px, 3vw, 46px);
+      height: clamp(38px, 3vw, 46px);
       border-radius: 50%;
       background: var(--box);
       border: 1px solid var(--line);
       display: grid;
       place-items: center;
-      margin-bottom: clamp(8px, 1.2vh, 14px);
-      box-shadow: 0 8px 24px -10px rgba(0,0,0,0.12);
+      margin-bottom: clamp(6px, 0.8vh, 10px);
+      box-shadow: 0 4px 14px -6px rgba(0,0,0,0.15);
       flex: 0 0 auto;
     }
 
     .stage__emblem img {
-      width: 60%;
-      height: 60%;
+      width: 55%;
+      height: 55%;
       object-fit: contain;
+      transition: filter 0.2s ease;
     }
 
     .headline {
       margin: 0;
-      font-size: clamp(26px, 2.8vw, 38px);
-      line-height: 1.15;
-      letter-spacing: -0.02em;
+      font-size: clamp(20px, 1.8vw, 26px);
+      line-height: 1.25;
+      letter-spacing: -0.015em;
       font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif;
       font-weight: 500;
     }
@@ -404,8 +397,8 @@ if ( $is_logged_in ) {
     }
 
     .squiggle {
-      width: clamp(140px, 15vw, 240px);
-      margin: clamp(6px, 0.8vh, 10px) auto clamp(10px, 1.4vh, 16px);
+      width: clamp(100px, 9vw, 130px);
+      margin: 4px auto 10px;
       display: block;
       color: var(--ink);
     }
@@ -775,35 +768,57 @@ if ( $is_logged_in ) {
 
     /* ═════════ 13. RESPONSIVE ═════════ */
     @media (max-width: 1023px) {
-      .hero {
-        height: auto;
-        min-height: 100svh;
+      html, body {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100% !important;
+      }
+      .hero,
+      .admin-bar .hero {
+        height: auto !important;
+        min-height: 100svh !important;
+        overflow: visible !important;
         display: flex;
         flex-direction: column;
       }
+      .panel {
+        overflow: visible !important;
+        height: auto !important;
+      }
       .hero__left {
         border-right: none;
-        padding: 16px;
+        padding: 12px 14px max(60px, env(safe-area-inset-bottom, 36px)) !important;
         min-height: 100svh;
+        height: auto !important;
+        overflow: visible !important;
       }
       .hero__right {
         display: none !important;
       }
       .stage {
-        padding: 24px 0 20px;
+        padding: 4px 0 12px;
+        margin: 0;
+      }
+      .stage__emblem {
+        display: none !important;
       }
       .headline {
-        font-size: clamp(22px, 6.5vw, 32px);
+        font-size: 16px;
+        line-height: 1.35;
+        font-weight: 500;
+        margin: 0 0 6px 0;
+        color: var(--ink-soft);
+      }
+      .headline b {
+        font-weight: 700;
+        color: var(--ink);
       }
       .squiggle {
-        width: min(72%, 220px);
+        display: none !important;
       }
     }
 
     @media (max-width: 420px) {
-      .headline {
-        font-size: clamp(20px, 6.5vw, 28px);
-      }
       .account__label {
         display: none;
       }
@@ -844,8 +859,12 @@ if ( $is_logged_in ) {
 
     html.dark .stage__emblem {
       background: #18181b;
-      border-color: #27272a;
+      border-color: rgba(255, 255, 255, 0.15);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    html.dark .stage__emblem img {
+      filter: brightness(0) invert(1);
     }
 
     html.dark .squiggle {

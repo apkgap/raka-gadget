@@ -602,7 +602,7 @@ while ( have_posts() ) :
 			}
 
 			// Pre-order button dynamic sync
-			const isVarPreorder = matched.is_preorder || !matched.is_in_stock;
+			const isVarPreorder = Boolean(matched.is_preorder || !matched.is_in_stock);
 			const cartBtn = document.getElementById('btn-add-to-cart');
 			const cartTxt = document.getElementById('btn-cart-text');
 			const cartIcon = document.getElementById('icon-cart-btn');
@@ -615,16 +615,28 @@ while ( have_posts() ) :
 					cartIcon.className = 'ri-time-line text-lg text-black';
 					cartBtn.setAttribute('data-is-preorder', '1');
 					cartBtn.style.border = '2px solid #000000';
-					if (preBanner) preBanner.classList.remove('hidden');
-					if (preBanner) preBanner.classList.add('flex');
+					if (preBanner) {
+						preBanner.classList.remove('hidden');
+						preBanner.classList.add('flex');
+						if (matched.preorder_eta) {
+							const etaEl = document.getElementById('preorder-eta-info');
+							if (etaEl) etaEl.textContent = matched.preorder_eta;
+						}
+						if (matched.preorder_badge) {
+							const badgeEl = document.getElementById('preorder-badge-title');
+							if (badgeEl) badgeEl.textContent = matched.preorder_badge;
+						}
+					}
 				} else {
 					cartBtn.className = 'flex-1 h-12 sm:h-14 px-8 rounded-xl bg-black text-white dark:bg-white dark:text-black font-semibold text-xs sm:text-sm uppercase tracking-[0.25em] flex items-center justify-center gap-3 transition-all duration-300 hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-lg font-hn';
 					cartTxt.textContent = 'ADD TO CART';
 					cartIcon.className = 'ri-shopping-bag-3-line text-lg';
 					cartBtn.setAttribute('data-is-preorder', '0');
 					cartBtn.style.border = '';
-					if (preBanner) preBanner.classList.remove('flex');
-					if (preBanner) preBanner.classList.add('hidden');
+					if (preBanner) {
+						preBanner.classList.remove('flex');
+						preBanner.classList.add('hidden');
+					}
 				}
 			}
 		}

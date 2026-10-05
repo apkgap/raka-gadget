@@ -22,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Criteria:
  * - Explicit backend toggle: `_raka_is_preorder` === 'yes'
+ * - Inherit from parent product if variation does not have explicit override
  * - Stock status: 'preorder', 'onbackorder', or 'outofstock'
  * - WooCommerce native backorder: is_on_backorder()
  * - Managing stock and quantity <= 0
@@ -50,10 +51,21 @@ function raka_is_product_preorder( $product ): bool {
 
 	$is_pre = false;
 
-	// 1. Explicit Pre-Order toggle in product meta
+	// 1. Explicit Pre-Order toggle in product/variation meta
 	$meta_preorder = get_post_meta( $product_id, '_raka_is_preorder', true );
 	if ( 'yes' === $meta_preorder ) {
 		$is_pre = true;
+	} elseif ( 'no' === $meta_preorder ) {
+		$is_pre = false;
+	} elseif ( $product->is_type( 'variation' ) ) {
+		// Inherit from parent product if variation does not have explicit setting
+		$parent_id = $product->get_parent_id();
+		if ( $parent_id ) {
+			$parent_preorder = get_post_meta( $parent_id, '_raka_is_preorder', true );
+			if ( 'yes' === $parent_preorder ) {
+				$is_pre = true;
+			}
+		}
 	}
 
 	// 2. Stock status is 'preorder', 'onbackorder', or 'outofstock'
@@ -75,6 +87,20 @@ function raka_is_product_preorder( $product ): bool {
 	// 4. Native WooCommerce on_backorder check
 	if ( ! $is_pre && method_exists( $product, 'is_on_backorder' ) && $product->is_on_backorder() ) {
 		$is_pre = true;
+	}
+
+	// 5. If variation, also inherit parent stock status if parent is preorder/onbackorder
+	if ( ! $is_pre && $product->is_type( 'variation' ) ) {
+		$parent_id = $product->get_parent_id();
+		if ( $parent_id ) {
+			$parent_product = wc_get_product( $parent_id );
+			if ( $parent_product ) {
+				$p_stock = $parent_product->get_stock_status();
+				if ( 'preorder' === $p_stock || 'onbackorder' === $p_stock ) {
+					$is_pre = true;
+				}
+			}
+		}
 	}
 
 	unset( $checking[ $product_id ] );
@@ -126,6 +152,9 @@ function raka_get_product_preorder_badge( $product ): string {
 	}
 
 	$badge = (string) get_post_meta( $product->get_id(), '_raka_preorder_badge', true );
+	if ( empty( $badge ) && $product->is_type( 'variation' ) ) {
+		$badge = (string) get_post_meta( $product->get_parent_id(), '_raka_preorder_badge', true );
+	}
 	return ! empty( $badge ) ? $badge : 'PRE-ORDER';
 }
 
@@ -228,6 +257,61 @@ function raka_save_preorder_product_options( int $post_id ): void {
 	}
 }
 add_action( 'woocommerce_process_product_meta', 'raka_save_preorder_product_options', 20 );
+
+/**
+ * Add Pre-Order fields to WooCommerce Variations in admin.
+ */
+function raka_add_preorder_variation_options( $loop, $variation_data, $variation ): void {
+	$variation_id = $variation->ID;
+	$is_preorder  = get_post_meta( $variation_id, '_raka_is_preorder', true );
+	$eta          = get_post_meta( $variation_id, '_raka_preorder_eta', true );
+	?>
+	<div class="raka-variation-preorder-options form-row form-row-full" style="background:#fefce8; padding: 10px 12px; border: 1px solid #fde047; border-radius: 6px; margin: 8px 0;">
+		<strong style="color: #b45309; display: block; margin-bottom: 6px; font-size: 12px; text-transform: uppercase;">
+			<?php esc_html_e( '⚡ Raka Pre-Order สำหรับ Variation นี้', 'raka-preorder-theme' ); ?>
+		</strong>
+		<p class="form-field form-row form-row-first" style="margin-bottom: 0;">
+			<label style="display:block; margin-bottom: 4px; font-size: 11px;"><?php esc_html_e( 'สถานะ Pre-Order', 'raka-preorder-theme' ); ?></label>
+			<select name="raka_variation_is_preorder[<?php echo esc_attr( (string) $loop ); ?>]" style="width: 100%;">
+				<option value="" <?php selected( $is_preorder, '' ); ?>><?php esc_html_e( 'ตามสินค้าหลัก (Inherit Parent)', 'raka-preorder-theme' ); ?></option>
+				<option value="yes" <?php selected( $is_preorder, 'yes' ); ?>><?php esc_html_e( 'เปิดใช้งาน Pre-Order (Force Yes)', 'raka-preorder-theme' ); ?></option>
+				<option value="no" <?php selected( $is_preorder, 'no' ); ?>><?php esc_html_e( 'ปิด Pre-Order (Force No / In Stock)', 'raka-preorder-theme' ); ?></option>
+			</select>
+		</p>
+		<p class="form-field form-row form-row-last" style="margin-bottom: 0;">
+			<label style="display:block; margin-bottom: 4px; font-size: 11px;"><?php esc_html_e( 'ETA จัดส่งเฉพาะตัวเลือกนี้', 'raka-preorder-theme' ); ?></label>
+			<input type="text" name="raka_variation_preorder_eta[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( $eta ); ?>" placeholder="<?php esc_attr_e( 'เช่น รอ 7-14 วัน', 'raka-preorder-theme' ); ?>" style="width: 100%;" />
+		</p>
+		<input type="hidden" name="raka_variation_post_id[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( (string) $variation_id ); ?>" />
+	</div>
+	<?php
+}
+add_action( 'woocommerce_variation_options_pricing', 'raka_add_preorder_variation_options', 10, 3 );
+
+/**
+ * Save Pre-Order variation settings.
+ */
+function raka_save_preorder_variation_options( int $variation_id, int $i ): void {
+	if ( isset( $_POST['raka_variation_is_preorder'][ $i ] ) ) {
+		$val = sanitize_text_field( wp_unslash( $_POST['raka_variation_is_preorder'][ $i ] ) );
+		if ( in_array( $val, [ 'yes', 'no' ], true ) ) {
+			update_post_meta( $variation_id, '_raka_is_preorder', $val );
+		} else {
+			delete_post_meta( $variation_id, '_raka_is_preorder' );
+		}
+	}
+
+	if ( isset( $_POST['raka_variation_preorder_eta'][ $i ] ) ) {
+		$eta = sanitize_text_field( wp_unslash( $_POST['raka_variation_preorder_eta'][ $i ] ) );
+		if ( ! empty( $eta ) ) {
+			update_post_meta( $variation_id, '_raka_preorder_eta', $eta );
+		} else {
+			delete_post_meta( $variation_id, '_raka_preorder_eta' );
+		}
+	}
+}
+add_action( 'woocommerce_save_product_variation', 'raka_save_preorder_variation_options', 10, 2 );
+
 
 /**
  * Display Pre-order status in admin product list columns.

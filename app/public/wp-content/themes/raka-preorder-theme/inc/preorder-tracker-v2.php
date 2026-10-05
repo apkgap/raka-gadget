@@ -35,19 +35,36 @@ function raka_render_preorder_tracker_v2(): string {
 	<?php endif; ?>
 
 	<style id="raka-tracker-scroll-styles">
-		#raka-res-scroll-body,
-		#raka-tracker-list-container,
-		.custom-tracker-scroll {
-			max-height: 350px !important;
-			max-height: clamp(230px, 38vh, 380px) !important;
-			overflow-y: auto !important;
-			-webkit-overflow-scrolling: touch !important;
-			overscroll-behavior: contain;
-			touch-action: pan-y;
-			pointer-events: auto;
-			scrollbar-width: thin;
-			scrollbar-color: rgba(220, 38, 38, 0.5) transparent;
+		/* Desktop only: smooth contained scroll with spacious max-height */
+		@media (min-width: 768px) {
+			#raka-res-scroll-body,
+			#raka-tracker-list-container,
+			.custom-tracker-scroll {
+				max-height: clamp(360px, 55vh, 620px) !important;
+				overflow-y: auto !important;
+				-webkit-overflow-scrolling: touch !important;
+				overscroll-behavior: contain;
+				touch-action: pan-y;
+				scrollbar-width: thin;
+				scrollbar-color: rgba(220, 38, 38, 0.5) transparent;
+			}
 		}
+
+		/* Mobile: Full natural document scroll, comfortable touch layout, no cramped box */
+		@media (max-width: 767px) {
+			#raka-tracker-list-view,
+			#raka-tracker-result-view {
+				min-height: 400px;
+			}
+			#raka-res-scroll-body,
+			#raka-tracker-list-container,
+			.custom-tracker-scroll {
+				max-height: none !important;
+				overflow: visible !important;
+				height: auto !important;
+			}
+		}
+
 		.custom-tracker-scroll::-webkit-scrollbar {
 			width: 6px;
 		}
@@ -71,11 +88,11 @@ function raka_render_preorder_tracker_v2(): string {
 		}
 	</style>
 
-	<div id="raka-tracker-v2" class="w-full text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 pb-5 sm:pb-8">
-		
+	<div id="raka-tracker-v2" class="w-full text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 pb-16 sm:pb-8">
+
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3 sm:space-y-3.5">
-			
+
 			<!-- Mode Selector Tab Switcher -->
 			<div id="raka-track-tab-wrap" class="grid grid-cols-2 p-1 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10">
 				<button
@@ -141,7 +158,7 @@ function raka_render_preorder_tracker_v2(): string {
 					<i id="raka-tracker-btn-icon" class="ri-search-2-line text-base sm:text-lg"></i>
 					<span id="raka-tracker-btn-text"><?php esc_html_e( 'ค้นหารายการพรีออเดอร์', 'raka-preorder-theme' ); ?></span>
 				</button>
-				
+
 				<?php if ( $is_logged_in ) : ?>
 					<button
 						type="button"
@@ -166,7 +183,7 @@ function raka_render_preorder_tracker_v2(): string {
 
 		<!-- ── 2. MULTI-ITEM LIST VIEW (Phone Search / My Pre-orders) ── -->
 		<div id="raka-tracker-list-view" class="hidden w-full p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 shadow-sm space-y-2.5 sm:space-y-3 mb-2">
-			
+
 			<!-- List Header (Pinned at Top of Frame) -->
 			<div id="raka-list-header-bar" class="flex items-center justify-between gap-2 pb-2 sm:pb-2.5 border-b border-black/10 dark:border-white/10 shrink-0">
 				<div id="raka-list-header-info" class="space-y-0.5 min-w-0 flex-1">
@@ -186,7 +203,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Dynamic List Container with custom scroll -->
-			<div id="raka-tracker-list-container" style="max-height: clamp(230px, 38vh, 380px); overflow-y: auto;" class="space-y-2 sm:space-y-2.5 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+			<div id="raka-tracker-list-container" class="space-y-2 sm:space-y-2.5 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				<!-- Dynamically populated via JS -->
 			</div>
 
@@ -194,12 +211,12 @@ function raka_render_preorder_tracker_v2(): string {
 
 		<!-- ── 3. SINGLE RESULT / DETAIL VIEW ── -->
 		<div id="raka-tracker-result-view" class="hidden w-full p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 shadow-sm space-y-2.5 sm:space-y-3 mb-2">
-			
+
 			<!-- Top Header: Order ID & Back Button -->
 			<div id="raka-res-header-bar" class="flex items-center justify-between gap-2 pb-2 sm:pb-2.5 border-b border-black/10 dark:border-white/10 shrink-0">
 				<div id="raka-res-header-info" class="min-w-0 flex-1">
-					<span id="raka-res-order-no" class="text-xs sm:text-sm font-mono font-bold text-neutral-900 dark:text-white uppercase tracking-wider block truncate"></span>
-					<h3 id="raka-res-product-title" class="text-sm sm:text-base md:text-lg font-bold text-neutral-900 dark:text-white truncate max-w-[160px] sm:max-w-xs md:max-w-sm"></h3>
+					<span id="raka-res-order-no" class="text-xs sm:text-sm font-mono font-semibold text-neutral-900 dark:text-white uppercase tracking-wider block truncate"></span>
+					<h3 id="raka-res-product-title" class="text-sm sm:text-base md:text-lg font-semibold text-neutral-900 dark:text-white truncate max-w-[160px] sm:max-w-xs md:max-w-sm"></h3>
 				</div>
 				<button
 					type="button"
@@ -212,8 +229,8 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Scrollable Container for Result Body -->
-			<div id="raka-res-scroll-body" style="max-height: clamp(230px, 38vh, 380px); overflow-y: auto;" class="space-y-2.5 sm:space-y-3 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
-				
+			<div id="raka-res-scroll-body" class="space-y-2.5 sm:space-y-3 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+
 				<!-- Product Details & Summary Card -->
 				<div id="raka-res-product-card" class="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900 border border-black/5 dark:border-white/10 flex gap-3 sm:gap-3.5 items-center shadow-xs">
 					<div id="raka-res-img-wrap" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-black/10 dark:border-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden">
@@ -222,19 +239,19 @@ function raka_render_preorder_tracker_v2(): string {
 					</div>
 					<div id="raka-res-details-col" class="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
 						<div id="raka-res-title-row" class="flex items-center justify-between gap-2">
-							<h4 id="raka-res-prod-name" class="text-xs sm:text-sm md:text-base font-bold text-neutral-900 dark:text-white leading-snug line-clamp-1"></h4>
-							<span id="raka-res-total-price" class="text-sm sm:text-base md:text-lg font-mono font-bold text-neutral-900 dark:text-white shrink-0"></span>
+							<h4 id="raka-res-prod-name" class="text-xs sm:text-sm md:text-base font-semibold text-neutral-900 dark:text-white leading-snug line-clamp-1"></h4>
+							<span id="raka-res-total-price" class="text-sm sm:text-base md:text-lg font-mono font-semibold text-neutral-900 dark:text-white shrink-0"></span>
 						</div>
 						<div id="raka-res-meta-row" class="flex flex-wrap items-center gap-1.5 sm:gap-2">
 							<span id="raka-res-qty-wrap" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/5">
-								<span>จำนวน:</span> <b id="raka-res-qty" class="font-bold text-neutral-900 dark:text-white">1 ชิ้น</b>
+								<span>จำนวน:</span> <b id="raka-res-qty" class="font-semibold text-neutral-900 dark:text-white">1 ชิ้น</b>
 							</span>
 							<span id="raka-res-ship-wrap" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/5">
 								<span>ค่าส่ง:</span> <b id="raka-res-shipping" class="font-bold text-neutral-900 dark:text-white">฿0</b>
 							</span>
 							<span id="raka-res-eta-wrap" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-semibold bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/20">
 								<i id="raka-res-eta-ico" class="ri-time-line text-xs"></i>
-								<span>ETA:</span> <b id="raka-res-eta" class="font-bold"></b>
+								<span>ETA:</span> <b id="raka-res-eta" class="font-light"></b>
 							</span>
 						</div>
 					</div>
@@ -246,7 +263,7 @@ function raka_render_preorder_tracker_v2(): string {
 						<span id="raka-res-cur-status-lbl" class="text-[10px] sm:text-[11px] uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block mb-1">
 							<?php esc_html_e( 'สถานะปัจจุบัน', 'raka-preorder-theme' ); ?>
 						</span>
-						<span id="raka-res-status-badge" class="font-bold text-xs sm:text-sm text-red-600 dark:text-red-400 leading-tight block"></span>
+						<span id="raka-res-status-badge" class="font-normal text-xs sm:text-sm text-red-600 dark:text-red-400 leading-tight block"></span>
 					</div>
 					<div id="raka-res-shipment-wrap" class="flex flex-col justify-center sm:border-l sm:border-black/5 sm:dark:border-white/5 sm:pl-3">
 						<span id="raka-res-shipment-lbl" class="text-[10px] sm:text-[11px] uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono block mb-1">
@@ -352,7 +369,7 @@ function raka_render_preorder_tracker_v2(): string {
 			const loginActionBtn= document.getElementById('raka-login-action-btn');
 			const loginBackBtn  = document.getElementById('raka-login-back-btn');
 			const loginDesc     = document.getElementById('raka-login-desc');
-			
+
 			const primaryLabel  = document.getElementById('raka-track-primary-label');
 			const primaryIcon   = document.getElementById('raka-track-primary-icon');
 			const primaryInput  = document.getElementById('raka-track-primary-input');
@@ -694,7 +711,7 @@ function raka_render_preorder_tracker_v2(): string {
 				}
 
 				const allItems = items;
-				const BATCH_SIZE = 6;
+				const BATCH_SIZE = 10;
 				let renderedCount = 0;
 				let isScrollLoading = false;
 
@@ -709,52 +726,52 @@ function raka_render_preorder_tracker_v2(): string {
 
 				function appendBatch() {
 					const nextItems = allItems.slice(renderedCount, renderedCount + BATCH_SIZE);
-					
+
 					nextItems.forEach((item, batchIdx) => {
 						const globalIdx = renderedCount + batchIdx;
 						const card = document.createElement('div');
 						card.id = 'raka-list-item-' + globalIdx;
-						card.className = 'group raka-fade-in p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900/90 hover:bg-neutral-50 dark:hover:bg-neutral-900 border border-black/5 dark:border-white/10 transition-all duration-200 cursor-pointer space-y-1.5 sm:space-y-2 shadow-xs hover:shadow';
-						
+						card.className = 'group raka-fade-in p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-neutral-900/90 hover:bg-neutral-50 dark:hover:bg-neutral-900 border border-black/5 dark:border-white/10 transition-all duration-200 cursor-pointer space-y-2.5 sm:space-y-3 shadow-xs hover:shadow-md';
+
 						const totalVal = item.total ? item.total : (Number(item.price || 0) * Number(item.qty || 1) + Number(item.shipping || 0));
 						const orderNumber = item.order_no || ('RAKA-PRE-' + item.id);
 						const productName = item.product_name || 'พรีออเดอร์สินค้า';
 						const statusText = item.current_status || 'รับคำสั่งซื้อเรียบร้อย';
 
 						card.innerHTML = `
-							<div id="raka-list-card-top-${globalIdx}" class="flex items-center justify-between gap-2 border-b border-black/5 dark:border-white/5 pb-1 sm:pb-1.5">
-								<span id="raka-list-card-orderno-${globalIdx}" class="text-[11px] sm:text-xs font-mono font-bold text-neutral-900 dark:text-white uppercase tracking-wider truncate">
+							<div id="raka-list-card-top-${globalIdx}" class="flex items-center justify-between gap-2 border-b border-black/5 dark:border-white/5 pb-2">
+								<span id="raka-list-card-orderno-${globalIdx}" class="text-xs sm:text-sm font-mono font-bold text-neutral-900 dark:text-white uppercase tracking-wider truncate">
 									${orderNumber}
 								</span>
-								<span id="raka-list-card-date-${globalIdx}" class="text-[10px] sm:text-[11px] font-mono text-neutral-400 dark:text-neutral-500 shrink-0">
+								<span id="raka-list-card-date-${globalIdx}" class="text-[11px] sm:text-xs font-mono text-neutral-400 dark:text-neutral-500 shrink-0">
 									${item.created_at || ''}
 								</span>
 							</div>
-							<div id="raka-list-card-body-${globalIdx}" class="flex items-center gap-2.5 sm:gap-3">
-								<div id="raka-list-card-imgwrap-${globalIdx}" class="w-11 h-11 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-neutral-100 dark:bg-neutral-800 overflow-hidden shrink-0 border border-black/5 dark:border-white/10 flex items-center justify-center">
-									${item.image_url ? `<img id="raka-list-card-img-${globalIdx}" src="${item.image_url}" alt="Product" class="w-full h-full object-cover" />` : `<i id="raka-list-card-fallback-${globalIdx}" class="ri-shopping-bag-3-line text-lg sm:text-xl text-neutral-400"></i>`}
+							<div id="raka-list-card-body-${globalIdx}" class="flex items-center gap-3 sm:gap-3.5">
+								<div id="raka-list-card-imgwrap-${globalIdx}" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-neutral-100 dark:bg-neutral-800 overflow-hidden shrink-0 border border-black/5 dark:border-white/10 flex items-center justify-center p-1">
+									${item.image_url ? `<img id="raka-list-card-img-${globalIdx}" src="${item.image_url}" alt="Product" class="w-full h-full object-contain rounded-lg" />` : `<i id="raka-list-card-fallback-${globalIdx}" class="ri-shopping-bag-3-line text-2xl text-neutral-400"></i>`}
 								</div>
 								<div id="raka-list-card-info-${globalIdx}" class="flex-1 min-w-0">
-									<h4 id="raka-list-card-name-${globalIdx}" class="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white line-clamp-1 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+									<h4 id="raka-list-card-name-${globalIdx}" class="text-sm sm:text-base font-bold text-neutral-900 dark:text-white line-clamp-1 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
 										${productName}
 									</h4>
-									<div id="raka-list-card-meta-${globalIdx}" class="flex flex-wrap items-center gap-1.5 mt-1">
-										<span id="raka-list-card-price-${globalIdx}" class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-mono font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white border border-black/5 dark:border-white/5">
+									<div id="raka-list-card-meta-${globalIdx}" class="flex flex-wrap items-center gap-2 mt-1.5">
+										<span id="raka-list-card-price-${globalIdx}" class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs sm:text-sm font-mono font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white border border-black/5 dark:border-white/5">
 											${formatPrice(totalVal)}
 										</span>
-										<span id="raka-list-card-qty-${globalIdx}" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+										<span id="raka-list-card-qty-${globalIdx}" class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] sm:text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
 											${item.qty || 1} ชิ้น
 										</span>
 									</div>
 								</div>
-								<i id="raka-list-card-arrow-${globalIdx}" class="ri-arrow-right-s-line text-lg sm:text-xl text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0"></i>
+								<i id="raka-list-card-arrow-${globalIdx}" class="ri-arrow-right-s-line text-xl sm:text-2xl text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0"></i>
 							</div>
-							<div id="raka-list-card-footer-${globalIdx}" class="pt-0.5 flex items-center justify-between gap-2 text-xs">
-								<span id="raka-list-card-status-${globalIdx}" class="inline-flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400 text-[10px] sm:text-xs min-w-0 truncate">
-									<span id="raka-list-dot-${globalIdx}" class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse shrink-0"></span>
+							<div id="raka-list-card-footer-${globalIdx}" class="pt-1 flex items-center justify-between gap-2 text-xs">
+								<span id="raka-list-card-status-${globalIdx}" class="inline-flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400 text-xs sm:text-sm min-w-0 truncate">
+									<span id="raka-list-dot-${globalIdx}" class="w-2 h-2 rounded-full bg-red-600 animate-pulse shrink-0"></span>
 									<span class="truncate">${statusText}</span>
 								</span>
-								<span id="raka-list-card-action-${globalIdx}" class="text-[10px] sm:text-[11px] font-medium text-neutral-500 dark:text-neutral-400 group-hover:underline shrink-0 whitespace-nowrap">
+								<span id="raka-list-card-action-${globalIdx}" class="text-xs font-medium text-neutral-500 dark:text-neutral-400 group-hover:underline shrink-0 whitespace-nowrap">
 									ดูสถานะ & ไทม์ไลน์
 								</span>
 							</div>
@@ -777,7 +794,7 @@ function raka_render_preorder_tracker_v2(): string {
 						if (allItems.length > BATCH_SIZE) {
 							const endEl = document.createElement('div');
 							endEl.id = 'raka-list-end-msg';
-							endEl.className = 'py-2.5 text-center text-[11px] font-mono text-neutral-400 dark:text-neutral-500';
+							endEl.className = 'py-3 text-center text-xs font-mono text-neutral-400 dark:text-neutral-500';
 							endEl.textContent = `✦ แสดงรายการทั้งหมดแล้ว (${allItems.length} รายการ) ✦`;
 							listContainer.appendChild(endEl);
 						}
@@ -787,21 +804,34 @@ function raka_render_preorder_tracker_v2(): string {
 				listContainer.appendChild(loaderEl);
 				appendBatch();
 
-				// Scroll loading trigger
-				listContainer.onscroll = () => {
+				// Scroll loading triggers (Container scroll for desktop, window scroll for mobile)
+				function checkAndLoadMore() {
 					if (renderedCount < allItems.length && !isScrollLoading) {
-						const scrollDistance = listContainer.scrollHeight - listContainer.scrollTop - listContainer.clientHeight;
-						if (scrollDistance < 70) {
-							isScrollLoading = true;
-							loaderEl.classList.remove('opacity-0');
-							setTimeout(() => {
-								appendBatch();
-								loaderEl.classList.add('opacity-0');
-								isScrollLoading = false;
-							}, 250);
-						}
+						isScrollLoading = true;
+						loaderEl.classList.remove('opacity-0');
+						setTimeout(() => {
+							appendBatch();
+							loaderEl.classList.add('opacity-0');
+							isScrollLoading = false;
+						}, 250);
+					}
+				}
+
+				listContainer.onscroll = () => {
+					const scrollDistance = listContainer.scrollHeight - listContainer.scrollTop - listContainer.clientHeight;
+					if (scrollDistance < 80) {
+						checkAndLoadMore();
 					}
 				};
+
+				window.addEventListener('scroll', () => {
+					if (!listView.classList.contains('hidden')) {
+						const rect = listContainer.getBoundingClientRect();
+						if (rect.bottom <= window.innerHeight + 150) {
+							checkAndLoadMore();
+						}
+					}
+				}, { passive: true });
 
 				if (listContainer) listContainer.scrollTop = 0;
 				searchView.classList.add('hidden');
@@ -893,7 +923,7 @@ function raka_render_preorder_tracker_v2(): string {
 					if (!isLast) {
 						const line = document.createElement('div');
 						line.id = 'raka-step-line-' + idx;
-						line.className = 'absolute left-[11px] top-6 bottom-0 w-[2px] ' + 
+						line.className = 'absolute left-[11px] top-6 bottom-0 w-[2px] ' +
 							(isPassed ? 'bg-emerald-500/80 dark:bg-emerald-500/60' : 'bg-neutral-200 dark:bg-neutral-700/80');
 						stepEl.appendChild(line);
 					}
@@ -1053,7 +1083,7 @@ function raka_render_preorder_tracker_v2(): string {
 					const userIdParam = searchParams.get('user_id');
 					const orderParam = searchParams.get('order_no') || searchParams.get('order') || searchParams.get('track') || searchParams.get('tracking') || searchParams.get('no');
 					const phoneParam = searchParams.get('phone') || searchParams.get('tel');
-					
+
 					if (myOrdersParam || userIdParam) {
 						doSearchMyOrders(userIdParam);
 						return;

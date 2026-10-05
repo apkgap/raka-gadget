@@ -38,6 +38,26 @@ function preorder_raka_register_rest_routes() {
 			'permission_callback' => '__return_true', // Publicly accessible to display preorder catalog
 		]
 	] );
+
+	register_rest_route( 'preorder-raka/v1', '/wc-orders', [
+		[
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => 'preorder_raka_get_wc_orders',
+			'permission_callback' => function () {
+				return current_user_can( 'edit_posts' );
+			},
+		]
+	] );
+
+	register_rest_route( 'preorder-raka/v1', '/users', [
+		[
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => 'preorder_raka_get_users',
+			'permission_callback' => function () {
+				return current_user_can( 'edit_posts' );
+			},
+		]
+	] );
 }
 add_action( 'rest_api_init', 'preorder_raka_register_rest_routes' );
 
@@ -544,6 +564,9 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	$tracking_link = esc_url_raw( (string) $request->get_param( 'tracking_link' ) );
 	$facebook      = esc_url_raw( (string) $request->get_param( 'facebook' ) );
 	$line          = esc_url_raw( (string) $request->get_param( 'line' ) );
+	$wc_order_id   = intval( $request->get_param( 'wc_order_id' ) );
+	$user_id       = intval( $request->get_param( 'user_id' ) );
+	$email         = sanitize_email( (string) $request->get_param( 'email' ) );
 
 	if ( empty( $order_no ) ) {
 		$order_no = 'RAKA-PRE-' . wp_rand( 100000, 999999 );
@@ -574,12 +597,14 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	update_post_meta( $post_id, '_preorder_phone', $phone );
 	update_post_meta( $post_id, '_preorder_citizen_id_last4', substr( preg_replace( '/[^0-9]/', '', $citizen_id ), -4 ) );
 	update_post_meta( $post_id, '_preorder_product_id', $product_id );
+	
 	if ( $product_id ) {
 		$p_thumb = get_post_thumbnail_id( $product_id );
 		if ( $p_thumb ) {
 			set_post_thumbnail( $post_id, $p_thumb );
 		}
 	}
+	
 	update_post_meta( $post_id, '_preorder_product', $product_name );
 	update_post_meta( $post_id, '_preorder_price', $price );
 	update_post_meta( $post_id, '_preorder_qty', $qty );
@@ -592,6 +617,19 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	update_post_meta( $post_id, '_preorder_facebook', $facebook );
 	update_post_meta( $post_id, '_preorder_line', $line );
 	update_post_meta( $post_id, '_preorder_current_step_idx', 0 );
+
+	if ( $wc_order_id > 0 ) {
+		update_post_meta( $post_id, '_preorder_wc_order_id', $wc_order_id );
+	}
+
+	if ( $user_id > 0 ) {
+		update_post_meta( $post_id, '_preorder_user_id', $user_id );
+		update_post_meta( $post_id, '_customer_user', $user_id );
+	}
+
+	if ( ! empty( $email ) ) {
+		update_post_meta( $post_id, '_preorder_email', $email );
+	}
 
 	// Default steps setup
 	$default_steps = [
@@ -618,7 +656,7 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 }
 
 /**
- * Get List of Pre-order Products for Admin dropdown and Frontend catalog.
+ * Get List of Products (WooCommerce Products, Variations & Custom Preorders) for Admin.
  */
 function preorder_raka_get_products() {
 	$data = [];
@@ -627,49 +665,94 @@ function preorder_raka_get_products() {
 	if ( function_exists( 'wc_get_products' ) ) {
 		$wc_products = wc_get_products([
 			'status'  => 'publish',
-			'limit'   => -1,
-			'orderby' => 'date',
-			'order'   => 'DESC',
+			'limit'   => 150,
+			'orderby' => 'title',
+			'order'   => 'ASC',
 		]);
 
 		foreach ( $wc_products as $prod ) {
-			$is_preorder = get_post_meta( $prod->get_id(), '_raka_is_preorder', true ) === 'yes' || 'preorder' === $prod->get_stock_status();
-			if ( ! $is_preorder ) {
-				continue;
+			$p_id        = $prod->get_id();
+			$p_name      = $prod->get_name();
+			$p_type      = $prod->get_type();
+			$p_price     = (float) $prod->get_price();
+			$img_id      = $prod->get_image_id();
+			$img_url     = $img_id ? wp_get_attachment_image_url( $img_id, 'medium' ) : '';
+			$is_preorder = function_exists( 'raka_is_product_preorder' ) ? raka_is_product_preorder( $prod ) : ( get_post_meta( $p_id, '_raka_is_preorder', true ) === 'yes' );
+			$eta         = function_exists( 'raka_get_product_preorder_eta' ) ? raka_get_product_preorder_eta( $prod ) : '7-14 วัน';
+
+			if ( 'variable' === $p_type && method_exists( $prod, 'get_available_variations' ) ) {
+				$variations = $prod->get_available_variations();
+				foreach ( $variations as $var_data ) {
+					$var_id    = $var_data['variation_id'];
+					$var_obj   = wc_get_product( $var_id );
+					$var_attrs = [];
+					if ( ! empty( $var_data['attributes'] ) ) {
+						foreach ( $var_data['attributes'] as $attr_k => $attr_v ) {
+							$attr_label = wc_attribute_label( str_replace( 'attribute_', '', $attr_k ) );
+							$var_attrs[] = $attr_v;
+						}
+					}
+					$var_suffix    = ! empty( $var_attrs ) ? ' (' . implode( ' / ', $var_attrs ) . ')' : ' #' . $var_id;
+					$var_img_url   = ! empty( $var_data['image']['src'] ) ? $var_data['image']['src'] : $img_url;
+					$var_price     = ! empty( $var_data['display_price'] ) ? (float) $var_data['display_price'] : $p_price;
+					$var_is_pre    = function_exists( 'raka_is_product_preorder' ) ? raka_is_product_preorder( $var_obj ) : $is_preorder;
+					$var_eta       = function_exists( 'raka_get_product_preorder_eta' ) ? raka_get_product_preorder_eta( $var_obj ) : $eta;
+
+					$data[] = [
+						'id'          => $var_id,
+						'parent_id'   => $p_id,
+						'title'       => $p_name . $var_suffix,
+						'group'       => $p_name,
+						'sku'         => $var_data['sku'] ?? '',
+						'price'       => $var_price,
+						'image_url'   => $var_img_url,
+						'is_preorder' => $var_is_pre,
+						'eta'         => $var_eta,
+						'type'        => 'variation',
+						'permalink'   => $prod->get_permalink(),
+					];
+				}
+			} else {
+				$data[] = [
+					'id'          => $p_id,
+					'parent_id'   => 0,
+					'title'       => $p_name,
+					'group'       => __( 'สินค้าทั่วไป (Simple)', 'preorder-raka' ),
+					'sku'         => $prod->get_sku() ?: '',
+					'price'       => $p_price,
+					'image_url'   => $img_url,
+					'is_preorder' => $is_preorder,
+					'eta'         => $eta,
+					'type'        => 'simple',
+					'permalink'   => $prod->get_permalink(),
+				];
 			}
-			$img_id = $prod->get_image_id();
-			$img_url = $img_id ? wp_get_attachment_image_url( $img_id, 'medium_large' ) : '';
-			$data[] = [
-				'id'          => $prod->get_id(),
-				'title'       => $prod->get_name(),
-				'price'       => (float) $prod->get_price(),
-				'image_url'   => $img_url,
-				'description' => wp_strip_all_tags( $prod->get_short_description() ?: $prod->get_description() ),
-				'permalink'   => $prod->get_permalink(),
-				'is_preorder' => true,
-			];
 		}
 	}
 
-	// 2. Also include preorder_product CPT
+	// 2. Also include custom preorder_product CPT
 	$posts = get_posts([
 		'post_type'   => 'preorder_product',
 		'post_status' => 'publish',
-		'numberposts' => -1,
-		'orderby'     => 'date',
-		'order'       => 'DESC',
+		'numberposts' => 100,
+		'orderby'     => 'title',
+		'order'       => 'ASC',
 	]);
 
 	foreach ( $posts as $p ) {
-		$thumb_url = get_the_post_thumbnail_url( $p->ID, 'medium_large' ) ?: '';
+		$thumb_url = get_the_post_thumbnail_url( $p->ID, 'medium' ) ?: '';
 		$data[] = [
 			'id'          => $p->ID,
-			'title'       => $p->post_title,
+			'parent_id'   => 0,
+			'title'       => '[Pre-Order เฉพาะกิจ] ' . $p->post_title,
+			'group'       => __( 'สินค้าเฉพาะพรีออเดอร์', 'preorder-raka' ),
+			'sku'         => '',
 			'price'       => (float) get_post_meta( $p->ID, '_preorder_price', true ),
 			'image_url'   => $thumb_url,
-			'description' => wp_strip_all_tags( $p->post_content ),
-			'permalink'   => get_permalink( $p->ID ),
 			'is_preorder' => true,
+			'eta'         => get_post_meta( $p->ID, '_preorder_estimate_days', true ) ?: '7-14 วัน',
+			'type'        => 'custom_preorder',
+			'permalink'   => get_permalink( $p->ID ),
 		];
 	}
 
@@ -678,6 +761,148 @@ function preorder_raka_get_products() {
 		'data'    => $data,
 	];
 }
+
+/**
+ * Get Recent WooCommerce Orders for Quick Import / Preorder Link.
+ */
+function preorder_raka_get_wc_orders( WP_REST_Request $request ) {
+	if ( ! function_exists( 'wc_get_orders' ) ) {
+		return [ 'success' => true, 'data' => [] ];
+	}
+
+	$search = sanitize_text_field( (string) $request->get_param( 's' ) );
+	$limit  = intval( $request->get_param( 'limit' ) ) ?: 50;
+
+	$args = [
+		'limit'   => $limit,
+		'orderby' => 'date',
+		'order'   => 'DESC',
+		'status'  => [ 'processing', 'on-hold', 'completed', 'pending' ],
+	];
+
+	if ( ! empty( $search ) ) {
+		$args['s'] = $search;
+	}
+
+	$orders = wc_get_orders( $args );
+	$data   = [];
+
+	foreach ( $orders as $order ) {
+		$order_id      = $order->get_id();
+		$order_no      = $order->get_order_number();
+		$customer_name = trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() );
+		$phone         = preg_replace( '/[^0-9]/', '', (string) $order->get_billing_phone() );
+		$email         = $order->get_billing_email();
+		$address       = $order->get_formatted_shipping_address() ?: $order->get_formatted_billing_address();
+		$user_id       = (int) $order->get_user_id();
+		$status        = $order->get_status();
+		$date_created  = $order->get_date_created() ? $order->get_date_created()->date_i18n( 'd/m/Y H:i' ) : '';
+		$total         = (float) $order->get_total();
+		$shipping      = (float) $order->get_shipping_total();
+
+		$items = [];
+		$has_preorder = false;
+		foreach ( $order->get_items() as $item ) {
+			$product      = $item->get_product();
+			$item_p_id    = $item->get_product_id();
+			$item_v_id    = $item->get_variation_id();
+			$target_prod  = $item_v_id ? wc_get_product( $item_v_id ) : $product;
+			$is_item_pre  = $target_prod && function_exists( 'raka_is_product_preorder' ) ? raka_is_product_preorder( $target_prod ) : false;
+			if ( $is_item_pre ) {
+				$has_preorder = true;
+			}
+			$thumb_id     = $target_prod ? $target_prod->get_image_id() : ( $product ? $product->get_image_id() : 0 );
+			$thumb_url    = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' ) : '';
+			$eta          = $target_prod && function_exists( 'raka_get_product_preorder_eta' ) ? raka_get_product_preorder_eta( $target_prod ) : '7-14 วัน';
+
+			$items[] = [
+				'product_id'   => $item_v_id ?: $item_p_id,
+				'parent_id'    => $item_p_id,
+				'name'         => $item->get_name(),
+				'price'        => (float) ( $item->get_total() / max( 1, $item->get_quantity() ) ),
+				'qty'          => (int) $item->get_quantity(),
+				'subtotal'     => (float) $item->get_total(),
+				'thumb_url'    => $thumb_url,
+				'is_preorder'  => $is_item_pre,
+				'eta'          => $eta,
+			];
+		}
+
+		// Check if already linked to a preorder post
+		$existing_pre = get_posts([
+			'post_type'   => 'preorder',
+			'meta_key'    => '_preorder_wc_order_id',
+			'meta_value'  => $order_id,
+			'post_status' => 'any',
+			'numberposts' => 1,
+			'fields'      => 'ids',
+		]);
+
+		$data[] = [
+			'id'              => $order_id,
+			'order_no'        => $order_no,
+			'customer_name'   => $customer_name ?: __( 'ลูกค้าทั่วไป', 'preorder-raka' ),
+			'phone'           => $phone,
+			'email'           => $email,
+			'address'         => wp_strip_all_tags( $address ),
+			'user_id'         => $user_id,
+			'status'          => $status,
+			'status_label'    => wc_get_order_status_name( $status ),
+			'date'            => $date_created,
+			'total'           => $total,
+			'shipping'        => $shipping,
+			'has_preorder'    => $has_preorder,
+			'is_already_synced' => ! empty( $existing_pre ),
+			'synced_post_id'  => ! empty( $existing_pre ) ? $existing_pre[0] : 0,
+			'items'           => $items,
+		];
+	}
+
+	return [
+		'success' => true,
+		'data'    => $data,
+	];
+}
+
+/**
+ * Get List of WordPress / WooCommerce Users for Member Linking.
+ */
+function preorder_raka_get_users( WP_REST_Request $request ) {
+	$search = sanitize_text_field( (string) $request->get_param( 's' ) );
+	$args   = [
+		'number'  => 100,
+		'orderby' => 'display_name',
+		'order'   => 'ASC',
+	];
+
+	if ( ! empty( $search ) ) {
+		$args['search']         = '*' . $search . '*';
+		$args['search_columns'] = [ 'user_login', 'user_email', 'user_nicename', 'display_name' ];
+	}
+
+	$users = get_users( $args );
+	$data  = [];
+
+	foreach ( $users as $u ) {
+		$phone = get_user_meta( $u->ID, 'billing_phone', true ) ?: get_user_meta( $u->ID, 'phone', true );
+		$name  = $u->display_name ?: $u->user_login;
+		$label = sprintf( '#%d: %s (%s)%s', $u->ID, $name, $u->user_email, $phone ? ' - ' . $phone : '' );
+
+		$data[] = [
+			'id'           => $u->ID,
+			'name'         => $name,
+			'email'        => $u->user_email,
+			'phone'        => $phone ? (string) $phone : '',
+			'label'        => $label,
+		];
+	}
+
+	return [
+		'success' => true,
+		'data'    => $data,
+	];
+}
+
 
 
 
