@@ -84,6 +84,8 @@ class WcHooks {
 		$js_ver  = file_exists( $plugin_dir . 'assets/js/passkeys.js' ) ? (string) filemtime( $plugin_dir . 'assets/js/passkeys.js' ) : MY_WC_PASSKEYS_VERSION;
 		$css_ver = file_exists( $plugin_dir . 'assets/css/passkeys.css' ) ? (string) filemtime( $plugin_dir . 'assets/css/passkeys.css' ) : MY_WC_PASSKEYS_VERSION;
 
+		$social_js_ver = file_exists( $plugin_dir . 'assets/js/auth-social-magic.js' ) ? (string) filemtime( $plugin_dir . 'assets/js/auth-social-magic.js' ) : MY_WC_PASSKEYS_VERSION;
+
 		wp_enqueue_style(
 			'my-wc-passkeys-css',
 			$plugin_url . 'assets/css/passkeys.css',
@@ -99,25 +101,42 @@ class WcHooks {
 			true
 		);
 
-		wp_localize_script(
-			'my-wc-passkeys-js',
-			'myWcPasskeysData',
-			[
-				'restUrl'     => esc_url_raw( rest_url( 'wc-passkeys/v1' ) ),
-				'nonce'       => wp_create_nonce( 'wp_rest' ),
-				'isLoggedIn'  => is_user_logged_in(),
-				'i18n'        => [
-					'notSupported'   => __( 'เบราว์เซอร์หรืออุปกรณ์นี้ยังไม่รองรับ Passkeys (WebAuthn)', 'my-wc-passkeys' ),
-					'regSuccess'     => __( 'ลงทะเบียนอุปกรณ์ Passkey สำเร็จเรียบร้อย!', 'my-wc-passkeys' ),
-					'loginSuccess'   => __( 'ยืนยันตัวตนสำเร็จ กำลังเข้าสู่ระบบ...', 'my-wc-passkeys' ),
-					'confirmDelete'  => __( 'คุณแน่ใจหรือไม่ว่าต้องการลบอุปกรณ์ Passkey นี้?', 'my-wc-passkeys' ),
-					'devicePrompt'   => __( 'กรุณากรอกชื่ออุปกรณ์ เช่น iPhone 15 หรือ MacBook Pro', 'my-wc-passkeys' ),
-					'authenticating' => __( 'กำลังรอสแกนลายนิ้วมือ / Face ID...', 'my-wc-passkeys' ),
-					'registering'    => __( 'กำลังลงทะเบียนอุปกรณ์...', 'my-wc-passkeys' ),
-					'errorOccurred'  => __( 'เกิดข้อผิดพลาดในการทำรายการ กรุณาลองใหม่อีกครั้ง', 'my-wc-passkeys' ),
-				],
-			]
+		wp_enqueue_script(
+			'my-wc-social-magic-js',
+			$plugin_url . 'assets/js/auth-social-magic.js',
+			[ 'my-wc-passkeys-js' ],
+			$social_js_ver,
+			true
 		);
+
+		$redirect_to = isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : AuthSettings::get_default_redirect_url();
+
+		$localized_data = [
+			'restUrl'           => esc_url_raw( rest_url( 'wc-passkeys/v1' ) ),
+			'nonce'             => wp_create_nonce( 'wp_rest' ),
+			'isLoggedIn'        => is_user_logged_in(),
+			'redirectTo'        => $redirect_to,
+			'isPasswordEnabled' => AuthSettings::is_password_enabled(),
+			'isGoogleEnabled'   => AuthSettings::is_google_enabled(),
+			'isOneTapEnabled'   => AuthSettings::is_google_onetap_enabled(),
+			'googleClientId'    => AuthSettings::get_google_client_id(),
+			'isLineEnabled'     => AuthSettings::is_line_enabled(),
+			'isMagicEnabled'    => AuthSettings::is_magic_link_enabled(),
+			'isPasskeyEnabled'  => AuthSettings::is_passkey_enabled(),
+			'i18n'              => [
+				'notSupported'   => __( 'เบราว์เซอร์หรืออุปกรณ์นี้ยังไม่รองรับ Passkeys (WebAuthn)', 'my-wc-passkeys' ),
+				'regSuccess'     => __( 'ลงทะเบียนอุปกรณ์ Passkey สำเร็จเรียบร้อย!', 'my-wc-passkeys' ),
+				'loginSuccess'   => __( 'ยืนยันตัวตนสำเร็จ กำลังเข้าสู่ระบบ...', 'my-wc-passkeys' ),
+				'confirmDelete'  => __( 'คุณแน่ใจหรือไม่ว่าต้องการลบอุปกรณ์ Passkey นี้?', 'my-wc-passkeys' ),
+				'devicePrompt'   => __( 'กรุณากรอกชื่ออุปกรณ์ เช่น iPhone 15 หรือ MacBook Pro', 'my-wc-passkeys' ),
+				'authenticating' => __( 'กำลังรอสแกนลายนิ้วมือ / Face ID...', 'my-wc-passkeys' ),
+				'registering'    => __( 'กำลังลงทะเบียนอุปกรณ์...', 'my-wc-passkeys' ),
+				'errorOccurred'  => __( 'เกิดข้อผิดพลาดในการทำรายการ กรุณาลองใหม่อีกครั้ง', 'my-wc-passkeys' ),
+			],
+		];
+
+		wp_localize_script( 'my-wc-passkeys-js', 'myWcPasskeysData', $localized_data );
+		wp_localize_script( 'my-wc-social-magic-js', 'myWcPasskeysData', $localized_data );
 	}
 
 	/**

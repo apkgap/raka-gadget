@@ -109,6 +109,80 @@ class RestController extends WP_REST_Controller {
 				'permission_callback' => [ $this, 'check_logged_in_permission' ],
 			]
 		);
+
+		// 6. POST /auth/google - Verify Google GSI Credential
+		register_rest_route(
+			$this->namespace,
+			'/auth/google',
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'auth_google' ],
+				'permission_callback' => '__return_true',
+				'args'                => [
+					'credential'  => [
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+					'redirect_to' => [
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'esc_url_raw',
+					],
+				],
+			]
+		);
+
+		// 7. POST /auth/magic-link/send - Send Magic Link & OTP Code
+		register_rest_route(
+			$this->namespace,
+			'/auth/magic-link/send',
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'auth_magic_send' ],
+				'permission_callback' => '__return_true',
+				'args'                => [
+					'email'       => [
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_email',
+					],
+					'redirect_to' => [
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'esc_url_raw',
+					],
+				],
+			]
+		);
+
+		// 8. POST /auth/magic-link/verify-otp - Verify 6-digit OTP Code
+		register_rest_route(
+			$this->namespace,
+			'/auth/magic-link/verify-otp',
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'auth_magic_verify_otp' ],
+				'permission_callback' => '__return_true',
+				'args'                => [
+					'email'       => [
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_email',
+					],
+					'otp_code'    => [
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+					'redirect_to' => [
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'esc_url_raw',
+					],
+				],
+			]
+		);
 	}
 
 	/**
@@ -257,6 +331,111 @@ class RestController extends WP_REST_Controller {
 		return rest_ensure_response( [
 			'success' => true,
 			'message' => __( 'ลบอุปกรณ์ Passkey สำเร็จเรียบร้อย', 'my-wc-passkeys' ),
+		] );
+	}
+
+	/**
+	 * POST /auth/google - Authenticate user with Google Credential JWT.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function auth_google( WP_REST_Request $request ) {
+		if ( ! AuthSettings::is_google_enabled() ) {
+			return new WP_Error( 'google_disabled', __( 'Google Sign-In ปิดการใช้งานอยู่', 'my-wc-passkeys' ), [ 'status' => 403 ] );
+		}
+
+		$credential  = (string) $request->get_param( 'credential' );
+		$redirect_to = (string) $request->get_param( 'redirect_to' );
+		if ( empty( $redirect_to ) ) {
+			$redirect_to = AuthSettings::get_default_redirect_url();
+		}
+
+		$payload = SocialAuth::verify_google_jwt( $credential );
+		if ( is_wp_error( $payload ) ) {
+			return $payload;
+		}
+
+		$google_sub   = $payload['sub'] ?? '';
+		$email        = sanitize_email( $payload['email'] ?? '' );
+		$display_name = sanitize_text_field( $payload['name'] ?? '' );
+		$avatar_url   = esc_url_raw( $payload['picture'] ?? '' );
+
+		$user = SocialAuth::login_or_create_user( [
+			'provider'     => 'google',
+			'provider_id'  => $google_sub,
+			'email'        => $email,
+			'display_name' => $display_name,
+			'avatar_url'   => $avatar_url,
+		] );
+
+		if ( is_wp_error( $user ) ) {
+			return $user;
+		}
+
+		return rest_ensure_response( [
+			'success'      => true,
+			'redirect_url' => $redirect_to,
+			'message'      => __( 'เข้าสู่ระบบด้วย Google สำเร็จเรียบร้อย!', 'my-wc-passkeys' ),
+		] );
+	}
+
+	/**
+	 * POST /auth/magic-link/send - Send Magic Link and OTP.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function auth_magic_send( WP_REST_Request $request ) {
+		if ( ! AuthSettings::is_magic_link_enabled() ) {
+			return new WP_Error( 'magic_link_disabled', __( 'Magic Link & OTP ปิดการใช้งานอยู่', 'my-wc-passkeys' ), [ 'status' => 403 ] );
+		}
+
+		$email       = sanitize_email( (string) $request->get_param( 'email' ) );
+		$redirect_to = (string) $request->get_param( 'redirect_to' );
+		if ( empty( $redirect_to ) ) {
+			$redirect_to = AuthSettings::get_default_redirect_url();
+		}
+
+		$result = SocialAuth::send_magic_link_otp( $email, $redirect_to );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return rest_ensure_response( [
+			'success' => true,
+			'message' => __( 'ระบบได้ส่งรหัส OTP 6 หลัก และลิงก์เข้าสู่ระบบไปยังอีเมลของคุณเรียบร้อยแล้ว กรุณาตรวจสอบกล่องข้อความ (Inbox / Spam)', 'my-wc-passkeys' ),
+			'ttl'     => AuthSettings::get_magic_link_ttl(),
+		] );
+	}
+
+	/**
+	 * POST /auth/magic-link/verify-otp - Verify 6-digit OTP code and login.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function auth_magic_verify_otp( WP_REST_Request $request ) {
+		if ( ! AuthSettings::is_magic_link_enabled() ) {
+			return new WP_Error( 'magic_link_disabled', __( 'Magic Link & OTP ปิดการใช้งานอยู่', 'my-wc-passkeys' ), [ 'status' => 403 ] );
+		}
+
+		$email       = sanitize_email( (string) $request->get_param( 'email' ) );
+		$otp_code    = (string) $request->get_param( 'otp_code' );
+		$redirect_to = (string) $request->get_param( 'redirect_to' );
+		if ( empty( $redirect_to ) ) {
+			$redirect_to = AuthSettings::get_default_redirect_url();
+		}
+
+		$user = SocialAuth::verify_otp_code( $email, $otp_code );
+		if ( is_wp_error( $user ) ) {
+			return $user;
+		}
+
+		return rest_ensure_response( [
+			'success'      => true,
+			'redirect_url' => $redirect_to,
+			'message'      => __( 'ยืนยันรหัส OTP สำเร็จเรียบร้อย กำลังเข้าสู่ระบบ...', 'my-wc-passkeys' ),
 		] );
 	}
 }

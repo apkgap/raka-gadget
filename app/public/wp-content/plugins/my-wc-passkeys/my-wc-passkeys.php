@@ -50,6 +50,8 @@ spl_autoload_register( function ( string $class_name ): void {
 		'TemplateLoader' => 'class-template-loader.php',
 		'AuthShortcodes' => 'class-auth-shortcodes.php',
 		'Captcha'        => 'class-captcha.php',
+		'AuthSettings'   => 'class-auth-settings.php',
+		'SocialAuth'     => 'class-social-auth.php',
 	];
 
 	if ( isset( $map[ $relative_class ] ) ) {
@@ -96,6 +98,12 @@ add_action( 'before_woocommerce_init', function (): void {
  * Main Plugin Initialization.
  */
 function init(): void {
+	// Initialize Admin Settings
+	AuthSettings::init();
+
+	// Initialize Social & Magic Link Authentication
+	SocialAuth::init();
+
 	// Initialize WooCommerce UI Hooks
 	WcHooks::init();
 

@@ -2,7 +2,7 @@
 /**
  * Dedicated Custom Register Template (X / Twitter Style - Horizontal 2 Column).
  * Floating active red labels, plump inputs & black pill buttons.
- * Override by copying to yourtheme/wc-passkeys/auth-register.php
+ * Supports: Google Sign-In / One Tap, LINE OAuth, Magic Link & Email OTP, Password, Passkeys.
  *
  * @package my-wc-passkeys
  */
@@ -11,13 +11,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$redirect_to      = ! empty( $redirect ) ? $redirect : ( isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : '' );
-$login_url        = ! empty( $login_url ) ? $login_url : home_url( '/login/' );
-$google_oauth_url = apply_filters( 'my_wc_google_auth_url', '' );
-if ( empty( $google_oauth_url ) && class_exists( 'NextendSocialLogin' ) && function_exists( 'nsl_get_login_url' ) ) {
-	$google_oauth_url = nsl_get_login_url( 'google' );
-}
-$is_google_active = ! empty( $google_oauth_url );
+use MyWcPasskeys\AuthSettings;
+use MyWcPasskeys\SocialAuth;
+
+$redirect_to         = ! empty( $redirect ) ? $redirect : ( isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : AuthSettings::get_default_redirect_url() );
+$login_url           = ! empty( $login_url ) ? $login_url : home_url( '/login/' );
+
+$is_password_enabled = AuthSettings::is_password_enabled();
+$is_google_enabled   = AuthSettings::is_google_enabled();
+$is_line_enabled     = AuthSettings::is_line_enabled();
+$is_magic_enabled    = AuthSettings::is_magic_link_enabled();
+$is_passkey_enabled  = AuthSettings::is_passkey_enabled();
+
+$line_auth_url       = $is_line_enabled ? SocialAuth::get_line_auth_url( $redirect_to ) : '';
+$has_right_col       = $is_google_enabled || $is_line_enabled || $is_passkey_enabled;
 ?>
 
 <div id="my-wc-auth-register-container" class="woocommerce my-wc-auth-box w-full max-w-2xl md:max-w-3xl mx-auto">
@@ -31,167 +38,296 @@ $is_google_active = ! empty( $google_oauth_url );
 
 	<div id="my-wc-register-wrap" class="space-y-6">
 
+		<!-- Dynamic Notice Container for AJAX -->
+		<div id="my-wc-auth-dynamic-notice" class="hidden w-full p-3.5 rounded-xl text-sm font-medium text-center"></div>
+
 		<!-- ── 2-Column Horizontal Grid: Left = Register Form, Right = Google & One-Pass ── -->
-		<div id="my-wc-register-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start relative">
+		<div id="my-wc-register-grid" class="grid grid-cols-1 <?php echo $has_right_col ? 'md:grid-cols-2 gap-6 md:gap-10' : 'max-w-md mx-auto'; ?> items-start relative">
 
 			<!-- ── LEFT COLUMN: Standard Registration Form (X Floating Active Red Labels) ── -->
 			<div id="my-wc-register-col-left" class="space-y-4">
-				<form id="my-wc-custom-register-form" method="post" class="space-y-3.5">
 
-					<!-- Username -->
-					<div id="my-wc-reg-field-wrap-username" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
-						<input
-							type="text"
-							id="my_wc_reg_username"
-							name="username"
-							placeholder=" "
-							class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
-							autocomplete="username"
-						/>
-						<label
-							id="my-wc-reg-lbl-username"
-							for="my_wc_reg_username"
-							class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
-						>
-							<?php esc_html_e( 'ชื่อผู้ใช้ (Username)', 'my-wc-passkeys' ); ?>
-						</label>
-					</div>
-
-					<!-- Email -->
-					<div id="my-wc-reg-field-wrap-email" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
-						<input
-							type="email"
-							id="my_wc_reg_email"
-							name="email"
-							placeholder=" "
-							class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
-							autocomplete="email"
-							required
-						/>
-						<label
-							id="my-wc-reg-lbl-email"
-							for="my_wc_reg_email"
-							class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
-						>
-							<?php esc_html_e( 'ที่อยู่อีเมล', 'my-wc-passkeys' ); ?>
-						</label>
-					</div>
-
-					<!-- Password -->
-					<div id="my-wc-reg-field-wrap-password" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
-						<input
-							type="password"
-							id="my_wc_reg_password"
-							name="password"
-							placeholder=" "
-							class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
-							autocomplete="new-password"
-							required
-						/>
-						<label
-							id="my-wc-reg-lbl-password"
-							for="my_wc_reg_password"
-							class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
-						>
-							<?php esc_html_e( 'รหัสผ่าน', 'my-wc-passkeys' ); ?>
-						</label>
-					</div>
-
-					<!-- Confirm Password -->
-					<div id="my-wc-reg-field-wrap-confirm" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
-						<input
-							type="password"
-							id="my_wc_reg_password_confirm"
-							name="password_confirm"
-							placeholder=" "
-							class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
-							autocomplete="new-password"
-							required
-						/>
-						<label
-							id="my-wc-reg-lbl-confirm"
-							for="my_wc_reg_password_confirm"
-							class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
-						>
-							<?php esc_html_e( 'ยืนยันรหัสผ่านอีกครั้ง', 'my-wc-passkeys' ); ?>
-						</label>
-					</div>
-
-					<!-- 🛡️ CAPTCHA WIDGET CONTAINER (Above Submit Button) -->
-					<?php if ( class_exists( '\MyWcPasskeys\Captcha' ) ) : ?>
-						<div id="my-wc-reg-captcha-wrap" class="flex items-center justify-center pt-1 overflow-hidden">
-							<?php echo \MyWcPasskeys\Captcha::render( 'auto' ); ?>
-						</div>
-					<?php endif; ?>
-
-					<!-- Submit Button (Black Pill Button, White Text) -->
-					<div id="my-wc-reg-field-wrap-submit" class="pt-1.5">
-						<?php wp_nonce_field( 'my_wc_custom_register_action', 'my_wc_register_nonce' ); ?>
-						<input id="my_wc_reg_redirect" type="hidden" name="redirect" value="<?php echo esc_attr( $redirect_to ); ?>" />
+				<?php if ( $is_password_enabled && $is_magic_enabled ) : ?>
+					<!-- Auth Mode Switcher Tabs -->
+					<div id="my-wc-auth-reg-tabs" class="flex border-b border-black/10 dark:border-neutral-800 mb-2">
 						<button
-							id="my_wc_register_submit_btn"
-							type="submit"
-							name="my_wc_custom_register_submit"
-							value="1"
-							class="w-full h-12 sm:h-13 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white text-sm sm:text-base font-bold border border-neutral-900 transition-all shadow-sm hover:shadow-md cursor-pointer flex items-center justify-center gap-2"
+							type="button"
+							id="my-wc-tab-password"
+							class="active pb-2.5 px-3 text-sm sm:text-base font-bold text-neutral-900 dark:text-white border-b-2 border-black dark:border-white transition-all cursor-pointer"
 						>
-							<span id="my-wc-reg-submit-text"><?php esc_html_e( 'สร้างบัญชี', 'my-wc-passkeys' ); ?></span>
+							<?php esc_html_e( 'สร้างบัญชีด้วยรหัสผ่าน', 'my-wc-passkeys' ); ?>
+						</button>
+						<button
+							type="button"
+							id="my-wc-tab-magic"
+							class="pb-2.5 px-3 text-sm sm:text-base font-medium text-neutral-500 border-b-2 border-transparent hover:text-neutral-900 dark:hover:text-white transition-all cursor-pointer"
+						>
+							<?php esc_html_e( 'Magic Link / OTP', 'my-wc-passkeys' ); ?>
 						</button>
 					</div>
+				<?php endif; ?>
 
-					<?php
-					do_action( 'woocommerce_register_form_end' );
-					do_action( 'register_form' );
-					?>
+				<!-- 1. Password Form -->
+				<?php if ( $is_password_enabled ) : ?>
+					<form id="my-wc-custom-register-form" method="post" class="space-y-3.5">
 
-				</form>
+						<!-- Username -->
+						<div id="my-wc-reg-field-wrap-username" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
+							<input
+								type="text"
+								id="my_wc_reg_username"
+								name="username"
+								placeholder=" "
+								class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
+								autocomplete="username"
+							/>
+							<label
+								id="my-wc-reg-lbl-username"
+								for="my_wc_reg_username"
+								class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
+							>
+								<?php esc_html_e( 'ชื่อผู้ใช้ (Username)', 'my-wc-passkeys' ); ?>
+							</label>
+						</div>
+
+						<!-- Email -->
+						<div id="my-wc-reg-field-wrap-email" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
+							<input
+								type="email"
+								id="my_wc_reg_email"
+								name="email"
+								placeholder=" "
+								class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
+								autocomplete="email"
+								required
+							/>
+							<label
+								id="my-wc-reg-lbl-email"
+								for="my_wc_reg_email"
+								class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
+							>
+								<?php esc_html_e( 'ที่อยู่อีเมล', 'my-wc-passkeys' ); ?>
+							</label>
+						</div>
+
+						<!-- Password -->
+						<div id="my-wc-reg-field-wrap-password" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
+							<input
+								type="password"
+								id="my_wc_reg_password"
+								name="password"
+								placeholder=" "
+								class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
+								autocomplete="new-password"
+								required
+							/>
+							<label
+								id="my-wc-reg-lbl-password"
+								for="my_wc_reg_password"
+								class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
+							>
+								<?php esc_html_e( 'รหัสผ่าน', 'my-wc-passkeys' ); ?>
+							</label>
+						</div>
+
+						<!-- Confirm Password -->
+						<div id="my-wc-reg-field-wrap-confirm" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
+							<input
+								type="password"
+								id="my_wc_reg_password_confirm"
+								name="password_confirm"
+								placeholder=" "
+								class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
+								autocomplete="new-password"
+								required
+							/>
+							<label
+								id="my-wc-reg-lbl-confirm"
+								for="my_wc_reg_password_confirm"
+								class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
+							>
+								<?php esc_html_e( 'ยืนยันรหัสผ่านอีกครั้ง', 'my-wc-passkeys' ); ?>
+							</label>
+						</div>
+
+						<!-- CAPTCHA CONTAINER -->
+						<?php if ( class_exists( '\MyWcPasskeys\Captcha' ) ) : ?>
+							<div id="my-wc-reg-captcha-wrap" class="flex items-center justify-center pt-1 overflow-hidden">
+								<?php echo \MyWcPasskeys\Captcha::render( 'auto' ); ?>
+							</div>
+						<?php endif; ?>
+
+						<!-- Submit Button -->
+						<div id="my-wc-reg-field-wrap-submit" class="pt-1.5">
+							<?php wp_nonce_field( 'my_wc_custom_register_action', 'my_wc_register_nonce' ); ?>
+							<input id="my_wc_reg_redirect" type="hidden" name="redirect" value="<?php echo esc_attr( $redirect_to ); ?>" />
+							<button
+								id="my_wc_register_submit_btn"
+								type="submit"
+								name="my_wc_custom_register_submit"
+								value="1"
+								class="w-full h-12 sm:h-13 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white text-sm sm:text-base font-bold border border-neutral-900 transition-all shadow-sm hover:shadow-md cursor-pointer flex items-center justify-center gap-2"
+							>
+								<span id="my-wc-reg-submit-text"><?php esc_html_e( 'สร้างบัญชี', 'my-wc-passkeys' ); ?></span>
+							</button>
+						</div>
+
+						<?php
+						do_action( 'woocommerce_register_form_end' );
+						do_action( 'register_form' );
+						?>
+
+					</form>
+				<?php endif; ?>
+
+				<!-- 2. Magic Link & Email OTP Section -->
+				<?php if ( $is_magic_enabled ) : ?>
+					<div id="my-wc-magic-auth-section" class="space-y-4" style="<?php echo ( $is_password_enabled ) ? 'display: none;' : ''; ?>">
+						<!-- Step 1: Email Form -->
+						<form id="my-wc-magic-send-form" class="space-y-3.5">
+							<p id="my-wc-reg-magic-hint" class="text-xs text-neutral-500 leading-relaxed">
+								<?php esc_html_e( 'กรอกอีเมลของคุณเพื่อรับรหัส OTP 6 หลัก และสร้างบัญชีได้ทันทีโดยไม่ต้องจำรหัสผ่าน', 'my-wc-passkeys' ); ?>
+							</p>
+
+							<div id="my-wc-reg-field-wrap-magic-email" class="form-row relative w-full rounded-2xl border border-black/15 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900/60 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 transition-all">
+								<input
+									type="email"
+									id="my_wc_magic_email"
+									name="email"
+									placeholder=" "
+									class="peer w-full h-13 sm:h-14 pt-4 pb-1 px-4 sm:px-5 bg-transparent border-0 text-neutral-900 dark:text-white text-sm sm:text-base font-sans focus:outline-none focus:ring-0 transition-all"
+									autocomplete="email"
+									required
+								/>
+								<label
+									id="my-wc-reg-lbl-magic-email"
+									for="my_wc_magic_email"
+									class="absolute left-4 sm:left-5 top-3.5 sm:top-4 text-neutral-500 text-sm sm:text-base font-sans pointer-events-none transition-all duration-200 origin-left transform peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-red-500 peer-focus:font-medium peer-[:not(:placeholder-shown)]:-translate-y-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-neutral-500"
+								>
+									<?php esc_html_e( 'ที่อยู่อีเมลของคุณ', 'my-wc-passkeys' ); ?>
+								</label>
+							</div>
+
+							<div id="my-wc-reg-field-wrap-magic-submit" class="pt-1.5">
+								<button
+									id="my-wc-magic-send-btn"
+									type="submit"
+									class="w-full h-12 sm:h-13 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white text-sm sm:text-base font-bold border border-neutral-900 transition-all shadow-sm hover:shadow-md cursor-pointer flex items-center justify-center gap-2"
+								>
+									<span id="my-wc-reg-magic-send-text"><?php esc_html_e( 'ส่งรหัส OTP / สร้างบัญชีด่วน', 'my-wc-passkeys' ); ?></span>
+								</button>
+							</div>
+						</form>
+
+						<!-- Step 2: OTP Verification Form (Hidden until OTP sent) -->
+						<form id="my-wc-otp-verify-form" class="space-y-4" style="display: none;">
+							<div id="my-wc-reg-otp-info" class="text-center space-y-1">
+								<span id="my-wc-reg-otp-sent-label" class="text-xs text-neutral-500"><?php esc_html_e( 'รหัส OTP ถูกส่งไปยังอีเมล:', 'my-wc-passkeys' ); ?></span>
+								<div id="my-wc-otp-target-email" class="text-sm font-bold text-neutral-900 dark:text-white"></div>
+							</div>
+
+							<!-- 6-Digit OTP Inputs -->
+							<div id="my-wc-reg-otp-boxes" class="flex justify-center items-center gap-2 sm:gap-2.5">
+								<input type="text" id="my_wc_otp_1" class="my-wc-otp-digit-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border border-black/20 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code" required />
+								<input type="text" id="my_wc_otp_2" class="my-wc-otp-digit-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border border-black/20 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+								<input type="text" id="my_wc_otp_3" class="my-wc-otp-digit-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border border-black/20 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+								<input type="text" id="my_wc_otp_4" class="my-wc-otp-digit-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border border-black/20 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+								<input type="text" id="my_wc_otp_5" class="my-wc-otp-digit-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border border-black/20 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+								<input type="text" id="my_wc_otp_6" class="my-wc-otp-digit-input w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border border-black/20 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+							</div>
+
+							<!-- Verify Button -->
+							<div id="my-wc-reg-otp-actions" class="space-y-2 pt-1">
+								<button
+									id="my-wc-otp-verify-btn"
+									type="submit"
+									class="w-full h-12 sm:h-13 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white text-sm sm:text-base font-bold border border-neutral-900 transition-all shadow-sm hover:shadow-md cursor-pointer flex items-center justify-center gap-2"
+								>
+									<span id="my-wc-reg-otp-verify-text"><?php esc_html_e( 'ยืนยันรหัส OTP และสร้างบัญชี', 'my-wc-passkeys' ); ?></span>
+								</button>
+
+								<div id="my-wc-reg-otp-resend-wrap" class="text-center">
+									<button
+										type="button"
+										id="my-wc-otp-resend-btn"
+										class="text-xs sm:text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white underline cursor-pointer"
+									>
+										<?php esc_html_e( 'ส่งรหัส OTP ใหม่อีกครั้ง', 'my-wc-passkeys' ); ?>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				<?php endif; ?>
+
 			</div>
 
 			<!-- ── RIGHT COLUMN: Quick Social & Passkey Buttons ── -->
-			<div id="my-wc-register-col-right" class="space-y-4 md:border-l md:border-black/10 md:dark:border-neutral-800 md:pl-8 lg:pl-10">
-				<div id="my-wc-register-quick-auth-wrap" class="space-y-3">
-					<!-- Google / Gmail Register Button -->
-					<a
-						id="my-wc-google-register-btn"
-						href="<?php echo $is_google_active ? esc_url( $google_oauth_url ) : 'javascript:void(0);'; ?>"
-						data-active="<?php echo $is_google_active ? '1' : '0'; ?>"
-						class="w-full h-12 sm:h-13 rounded-full bg-white hover:bg-neutral-100 text-neutral-900 text-sm sm:text-base font-semibold border border-neutral-300 dark:border-transparent flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-sm cursor-pointer select-none"
-					>
-						<svg id="my-wc-google-register-svg" class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-							<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-							<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-							<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-							<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-						</svg>
-						<span id="my-wc-google-register-text" class="leading-none"><?php esc_html_e( 'สมัครด้วย Google', 'my-wc-passkeys' ); ?></span>
-					</a>
+			<?php if ( $has_right_col ) : ?>
+				<div id="my-wc-register-col-right" class="space-y-4 md:border-l md:border-black/10 md:dark:border-neutral-800 md:pl-8 lg:pl-10">
+					<div id="my-wc-register-quick-auth-wrap" class="space-y-3">
 
-					<!-- One-Pass (Passkeys / Biometrics) Register Button -->
-					<button
-						type="button"
-						id="my-wc-passkey-register-auth-btn"
-						class="w-full h-12 sm:h-13 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white text-sm sm:text-base font-semibold border border-neutral-900 flex items-center justify-center gap-2.5 transition-all shadow-sm hover:shadow-md cursor-pointer"
-					>
-						<svg id="my-wc-reg-passkey-icon" class="my-wc-passkey-svg shrink-0 text-white" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-							<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-						</svg>
-						<span id="my-wc-reg-passkey-btn-text" class="leading-none"><?php esc_html_e( 'สมัครด้วย One-Pass', 'my-wc-passkeys' ); ?></span>
-					</button>
+						<!-- 1. Google Login Button -->
+						<?php if ( $is_google_enabled ) : ?>
+							<a
+								id="my-wc-google-login-btn"
+								href="#google-gsi"
+								class="w-full h-12 sm:h-13 rounded-full bg-white hover:bg-neutral-100 text-neutral-900 text-sm sm:text-base font-semibold border border-neutral-300 dark:border-transparent flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-sm cursor-pointer select-none"
+							>
+								<svg id="my-wc-reg-google-login-svg" class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+									<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+									<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+									<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+									<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+								</svg>
+								<span id="my-wc-reg-google-login-text" class="leading-none"><?php esc_html_e( 'สมัครด้วย Google', 'my-wc-passkeys' ); ?></span>
+							</a>
+						<?php endif; ?>
 
-					<div id="my-wc-passkey-register-status" class="my-wc-passkey-status-msg text-xs" style="display: none;"></div>
+						<!-- 2. LINE Login Button -->
+						<?php if ( $is_line_enabled ) : ?>
+							<a
+								id="my-wc-line-login-btn"
+								href="<?php echo ! empty( $line_auth_url ) ? esc_url( $line_auth_url ) : 'javascript:alert(\'กรุณากำหนด LINE Channel ID ในหน้าการตั้งค่าก่อน\');'; ?>"
+								class="w-full h-12 sm:h-13 rounded-full bg-[#06C755] hover:bg-[#05b34c] text-white text-sm sm:text-base font-semibold border border-[#06C755] flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-sm cursor-pointer select-none"
+							>
+								<svg id="my-wc-reg-line-login-svg" class="w-5 h-5 shrink-0 fill-current" viewBox="0 0 24 24">
+									<path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.039 9.608.391.084.922.258 1.057.592.121.303.079.777.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.569-3.864 2.569-5.392zm-14.896 2.378h-2.186a.557.557 0 0 1-.557-.557v-4.05a.557.557 0 0 1 .557-.557h2.186a.557.557 0 1 1 0 1.114h-1.629v.911h1.629a.557.557 0 1 1 0 1.114h-1.629v.925h1.629a.557.557 0 1 1 0 1.114zm3.03 0a.557.557 0 0 1-.557-.557v-4.05a.557.557 0 1 1 1.114 0v4.05a.557.557 0 0 1-.557.557zm4.27 0h-2.186a.557.557 0 0 1-.557-.557v-4.05a.557.557 0 0 1 .557-.557.557.557 0 0 1 .557.557v3.493h1.629a.557.557 0 1 1 0 1.114zm3.629-1.393a.557.557 0 0 1-.163.394l-2.072 2.071a.557.557 0 0 1-.788-.788l1.678-1.677-1.678-1.678a.557.557 0 1 1 .788-.788l2.072 2.071a.557.557 0 0 1 .163.395z"/>
+								</svg>
+								<span id="my-wc-reg-line-login-text" class="leading-none"><?php esc_html_e( 'สมัครด้วย LINE', 'my-wc-passkeys' ); ?></span>
+							</a>
+						<?php endif; ?>
+
+						<!-- 3. One-Pass (Passkeys / Biometrics) Login Button -->
+						<?php if ( $is_passkey_enabled ) : ?>
+							<button
+								type="button"
+								id="my-wc-passkey-login-btn"
+								class="w-full h-12 sm:h-13 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white text-sm sm:text-base font-semibold border border-neutral-900 flex items-center justify-center gap-2.5 transition-all shadow-sm hover:shadow-md cursor-pointer"
+							>
+								<svg id="my-wc-reg-passkey-icon" class="my-wc-passkey-svg shrink-0 text-white" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+									<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+								</svg>
+								<span id="my-wc-reg-passkey-btn-text" class="leading-none"><?php esc_html_e( 'ดำเนินการต่อด้วย One-Pass', 'my-wc-passkeys' ); ?></span>
+							</button>
+
+							<div id="my-wc-passkey-login-status" class="my-wc-passkey-status-msg text-xs" style="display: none;"></div>
+						<?php endif; ?>
+
+					</div>
+
+					<!-- ── Terms & Policies Disclaimer ── -->
+					<div id="my-wc-reg-auth-disclaimer" class="pt-1">
+						<p id="my-wc-reg-auth-disclaimer-text" class="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+							<?php esc_html_e( 'การดำเนินการต่อ แสดงว่าคุณยอมรับ', 'my-wc-passkeys' ); ?>
+							<a id="my-wc-reg-terms-link" href="#" class="text-neutral-800 dark:text-neutral-200 underline hover:text-black dark:hover:text-white"><?php esc_html_e( 'ข้อกำหนดการใช้งาน', 'my-wc-passkeys' ); ?></a>,
+							<a id="my-wc-reg-privacy-link" href="#" class="text-neutral-800 dark:text-neutral-200 underline hover:text-black dark:hover:text-white"><?php esc_html_e( 'นโยบายความเป็นส่วนตัว', 'my-wc-passkeys' ); ?></a>
+							<?php esc_html_e( 'และ', 'my-wc-passkeys' ); ?>
+							<a id="my-wc-reg-cookies-link" href="#" class="text-neutral-800 dark:text-neutral-200 underline hover:text-black dark:hover:text-white"><?php esc_html_e( 'การใช้คุกกี้', 'my-wc-passkeys' ); ?></a> <?php esc_html_e( 'ของเรา', 'my-wc-passkeys' ); ?>
+						</p>
+					</div>
 				</div>
-
-				<!-- ── X Terms & Policies Disclaimer ── -->
-				<div id="my-wc-reg-disclaimer" class="pt-1">
-					<p id="my-wc-reg-disclaimer-text" class="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-						<?php esc_html_e( 'การสมัครสมาชิก แสดงว่าคุณยอมรับ', 'my-wc-passkeys' ); ?>
-						<a id="my-wc-reg-terms-link" href="#" class="text-neutral-800 dark:text-neutral-200 underline hover:text-black dark:hover:text-white"><?php esc_html_e( 'ข้อกำหนดการใช้งาน', 'my-wc-passkeys' ); ?></a>,
-						<a id="my-wc-reg-privacy-link" href="#" class="text-neutral-800 dark:text-neutral-200 underline hover:text-black dark:hover:text-white"><?php esc_html_e( 'นโยบายความเป็นส่วนตัว', 'my-wc-passkeys' ); ?></a>
-						<?php esc_html_e( 'และ', 'my-wc-passkeys' ); ?>
-						<a id="my-wc-reg-cookies-link" href="#" class="text-neutral-800 dark:text-neutral-200 underline hover:text-black dark:hover:text-white"><?php esc_html_e( 'การใช้คุกกี้', 'my-wc-passkeys' ); ?></a> <?php esc_html_e( 'ของเรา', 'my-wc-passkeys' ); ?>
-					</p>
-				</div>
-			</div>
+			<?php endif; ?>
 
 		</div>
 
