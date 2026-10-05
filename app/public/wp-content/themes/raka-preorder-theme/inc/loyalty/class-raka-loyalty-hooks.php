@@ -44,6 +44,14 @@ class Raka_Loyalty_Hooks {
 		add_action( 'woocommerce_before_cart_table', [ __CLASS__, 'render_cart_reward_widget' ] );
 		add_action( 'woocommerce_before_checkout_form', [ __CLASS__, 'render_cart_reward_widget' ] );
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_cart_reward_assets' ] );
+
+		// 6. User Profile & Admin Users Table Integration
+		add_action( 'show_user_profile', [ __CLASS__, 'render_user_profile_loyalty_fields' ] );
+		add_action( 'edit_user_profile', [ __CLASS__, 'render_user_profile_loyalty_fields' ] );
+		add_action( 'personal_options_update', [ __CLASS__, 'save_user_profile_loyalty_fields' ] );
+		add_action( 'edit_user_profile_update', [ __CLASS__, 'save_user_profile_loyalty_fields' ] );
+		add_filter( 'manage_users_columns', [ __CLASS__, 'add_users_loyalty_columns' ] );
+		add_filter( 'manage_users_custom_column', [ __CLASS__, 'render_users_loyalty_column' ], 10, 3 );
 	}
 
 	/**
@@ -341,4 +349,108 @@ class Raka_Loyalty_Hooks {
 			);
 		}
 	}
+
+	/**
+	 * Render Loyalty Points & Tier in User Profile.
+	 */
+	public static function render_user_profile_loyalty_fields( WP_User $user ): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$account  = Raka_Loyalty_Service::get_account( $user->ID );
+		$balance  = (float) ( $account['balance'] ?? 0 );
+		$tier     = strtoupper( (string) ( $account['tier'] ?? 'BRONZE' ) );
+		$lifetime = (float) ( $account['lifetime_earned'] ?? 0 );
+
+		$tier_badge_color = '#d97706'; // Bronze
+		if ( 'SILVER' === $tier ) {
+			$tier_badge_color = '#64748b';
+		} elseif ( 'GOLD' === $tier ) {
+			$tier_badge_color = '#eab308';
+		}
+		?>
+		<h2 id="raka-loyalty-heading" style="margin-top: 30px; display: flex; align-items: center; gap: 8px;">
+			<span class="dashicons dashicons-awards" style="color: #2563eb; font-size: 24px; width: 24px; height: 24px;"></span>
+			<?php esc_html_e( 'ระบบแต้มสะสม & สมาชิก (Raka Loyalty & Rewards)', 'raka-preorder-theme' ); ?>
+		</h2>
+		<table id="raka-loyalty-table" class="form-table" role="presentation" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+			<tr id="raka-loyalty-row-balance">
+				<th><label><?php esc_html_e( 'ยอดแต้มสะสมปัจจุบัน', 'raka-preorder-theme' ); ?></label></th>
+				<td>
+					<span style="font-size: 20px; font-weight: 700; color: #0f172a; margin-right: 12px;">
+						<?php echo esc_html( number_format( $balance, 2 ) ); ?> แต้ม
+					</span>
+					<span style="display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; color: #fff; background: <?php echo esc_attr( $tier_badge_color ); ?>;">
+						TIER: <?php echo esc_html( $tier ); ?>
+					</span>
+					<p class="description" style="margin-top: 6px;"><?php echo esc_html( sprintf( 'แต้มที่เคยสะสมทั้งหมดตลอดชีพ: %s แต้ม', number_format( $lifetime, 2 ) ) ); ?></p>
+				</td>
+			</tr>
+			<tr id="raka-loyalty-row-adjust">
+				<th><label for="raka_loyalty_adjust_amount"><?php esc_html_e( 'เพิ่ม / ลด แต้มให้ลูกค้า', 'raka-preorder-theme' ); ?></label></th>
+				<td>
+					<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 6px;">
+						<input type="number" step="any" name="raka_loyalty_adjust_amount" id="raka_loyalty_adjust_amount" class="regular-text" placeholder="ใส่จำนวนแต้ม เช่น 100 หรือ -50" style="max-width: 220px;" />
+						<input type="text" name="raka_loyalty_adjust_reason" id="raka_loyalty_adjust_reason" class="regular-text" placeholder="ระบุเหตุผล (เช่น แต้มพิเศษต้อนรับลูกค้า, ชดเชย)" style="max-width: 320px;" />
+					</div>
+					<p class="description"><?php esc_html_e( 'ใส่ค่าบวก (เช่น 100) เพื่อเพิ่มแต้ม หรือใส่ค่าลบ (เช่น -50) เพื่อหักแต้ม พร้อมระบุเหตุผล แล้วกดบันทึกโปรไฟล์', 'raka-preorder-theme' ); ?></p>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	/**
+	 * Save Loyalty Adjustments from User Profile.
+	 */
+	public static function save_user_profile_loyalty_fields( int $user_id ): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( ! empty( $_POST['raka_loyalty_adjust_amount'] ) ) {
+			$amount = (float) sanitize_text_field( wp_unslash( $_POST['raka_loyalty_adjust_amount'] ) );
+			$reason = sanitize_text_field( wp_unslash( $_POST['raka_loyalty_adjust_reason'] ?? 'Admin profile adjustment' ) );
+
+			if ( 0.0 !== $amount && ! empty( $reason ) ) {
+				Raka_Loyalty_Service::admin_adjust( $user_id, $amount, $reason, get_current_user_id() );
+			}
+		}
+	}
+
+	/**
+	 * Add Loyalty Column in Users List Table.
+	 */
+	public static function add_users_loyalty_columns( array $columns ): array {
+		$columns['raka_points'] = esc_html__( 'แต้มสะสม (Raka Points)', 'raka-preorder-theme' );
+		return $columns;
+	}
+
+	/**
+	 * Render Loyalty Column in Users List Table.
+	 */
+	public static function render_users_loyalty_column( string $output, string $column_name, int $user_id ): string {
+		if ( 'raka_points' === $column_name ) {
+			$account = Raka_Loyalty_Service::get_account( $user_id );
+			$balance = (float) ( $account['balance'] ?? 0 );
+			$tier    = strtoupper( (string) ( $account['tier'] ?? 'BRONZE' ) );
+
+			$color = '#d97706';
+			if ( 'SILVER' === $tier ) {
+				$color = '#64748b';
+			} elseif ( 'GOLD' === $tier ) {
+				$color = '#eab308';
+			}
+
+			return sprintf(
+				'<div style="font-weight:700;color:#0f172a;">%s <span style="font-size:11px;font-weight:600;color:#64748b;">pts</span></div><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;background:%s;">%s</span>',
+				number_format( $balance ),
+				esc_attr( $color ),
+				esc_html( $tier )
+			);
+		}
+		return $output;
+	}
 }
+
