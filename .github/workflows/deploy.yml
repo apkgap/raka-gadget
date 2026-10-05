@@ -14,71 +14,48 @@ jobs:
       - name: 🚚 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🚀 FTP Deploy Plugin (preorder-raka)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          security: loose
-          security-mode: loose
-          log-level: verbose
-          local-dir: ./app/public/wp-content/plugins/preorder-raka/
-          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/preorder-raka/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/src/**
-            **/package.json
-            **/package-lock.json
-            **/AGENTS.md
-            **/.windsurf/**
+      - name: 📦 Install lftp Engine
+        run: sudo apt-get update -y && sudo apt-get install -y lftp
 
-      - name: 🚀 FTP Deploy Plugin (my-wc-passkeys)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          security: loose
-          security-mode: loose
-          log-level: verbose
-          local-dir: ./app/public/wp-content/plugins/my-wc-passkeys/
-          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/my-wc-passkeys/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/src/**
-            **/package.json
-            **/package-lock.json
-            **/AGENTS.md
-            **/.windsurf/**
+      - name: 🚀 Deploy Plugins and Theme via lftp (PASV Mode)
+        run: |
+          lftp -c "
+          set ftp:ssl-allow yes;
+          set ssl:verify-certificate no;
+          set ftp:passive-mode yes;
+          set ftp:use-epsv no;
+          set net:timeout 60;
+          set net:max-retries 10;
+          set net:reconnect-interval-base 3;
+          open -u ${{ secrets.FTP_USERNAME }},'${{ secrets.FTP_PASSWORD }}' ${{ secrets.FTP_SERVER }};
 
-      - name: 🚀 FTP Deploy Theme (raka-preorder-theme)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          security: loose
-          security-mode: loose
-          log-level: verbose
-          local-dir: ./app/public/wp-content/themes/raka-preorder-theme/
-          server-dir: ${{ secrets.FTP_THEME_DIR }}/raka-preorder-theme/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/src/**
-            **/package.json
-            **/package-lock.json
-            **/AGENTS.md
-            **/.windsurf/**
+          echo '=== [1/3] Deploying preorder-raka plugin ===';
+          mirror -R -v --only-newer \
+            --exclude-glob .git* \
+            --exclude-glob node_modules/ \
+            --exclude-glob src/ \
+            --exclude-glob package*.json \
+            --exclude-glob AGENTS.md \
+            --exclude-glob .windsurf/ \
+            ./app/public/wp-content/plugins/preorder-raka/ ${{ secrets.FTP_PLUGIN_DIR }}/preorder-raka/;
+
+          echo '=== [2/3] Deploying my-wc-passkeys plugin ===';
+          mirror -R -v --only-newer \
+            --exclude-glob .git* \
+            --exclude-glob node_modules/ \
+            --exclude-glob src/ \
+            --exclude-glob package*.json \
+            --exclude-glob AGENTS.md \
+            --exclude-glob .windsurf/ \
+            ./app/public/wp-content/plugins/my-wc-passkeys/ ${{ secrets.FTP_PLUGIN_DIR }}/my-wc-passkeys/;
+
+          echo '=== [3/3] Deploying raka-preorder-theme ===';
+          mirror -R -v --only-newer \
+            --exclude-glob .git* \
+            --exclude-glob node_modules/ \
+            --exclude-glob src/ \
+            --exclude-glob package*.json \
+            --exclude-glob AGENTS.md \
+            --exclude-glob .windsurf/ \
+            ./app/public/wp-content/themes/raka-preorder-theme/ ${{ secrets.FTP_THEME_DIR }}/raka-preorder-theme/;
+          "
