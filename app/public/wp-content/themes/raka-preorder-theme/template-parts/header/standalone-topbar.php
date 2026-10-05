@@ -9,29 +9,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$cart_url          = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart' );
-$cart_count        = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
-$current_user      = wp_get_current_user();
-$is_logged_in      = is_user_logged_in();
+$cart_url     = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart' );
+$cart_count   = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+$current_user = wp_get_current_user();
+$is_logged_in = is_user_logged_in();
 ?>
 <!-- Topbar Header -->
-<header id="raka-hero-topbar" class="w-full flex items-center justify-between pb-4 sm:pb-6 shrink-0">
+<header id="raka-hero-topbar" class="topbar">
 	<!-- Brand -->
-	<div id="raka-topbar-brand-wrap" class="flex items-center">
-		<a id="raka-topbar-brand-link" class="flex items-center group" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-			<img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-			<img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block transition-transform duration-300 group-hover:scale-105" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+	<div id="raka-topbar-brand-wrap" class="nav-left flex items-center">
+		<a id="raka-topbar-brand-link" class="brand flex items-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+			<img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+			<img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
 		</a>
 	</div>
 
 	<!-- Controls -->
-	<div id="raka-topbar-controls" class="flex items-center gap-2 sm:gap-3">
+	<div id="raka-topbar-controls" class="theme-topbar-controls">
 		
 		<!-- User Account Dropdown -->
 		<div id="raka-account-menu-wrap" class="relative">
 			<button
 				id="raka-account-btn"
-				class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/10 dark:border-white/15 text-neutral-900 dark:text-white transition-all duration-300 hover:scale-105 cursor-pointer focus:outline-none"
+				class="theme-ctrl-btn"
 				type="button"
 				onclick="window.toggleRakaAccountMenu(event)"
 				aria-label="<?php esc_attr_e( 'Account Menu', 'raka-preorder-theme' ); ?>"
@@ -100,7 +100,7 @@ $is_logged_in      = is_user_logged_in();
 		<!-- Cart Drawer Button -->
 		<a
 			id="raka-cart-btn"
-			class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/10 dark:border-white/15 text-neutral-900 dark:text-white transition-all duration-300 hover:scale-105 cursor-pointer focus:outline-none"
+			class="theme-ctrl-btn"
 			href="<?php echo esc_url( $cart_url ); ?>"
 			onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
 			aria-label="Shopping Cart"
@@ -109,7 +109,7 @@ $is_logged_in      = is_user_logged_in();
 			<i id="raka-cart-icon" class="ri-shopping-bag-3-line text-sm sm:text-base"></i>
 			<span
 				id="raka-cart-count"
-				class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-[9px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
+				class="raka-cart-count-badge absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-[9px] font-bold font-mono flex items-center justify-center border border-white dark:border-black transition-transform duration-300 <?php echo ( $cart_count > 0 ) ? 'scale-100' : 'scale-0'; ?>"
 			>
 				<?php echo esc_html( (string) $cart_count ); ?>
 			</span>
@@ -118,7 +118,7 @@ $is_logged_in      = is_user_logged_in();
 		<!-- Theme Mode Switcher -->
 		<button
 			id="raka-theme-btn"
-			class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/10 dark:border-white/15 text-neutral-900 dark:text-white transition-all duration-300 hover:scale-105 cursor-pointer focus:outline-none"
+			class="theme-ctrl-btn"
 			type="button"
 			onclick="window.toggleRakaTheme(event)"
 			aria-label="Toggle dark / light mode"

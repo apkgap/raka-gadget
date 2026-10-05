@@ -62,8 +62,12 @@ function raka_preorder_theme_scripts() {
 		false // Load in header
 	);
 
-	// Enqueue Standalone Hero JS on standalone templates
+	// Enqueue Standalone Hero CSS & JS on standalone templates
 	if ( is_page_template( 'page-pre-order.php' ) || is_page_template( 'page-login.php' ) || is_page_template( 'page-register.php' ) ) {
+		$hero_css_path = get_template_directory() . '/assets/css/standalone-hero.css';
+		$hero_css_ver  = file_exists( $hero_css_path ) ? (string) filemtime( $hero_css_path ) : '1.0.0';
+		wp_enqueue_style( 'raka-standalone-hero-css', get_template_directory_uri() . '/assets/css/standalone-hero.css', [], $hero_css_ver );
+
 		$hero_js_path = get_template_directory() . '/assets/js/standalone-hero.js';
 		$hero_js_ver  = file_exists( $hero_js_path ) ? (string) filemtime( $hero_js_path ) : '1.0.0';
 		wp_enqueue_script( 'raka-standalone-hero', get_template_directory_uri() . '/assets/js/standalone-hero.js', [], $hero_js_ver, true );
