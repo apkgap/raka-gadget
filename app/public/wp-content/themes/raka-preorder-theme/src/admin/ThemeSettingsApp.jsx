@@ -16,6 +16,7 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import LoyaltySettingsTab from './components/LoyaltySettingsTab';
 
 /**
  * Modern Segmented Tab Switcher Component.
@@ -582,6 +583,15 @@ export default function ThemeSettingsApp() {
 				</span>
 			),
 		},
+		{
+			name: 'loyalty_settings',
+			title: (
+				<span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+					<i className="ri-copper-coin-line" style={{ fontSize: '16px', color: '#ef4444' }} />
+					{__('Loyalty & Rewards', 'raka-preorder-theme')}
+				</span>
+			),
+		},
 	];
 
 	// Detect initial active tab from page or tab URL parameter
@@ -598,6 +608,8 @@ export default function ThemeSettingsApp() {
 		defaultTabName = 'hero_contact';
 	} else if (tabParam === 'security_settings' || tabParam === 'security' || pageParam === 'raka-theme-settings-security') {
 		defaultTabName = 'security_settings';
+	} else if (tabParam === 'loyalty_settings' || tabParam === 'loyalty' || pageParam === 'raka-theme-settings-loyalty') {
+		defaultTabName = 'loyalty_settings';
 	}
 
 	return (
@@ -1302,6 +1314,20 @@ export default function ThemeSettingsApp() {
 											</div>
 										</div>
 									</div>
+								</CardBody>
+							);
+						}
+
+						if (tab.name === 'loyalty_settings') {
+							return (
+								<CardBody style={{ padding: '24px 28px' }}>
+									<LoyaltySettingsTab
+										options={options}
+										onOptionsChange={handleOptionChange}
+										wcProducts={wcData.products}
+										notice={notice}
+										setNotice={setNotice}
+									/>
 								</CardBody>
 							);
 						}

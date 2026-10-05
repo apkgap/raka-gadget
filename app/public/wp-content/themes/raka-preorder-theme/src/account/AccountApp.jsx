@@ -3,6 +3,7 @@ import DashboardView from './components/DashboardView';
 import OrdersView from './components/OrdersView';
 import AddressesView from './components/AddressesView';
 import SecurityView from './components/SecurityView';
+import RewardsView from './components/RewardsView';
 import OrderDetailModal from './components/OrderDetailModal';
 import AddressEditModal from './components/AddressEditModal';
 import LogoutModal from './components/LogoutModal';
@@ -116,6 +117,7 @@ export default function AccountApp() {
 
 	const tabs = [
 		{ id: 'dashboard', label: 'ภาพรวม', icon: 'ri-dashboard-3-line' },
+		{ id: 'rewards', label: 'ของรางวัล & แต้มสะสม', icon: 'ri-copper-coin-line', badge: overview?.stats?.points_balance },
 		{ id: 'orders', label: 'คำสั่งซื้อ & พรีออเดอร์', icon: 'ri-shopping-bag-3-line', badge: overview?.stats?.total_orders },
 		{ id: 'addresses', label: 'ที่อยู่จัดส่ง & ออกใบกำกับ', icon: 'ri-map-pin-user-line' },
 		{ id: 'security', label: 'ความปลอดภัย & Passkeys', icon: 'ri-shield-keyhole-line', badge: passkeys?.length },
@@ -271,6 +273,13 @@ export default function AccountApp() {
 						config={ config }
 						passkeys={ passkeys }
 						onRefreshPasskeys={ fetchPasskeys }
+						showToast={ showToast }
+					/>
+				) }
+
+				{ currentTab === 'rewards' && (
+					<RewardsView
+						config={ config }
 						showToast={ showToast }
 					/>
 				) }

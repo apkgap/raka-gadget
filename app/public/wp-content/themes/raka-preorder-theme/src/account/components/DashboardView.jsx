@@ -31,8 +31,18 @@ export default function DashboardView( { user, stats, recentOrders, onSelectTab,
 			tab: 'orders',
 		},
 		{
+			id: 'stat-points',
+			label: 'แต้มสะสมพร้อมใช้',
+			value: Number( stats.points_balance ?? 0 ).toLocaleString(),
+			unit: 'แต้ม',
+			icon: 'ri-copper-coin-line',
+			color: 'text-red-600 dark:text-red-500',
+			bgColor: 'bg-red-600/10 dark:bg-red-500/10',
+			tab: 'rewards',
+		},
+		{
 			id: 'stat-passkeys',
-			label: 'อุปกรณ์ Passkeys ที่ผูกไว้',
+			label: 'อุปกรณ์ Passkeys',
 			value: stats.passkeys_count ?? 0,
 			unit: 'อุปกรณ์',
 			icon: 'ri-fingerprint-line',
@@ -46,7 +56,7 @@ export default function DashboardView( { user, stats, recentOrders, onSelectTab,
 		<div id="raka-dashboard-view" className="space-y-6 sm:space-y-8">
 
 			{ /* Stat Metrics Grid */ }
-			<div id="raka-dashboard-stats-grid" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+			<div id="raka-dashboard-stats-grid" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
 				{ statCards.map( ( item ) => (
 					<div
 						key={ item.id }

@@ -74,6 +74,16 @@ function raka_register_theme_options_menu() {
 		'raka-theme-settings-security',
 		'raka_render_theme_options_page'
 	);
+
+	// Submenu 6: Loyalty & Rewards Engine
+	add_submenu_page(
+		'raka-theme-settings',
+		__( 'Loyalty & Rewards', 'raka-preorder-theme' ),
+		__( 'Loyalty & Rewards', 'raka-preorder-theme' ),
+		'manage_options',
+		'raka-theme-settings-loyalty',
+		'raka_render_theme_options_page'
+	);
 }
 add_action( 'admin_menu', 'raka_register_theme_options_menu' );
 
@@ -454,6 +464,30 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 	// e-Tax Invoice System Global Toggle
 	if ( isset( $raw_data['etax_invoice_enabled'] ) ) {
 		$clean_options['etax_invoice_enabled'] = ! empty( $raw_data['etax_invoice_enabled'] );
+	}
+
+	// Loyalty & Rewards Engine Settings
+	if ( isset( $raw_data['loyalty'] ) && is_array( $raw_data['loyalty'] ) ) {
+		$raw_loyalty = $raw_data['loyalty'];
+		$clean_options['loyalty'] = [
+			'enabled'                    => ! empty( $raw_loyalty['enabled'] ),
+			'spend_per_point'            => max( 1.0, (float) ( $raw_loyalty['spend_per_point'] ?? 100.0 ) ),
+			'tier_threshold_silver'      => max( 1.0, (float) ( $raw_loyalty['tier_threshold_silver'] ?? 500.0 ) ),
+			'tier_threshold_gold'        => max( 1.0, (float) ( $raw_loyalty['tier_threshold_gold'] ?? 2000.0 ) ),
+			'preorder_points_multiplier' => max( 0.1, (float) ( $raw_loyalty['preorder_points_multiplier'] ?? 1.0 ) ),
+			'lot_expiry_days'            => max( 1, (int) ( $raw_loyalty['lot_expiry_days'] ?? 365 ) ),
+			'reward_product_ids'         => array_values( array_filter( array_map( 'absint', (array) ( $raw_loyalty['reward_product_ids'] ?? [] ) ) ) ),
+		];
+	} else {
+		$clean_options['loyalty'] = [
+			'enabled'                    => true,
+			'spend_per_point'            => 100.0,
+			'tier_threshold_silver'      => 500.0,
+			'tier_threshold_gold'        => 2000.0,
+			'preorder_points_multiplier' => 1.0,
+			'lot_expiry_days'            => 365,
+			'reward_product_ids'         => [],
+		];
 	}
 
 	// Dynamic Repeater: hero_cards

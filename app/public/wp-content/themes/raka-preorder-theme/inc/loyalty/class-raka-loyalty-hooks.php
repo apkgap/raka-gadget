@@ -39,6 +39,50 @@ class Raka_Loyalty_Hooks {
 		// 4. Action Scheduler Cron Jobs
 		add_action( 'raka_loyalty_daily_expire_lots', [ 'Raka_Loyalty_Service', 'expire_lots' ] );
 		add_action( 'raka_loyalty_daily_reconcile_check', [ __CLASS__, 'run_daily_reconcile_check' ] );
+
+		// 5. Cart / Checkout Reward Widget UI
+		add_action( 'woocommerce_before_cart_table', [ __CLASS__, 'render_cart_reward_widget' ] );
+		add_action( 'woocommerce_before_checkout_form', [ __CLASS__, 'render_cart_reward_widget' ] );
+		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_cart_reward_assets' ] );
+	}
+
+	/**
+	 * Render cart reward widget mountpoint.
+	 */
+	public static function render_cart_reward_widget(): void {
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+		echo '<div id="raka-cart-loyalty-root" class="w-full"></div>';
+	}
+
+	/**
+	 * Enqueue assets on cart / checkout if needed.
+	 */
+	public static function enqueue_cart_reward_assets(): void {
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+		if ( ( function_exists( 'is_cart' ) && is_cart() ) || ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
+			$asset_file = get_template_directory() . '/build/index.asset.php';
+			$asset      = file_exists( $asset_file ) ? require $asset_file : [ 'dependencies' => [ 'wp-element' ], 'version' => '1.0.0' ];
+			wp_enqueue_script(
+				'raka-account-react',
+				get_template_directory_uri() . '/build/index.js',
+				$asset['dependencies'],
+				$asset['version'],
+				true
+			);
+			wp_localize_script(
+				'raka-account-react',
+				'rakaAccountData',
+				[
+					'apiUrl'      => esc_url_raw( rest_url( 'account/v1' ) ),
+					'nonce'       => wp_create_nonce( 'wp_rest' ),
+					'currentUser' => get_current_user_id(),
+				]
+			);
+		}
 	}
 
 	/**

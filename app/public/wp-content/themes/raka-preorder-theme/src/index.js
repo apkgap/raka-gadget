@@ -1,6 +1,7 @@
 import { render, createRoot } from '@wordpress/element';
 import ThemeSettingsApp from './admin/ThemeSettingsApp';
 import AccountApp from './account/AccountApp';
+import LoyaltyRewardSelector from './account/components/LoyaltyRewardSelector';
 
 document.addEventListener( 'DOMContentLoaded', () => {
 	// Admin Theme Settings Root
@@ -20,6 +21,16 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			createRoot( accountContainer ).render( <AccountApp /> );
 		} else if ( typeof render === 'function' ) {
 			render( <AccountApp />, accountContainer );
+		}
+	}
+
+	// Cart / Checkout Loyalty Reward Selector Root
+	const rewardSelectorContainer = document.getElementById( 'raka-cart-loyalty-root' );
+	if ( rewardSelectorContainer ) {
+		if ( typeof createRoot === 'function' ) {
+			createRoot( rewardSelectorContainer ).render( <LoyaltyRewardSelector config={ window.rakaAccountData } /> );
+		} else if ( typeof render === 'function' ) {
+			render( <LoyaltyRewardSelector config={ window.rakaAccountData } />, rewardSelectorContainer );
 		}
 	}
 } );

@@ -197,6 +197,9 @@ function raka_account_api_get_overview( WP_REST_Request $request ): WP_REST_Resp
 		'member_since' => date_i18n( 'd M Y', strtotime( $user->user_registered ) ),
 	];
 
+	$points_balance = class_exists( 'Raka_Loyalty_Service' ) ? Raka_Loyalty_Service::get_available_points( $user_id ) : 0.0;
+	$tier           = class_exists( 'Raka_Loyalty_Earn_Engine' ) ? Raka_Loyalty_Earn_Engine::get_user_tier( $user_id ) : 'bronze';
+
 	$data = [
 		'profile' => $profile,
 		'stats'   => [
@@ -204,6 +207,8 @@ function raka_account_api_get_overview( WP_REST_Request $request ): WP_REST_Resp
 			'active_preorders' => $active_preorders,
 			'total_spent'      => function_exists( 'wc_price' ) ? html_entity_decode( wp_strip_all_tags( wc_price( $total_spent ) ) ) : number_format( $total_spent, 2 ) . ' ฿',
 			'passkeys_count'   => $passkeys_count,
+			'points_balance'   => $points_balance,
+			'tier'             => $tier,
 		],
 		'recent_orders' => $recent_orders,
 	];

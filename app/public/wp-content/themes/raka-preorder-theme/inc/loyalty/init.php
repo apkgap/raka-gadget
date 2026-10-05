@@ -22,12 +22,16 @@ require_once __DIR__ . '/class-raka-loyalty-earn-engine.php';
 require_once __DIR__ . '/class-raka-loyalty-service.php';
 require_once __DIR__ . '/class-raka-loyalty-hooks.php';
 require_once __DIR__ . '/class-raka-loyalty-blocks.php';
+require_once __DIR__ . '/class-raka-loyalty-rest-controller.php';
 
 // Initialize Infrastructure & Hooks
 Raka_Loyalty_DB::init();
 Raka_Loyalty_CLI::init();
 Raka_Loyalty_Hooks::init();
 Raka_Loyalty_Blocks::init();
+
+// Register REST API Routes
+add_action( 'rest_api_init', [ 'Raka_Loyalty_REST_Controller', 'register_routes' ] );
 
 // Register Action Scheduler Scheduled Tasks
 add_action( 'init', 'raka_loyalty_register_scheduled_actions' );
