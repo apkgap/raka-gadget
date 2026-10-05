@@ -1,61 +1,96 @@
-name: Deploy to Production (FTP)
+name: Fast FTP Deploy
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      deploy_all:
+        description: 'Force deploy all components (ignore paths-filter)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   deploy:
-    name: Build & Deploy via FTP
+    name: FTP Sync
     runs-on: ubuntu-latest
-
     steps:
-      - name: 🚚 Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 📦 Install lftp Engine
-        run: sudo apt-get update -y && sudo apt-get install -y lftp
+      - name: Check for file changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            theme:
+              - 'app/public/wp-content/themes/raka-preorder-theme/**'
+            preorder:
+              - 'app/public/wp-content/plugins/preorder-raka/**'
+            passkeys:
+              - 'app/public/wp-content/plugins/my-wc-passkeys/**'
 
-      - name: 🚀 Deploy Plugins and Theme via lftp (PASV Mode)
-        run: |
-          lftp -c "
-          set ftp:ssl-allow yes;
-          set ssl:verify-certificate no;
-          set ftp:passive-mode yes;
-          set ftp:use-epsv no;
-          set net:timeout 60;
-          set net:max-retries 10;
-          set net:reconnect-interval-base 3;
-          open -u ${{ secrets.FTP_USERNAME }},'${{ secrets.FTP_PASSWORD }}' ${{ secrets.FTP_SERVER }};
+      - name: FTP Deploy Theme (raka-preorder-theme)
+        if: steps.changes.outputs.theme == 'true' || inputs.deploy_all == true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_THEME_DIR }}
+          local-dir: app/public/wp-content/themes/raka-preorder-theme/
+          protocol: ftp
+          security: loose
+          timeout: 120000
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.github/**
+            **/src/**
+            package.json
+            package-lock.json
+            AGENTS.md
 
-          echo '=== [1/3] Deploying preorder-raka plugin ===';
-          mirror -R -v --only-newer \
-            --exclude-glob .git* \
-            --exclude-glob node_modules/ \
-            --exclude-glob src/ \
-            --exclude-glob package*.json \
-            --exclude-glob AGENTS.md \
-            --exclude-glob .windsurf/ \
-            ./app/public/wp-content/plugins/preorder-raka/ ${{ secrets.FTP_PLUGIN_DIR }}/preorder-raka/;
+      - name: FTP Deploy preorder-raka
+        if: steps.changes.outputs.preorder == 'true' || inputs.deploy_all == true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}
+          local-dir: app/public/wp-content/plugins/preorder-raka/
+          protocol: ftp
+          security: loose
+          timeout: 120000
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/src/**
+            package.json
+            package-lock.json
+            AGENTS.md
 
-          echo '=== [2/3] Deploying my-wc-passkeys plugin ===';
-          mirror -R -v --only-newer \
-            --exclude-glob .git* \
-            --exclude-glob node_modules/ \
-            --exclude-glob src/ \
-            --exclude-glob package*.json \
-            --exclude-glob AGENTS.md \
-            --exclude-glob .windsurf/ \
-            ./app/public/wp-content/plugins/my-wc-passkeys/ ${{ secrets.FTP_PLUGIN_DIR }}/my-wc-passkeys/;
-
-          echo '=== [3/3] Deploying raka-preorder-theme ===';
-          mirror -R -v --only-newer \
-            --exclude-glob .git* \
-            --exclude-glob node_modules/ \
-            --exclude-glob src/ \
-            --exclude-glob package*.json \
-            --exclude-glob AGENTS.md \
-            --exclude-glob .windsurf/ \
-            ./app/public/wp-content/themes/raka-preorder-theme/ ${{ secrets.FTP_THEME_DIR }}/raka-preorder-theme/;
-          "
+      - name: FTP Deploy my-wc-passkeys
+        if: steps.changes.outputs.passkeys == 'true' || inputs.deploy_all == true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}../my-wc-passkeys/
+          local-dir: app/public/wp-content/plugins/my-wc-passkeys/
+          protocol: ftp
+          security: loose
+          timeout: 120000
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/src/**
+            package.json
+            package-lock.json
+            AGENTS.md
