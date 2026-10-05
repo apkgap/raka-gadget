@@ -17,9 +17,10 @@ jobs:
     name: FTP Sync
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: 🚚 Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Check for file changes
+      - name: 🔍 Check for file changes
         uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -31,14 +32,52 @@ jobs:
             passkeys:
               - 'app/public/wp-content/plugins/my-wc-passkeys/**'
 
-      - name: FTP Deploy Theme (raka-preorder-theme)
+      - name: ⚙️ Resolve Server Directories
+        id: dirs
+        run: |
+          # Clean theme dir
+          THEME_RAW="${{ secrets.FTP_THEME_DIR }}"
+          THEME_RAW="${THEME_RAW%/}"
+          if [[ "$THEME_RAW" == *"raka-preorder-theme"* ]]; then
+            THEME_FINAL="${THEME_RAW}/"
+          else
+            THEME_FINAL="${THEME_RAW}/raka-preorder-theme/"
+          fi
+
+          # Clean plugin dir
+          PLUGIN_RAW="${{ secrets.FTP_PLUGIN_DIR }}"
+          PLUGIN_RAW="${PLUGIN_RAW%/}"
+          if [[ "$PLUGIN_RAW" == *"preorder-raka"* ]]; then
+            PREORDER_FINAL="${PLUGIN_RAW}/"
+            PLUGINS_BASE="${PLUGIN_RAW%preorder-raka*}"
+            PLUGINS_BASE="${PLUGINS_BASE%/}"
+            PASSKEYS_FINAL="${PLUGINS_BASE}/my-wc-passkeys/"
+          else
+            PREORDER_FINAL="${PLUGIN_RAW}/preorder-raka/"
+            PASSKEYS_FINAL="${PLUGIN_RAW}/my-wc-passkeys/"
+          fi
+
+          # Remove any potential duplicate slashes (except leading /)
+          THEME_FINAL=$(echo "$THEME_FINAL" | sed -E 's|/{2,}|/|g')
+          PREORDER_FINAL=$(echo "$PREORDER_FINAL" | sed -E 's|/{2,}|/|g')
+          PASSKEYS_FINAL=$(echo "$PASSKEYS_FINAL" | sed -E 's|/{2,}|/|g')
+
+          echo "theme_dir=$THEME_FINAL" >> "$GITHUB_OUTPUT"
+          echo "preorder_dir=$PREORDER_FINAL" >> "$GITHUB_OUTPUT"
+          echo "passkeys_dir=$PASSKEYS_FINAL" >> "$GITHUB_OUTPUT"
+
+          echo "Target Theme Directory:    $THEME_FINAL"
+          echo "Target Preorder Directory: $PREORDER_FINAL"
+          echo "Target Passkeys Directory: $PASSKEYS_FINAL"
+
+      - name: 🚀 FTP Deploy Theme (raka-preorder-theme)
         if: steps.changes.outputs.theme == 'true' || inputs.deploy_all == true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_THEME_DIR }}
+          server-dir: ${{ steps.dirs.outputs.theme_dir }}
           local-dir: app/public/wp-content/themes/raka-preorder-theme/
           protocol: ftp
           security: loose
@@ -53,14 +92,14 @@ jobs:
             package-lock.json
             AGENTS.md
 
-      - name: FTP Deploy preorder-raka
+      - name: 🚀 FTP Deploy preorder-raka
         if: steps.changes.outputs.preorder == 'true' || inputs.deploy_all == true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}
+          server-dir: ${{ steps.dirs.outputs.preorder_dir }}
           local-dir: app/public/wp-content/plugins/preorder-raka/
           protocol: ftp
           security: loose
@@ -74,14 +113,14 @@ jobs:
             package-lock.json
             AGENTS.md
 
-      - name: FTP Deploy my-wc-passkeys
+      - name: 🚀 FTP Deploy my-wc-passkeys
         if: steps.changes.outputs.passkeys == 'true' || inputs.deploy_all == true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}../my-wc-passkeys/
+          server-dir: ${{ steps.dirs.outputs.passkeys_dir }}
           local-dir: app/public/wp-content/plugins/my-wc-passkeys/
           protocol: ftp
           security: loose
