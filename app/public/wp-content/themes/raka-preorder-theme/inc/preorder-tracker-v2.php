@@ -41,6 +41,8 @@ function raka_render_preorder_tracker_v2(): string {
 			scroll-behavior: smooth;
 			-webkit-overflow-scrolling: touch;
 			overscroll-behavior: contain;
+			touch-action: pan-y;
+			pointer-events: auto;
 		}
 		.custom-tracker-scroll::-webkit-scrollbar {
 			width: 5px;
@@ -179,7 +181,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Dynamic List Container with custom scroll -->
-			<div id="raka-tracker-list-container" class="space-y-2 sm:space-y-2.5 max-h-[240px] sm:max-h-[290px] md:max-h-[340px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+			<div id="raka-tracker-list-container" class="space-y-2 sm:space-y-2.5 max-h-[280px] sm:max-h-[340px] md:max-h-[390px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				<!-- Dynamically populated via JS -->
 			</div>
 
@@ -205,7 +207,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Scrollable Container for Result Body -->
-			<div id="raka-res-scroll-body" class="space-y-2.5 sm:space-y-3 max-h-[240px] sm:max-h-[290px] md:max-h-[340px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+			<div id="raka-res-scroll-body" class="space-y-2.5 sm:space-y-3 max-h-[280px] sm:max-h-[340px] md:max-h-[390px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				
 				<!-- Product Details & Summary Card -->
 				<div id="raka-res-product-card" class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900/90 border border-black/5 dark:border-white/10 flex gap-3 sm:gap-3.5 items-start shadow-xs">
@@ -371,6 +373,7 @@ function raka_render_preorder_tracker_v2(): string {
 			const resEta        = document.getElementById('raka-res-eta');
 			const resAddressBox = document.getElementById('raka-res-address-box');
 			const resAddressTxt = document.getElementById('raka-res-address-text');
+			const resScrollBody = document.getElementById('raka-res-scroll-body');
 
 			const activeTabClass = 'bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-sm border border-black/5 dark:border-white/10';
 			const inactiveTabClass = 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white';
@@ -790,6 +793,7 @@ function raka_render_preorder_tracker_v2(): string {
 					}
 				};
 
+				if (listContainer) listContainer.scrollTop = 0;
 				searchView.classList.add('hidden');
 				resultView.classList.add('hidden');
 				listView.classList.remove('hidden');
@@ -933,6 +937,7 @@ function raka_render_preorder_tracker_v2(): string {
 					resTimeline.appendChild(stepEl);
 				});
 
+				if (resScrollBody) resScrollBody.scrollTop = 0;
 				searchView.classList.add('hidden');
 				listView.classList.add('hidden');
 				resultView.classList.remove('hidden');
@@ -1008,6 +1013,32 @@ function raka_render_preorder_tracker_v2(): string {
 						turnstileToken = '';
 					}
 				});
+			}
+
+			// Smooth Wheel Scroll for Result View (Hover anywhere inside result card)
+			if (resultView && resScrollBody) {
+				resultView.addEventListener('wheel', (e) => {
+					if (resScrollBody.scrollHeight > resScrollBody.clientHeight) {
+						const prev = resScrollBody.scrollTop;
+						resScrollBody.scrollTop += e.deltaY;
+						if (resScrollBody.scrollTop !== prev) {
+							e.preventDefault();
+						}
+					}
+				}, { passive: false });
+			}
+
+			// Smooth Wheel Scroll for List View (Hover anywhere inside list card)
+			if (listView && listContainer) {
+				listView.addEventListener('wheel', (e) => {
+					if (listContainer.scrollHeight > listContainer.clientHeight) {
+						const prev = listContainer.scrollTop;
+						listContainer.scrollTop += e.deltaY;
+						if (listContainer.scrollTop !== prev) {
+							e.preventDefault();
+						}
+					}
+				}, { passive: false });
 			}
 
 			// Check URL parameters on page load for direct access
