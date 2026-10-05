@@ -157,19 +157,24 @@ const useStyles = (isDark, isMobile) => ({
 const PreOrderApp = ({ postId }) => {
 	const settings = window.preorderRakaSettings || { root: '/wp-json/', nonce: '' };
 
-	const [isDark, setIsDark]     = useState(() => localStorage.getItem('preorder_raka_theme') !== 'light');
-	const [screen, setScreen]     = useState('search');
+	const [isDark, setIsDark]           = useState(() => localStorage.getItem('preorder_raka_theme') !== 'light');
+	const [screen, setScreen]           = useState('search');
 	const [initialVerifying, setInitialVerifying] = useState(true);
-	const [orderNo, setOrderNo]   = useState('');
-	const [phone, setPhone]       = useState('');
-	const [citizenId, setCitizenId] = useState('');
+	const [orderNo, setOrderNo]         = useState('');
+	const [phone, setPhone]             = useState('');
+	const [citizenId, setCitizenId]     = useState('');
 	const [verificationType, setVerificationType] = useState('phone');
-	const [loading, setLoading]   = useState(false);
-	const [error, setError]       = useState(null);
+	const [loading, setLoading]         = useState(false);
+	const [error, setError]             = useState(null);
 	const [preorderData, setPreorderData] = useState(null);
-	const [copied, setCopied]     = useState(false);
-	const [focused, setFocused]   = useState(null);
-	const [width, setWidth]       = useState(window.innerWidth);
+	const [copied, setCopied]           = useState(false);
+	const [focused, setFocused]         = useState(null);
+	const [width, setWidth]             = useState(window.innerWidth);
+
+	// Pre-order products catalog state
+	const [products, setProducts]               = useState([]);
+	const [productsLoading, setProductsLoading] = useState(false);
+	const [productSearch, setProductSearch]     = useState('');
 
 	// Handle resize for custom responsive styling in JS
 	useEffect(() => {
@@ -180,6 +185,42 @@ const PreOrderApp = ({ postId }) => {
 
 	const isMobile = width < 768;
 	const S = useStyles(isDark, isMobile);
+
+	// Fetch Pre-order Products catalog
+	const fetchPreorderProducts = async () => {
+		if (products.length > 0) return;
+		setProductsLoading(true);
+		try {
+			let endpoint = '';
+			const rootUrl = settings.root || '/wp-json/preorder-raka/v1';
+			if (rootUrl.includes('rest_route=')) {
+				const [basePath] = rootUrl.split('?');
+				endpoint = `${basePath}?rest_route=/preorder-raka/v1/products`;
+			} else {
+				endpoint = `${rootUrl.replace(/\/$/, '')}/products`;
+			}
+			const res = await fetch(endpoint, { headers: { 'X-WP-Nonce': settings.nonce || '' } });
+			if (res.ok) {
+				const json = await res.json();
+				if (json.success && Array.isArray(json.data)) {
+					setProducts(json.data);
+				}
+			}
+		} catch (e) {
+			console.error('Failed to load preorder products', e);
+		} finally {
+			setProductsLoading(false);
+		}
+	};
+
+	const filteredProducts = products.filter((p) => {
+		if (!productSearch) return true;
+		const query = productSearch.toLowerCase();
+		return (
+			p.title?.toLowerCase().includes(query) ||
+			(p.description && p.description.toLowerCase().includes(query))
+		);
+	});
 
 	// Sync dark mode
 	useEffect(() => {
@@ -275,7 +316,6 @@ const PreOrderApp = ({ postId }) => {
 			const rootUrl = settings.root || '/wp-json/preorder-raka/v1';
 
 			if (rootUrl.includes('rest_route=')) {
-				// Extract origin and base path e.g. https://site.com/index.php
 				const [basePath] = rootUrl.split('?');
 				const params = new URLSearchParams();
 				params.set('rest_route', '/preorder-raka/v1/status');
@@ -288,7 +328,6 @@ const PreOrderApp = ({ postId }) => {
 
 				url = `${basePath}?${params.toString()}`;
 			} else {
-				// Pretty Permalinks e.g. https://site.com/wp-json/preorder-raka/v1
 				const baseUrl = `${rootUrl.replace(/\/$/, '')}/status`;
 				const params = new URLSearchParams();
 				if (pId || (postId && screen === 'verify-direct')) params.append('post_id', pId || postId);
@@ -304,7 +343,6 @@ const PreOrderApp = ({ postId }) => {
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.message || 'ไม่สามารถดึงข้อมูลได้');
 			
-			// Save successful verification into 2-day session cache
 			saveAuthCache(targetPhone, targetCitizen, targetType);
 
 			setPreorderData(data.data); setScreen('result');
@@ -319,7 +357,6 @@ const PreOrderApp = ({ postId }) => {
 
 	const handleReset = () => {
 		setPreorderData(null); setError(null);
-		// Keep cached phone & citizen for fast re-check, just return to search view
 		setScreen(postId ? 'verify-direct' : 'search');
 	};
 
@@ -399,6 +436,38 @@ const PreOrderApp = ({ postId }) => {
 				<i className={loading ? 'ri-loader-4-line' : submitIcon} style={{ fontSize: 18 }}/>
 				{loading ? 'กำลังตรวจสอบ...' : submitLabel}
 			</button>
+
+			{/* Quick Catalog Link on Search Screen */}
+			{screen === 'search' && (
+				<div style={{ textAlign: 'center', paddingTop: 8 }}>
+					<button
+						type="button"
+						id="preorder-jump-catalog-btn"
+						onClick={() => {
+							setScreen('products');
+							fetchPreorderProducts();
+						}}
+						style={{
+							background: 'transparent',
+							border: 'none',
+							color: T.red,
+							fontSize: 14,
+							fontWeight: 600,
+							cursor: 'pointer',
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: 6,
+							padding: '6px 12px',
+							borderRadius: 8,
+							transition: 'all 0.2s ease',
+						}}
+					>
+						<i className="ri-shopping-bag-3-line" style={{ fontSize: 16 }} />
+						<span>ยังไม่มีเลขคำสั่งซื้อ? ดูสินค้าพรีออเดอร์ทั้งหมด</span>
+						<i className="ri-arrow-right-s-line" style={{ fontSize: 16 }} />
+					</button>
+				</div>
+			)}
 		</form>
 	);
 
@@ -445,7 +514,7 @@ const PreOrderApp = ({ postId }) => {
 				<div id="preorder-raka-hero-glow" style={S.heroGlow}/>
 
 				{/* Nav row */}
-				<div id="preorder-raka-nav-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, position: 'relative' }}>
+				<div id="preorder-raka-nav-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative' }}>
 					{/* Logo */}
 					<div id="preorder-raka-logo-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 						{settings.logoUrl ? (
@@ -468,7 +537,7 @@ const PreOrderApp = ({ postId }) => {
 								{settings.siteName || 'RAKA GADGET'}
 							</div>
 							<div id="preorder-raka-logo-sub" style={{ fontSize: 11, fontWeight: 400, letterSpacing: '1.1px', color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase' }}>
-								Pre-Order Tracker
+								Pre-Order Hub
 							</div>
 						</div>
 					</div>
@@ -497,8 +566,82 @@ const PreOrderApp = ({ postId }) => {
 					</div>
 				</div>
 
+				{/* ── Mode Switcher Pills (Tracker vs Preorder Catalog) ── */}
+				<div id="preorder-raka-mode-switcher-wrap" style={{ marginBottom: 24 }}>
+					<div id="preorder-raka-mode-pills" style={{
+						display: 'inline-flex', gap: 6, padding: 4, borderRadius: 9999,
+						background: 'rgba(0, 0, 0, 0.22)', border: '1px solid rgba(255, 255, 255, 0.25)',
+						backdropFilter: 'blur(8px)'
+					}}>
+						<button
+							id="preorder-tab-btn-tracker"
+							type="button"
+							onClick={() => setScreen(postId ? 'verify-direct' : 'search')}
+							style={{
+								padding: '7px 16px', borderRadius: 9999, border: 'none',
+								fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.25s',
+								background: screen !== 'products' ? '#ffffff' : 'transparent',
+								color: screen !== 'products' ? '#dc2626' : '#ffffff',
+								boxShadow: screen !== 'products' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
+								display: 'inline-flex', alignItems: 'center', gap: 6,
+							}}
+						>
+							<i className="ri-radar-line" />
+							<span>เช็คสถานะพรีออเดอร์</span>
+						</button>
+						<button
+							id="preorder-tab-btn-catalog"
+							type="button"
+							onClick={() => {
+								setScreen('products');
+								fetchPreorderProducts();
+							}}
+							style={{
+								padding: '7px 16px', borderRadius: 9999, border: 'none',
+								fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.25s',
+								background: screen === 'products' ? '#ffffff' : 'transparent',
+								color: screen === 'products' ? '#dc2626' : '#ffffff',
+								boxShadow: screen === 'products' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
+								display: 'inline-flex', alignItems: 'center', gap: 6,
+							}}
+						>
+							<i className="ri-shopping-bag-3-line" />
+							<span>ดูสินค้าพรีออเดอร์</span>
+							{products.length > 0 && (
+								<span style={{
+									background: screen === 'products' ? '#dc2626' : 'rgba(255,255,255,0.3)',
+									color: '#ffffff', fontSize: 11, padding: '1px 6px', borderRadius: 9999, fontWeight: 700
+								}}>
+									{products.length}
+								</span>
+							)}
+						</button>
+					</div>
+				</div>
+
+				{/* Hero title — Products Catalog */}
+				{screen === 'products' && (
+					<div id="preorder-raka-hero-content-products" style={{ position: 'relative' }}>
+						<div id="preorder-raka-hero-chip-products" style={{
+							display: 'inline-flex', alignItems: 'center', gap: 6,
+							padding: '8px 16px', borderRadius: 9999,
+							background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(255, 255, 255, 0.25)',
+							fontSize: 14, fontWeight: 500, letterSpacing: '0.6px', color: '#ffffff',
+						}} className="mb-3">
+							<i className="ri-sparkling-fill" style={{ fontSize: 14 }} />
+							<span>แคตตาล็อกสินค้าพรีออเดอร์</span>
+						</div>
+						<h2 id="preorder-raka-hero-title-products" style={{ margin: '12px 0 6px', fontSize: 28, fontWeight: 500, letterSpacing: '-0.6px', color: '#ffffff', lineHeight: 1.15 }}>
+							สินค้าเปิดรับพรีออเดอร์ (Pre-Orders)
+						</h2>
+						<p id="preorder-raka-hero-desc-products" style={{ margin: 0, fontSize: 15, color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.65 }}>
+							รวมสินค้าเกมมิ่งเกียร์ คีย์บอร์ด และอุปกรณ์คัสตอมนำเข้าจากต่างประเทศ สั่งจองได้ก่อนใคร
+						</p>
+					</div>
+				)}
+
 				{/* Hero title — search / verify */}
-				{screen !== 'result' && (
+				{screen !== 'result' && screen !== 'products' && (
 					<div id="preorder-raka-hero-content" style={{ position: 'relative' }}>
 						<div id="preorder-raka-hero-chip" style={{
 							display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -554,6 +697,134 @@ const PreOrderApp = ({ postId }) => {
 
 			{/* ── BODY ──────────────────────────────────────────────────────── */}
 			<div id="preorder-raka-body" style={S.body}>
+
+				{/* PRE-ORDER PRODUCTS CATALOG VIEW */}
+				{screen === 'products' && (
+					<div id="preorder-raka-products-catalog" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+						{/* Search Bar & Product Count */}
+						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+							<div style={{ position: 'relative', flex: '1 1 260px', maxWidth: 420 }}>
+								<i className="ri-search-line" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: ds('#888', '#aaa', isDark), fontSize: 16 }} />
+								<input
+									type="text"
+									placeholder="ค้นหาชื่อสินค้าพรีออเดอร์..."
+									value={productSearch}
+									onChange={(e) => setProductSearch(e.target.value)}
+									style={{
+										...S.input('prod_search', focused),
+										paddingLeft: 42,
+										paddingRight: 16,
+									}}
+									onFocus={() => setFocused('prod_search')}
+									onBlur={() => setFocused(null)}
+								/>
+							</div>
+							<div style={{ fontSize: 13, color: ds('#888', '#666', isDark), fontWeight: 600 }}>
+								พบทั้งหมด {filteredProducts.length} รายการ
+							</div>
+						</div>
+
+						{/* Loading state */}
+						{productsLoading ? (
+							<div style={{ padding: '60px 0', textAlign: 'center', color: ds('#888', '#666', isDark) }}>
+								<i className="ri-loader-4-line" style={{ fontSize: 32, animation: 'spin 1s linear infinite', color: T.red, display: 'inline-block', marginBottom: 12 }} />
+								<div>กำลังโหลดรายการสินค้าพรีออเดอร์...</div>
+							</div>
+						) : filteredProducts.length === 0 ? (
+							<div style={{ padding: '60px 20px', textAlign: 'center', background: ds(T.bg2, T.lBg2, isDark), borderRadius: 16, border: `1px solid ${ds(T.line, T.lLine, isDark)}` }}>
+								<i className="ri-inbox-line" style={{ fontSize: 40, color: ds('#666', '#bbb', isDark), marginBottom: 12, display: 'inline-block' }} />
+								<h4 style={{ margin: '0 0 6px', fontSize: 16, color: ds('#fff', '#111', isDark) }}>ไม่พบสินค้าที่ค้นหา</h4>
+								<p style={{ margin: 0, fontSize: 13, color: ds('#888', '#666', isDark) }}>ลองค้นหาด้วยคำค้นอื่น หรือล้างคำค้นหา</p>
+							</div>
+						) : (
+							/* Grid of products */
+							<div id="preorder-raka-products-grid" style={{
+								display: 'grid',
+								gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+								gap: 20
+							}}>
+								{filteredProducts.map((p) => (
+									<div key={p.id} id={`preorder-prod-card-${p.id}`} style={{
+										...S.card,
+										display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0,
+										border: `1px solid ${ds(T.line, T.lLine, isDark)}`,
+										boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.05)',
+										transition: 'all 0.3s ease',
+									}}>
+										{/* Product Image */}
+										<div style={{ width: '100%', height: 210, position: 'relative', background: ds(T.bg3, T.lBg3, isDark), overflow: 'hidden' }}>
+											{p.image_url ? (
+												<img
+													src={p.image_url}
+													alt={p.title}
+													style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
+												/>
+											) : (
+												<div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: ds('#555', '#bbb', isDark) }}>
+													<i className="ri-image-line" style={{ fontSize: 36 }} />
+												</div>
+											)}
+											<span style={{
+												position: 'absolute', top: 12, left: 12,
+												padding: '4px 10px', borderRadius: 9999,
+												background: 'rgba(225,29,72,0.92)', color: '#ffffff',
+												fontSize: 10, fontWeight: 700, letterSpacing: '0.6px',
+												boxShadow: '0 2px 8px rgba(225,29,72,0.4)',
+												backdropFilter: 'blur(4px)',
+											}}>
+												PRE-ORDER
+											</span>
+										</div>
+
+										{/* Content */}
+										<div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+											<div>
+												<h3 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: ds('#fff', '#111', isDark), lineHeight: 1.35 }}>
+													{p.title}
+												</h3>
+												{p.description && (
+													<p style={{
+														margin: '0 0 14px', fontSize: 13, color: ds('#888', '#666', isDark), lineHeight: 1.5,
+														display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+													}}>
+														{p.description}
+													</p>
+												)}
+											</div>
+
+											<div style={{ paddingTop: 14, borderTop: `1px solid ${ds(T.line, T.lLine, isDark)}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+												<div>
+													<div style={{ fontSize: 10, color: ds('#888', '#999', isDark), textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>ราคาพรีออเดอร์</div>
+													<div style={{ fontSize: 20, fontWeight: 700, color: T.red }}>
+														{p.price > 0 ? `฿${p.price.toLocaleString()}` : 'ติดต่อสั่งจอง'}
+													</div>
+												</div>
+												<button
+													type="button"
+													onClick={() => {
+														setOrderNo('');
+														setScreen('search');
+													}}
+													style={{
+														padding: '8px 16px', borderRadius: 9999,
+														background: `linear-gradient(135deg, ${T.red}, ${T.redDeep})`,
+														color: '#fff', border: 'none', fontSize: 12, fontWeight: 600,
+														cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
+														boxShadow: `0 4px 12px ${T.redGlow}`,
+														transition: 'all 0.2s',
+													}}
+												>
+													<span>เช็คสถานะ</span>
+													<i className="ri-arrow-right-line" />
+												</button>
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+				)}
 
 				{/* SEARCH */}
 				{screen === 'search' && (

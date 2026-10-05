@@ -35,9 +35,7 @@ function preorder_raka_register_rest_routes() {
 		[
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => 'preorder_raka_get_products',
-			'permission_callback' => function () {
-				return current_user_can( 'edit_posts' );
-			},
+			'permission_callback' => '__return_true', // Publicly accessible to display preorder catalog
 		]
 	] );
 }
@@ -502,7 +500,7 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 }
 
 /**
- * Get List of Pre-order Products for Admin dropdown.
+ * Get List of Pre-order Products for Admin dropdown and Frontend catalog.
  */
 function preorder_raka_get_products() {
 	$data = [];
@@ -512,39 +510,48 @@ function preorder_raka_get_products() {
 		$wc_products = wc_get_products([
 			'status'  => 'publish',
 			'limit'   => -1,
-			'orderby' => 'name',
-			'order'   => 'ASC',
+			'orderby' => 'date',
+			'order'   => 'DESC',
 		]);
 
 		foreach ( $wc_products as $prod ) {
 			$is_preorder = get_post_meta( $prod->get_id(), '_raka_is_preorder', true ) === 'yes' || 'preorder' === $prod->get_stock_status();
-			$title = $prod->get_name();
-			if ( $is_preorder ) {
-				$title = '[PRE-ORDER] ' . $title;
+			if ( ! $is_preorder ) {
+				continue;
 			}
+			$img_id = $prod->get_image_id();
+			$img_url = $img_id ? wp_get_attachment_image_url( $img_id, 'medium_large' ) : '';
 			$data[] = [
 				'id'          => $prod->get_id(),
-				'title'       => $title,
-				'price'       => (int) $prod->get_price(),
-				'is_preorder' => $is_preorder,
+				'title'       => $prod->get_name(),
+				'price'       => (float) $prod->get_price(),
+				'image_url'   => $img_url,
+				'description' => wp_strip_all_tags( $prod->get_short_description() ?: $prod->get_description() ),
+				'permalink'   => $prod->get_permalink(),
+				'is_preorder' => true,
 			];
 		}
 	}
 
-	// 2. Also include legacy preorder_product CPT
+	// 2. Also include preorder_product CPT
 	$posts = get_posts([
 		'post_type'   => 'preorder_product',
 		'post_status' => 'publish',
 		'numberposts' => -1,
-		'orderby'     => 'title',
-		'order'       => 'ASC',
+		'orderby'     => 'date',
+		'order'       => 'DESC',
 	]);
 
 	foreach ( $posts as $p ) {
+		$thumb_url = get_the_post_thumbnail_url( $p->ID, 'medium_large' ) ?: '';
 		$data[] = [
-			'id'    => $p->ID,
-			'title' => $p->post_title,
-			'price' => (int) get_post_meta( $p->ID, '_preorder_price', true ),
+			'id'          => $p->ID,
+			'title'       => $p->post_title,
+			'price'       => (float) get_post_meta( $p->ID, '_preorder_price', true ),
+			'image_url'   => $thumb_url,
+			'description' => wp_strip_all_tags( $p->post_content ),
+			'permalink'   => get_permalink( $p->ID ),
+			'is_preorder' => true,
 		];
 	}
 
