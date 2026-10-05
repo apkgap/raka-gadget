@@ -13,12 +13,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 $video_url       = get_template_directory_uri() . '/assets/images/a9-air.mp4';
 $logo_horizontal = get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png';
 $logo_icon       = get_template_directory_uri() . '/assets/images/logo-raka-icon.png';
-$shop_url        = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' );
-$account_url     = home_url( '/account' );
-$cart_url        = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart' );
-$cart_count      = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
-$current_user    = wp_get_current_user();
-$is_logged_in    = is_user_logged_in();
+$shop_url          = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop' );
+$myaccount_page_id = get_option( 'woocommerce_myaccount_page_id' );
+$myaccount_url     = $myaccount_page_id ? get_permalink( $myaccount_page_id ) : ( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ) );
+$cart_url          = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart' );
+$cart_count        = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+$current_user      = wp_get_current_user();
+$is_logged_in      = is_user_logged_in();
+
+if ( $is_logged_in ) {
+	$account_url   = $myaccount_url;
+	$account_label = ! empty( $current_user->display_name ) ? esc_html( $current_user->display_name ) : esc_html__( 'My Account', 'raka-preorder-theme' );
+} else {
+	$account_url   = $myaccount_url;
+	$account_label = esc_html__( 'Login', 'raka-preorder-theme' );
+}
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> lang="en">
@@ -65,10 +74,26 @@ $is_logged_in    = is_user_logged_in();
     }
 
     html, body {
-      margin: 0 !important;
-      padding: 0 !important;
+      margin: 0;
+      padding: 0;
       width: 100%;
       height: 100%;
+    }
+
+    body.admin-bar {
+      padding-top: 32px !important;
+    }
+
+    @media screen and (max-width: 782px) {
+      body.admin-bar {
+        padding-top: 46px !important;
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      #wpadminbar {
+        position: fixed !important;
+      }
     }
 
     body {
@@ -120,13 +145,39 @@ $is_logged_in    = is_user_logged_in();
       position: relative;
       height: 100vh;
       height: 100svh;
-      min-height: 640px;
+      min-height: 540px;
       width: 100%;
       overflow: hidden;
       isolation: isolate;
       background: var(--panel);
       display: grid;
       grid-template-columns: 100%;
+    }
+
+    .admin-bar .hero {
+      height: calc(100vh - 32px) !important;
+      height: calc(100svh - 32px) !important;
+    }
+
+    @media screen and (max-width: 782px) {
+      .admin-bar .hero {
+        height: calc(100vh - 46px) !important;
+        height: calc(100svh - 46px) !important;
+      }
+    }
+
+    .admin-bar #raka-menu-overlay,
+    .admin-bar #raka-cart-drawer {
+      top: 32px !important;
+      height: calc(100vh - 32px) !important;
+    }
+
+    @media screen and (max-width: 782px) {
+      .admin-bar #raka-menu-overlay,
+      .admin-bar #raka-cart-drawer {
+        top: 46px !important;
+        height: calc(100vh - 46px) !important;
+      }
     }
 
     @media (min-width: 1024px) {
@@ -138,10 +189,10 @@ $is_logged_in    = is_user_logged_in();
     .hero__left {
       position: relative;
       background: var(--panel);
-      padding: clamp(16px, 2.2vw, 40px);
+      padding: clamp(8px, 1.8vw, 24px) clamp(14px, 2.2vw, 36px);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       height: 100%;
       min-height: 0;
       overflow-y: auto;
@@ -181,19 +232,31 @@ $is_logged_in    = is_user_logged_in();
       background: var(--panel);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       min-height: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
     }
 
-    /* ═════════ 6. TOPBAR (WITH THEME CONTROLS) ═════════ */
+    /* ═════════ 6. TOPBAR (STICKY WITH THEME CONTROLS) ═════════ */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       flex: 0 0 auto;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--panel);
+      padding-top: 6px;
+      padding-bottom: 10px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    html.dark .topbar {
+      border-bottom-color: rgba(255, 255, 255, 0.07);
     }
 
     .brand {
@@ -204,14 +267,28 @@ $is_logged_in    = is_user_logged_in();
 
     .brand img {
       height: clamp(22px, 1.8vw, 28px);
+      max-height: 28px;
       width: auto;
       object-fit: contain;
+    }
+
+    html.dark .brand img#raka-topbar-brand-img-light {
+      display: none !important;
+    }
+    html.dark .brand img#raka-topbar-brand-img-dark {
+      display: block !important;
+    }
+    html:not(.dark) .brand img#raka-topbar-brand-img-dark {
+      display: none !important;
+    }
+    html:not(.dark) .brand img#raka-topbar-brand-img-light {
+      display: block !important;
     }
 
     .nav-left {
       display: flex;
       align-items: center;
-      gap: clamp(12px, 1.8vw, 28px);
+      gap: clamp(10px, 1.6vw, 24px);
     }
 
         /* Topbar Hamburger Menu Button */
@@ -259,8 +336,8 @@ $is_logged_in    = is_user_logged_in();
 
     .theme-ctrl-btn {
       position: relative;
-      width: clamp(32px, 2.4vw, 38px);
-      height: clamp(32px, 2.4vw, 38px);
+      width: clamp(34px, 2.6vw, 38px);
+      height: clamp(34px, 2.6vw, 38px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -270,6 +347,7 @@ $is_logged_in    = is_user_logged_in();
       color: var(--ink);
       transition: transform 0.25s ease, background-color 0.2s ease;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     .theme-ctrl-btn:hover {
@@ -1056,13 +1134,24 @@ $is_logged_in    = is_user_logged_in();
             <path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>
           </svg>
         </a>
-        <a id="raka-side-account-btn" class="account" href="<?php echo esc_url( $account_url ); ?>">
-          <svg class="account__plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-          <span id="raka-account-pill-label" class="account__label">Account</span>
+        <a id="raka-side-account-btn" class="account" href="<?php echo esc_url( $account_url ); ?>" aria-label="<?php echo esc_attr( $account_label ); ?>">
+          <?php if ( $is_logged_in ) : ?>
+            <svg class="account__plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          <?php else : ?>
+            <svg class="account__plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          <?php endif; ?>
+          <span id="raka-account-pill-label" class="account__label"><?php echo esc_html( $account_label ); ?></span>
           <div id="raka-account-pill-avatar" class="account__avatar">
-            <img id="raka-account-avatar-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Account">
+            <?php if ( $is_logged_in && ! empty( $current_user->display_name ) ) : ?>
+              <span class="text-[11px] font-bold text-black uppercase"><?php echo esc_html( strtoupper( substr( $current_user->display_name, 0, 1 ) ) ); ?></span>
+            <?php else : ?>
+              <img id="raka-account-avatar-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Account">
+            <?php endif; ?>
           </div>
         </a>
       </div>

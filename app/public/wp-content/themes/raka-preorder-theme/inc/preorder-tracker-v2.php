@@ -89,15 +89,17 @@ function raka_render_preorder_tracker_v2(): string {
 				<span id="raka-tracker-error-text" class="leading-tight"></span>
 			</div>
 
-			<!-- Search Submit Button -->
-			<button
-				type="button"
-				id="raka-tracker-submit-btn"
-				class="w-full h-12 px-6 rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-sm sm:text-base font-normal flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:scale-[1.005] active:scale-[0.99] cursor-pointer"
-			>
-				<i id="raka-tracker-btn-icon" class="ri-search-2-line text-base sm:text-lg"></i>
-				<span id="raka-tracker-btn-text"><?php esc_html_e( 'ค้นหารายการพรีออเดอร์', 'raka-preorder-theme' ); ?></span>
-			</button>
+			<!-- Search Submit Button (Inline Centered) -->
+			<div id="raka-tracker-submit-wrap" class="flex items-center justify-center pt-2">
+				<button
+					type="button"
+					id="raka-tracker-submit-btn"
+					class="inline-flex items-center justify-center gap-2 h-11 sm:h-12 px-8 sm:px-12 w-full sm:w-auto min-w-[200px] max-w-sm rounded-2xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-sm sm:text-base font-normal shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+				>
+					<i id="raka-tracker-btn-icon" class="ri-search-2-line text-base sm:text-lg"></i>
+					<span id="raka-tracker-btn-text"><?php esc_html_e( 'ค้นหารายการพรีออเดอร์', 'raka-preorder-theme' ); ?></span>
+				</button>
+			</div>
 		</div>
 
 		<!-- ── 2. PHONE SEARCH MULTI-ITEM LIST VIEW ── -->
@@ -172,7 +174,7 @@ function raka_render_preorder_tracker_v2(): string {
 				</div>
 
 				<!-- Status & Delivery Badge Card -->
-				<div id="raka-res-status-grid" class="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-neutral-100/70 dark:bg-neutral-800/60 border border-black/5 dark:border-white/10 text-xs sm:text-sm">
+				<div id="raka-res-status-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 sm:p-4 rounded-2xl bg-neutral-100/70 dark:bg-neutral-800/60 border border-black/5 dark:border-white/10 text-xs sm:text-sm">
 					<div id="raka-res-cur-status-wrap">
 						<span id="raka-res-cur-status-lbl" class="text-xs uppercase text-neutral-500 dark:text-neutral-400 font-mono block mb-1">
 							<?php esc_html_e( 'สถานะปัจจุบัน', 'raka-preorder-theme' ); ?>

@@ -1,0 +1,20 @@
+{
+  "name": "raka/my-wc-passkeys",
+  "description": "Enterprise-grade Passkeys (WebAuthn / FIDO2) authentication for WordPress & WooCommerce",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Senior Core Developer",
+      "role": "Lead Architect"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "MyWcPasskeys\\": "includes/"
+    }
+  }
+}

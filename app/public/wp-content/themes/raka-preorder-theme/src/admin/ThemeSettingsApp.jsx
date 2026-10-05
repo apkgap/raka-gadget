@@ -578,7 +578,7 @@ export default function ThemeSettingsApp() {
 			title: (
 				<span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
 					<i className="ri-shield-keyhole-line" style={{ fontSize: '16px', color: '#f59e0b' }} />
-					{__('Pre-Order & Security', 'raka-preorder-theme')}
+					{__('Pre-Order, Security & e-Tax', 'raka-preorder-theme')}
 				</span>
 			),
 		},
@@ -1247,6 +1247,27 @@ export default function ThemeSettingsApp() {
 														}
 														checked={!!options.preorder_require_member_login}
 														onChange={(val) => handleOptionChange('preorder_require_member_login', val)}
+													/>
+												</div>
+											</div>
+
+											{ /* e-Tax Invoice System Global Toggle */}
+											<div style={{ padding: '20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+												<h3 style={{ margin: '0 0 16px 0', fontSize: '14px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+													<i className="ri-file-list-3-line" style={{ color: '#ef4444' }} />
+													{__('e-Tax Invoice System (ระบบขอใบเสร็จ / ใบกำกับภาษี)', 'raka-preorder-theme')}
+												</h3>
+
+												<div style={{ marginBottom: '8px' }}>
+													<ToggleControl
+														label={__('เปิดใช้งานระบบขอใบกำกับภาษี e-Tax Invoice (Enable e-Tax Invoice System)', 'raka-preorder-theme')}
+														help={
+															options.etax_invoice_enabled !== false
+																? __('เปิดใช้งาน: ลูกค้าและสมาชิกสามารถกรอกข้อมูล และเลือกขอรับใบกำกับภาษี e-Tax Invoice ได้ในระบบและหน้าบัญชีผู้ใช้', 'raka-preorder-theme')
+																: __('ปิดใช้งาน: ปิดระบบขอใบกำกับภาษี e-Tax Invoice ทั้งหมดในระบบและหน้าบัญชีผู้ใช้', 'raka-preorder-theme')
+														}
+														checked={options.etax_invoice_enabled !== false}
+														onChange={(val) => handleOptionChange('etax_invoice_enabled', val)}
 													/>
 												</div>
 											</div>

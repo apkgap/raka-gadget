@@ -1,0 +1,323 @@
+/**
+ * Stylesheet for WooCommerce Passkeys (WebAuthn / FIDO2) Integration & My Account UI.
+ * Clean, lightweight styling with dark mode and WooCommerce core compatibility.
+ *
+ * @package my-wc-passkeys
+ */
+
+/* ─── 0. Universal WooCommerce My Account & Login Structure ─── */
+.woocommerce-account .woocommerce {
+	max-width: 960px;
+	margin: 0 auto;
+	font-family: inherit;
+}
+
+/* ─── 1. Clean Auth Reset ─── */
+.my-wc-auth-box {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+}
+
+.my-wc-auth-box .woocommerce-form-login,
+.my-wc-auth-box .woocommerce-form-register,
+.my-wc-auth-box form.login,
+.my-wc-auth-box form.register {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+}
+
+/* ─── 2. Passkey Quick Login Section (Fallback for native WC) ─── */
+.my-wc-passkeys-login-box {
+	margin-top: 1.5rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+	text-align: center;
+	clear: both;
+}
+
+html.dark .my-wc-passkeys-login-box {
+	border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.my-wc-passkeys-divider {
+	position: relative;
+	text-align: center;
+	margin: 0 0 1.25rem 0;
+}
+
+.my-wc-passkeys-divider::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background: #e2e8f0;
+	z-index: 1;
+}
+
+html.dark .my-wc-passkeys-divider::before {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.my-wc-passkeys-divider-text {
+	position: relative;
+	z-index: 2;
+	display: inline-block;
+	padding: 0 12px;
+	background: transparent;
+	color: #64748b;
+	font-size: 0.8125rem;
+	font-weight: 500;
+}
+
+html.dark .my-wc-passkeys-divider-text {
+	color: #94a3b8;
+}
+
+.my-wc-passkey-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	cursor: pointer;
+}
+
+.my-wc-passkey-svg {
+	fill: currentColor;
+	flex-shrink: 0;
+}
+
+.my-wc-passkeys-microcopy {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	margin: 10px 0 0 0;
+	font-size: 0.78125rem;
+	color: #64748b;
+	line-height: 1.4;
+}
+
+html.dark .my-wc-passkeys-microcopy {
+	color: #94a3b8;
+}
+
+.my-wc-shield-svg {
+	fill: #10b981;
+	flex-shrink: 0;
+}
+
+/* ─── 3. My Account Management Navigation & Layout ─── */
+.woocommerce-MyAccount-navigation {
+	float: left;
+	width: 28%;
+	margin-right: 4%;
+}
+
+.woocommerce-MyAccount-content {
+	float: left;
+	width: 68%;
+}
+
+@media (max-width: 768px) {
+	.woocommerce-MyAccount-navigation,
+	.woocommerce-MyAccount-content {
+		float: none;
+		width: 100%;
+		margin-right: 0;
+		margin-bottom: 2rem;
+	}
+}
+
+.woocommerce-MyAccount-navigation ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+html.dark .woocommerce-MyAccount-navigation ul {
+	background: #111111;
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.woocommerce-MyAccount-navigation li {
+	border-bottom: 1px solid #f1f5f9;
+}
+
+html.dark .woocommerce-MyAccount-navigation li {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.woocommerce-MyAccount-navigation li:last-child {
+	border-bottom: none;
+}
+
+.woocommerce-MyAccount-navigation li a {
+	display: block;
+	padding: 14px 18px;
+	color: #475569;
+	font-size: 0.9375rem;
+	font-weight: 500;
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+html.dark .woocommerce-MyAccount-navigation li a {
+	color: #94a3b8;
+}
+
+.woocommerce-MyAccount-navigation li.is-active a,
+.woocommerce-MyAccount-navigation li a:hover {
+	background: #f8fafc;
+	color: #0f172a;
+	font-weight: 700;
+	padding-left: 22px;
+}
+
+html.dark .woocommerce-MyAccount-navigation li.is-active a,
+html.dark .woocommerce-MyAccount-navigation li a:hover {
+	background: #1a1a1a;
+	color: #ffffff;
+}
+
+/* ─── 4. Passkeys Endpoint Inside My Account ─── */
+.my-wc-passkeys-account-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	font-family: inherit;
+}
+
+.my-wc-passkeys-header {
+	margin-bottom: 0.5rem;
+}
+
+.my-wc-passkeys-heading {
+	font-size: 1.5rem;
+	font-weight: 800;
+	margin: 0 0 0.5rem 0;
+	color: #0f172a;
+}
+
+html.dark .my-wc-passkeys-heading {
+	color: #ffffff;
+}
+
+.my-wc-passkeys-subheading {
+	font-size: 0.875rem;
+	color: #64748b;
+	line-height: 1.6;
+	margin: 0;
+}
+
+html.dark .my-wc-passkeys-subheading {
+	color: #94a3b8;
+}
+
+.my-wc-passkey-card {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 16px;
+	padding: 1.5rem;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+html.dark .my-wc-passkey-card {
+	background: #111111;
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.my-wc-card-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #1e293b;
+	margin: 0 0 1.25rem 0;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid #f1f5f9;
+}
+
+html.dark .my-wc-card-title {
+	color: #ffffff;
+	border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.my-wc-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 8px;
+	background: #f1f5f9;
+	color: #475569;
+	border-radius: 9999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+html.dark .my-wc-badge {
+	background: #262626;
+	color: #cbd5e1;
+}
+
+/* Status Messages */
+.my-wc-passkey-status-msg {
+	margin-top: 0.75rem;
+	padding: 10px 14px;
+	border-radius: 10px;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	line-height: 1.4;
+	animation: myWcFadeIn 0.2s ease;
+}
+
+.my-wc-status-info {
+	background: #eff6ff;
+	border: 1px solid #bfdbfe;
+	color: #1d4ed8;
+}
+
+html.dark .my-wc-status-info {
+	background: rgba(59, 130, 246, 0.15);
+	border-color: rgba(59, 130, 246, 0.3);
+	color: #93c5fd;
+}
+
+.my-wc-status-success {
+	background: #ecfdf5;
+	border: 1px solid #a7f3d0;
+	color: #047857;
+}
+
+html.dark .my-wc-status-success {
+	background: rgba(16, 185, 129, 0.15);
+	border-color: rgba(16, 185, 129, 0.3);
+	color: #6ee7b7;
+}
+
+.my-wc-status-error {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #b91c1c;
+}
+
+html.dark .my-wc-status-error {
+	background: rgba(239, 68, 68, 0.15);
+	border-color: rgba(239, 68, 68, 0.3);
+	color: #fca5a5;
+}
+
+@keyframes myWcFadeIn {
+	from { opacity: 0; transform: translateY(-4px); }
+	to { opacity: 1; transform: translateY(0); }
+}

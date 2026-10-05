@@ -44,6 +44,16 @@ function raka_is_turnstile_enabled(): bool {
 }
 
 /**
+ * Check if e-Tax Invoice system is enabled globally by admin.
+ *
+ * @return bool
+ */
+function raka_is_etax_invoice_enabled(): bool {
+	$options = raka_get_all_options();
+	return ! isset( $options['etax_invoice_enabled'] ) || ! empty( $options['etax_invoice_enabled'] );
+}
+
+/**
  * Get Cloudflare Turnstile Sitekey.
  *
  * @return string

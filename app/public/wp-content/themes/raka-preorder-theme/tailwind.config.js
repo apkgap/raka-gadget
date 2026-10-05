@@ -8,6 +8,12 @@ module.exports = {
     './woocommerce/**/*.php',
     './src/**/*.{js,jsx,ts,tsx}',
     './assets/js/**/*.js',
+    '../../plugins/my-wc-passkeys/templates/**/*.php',
+    '../../plugins/my-wc-passkeys/includes/**/*.php',
+    '../../plugins/my-wc-passkeys/assets/js/**/*.js',
+    '../../plugins/preorder-raka/*.php',
+    '../../plugins/preorder-raka/inc/**/*.php',
+    '../../plugins/preorder-raka/templates/**/*.php',
   ],
   theme: {
     extend: {

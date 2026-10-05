@@ -451,6 +451,11 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 		$clean_options['preorder_require_member_login'] = ! empty( $raw_data['preorder_require_member_login'] );
 	}
 
+	// e-Tax Invoice System Global Toggle
+	if ( isset( $raw_data['etax_invoice_enabled'] ) ) {
+		$clean_options['etax_invoice_enabled'] = ! empty( $raw_data['etax_invoice_enabled'] );
+	}
+
 	// Dynamic Repeater: hero_cards
 	$allowed_positions = [ 'left', 'right', 'center', 'bottom_left', 'bottom_right' ];
 	$clean_hero_cards  = [];

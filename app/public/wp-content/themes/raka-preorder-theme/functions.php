@@ -93,6 +93,8 @@ require_once get_template_directory() . '/inc/woocommerce-filters.php';
 require_once get_template_directory() . '/inc/theme-options.php';
 require_once get_template_directory() . '/inc/preorder.php';
 require_once get_template_directory() . '/inc/preorder-tracker-v2.php';
+require_once get_template_directory() . '/inc/account-api.php';
+require_once get_template_directory() . '/inc/loyalty/init.php';
 
 /**
  * Replace WooCommerce default pagination with OBSIDIAN Ultra-Minimal Pagination
