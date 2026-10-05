@@ -77,7 +77,13 @@ if ( $is_logged_in ) {
       margin: 0;
       padding: 0;
       width: 100%;
-      height: 100%;
+      min-height: 100%;
+    }
+
+    @media (min-width: 1024px) {
+      html, body {
+        height: 100%;
+      }
     }
 
     body.admin-bar {
@@ -772,6 +778,8 @@ if ( $is_logged_in ) {
         overflow-y: auto !important;
         height: auto !important;
         min-height: 100% !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-y: auto !important;
       }
       .hero,
       .admin-bar .hero {
@@ -784,13 +792,15 @@ if ( $is_logged_in ) {
       .panel {
         overflow: visible !important;
         height: auto !important;
+        overscroll-behavior: auto !important;
       }
       .hero__left {
         border-right: none;
         padding: 12px 14px max(60px, env(safe-area-inset-bottom, 36px)) !important;
-        min-height: 100svh;
+        min-height: auto !important;
         height: auto !important;
         overflow: visible !important;
+        overscroll-behavior: auto !important;
       }
       .hero__right {
         display: none !important;

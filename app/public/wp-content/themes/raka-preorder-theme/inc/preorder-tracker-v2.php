@@ -35,12 +35,12 @@ function raka_render_preorder_tracker_v2(): string {
 	<?php endif; ?>
 
 	<style id="raka-tracker-scroll-styles">
-		/* Desktop only: smooth contained scroll with spacious max-height */
-		@media (min-width: 768px) {
+		/* Desktop (1024px+): smooth contained scroll with spacious max-height */
+		@media (min-width: 1024px) {
 			#raka-res-scroll-body,
 			#raka-tracker-list-container,
 			.custom-tracker-scroll {
-				max-height: clamp(360px, 55vh, 620px) !important;
+				max-height: clamp(380px, 55vh, 620px) !important;
 				overflow-y: auto !important;
 				-webkit-overflow-scrolling: touch !important;
 				overscroll-behavior: contain;
@@ -50,11 +50,11 @@ function raka_render_preorder_tracker_v2(): string {
 			}
 		}
 
-		/* Mobile: Full natural document scroll, comfortable touch layout, no cramped box */
-		@media (max-width: 767px) {
+		/* Mobile & Tablet (<1024px): Natural document scroll, comfortable touch layout, no cramped box */
+		@media (max-width: 1023px) {
 			#raka-tracker-list-view,
 			#raka-tracker-result-view {
-				min-height: 400px;
+				min-height: auto;
 			}
 			#raka-res-scroll-body,
 			#raka-tracker-list-container,
@@ -62,6 +62,7 @@ function raka_render_preorder_tracker_v2(): string {
 				max-height: none !important;
 				overflow: visible !important;
 				height: auto !important;
+				overscroll-behavior: auto !important;
 			}
 		}
 
@@ -202,8 +203,13 @@ function raka_render_preorder_tracker_v2(): string {
 				</button>
 			</div>
 
-			<!-- Dynamic List Container with custom scroll -->
+			<!-- Dynamic List Container -->
 			<div id="raka-tracker-list-container" class="space-y-2 sm:space-y-2.5 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+				<!-- Dynamically populated via JS -->
+			</div>
+
+			<!-- Pagination Controls Bar -->
+			<div id="raka-list-pagination-bar" class="pt-2 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5">
 				<!-- Dynamically populated via JS -->
 			</div>
 
@@ -700,7 +706,7 @@ function raka_render_preorder_tracker_v2(): string {
 				}
 			}
 
-			// Render Multi-Item List View with Dynamic Scroll Loading
+			// Render Multi-Item List View with Clean Pagination
 			function renderListView(items, badgeLabel) {
 				listPhoneBadge.textContent = badgeLabel ? (badgeLabel.startsWith('เบอร์') || badgeLabel.startsWith('บัญชี') ? badgeLabel : 'รายการของ: ' + badgeLabel) : 'รายการพรีออเดอร์';
 				listContainer.innerHTML = '';
@@ -711,24 +717,20 @@ function raka_render_preorder_tracker_v2(): string {
 				}
 
 				const allItems = items;
-				const BATCH_SIZE = 10;
-				let renderedCount = 0;
-				let isScrollLoading = false;
+				const ITEMS_PER_PAGE = 3;
+				let currentPage = 1;
+				const totalPages = Math.ceil(allItems.length / ITEMS_PER_PAGE);
 
-				// Create loader element
-				const loaderEl = document.createElement('div');
-				loaderEl.id = 'raka-list-scroll-loader';
-				loaderEl.className = 'py-3 flex items-center justify-center gap-2 text-xs font-mono text-neutral-500 dark:text-neutral-400 opacity-0 transition-opacity duration-200';
-				loaderEl.innerHTML = `
-					<i id="raka-list-loader-ico" class="ri-loader-4-line animate-spin text-base text-red-600 dark:text-red-400"></i>
-					<span id="raka-list-loader-txt">กำลังโหลดรายการเพิ่มเติม...</span>
-				`;
+				function renderPage(page) {
+					currentPage = page;
+					listContainer.innerHTML = '';
 
-				function appendBatch() {
-					const nextItems = allItems.slice(renderedCount, renderedCount + BATCH_SIZE);
+					const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+					const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, allItems.length);
+					const currentBatch = allItems.slice(startIndex, endIndex);
 
-					nextItems.forEach((item, batchIdx) => {
-						const globalIdx = renderedCount + batchIdx;
+					currentBatch.forEach((item, batchIdx) => {
+						const globalIdx = startIndex + batchIdx;
 						const card = document.createElement('div');
 						card.id = 'raka-list-item-' + globalIdx;
 						card.className = 'group raka-fade-in p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-neutral-900/90 hover:bg-neutral-50 dark:hover:bg-neutral-900 border border-black/5 dark:border-white/10 transition-all duration-200 cursor-pointer space-y-2.5 sm:space-y-3 shadow-xs hover:shadow-md';
@@ -782,58 +784,82 @@ function raka_render_preorder_tracker_v2(): string {
 							renderResult(item);
 						});
 
-						listContainer.insertBefore(card, loaderEl);
+						listContainer.appendChild(card);
 					});
 
-					renderedCount += nextItems.length;
-
-					if (renderedCount >= allItems.length) {
-						if (loaderEl.parentNode === listContainer) {
-							listContainer.removeChild(loaderEl);
-						}
-						if (allItems.length > BATCH_SIZE) {
-							const endEl = document.createElement('div');
-							endEl.id = 'raka-list-end-msg';
-							endEl.className = 'py-3 text-center text-xs font-mono text-neutral-400 dark:text-neutral-500';
-							endEl.textContent = `✦ แสดงรายการทั้งหมดแล้ว (${allItems.length} รายการ) ✦`;
-							listContainer.appendChild(endEl);
-						}
-					}
+					renderPaginationControls();
 				}
 
-				listContainer.appendChild(loaderEl);
-				appendBatch();
+				function renderPaginationControls() {
+					const paginationBar = document.getElementById('raka-list-pagination-bar');
+					if (!paginationBar) return;
 
-				// Scroll loading triggers (Container scroll for desktop, window scroll for mobile)
-				function checkAndLoadMore() {
-					if (renderedCount < allItems.length && !isScrollLoading) {
-						isScrollLoading = true;
-						loaderEl.classList.remove('opacity-0');
-						setTimeout(() => {
-							appendBatch();
-							loaderEl.classList.add('opacity-0');
-							isScrollLoading = false;
-						}, 250);
+					if (totalPages <= 1) {
+						paginationBar.innerHTML = `
+							<div id="raka-page-info" class="w-full text-center py-1 text-xs font-mono text-neutral-500 dark:text-neutral-400">
+								✦ ทั้งหมด ${allItems.length} รายการ ✦
+							</div>
+						`;
+						return;
 					}
+
+					const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+					const endItem = Math.min(currentPage * ITEMS_PER_PAGE, allItems.length);
+
+					let pagesHtml = '';
+					for (let i = 1; i <= totalPages; i++) {
+						const isActive = (i === currentPage);
+						pagesHtml += `
+							<button
+								type="button"
+								id="raka-page-btn-${i}"
+								class="w-8 h-8 rounded-xl text-xs font-mono transition-all duration-150 flex items-center justify-center cursor-pointer ${isActive ? 'bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 shadow-sm font-bold scale-105' : 'bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-black/5 dark:border-white/10'}"
+								onclick="window.rakaListGoToPage(${i})"
+							>
+								${i}
+							</button>
+						`;
+					}
+
+					paginationBar.innerHTML = `
+						<div id="raka-page-info" class="text-xs font-mono text-neutral-500 dark:text-neutral-400">
+							แสดง ${startItem}-${endItem} จาก ${allItems.length} รายการ
+						</div>
+						<div id="raka-page-btns-wrap" class="flex items-center gap-1.5">
+							<button
+								type="button"
+								id="raka-page-prev-btn"
+								class="h-8 px-2.5 rounded-xl text-xs font-medium flex items-center gap-1 transition-all duration-150 cursor-pointer ${currentPage === 1 ? 'opacity-40 pointer-events-none bg-neutral-200 dark:bg-neutral-800 text-neutral-400' : 'bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-black/5 dark:border-white/10 shadow-xs'}"
+								onclick="window.rakaListGoToPage(${currentPage - 1})"
+							>
+								<i id="raka-page-prev-ico" class="ri-arrow-left-s-line text-sm"></i>
+								<span id="raka-page-prev-txt">ก่อนหน้า</span>
+							</button>
+
+							<div id="raka-page-numbers" class="flex items-center gap-1">
+								${pagesHtml}
+							</div>
+
+							<button
+								type="button"
+								id="raka-page-next-btn"
+								class="h-8 px-2.5 rounded-xl text-xs font-medium flex items-center gap-1 transition-all duration-150 cursor-pointer ${currentPage === totalPages ? 'opacity-40 pointer-events-none bg-neutral-200 dark:bg-neutral-800 text-neutral-400' : 'bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-black/5 dark:border-white/10 shadow-xs'}"
+								onclick="window.rakaListGoToPage(${currentPage + 1})"
+							>
+								<span id="raka-page-next-txt">ถัดไป</span>
+								<i id="raka-page-next-ico" class="ri-arrow-right-s-line text-sm"></i>
+							</button>
+						</div>
+					`;
 				}
 
-				listContainer.onscroll = () => {
-					const scrollDistance = listContainer.scrollHeight - listContainer.scrollTop - listContainer.clientHeight;
-					if (scrollDistance < 80) {
-						checkAndLoadMore();
-					}
+				window.rakaListGoToPage = function(targetPage) {
+					if (targetPage < 1 || targetPage > totalPages || targetPage === currentPage) return;
+					renderPage(targetPage);
+					scrollToTrackerTop();
 				};
 
-				window.addEventListener('scroll', () => {
-					if (!listView.classList.contains('hidden')) {
-						const rect = listContainer.getBoundingClientRect();
-						if (rect.bottom <= window.innerHeight + 150) {
-							checkAndLoadMore();
-						}
-					}
-				}, { passive: true });
-
-				if (listContainer) listContainer.scrollTop = 0;
+				renderPage(1);
 				searchView.classList.add('hidden');
 				resultView.classList.add('hidden');
 				listView.classList.remove('hidden');
