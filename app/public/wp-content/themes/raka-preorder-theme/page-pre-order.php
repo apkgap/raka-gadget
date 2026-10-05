@@ -365,53 +365,24 @@ if ( $is_logged_in ) {
       margin: 0;
       text-align: center;
       position: relative;
-      padding: clamp(6px, 1.2vh, 14px) 0 clamp(10px, 1.6vh, 18px);
+      padding: clamp(4px, 1vh, 12px) 0 clamp(8px, 1.4vh, 16px);
       width: 100%;
     }
 
-    .stage__emblem {
-      width: clamp(38px, 3vw, 46px);
-      height: clamp(38px, 3vw, 46px);
-      border-radius: 50%;
-      background: var(--box);
-      border: 1px solid var(--line);
-      display: grid;
-      place-items: center;
-      margin-bottom: clamp(6px, 0.8vh, 10px);
-      box-shadow: 0 4px 14px -6px rgba(0,0,0,0.15);
-      flex: 0 0 auto;
-    }
-
-    .stage__emblem img {
-      width: 55%;
-      height: 55%;
-      object-fit: contain;
-      transition: filter 0.2s ease;
-    }
-
     .headline {
-      margin: 0;
-      font-size: clamp(20px, 1.8vw, 26px);
-      line-height: 1.25;
-      letter-spacing: -0.015em;
+      margin: 0 0 clamp(8px, 1.2vh, 14px) 0;
+      font-size: clamp(24px, 2.5vw, 36px);
+      line-height: 1.1;
+      letter-spacing: 0.04em;
       font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif;
-      font-weight: 500;
-    }
-
-    .headline b {
-      font-weight: 800;
-    }
-
-    .squiggle {
-      width: clamp(100px, 9vw, 130px);
-      margin: 4px auto 10px;
-      display: block;
+      font-weight: 900;
+      text-transform: uppercase;
       color: var(--ink);
     }
 
     .stage__form-mount {
       width: 100%;
-      max-width: 715px;
+      max-width: 100%;
       margin: 0 auto;
       text-align: left;
     }
@@ -809,22 +780,14 @@ if ( $is_logged_in ) {
         padding: 4px 0 12px;
         margin: 0;
       }
-      .stage__emblem {
-        display: none !important;
-      }
       .headline {
-        font-size: 16px;
-        line-height: 1.35;
-        font-weight: 500;
-        margin: 0 0 6px 0;
-        color: var(--ink-soft);
-      }
-      .headline b {
-        font-weight: 700;
+        font-size: clamp(22px, 6vw, 30px);
+        line-height: 1.15;
+        font-weight: 900;
+        margin: 0 0 12px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
         color: var(--ink);
-      }
-      .squiggle {
-        display: none !important;
       }
     }
 
@@ -1136,13 +1099,7 @@ if ( $is_logged_in ) {
 
       <!-- Stage Center -->
       <div id="raka-hero-stage" class="stage">
-        <div id="raka-stage-emblem" class="stage__emblem">
-          <img id="raka-stage-emblem-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Raka">
-        </div>
-        <h1 id="raka-hero-headline" class="headline"><b>Track</b> your gear<br />with <b>Raka Pre-Order</b></h1>
-        <svg id="raka-hero-squiggle" class="squiggle" viewBox="0 0 320 26" aria-hidden="true">
-          <path d="M2 20C34 4 60 3 88 12s52 12 80 3 54-12 82-3 46 10 68 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-        </svg>
+        <h1 id="raka-hero-headline" class="headline font-extrabold tracking-wide uppercase">TRACKING</h1>
         
         <!-- Pre-Order Form Mount (V2) -->
         <div id="raka-stage-form-mount" class="stage__form-mount">
