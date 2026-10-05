@@ -35,27 +35,32 @@ function raka_render_preorder_tracker_v2(): string {
 	<?php endif; ?>
 
 	<style id="raka-tracker-scroll-styles">
+		#raka-res-scroll-body,
+		#raka-tracker-list-container,
 		.custom-tracker-scroll {
-			scrollbar-width: thin;
-			scrollbar-color: rgba(220, 38, 38, 0.4) transparent;
-			scroll-behavior: smooth;
-			-webkit-overflow-scrolling: touch;
+			max-height: 350px !important;
+			max-height: clamp(230px, 38vh, 380px) !important;
+			overflow-y: auto !important;
+			-webkit-overflow-scrolling: touch !important;
 			overscroll-behavior: contain;
 			touch-action: pan-y;
 			pointer-events: auto;
+			scrollbar-width: thin;
+			scrollbar-color: rgba(220, 38, 38, 0.5) transparent;
 		}
 		.custom-tracker-scroll::-webkit-scrollbar {
-			width: 5px;
+			width: 6px;
 		}
 		.custom-tracker-scroll::-webkit-scrollbar-track {
-			background: transparent;
+			background: rgba(0, 0, 0, 0.03);
+			border-radius: 9999px;
 		}
 		.custom-tracker-scroll::-webkit-scrollbar-thumb {
-			background: rgba(160, 160, 160, 0.35);
+			background: rgba(220, 38, 38, 0.4);
 			border-radius: 9999px;
 		}
 		.custom-tracker-scroll::-webkit-scrollbar-thumb:hover {
-			background: rgba(220, 38, 38, 0.6);
+			background: rgba(220, 38, 38, 0.75);
 		}
 		@keyframes rakaFadeInUp {
 			from { opacity: 0; transform: translateY(6px); }
@@ -66,7 +71,7 @@ function raka_render_preorder_tracker_v2(): string {
 		}
 	</style>
 
-	<div id="raka-tracker-v2" class="w-full text-left font-hn select-none text-neutral-900 dark:text-white transition-all duration-300 pb-5 sm:pb-8">
+	<div id="raka-tracker-v2" class="w-full text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 pb-5 sm:pb-8">
 		
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3 sm:space-y-3.5">
@@ -181,7 +186,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Dynamic List Container with custom scroll -->
-			<div id="raka-tracker-list-container" class="space-y-2 sm:space-y-2.5 max-h-[280px] sm:max-h-[340px] md:max-h-[390px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+			<div id="raka-tracker-list-container" style="max-height: clamp(230px, 38vh, 380px); overflow-y: auto;" class="space-y-2 sm:space-y-2.5 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				<!-- Dynamically populated via JS -->
 			</div>
 
@@ -207,7 +212,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Scrollable Container for Result Body -->
-			<div id="raka-res-scroll-body" class="space-y-2.5 sm:space-y-3 max-h-[280px] sm:max-h-[340px] md:max-h-[390px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+			<div id="raka-res-scroll-body" style="max-height: clamp(230px, 38vh, 380px); overflow-y: auto;" class="space-y-2.5 sm:space-y-3 overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				
 				<!-- Product Details & Summary Card -->
 				<div id="raka-res-product-card" class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900/90 border border-black/5 dark:border-white/10 flex gap-3 sm:gap-3.5 items-start shadow-xs">
@@ -1015,28 +1020,22 @@ function raka_render_preorder_tracker_v2(): string {
 				});
 			}
 
-			// Smooth Wheel Scroll for Result View (Hover anywhere inside result card)
+			// Smooth Wheel Scroll forwarding for Result View Header/Padding
 			if (resultView && resScrollBody) {
 				resultView.addEventListener('wheel', (e) => {
-					if (resScrollBody.scrollHeight > resScrollBody.clientHeight) {
-						const prev = resScrollBody.scrollTop;
+					if (!resScrollBody.contains(e.target) && resScrollBody.scrollHeight > resScrollBody.clientHeight) {
 						resScrollBody.scrollTop += e.deltaY;
-						if (resScrollBody.scrollTop !== prev) {
-							e.preventDefault();
-						}
+						e.preventDefault();
 					}
 				}, { passive: false });
 			}
 
-			// Smooth Wheel Scroll for List View (Hover anywhere inside list card)
+			// Smooth Wheel Scroll forwarding for List View Header/Padding
 			if (listView && listContainer) {
 				listView.addEventListener('wheel', (e) => {
-					if (listContainer.scrollHeight > listContainer.clientHeight) {
-						const prev = listContainer.scrollTop;
+					if (!listContainer.contains(e.target) && listContainer.scrollHeight > listContainer.clientHeight) {
 						listContainer.scrollTop += e.deltaY;
-						if (listContainer.scrollTop !== prev) {
-							e.preventDefault();
-						}
+						e.preventDefault();
 					}
 				}, { passive: false });
 			}
