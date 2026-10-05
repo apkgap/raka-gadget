@@ -34,6 +34,34 @@ function raka_render_preorder_tracker_v2(): string {
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 	<?php endif; ?>
 
+	<style id="raka-tracker-scroll-styles">
+		.custom-tracker-scroll {
+			scrollbar-width: thin;
+			scrollbar-color: rgba(220, 38, 38, 0.4) transparent;
+			scroll-behavior: smooth;
+		}
+		.custom-tracker-scroll::-webkit-scrollbar {
+			width: 6px;
+		}
+		.custom-tracker-scroll::-webkit-scrollbar-track {
+			background: transparent;
+		}
+		.custom-tracker-scroll::-webkit-scrollbar-thumb {
+			background: rgba(160, 160, 160, 0.35);
+			border-radius: 9999px;
+		}
+		.custom-tracker-scroll::-webkit-scrollbar-thumb:hover {
+			background: rgba(220, 38, 38, 0.6);
+		}
+		@keyframes rakaFadeInUp {
+			from { opacity: 0; transform: translateY(8px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+		.raka-fade-in {
+			animation: rakaFadeInUp 0.25s ease-out forwards;
+		}
+	</style>
+
 	<div id="raka-tracker-v2" class="w-full text-left font-hn select-none text-neutral-900 dark:text-white transition-all duration-300">
 		
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
@@ -150,7 +178,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Dynamic List Container with custom scroll -->
-			<div id="raka-tracker-list-container" class="space-y-3 max-h-[715px] overflow-y-auto pr-1.5 custom-tracker-scroll">
+			<div id="raka-tracker-list-container" class="space-y-3 max-h-[480px] sm:max-h-[520px] overflow-y-auto pr-1.5 custom-tracker-scroll">
 				<!-- Dynamically populated via JS -->
 			</div>
 
@@ -630,7 +658,7 @@ function raka_render_preorder_tracker_v2(): string {
 				}
 			}
 
-			// Render Multi-Item List View (Listed down cleanly)
+			// Render Multi-Item List View with Dynamic Scroll Loading
 			function renderListView(items, badgeLabel) {
 				listPhoneBadge.textContent = badgeLabel ? (badgeLabel.startsWith('เบอร์') || badgeLabel.startsWith('บัญชี') ? badgeLabel : 'รายการของ: ' + badgeLabel) : 'รายการพรีออเดอร์';
 				listContainer.innerHTML = '';
@@ -640,62 +668,115 @@ function raka_render_preorder_tracker_v2(): string {
 					return;
 				}
 
-				items.forEach((item, index) => {
-					const card = document.createElement('div');
-					card.id = 'raka-list-item-' + index;
-					card.className = 'group p-4 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 hover:bg-neutral-200/90 dark:hover:bg-neutral-700/80 border border-black/5 dark:border-white/10 transition-all duration-200 cursor-pointer space-y-2.5 shadow-sm hover:shadow-md';
+				const allItems = items;
+				const BATCH_SIZE = 6;
+				let renderedCount = 0;
+				let isScrollLoading = false;
+
+				// Create loader element
+				const loaderEl = document.createElement('div');
+				loaderEl.id = 'raka-list-scroll-loader';
+				loaderEl.className = 'py-3 flex items-center justify-center gap-2 text-xs font-mono text-neutral-500 dark:text-neutral-400 opacity-0 transition-opacity duration-200';
+				loaderEl.innerHTML = `
+					<i id="raka-list-loader-ico" class="ri-loader-4-line animate-spin text-base text-red-600 dark:text-red-400"></i>
+					<span id="raka-list-loader-txt">กำลังโหลดรายการเพิ่มเติม...</span>
+				`;
+
+				function appendBatch() {
+					const nextItems = allItems.slice(renderedCount, renderedCount + BATCH_SIZE);
 					
-					const totalVal = item.total ? item.total : (Number(item.price || 0) * Number(item.qty || 1) + Number(item.shipping || 0));
-					const orderNumber = item.order_no || ('RAKA-PRE-' + item.id);
-					const productName = item.product_name || 'พรีออเดอร์สินค้า';
-					const statusText = item.current_status || 'รับคำสั่งซื้อเรียบร้อย';
+					nextItems.forEach((item, batchIdx) => {
+						const globalIdx = renderedCount + batchIdx;
+						const card = document.createElement('div');
+						card.id = 'raka-list-item-' + globalIdx;
+						card.className = 'group raka-fade-in p-4 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 hover:bg-neutral-200/90 dark:hover:bg-neutral-700/80 border border-black/5 dark:border-white/10 transition-all duration-200 cursor-pointer space-y-2.5 shadow-sm hover:shadow-md';
+						
+						const totalVal = item.total ? item.total : (Number(item.price || 0) * Number(item.qty || 1) + Number(item.shipping || 0));
+						const orderNumber = item.order_no || ('RAKA-PRE-' + item.id);
+						const productName = item.product_name || 'พรีออเดอร์สินค้า';
+						const statusText = item.current_status || 'รับคำสั่งซื้อเรียบร้อย';
 
-					card.innerHTML = `
-						<div id="raka-list-card-top-${index}" class="flex items-center justify-between gap-2 border-b border-black/5 dark:border-white/5 pb-2">
-							<span id="raka-list-card-orderno-${index}" class="text-xs sm:text-sm font-mono font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
-								${orderNumber}
-							</span>
-							<span id="raka-list-card-date-${index}" class="text-xs font-mono text-neutral-500 dark:text-neutral-400">
-								${item.created_at || ''}
-							</span>
-						</div>
-						<div id="raka-list-card-body-${index}" class="flex items-center gap-3.5">
-							<div id="raka-list-card-imgwrap-${index}" class="w-14 h-14 rounded-xl bg-white dark:bg-neutral-900 overflow-hidden shrink-0 border border-black/5 dark:border-white/10 flex items-center justify-center">
-								${item.image_url ? `<img id="raka-list-card-img-${index}" src="${item.image_url}" alt="Product" class="w-full h-full object-cover" />` : `<i id="raka-list-card-fallback-${index}" class="ri-shopping-bag-3-line text-2xl text-neutral-400"></i>`}
+						card.innerHTML = `
+							<div id="raka-list-card-top-${globalIdx}" class="flex items-center justify-between gap-2 border-b border-black/5 dark:border-white/5 pb-2">
+								<span id="raka-list-card-orderno-${globalIdx}" class="text-xs sm:text-sm font-mono font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
+									${orderNumber}
+								</span>
+								<span id="raka-list-card-date-${globalIdx}" class="text-xs font-mono text-neutral-500 dark:text-neutral-400">
+									${item.created_at || ''}
+								</span>
 							</div>
-							<div id="raka-list-card-info-${index}" class="flex-1 min-w-0">
-								<h4 id="raka-list-card-name-${index}" class="text-sm sm:text-base font-bold text-neutral-900 dark:text-white line-clamp-1 leading-tight group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-									${productName}
-								</h4>
-								<div id="raka-list-card-meta-${index}" class="flex items-center gap-2 mt-1">
-									<span id="raka-list-card-price-${index}" class="text-sm sm:text-base font-mono font-bold text-neutral-900 dark:text-white">
-										${formatPrice(totalVal)}
-									</span>
-									<span id="raka-list-card-qty-${index}" class="text-xs font-mono text-neutral-500 dark:text-neutral-400">
-										(${item.qty || 1} ชิ้น)
-									</span>
+							<div id="raka-list-card-body-${globalIdx}" class="flex items-center gap-3.5">
+								<div id="raka-list-card-imgwrap-${globalIdx}" class="w-14 h-14 rounded-xl bg-white dark:bg-neutral-900 overflow-hidden shrink-0 border border-black/5 dark:border-white/10 flex items-center justify-center">
+									${item.image_url ? `<img id="raka-list-card-img-${globalIdx}" src="${item.image_url}" alt="Product" class="w-full h-full object-cover" />` : `<i id="raka-list-card-fallback-${globalIdx}" class="ri-shopping-bag-3-line text-2xl text-neutral-400"></i>`}
 								</div>
+								<div id="raka-list-card-info-${globalIdx}" class="flex-1 min-w-0">
+									<h4 id="raka-list-card-name-${globalIdx}" class="text-sm sm:text-base font-bold text-neutral-900 dark:text-white line-clamp-1 leading-tight group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+										${productName}
+									</h4>
+									<div id="raka-list-card-meta-${globalIdx}" class="flex items-center gap-2 mt-1">
+										<span id="raka-list-card-price-${globalIdx}" class="text-sm sm:text-base font-mono font-bold text-neutral-900 dark:text-white">
+											${formatPrice(totalVal)}
+										</span>
+										<span id="raka-list-card-qty-${globalIdx}" class="text-xs font-mono text-neutral-500 dark:text-neutral-400">
+											(${item.qty || 1} ชิ้น)
+										</span>
+									</div>
+								</div>
+								<i id="raka-list-card-arrow-${globalIdx}" class="ri-arrow-right-s-line text-2xl text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
 							</div>
-							<i id="raka-list-card-arrow-${index}" class="ri-arrow-right-s-line text-2xl text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
-						</div>
-						<div id="raka-list-card-footer-${index}" class="pt-1 flex items-center justify-between text-xs sm:text-sm">
-							<span id="raka-list-card-status-${index}" class="inline-flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400">
-								<span id="raka-list-dot-${index}" class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-								${statusText}
-							</span>
-							<span id="raka-list-card-action-${index}" class="text-xs font-medium text-neutral-500 dark:text-neutral-400 group-hover:underline">
-								ดูสถานะ & ไทม์ไลน์
-							</span>
-						</div>
-					`;
+							<div id="raka-list-card-footer-${globalIdx}" class="pt-1 flex items-center justify-between text-xs sm:text-sm">
+								<span id="raka-list-card-status-${globalIdx}" class="inline-flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400">
+									<span id="raka-list-dot-${globalIdx}" class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+									${statusText}
+								</span>
+								<span id="raka-list-card-action-${globalIdx}" class="text-xs font-medium text-neutral-500 dark:text-neutral-400 group-hover:underline">
+									ดูสถานะ & ไทม์ไลน์
+								</span>
+							</div>
+						`;
 
-					card.addEventListener('click', () => {
-						navigatedFromList = true;
-						renderResult(item);
+						card.addEventListener('click', () => {
+							navigatedFromList = true;
+							renderResult(item);
+						});
+
+						listContainer.insertBefore(card, loaderEl);
 					});
 
-					listContainer.appendChild(card);
-				});
+					renderedCount += nextItems.length;
+
+					if (renderedCount >= allItems.length) {
+						if (loaderEl.parentNode === listContainer) {
+							listContainer.removeChild(loaderEl);
+						}
+						if (allItems.length > BATCH_SIZE) {
+							const endEl = document.createElement('div');
+							endEl.id = 'raka-list-end-msg';
+							endEl.className = 'py-3 text-center text-xs font-mono text-neutral-400 dark:text-neutral-500';
+							endEl.textContent = `✦ แสดงรายการทั้งหมดแล้ว (${allItems.length} รายการ) ✦`;
+							listContainer.appendChild(endEl);
+						}
+					}
+				}
+
+				listContainer.appendChild(loaderEl);
+				appendBatch();
+
+				// Scroll loading trigger
+				listContainer.onscroll = () => {
+					if (renderedCount < allItems.length && !isScrollLoading) {
+						const scrollDistance = listContainer.scrollHeight - listContainer.scrollTop - listContainer.clientHeight;
+						if (scrollDistance < 70) {
+							isScrollLoading = true;
+							loaderEl.classList.remove('opacity-0');
+							setTimeout(() => {
+								appendBatch();
+								loaderEl.classList.add('opacity-0');
+								isScrollLoading = false;
+							}, 250);
+						}
+					}
+				};
 
 				searchView.classList.add('hidden');
 				resultView.classList.add('hidden');
