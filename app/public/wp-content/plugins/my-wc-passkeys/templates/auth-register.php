@@ -13,7 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $redirect_to      = ! empty( $redirect ) ? $redirect : ( isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : '' );
 $login_url        = ! empty( $login_url ) ? $login_url : home_url( '/login/' );
-$google_oauth_url = apply_filters( 'my_wc_google_auth_url', home_url( '/wp-login.php?loginSocial=google' ) );
+$google_oauth_url = apply_filters( 'my_wc_google_auth_url', '' );
+if ( empty( $google_oauth_url ) && class_exists( 'NextendSocialLogin' ) && function_exists( 'nsl_get_login_url' ) ) {
+	$google_oauth_url = nsl_get_login_url( 'google' );
+}
+$is_google_active = ! empty( $google_oauth_url );
 ?>
 
 <div id="my-wc-auth-register-container" class="woocommerce my-wc-auth-box w-full max-w-2xl md:max-w-3xl mx-auto">
@@ -149,7 +153,8 @@ $google_oauth_url = apply_filters( 'my_wc_google_auth_url', home_url( '/wp-login
 					<!-- Google / Gmail Register Button -->
 					<a
 						id="my-wc-google-register-btn"
-						href="<?php echo esc_url( $google_oauth_url ); ?>"
+						href="<?php echo $is_google_active ? esc_url( $google_oauth_url ) : 'javascript:void(0);'; ?>"
+						data-active="<?php echo $is_google_active ? '1' : '0'; ?>"
 						class="w-full h-12 sm:h-13 rounded-full bg-white hover:bg-neutral-100 text-neutral-900 text-sm sm:text-base font-semibold border border-neutral-300 dark:border-transparent flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-sm cursor-pointer select-none"
 					>
 						<svg id="my-wc-google-register-svg" class="w-5 h-5 shrink-0" viewBox="0 0 24 24">

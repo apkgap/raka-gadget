@@ -395,6 +395,29 @@
 				}
 			});
 		}
+
+		// Handle Google Login / Register Button click when inactive
+		const googleBtns = document.querySelectorAll('#my-wc-google-login-btn, #my-wc-google-register-btn');
+		googleBtns.forEach((btn) => {
+			btn.addEventListener('click', (e) => {
+				const isActive = btn.getAttribute('data-active') === '1';
+				const href = btn.getAttribute('href');
+				if (!isActive || !href || href === 'javascript:void(0);' || href.startsWith('#')) {
+					e.preventDefault();
+					const statusBox = document.getElementById('my-wc-passkey-login-status') || document.getElementById('my-wc-passkey-register-status');
+					if (statusBox) {
+						showStatus(
+							statusBox,
+							'ระบบเข้าสู่ระบบด้วย Google อยู่ระหว่างการพัฒนา กรุณาใช้ชื่อผู้ใช้/รหัสผ่าน หรือ One-Pass',
+							'info'
+						);
+					} else {
+						alert('ระบบเข้าสู่ระบบด้วย Google อยู่ระหว่างการพัฒนา กรุณาเข้าสู่ระบบด้วยชื่อผู้ใช้/รหัสผ่าน หรือ One-Pass');
+					}
+				}
+			});
+		});
 	});
 
 })();
+
