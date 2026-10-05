@@ -228,6 +228,120 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	$order_no   = sanitize_text_field( (string) $request->get_param( 'order_no' ) );
 	$phone      = sanitize_text_field( (string) $request->get_param( 'phone' ) );
 	$citizen_id = sanitize_text_field( (string) $request->get_param( 'citizen_id' ) );
+	$my_orders  = $request->get_param( 'my_orders' );
+	$user_id    = intval( $request->get_param( 'user_id' ) );
+
+	// ── 0. Handle Current Member / User ID Preorder List Query ──
+	if ( ! empty( $my_orders ) || ! empty( $user_id ) ) {
+		$target_user_id = $user_id > 0 ? $user_id : get_current_user_id();
+		if ( ! is_user_logged_in() && $target_user_id <= 0 ) {
+			return new WP_Error( 'login_required', 'กรุณาเข้าสู่ระบบเพื่อดูรายการพรีออเดอร์ของคุณ', [
+				'status'        => 401,
+				'require_login' => true,
+				'login_url'     => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url( home_url( '/pre-order/?my_orders=1' ) ),
+			] );
+		}
+
+		$current_uid = get_current_user_id();
+		$is_admin    = current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' );
+		if ( ! $is_admin && $current_uid !== $target_user_id ) {
+			$target_user_id = $current_uid;
+		}
+
+		$user_obj = get_userdata( $target_user_id );
+		$user_email = $user_obj ? $user_obj->user_email : '';
+		$user_phones = [];
+		$b_phone = get_user_meta( $target_user_id, 'billing_phone', true );
+		$u_phone = get_user_meta( $target_user_id, 'phone', true );
+		if ( ! empty( $b_phone ) ) {
+			$user_phones[] = (string) $b_phone;
+			$user_phones[] = preg_replace( '/[^0-9]/', '', (string) $b_phone );
+		}
+		if ( ! empty( $u_phone ) ) {
+			$user_phones[] = (string) $u_phone;
+			$user_phones[] = preg_replace( '/[^0-9]/', '', (string) $u_phone );
+		}
+		$user_phones = array_unique( array_filter( $user_phones ) );
+
+		$meta_or_query = [
+			'relation' => 'OR',
+			[
+				'key'     => '_preorder_user_id',
+				'value'   => $target_user_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => '_customer_user',
+				'value'   => $target_user_id,
+				'compare' => '=',
+			],
+		];
+		if ( ! empty( $user_email ) ) {
+			$meta_or_query[] = [
+				'key'     => '_preorder_email',
+				'value'   => $user_email,
+				'compare' => '=',
+			];
+		}
+		foreach ( $user_phones as $p_val ) {
+			$meta_or_query[] = [
+				'key'     => '_preorder_phone',
+				'value'   => $p_val,
+				'compare' => '=',
+			];
+			$meta_or_query[] = [
+				'key'     => '_preorder_phone',
+				'value'   => $p_val,
+				'compare' => 'LIKE',
+			];
+		}
+
+		$user_preorders = get_posts( [
+			'post_type'      => 'preorder',
+			'post_status'    => 'publish',
+			'numberposts'    => 100,
+			'meta_query'     => $meta_or_query,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+		] );
+
+		$author_preorders = get_posts( [
+			'post_type'      => 'preorder',
+			'post_status'    => 'publish',
+			'numberposts'    => 100,
+			'author'         => $target_user_id,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+		] );
+
+		$all_pids = [];
+		$merged_posts = [];
+		foreach ( array_merge( $user_preorders, $author_preorders ) as $p ) {
+			if ( ! in_array( $p->ID, $all_pids, true ) ) {
+				$all_pids[] = $p->ID;
+				$merged_posts[] = $p;
+			}
+		}
+
+		if ( empty( $merged_posts ) ) {
+			return new WP_Error( 'not_found', 'ยังไม่มีรายการพรีออเดอร์ในบัญชีสมาชิกของคุณ', [ 'status' => 404 ] );
+		}
+
+		$items = [];
+		foreach ( $merged_posts as $p ) {
+			$items[] = preorder_raka_format_single_item( $p );
+		}
+
+		return [
+			'success'   => true,
+			'mode'      => 'list',
+			'user_id'   => $target_user_id,
+			'user_name' => $user_obj ? ( $user_obj->display_name ?: $user_obj->user_login ) : '',
+			'count'     => count( $items ),
+			'items'     => $items,
+			'data'      => $items[0],
+		];
+	}
 
 	$args = [
 		'post_type'              => 'preorder',

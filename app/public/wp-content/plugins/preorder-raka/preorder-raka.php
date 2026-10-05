@@ -869,6 +869,10 @@ function preorder_raka_enqueue_assets() {
 				'logoUrl'    => esc_url( $custom_logo_url ),
 				'siteName'   => esc_html( get_bloginfo( 'name' ) ),
 				'siteDesc'   => esc_html( get_bloginfo( 'description' ) ),
+				'isLoggedIn' => is_user_logged_in(),
+				'userId'     => get_current_user_id(),
+				'userName'   => is_user_logged_in() ? ( wp_get_current_user()->display_name ?: wp_get_current_user()->user_login ) : '',
+				'loginUrl'   => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url( home_url( '/pre-order/' ) ),
 			]
 		);
 

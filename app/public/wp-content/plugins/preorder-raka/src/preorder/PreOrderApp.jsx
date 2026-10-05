@@ -176,6 +176,11 @@ const PreOrderApp = ({ postId }) => {
 	const [productsLoading, setProductsLoading] = useState(false);
 	const [productSearch, setProductSearch]     = useState('');
 
+	// My Pre-orders state
+	const [myOrders, setMyOrders]               = useState([]);
+	const [myOrdersLoading, setMyOrdersLoading] = useState(false);
+	const [myOrdersError, setMyOrdersError]     = useState(null);
+
 	// Handle resize for custom responsive styling in JS
 	useEffect(() => {
 		const handleResize = () => setWidth(window.innerWidth);
@@ -185,6 +190,47 @@ const PreOrderApp = ({ postId }) => {
 
 	const isMobile = width < 768;
 	const S = useStyles(isDark, isMobile);
+
+	// Fetch My Pre-orders (by logged-in user or user_id)
+	const fetchMyOrders = async (targetUserId) => {
+		setScreen('my-orders');
+		setMyOrdersLoading(true);
+		setMyOrdersError(null);
+		try {
+			let endpoint = '';
+			const rootUrl = settings.root || '/wp-json/preorder-raka/v1';
+			const params = new URLSearchParams();
+			if (targetUserId) {
+				params.append('user_id', targetUserId);
+			} else {
+				params.append('my_orders', '1');
+			}
+
+			if (rootUrl.includes('rest_route=')) {
+				const [basePath] = rootUrl.split('?');
+				endpoint = `${basePath}?rest_route=/preorder-raka/v1/status&${params.toString()}`;
+			} else {
+				endpoint = `${rootUrl.replace(/\/$/, '')}/status?${params.toString()}`;
+			}
+
+			const res = await fetch(endpoint, {
+				headers: { 'X-WP-Nonce': settings.nonce || '' },
+				credentials: 'same-origin',
+			});
+			const json = await res.json();
+			if (!res.ok) {
+				throw new Error(json.message || 'ไม่พบรายการพรีออเดอร์ในบัญชีของคุณ');
+			}
+			if (json.success) {
+				const items = Array.isArray(json.items) ? json.items : (json.data ? [json.data] : []);
+				setMyOrders(items);
+			}
+		} catch (e) {
+			setMyOrdersError(e.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
+		} finally {
+			setMyOrdersLoading(false);
+		}
+	};
 
 	// Fetch Pre-order Products catalog
 	const fetchPreorderProducts = async () => {
@@ -566,10 +612,10 @@ const PreOrderApp = ({ postId }) => {
 					</div>
 				</div>
 
-				{/* ── Mode Switcher Pills (Tracker vs Preorder Catalog) ── */}
+				{/* ── Mode Switcher Pills (Tracker vs My Orders vs Preorder Catalog) ── */}
 				<div id="preorder-raka-mode-switcher-wrap" style={{ marginBottom: 24 }}>
 					<div id="preorder-raka-mode-pills" style={{
-						display: 'inline-flex', gap: 6, padding: 4, borderRadius: 9999,
+						display: 'inline-flex', flexWrap: 'wrap', gap: 6, padding: 4, borderRadius: 9999,
 						background: 'rgba(0, 0, 0, 0.22)', border: '1px solid rgba(255, 255, 255, 0.25)',
 						backdropFilter: 'blur(8px)'
 					}}>
@@ -580,14 +626,36 @@ const PreOrderApp = ({ postId }) => {
 							style={{
 								padding: '7px 16px', borderRadius: 9999, border: 'none',
 								fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.25s',
-								background: screen !== 'products' ? '#ffffff' : 'transparent',
-								color: screen !== 'products' ? '#dc2626' : '#ffffff',
-								boxShadow: screen !== 'products' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
+								background: screen !== 'products' && screen !== 'my-orders' ? '#ffffff' : 'transparent',
+								color: screen !== 'products' && screen !== 'my-orders' ? '#dc2626' : '#ffffff',
+								boxShadow: screen !== 'products' && screen !== 'my-orders' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
 								display: 'inline-flex', alignItems: 'center', gap: 6,
 							}}
 						>
 							<i className="ri-radar-line" />
-							<span>เช็คสถานะพรีออเดอร์</span>
+							<span>เช็คสถานะ</span>
+						</button>
+						<button
+							id="preorder-tab-btn-my-orders"
+							type="button"
+							onClick={() => {
+								if (settings.isLoggedIn) {
+									fetchMyOrders();
+								} else {
+									window.location.href = settings.loginUrl || '/my-account/';
+								}
+							}}
+							style={{
+								padding: '7px 16px', borderRadius: 9999, border: 'none',
+								fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.25s',
+								background: screen === 'my-orders' ? '#ffffff' : 'transparent',
+								color: screen === 'my-orders' ? '#dc2626' : '#ffffff',
+								boxShadow: screen === 'my-orders' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
+								display: 'inline-flex', alignItems: 'center', gap: 6,
+							}}
+						>
+							<i className={settings.isLoggedIn ? "ri-user-star-line" : "ri-lock-line"} />
+							<span>{settings.isLoggedIn ? 'พรีออเดอร์ของฉัน' : 'เข้าสู่ระบบ'}</span>
 						</button>
 						<button
 							id="preorder-tab-btn-catalog"
@@ -619,6 +687,27 @@ const PreOrderApp = ({ postId }) => {
 					</div>
 				</div>
 
+				{/* Hero title — My Orders */}
+				{screen === 'my-orders' && (
+					<div id="preorder-raka-hero-content-my-orders" style={{ position: 'relative' }}>
+						<div id="preorder-raka-hero-chip-my-orders" style={{
+							display: 'inline-flex', alignItems: 'center', gap: 6,
+							padding: '8px 16px', borderRadius: 9999,
+							background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(255, 255, 255, 0.25)',
+							fontSize: 14, fontWeight: 500, letterSpacing: '0.6px', color: '#ffffff',
+						}} className="mb-3">
+							<i className="ri-user-smile-line" style={{ fontSize: 14 }} />
+							<span>บัญชีสมาชิก {settings.userName ? `(${settings.userName})` : ''}</span>
+						</div>
+						<h2 id="preorder-raka-hero-title-my-orders" style={{ margin: '12px 0 6px', fontSize: 28, fontWeight: 500, letterSpacing: '-0.6px', color: '#ffffff', lineHeight: 1.15 }}>
+							รายการพรีออเดอร์ของคุณ
+						</h2>
+						<p id="preorder-raka-hero-desc-my-orders" style={{ margin: 0, fontSize: 15, color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.65 }}>
+							ประวัติและสถานะการสั่งซื้อสินค้าพรีออเดอร์ทั้งหมดที่ผูกกับบัญชีสมาชิกของคุณ
+						</p>
+					</div>
+				)}
+
 				{/* Hero title — Products Catalog */}
 				{screen === 'products' && (
 					<div id="preorder-raka-hero-content-products" style={{ position: 'relative' }}>
@@ -641,7 +730,7 @@ const PreOrderApp = ({ postId }) => {
 				)}
 
 				{/* Hero title — search / verify */}
-				{screen !== 'result' && screen !== 'products' && (
+				{screen !== 'result' && screen !== 'products' && screen !== 'my-orders' && (
 					<div id="preorder-raka-hero-content" style={{ position: 'relative' }}>
 						<div id="preorder-raka-hero-chip" style={{
 							display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -697,6 +786,124 @@ const PreOrderApp = ({ postId }) => {
 
 			{/* ── BODY ──────────────────────────────────────────────────────── */}
 			<div id="preorder-raka-body" style={S.body}>
+
+				{/* MY PRE-ORDERS LIST VIEW */}
+				{screen === 'my-orders' && (
+					<div id="preorder-raka-my-orders-view" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${ds(T.line, T.lLine, isDark)}`, paddingBottom: 16 }}>
+							<div>
+								<div style={{ fontSize: 12, color: T.red, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+									บัญชีสมาชิก: {settings.userName || 'คุณ'}
+								</div>
+								<h3 style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, color: ds('#ffffff', '#111827', isDark) }}>
+									รายการพรีออเดอร์ของคุณ ({myOrders.length} รายการ)
+								</h3>
+							</div>
+							<button
+								type="button"
+								onClick={() => setScreen(postId ? 'verify-direct' : 'search')}
+								style={S.backBtn}
+							>
+								<i className="ri-arrow-left-s-line" />
+								<span>ค้นหาด้วยเลขออเดอร์</span>
+							</button>
+						</div>
+
+						{myOrdersLoading && (
+							<div style={{ padding: 48, textAlign: 'center', color: T.red }}>
+								<i className="ri-loader-4-line" style={{ fontSize: 32, animation: 'spin 1s linear infinite' }} />
+								<p style={{ margin: '12px 0 0', fontSize: 14, color: ds('#888', '#666', isDark) }}>กำลังโหลดรายการพรีออเดอร์...</p>
+							</div>
+						)}
+
+						{myOrdersError && !myOrdersLoading && (
+							<div style={{ padding: 24, borderRadius: 16, background: 'rgba(225,29,72,0.1)', border: `1px solid ${T.redBorder}`, textAlign: 'center', color: T.red }}>
+								<i className="ri-error-warning-line" style={{ fontSize: 28 }} />
+								<p style={{ margin: '8px 0 0', fontSize: 14, fontWeight: 600 }}>{myOrdersError}</p>
+							</div>
+						)}
+
+						{!myOrdersLoading && !myOrdersError && myOrders.length === 0 && (
+							<div style={{ padding: 48, textAlign: 'center', borderRadius: 16, background: ds(T.bg2, T.lBg2, isDark), border: `1px solid ${ds(T.line, T.lLine, isDark)}` }}>
+								<i className="ri-inbox-line" style={{ fontSize: 40, color: ds('#555', '#aaa', isDark) }} />
+								<p style={{ margin: '12px 0 4px', fontSize: 16, fontWeight: 600, color: ds('#fff', '#111', isDark) }}>ยังไม่มีรายการพรีออเดอร์ในบัญชีของคุณ</p>
+								<p style={{ margin: 0, fontSize: 13, color: ds('#888', '#666', isDark) }}>เมื่อคุณสั่งซื้อสินค้าพรีออเดอร์ รายการจะปรากฏที่นี่โดยอัตโนมัติ</p>
+							</div>
+						)}
+
+						{!myOrdersLoading && myOrders.length > 0 && (
+							<div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+								{myOrders.map((item, idx) => (
+									<div
+										key={item.id || idx}
+										onClick={() => {
+											setPreorderData(item);
+											setScreen('result');
+										}}
+										style={{
+											...S.card,
+											cursor: 'pointer',
+											display: 'flex',
+											flexDirection: isMobile ? 'column' : 'row',
+											alignItems: isMobile ? 'flex-start' : 'center',
+											justifyContent: 'space-between',
+											gap: 16,
+											boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.04)',
+											transition: 'all 0.2s ease',
+										}}
+									>
+										<div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0, flex: 1 }}>
+											<div style={{ width: 56, height: 56, borderRadius: 12, overflow: 'hidden', background: ds(T.bg3, T.lBg3, isDark), flexShrink: 0, border: `1px solid ${ds(T.line, T.lLine, isDark)}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+												{item.image_url ? (
+													<img src={item.image_url} alt={item.product_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+												) : (
+													<i className="ri-shopping-bag-3-line" style={{ fontSize: 22, color: ds('#666', '#aaa', isDark) }} />
+												)}
+											</div>
+											<div style={{ minWidth: 0, flex: 1 }}>
+												<div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+													<span style={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 700, color: ds('#ffffff', '#111827', isDark) }}>
+														{item.order_no}
+													</span>
+													<span style={{ fontSize: 11, color: ds('#777', '#888', isDark) }}>
+														{item.created_at}
+													</span>
+												</div>
+												<h4 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: ds('#ffffff', '#111827', isDark), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+													{item.product_name}
+												</h4>
+											</div>
+										</div>
+
+										<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: isMobile ? '100%' : 'auto', gap: 20 }}>
+											<div style={{ textAlign: isMobile ? 'left' : 'right' }}>
+												<div style={{ fontSize: 16, fontWeight: 700, color: T.red, fontFamily: 'monospace' }}>
+													฿{(item.total || item.price || 0).toLocaleString()}
+												</div>
+												<div style={{ fontSize: 12, color: ds('#888', '#777', isDark) }}>
+													{item.qty || 1} ชิ้น
+												</div>
+											</div>
+
+											<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+												<span style={{
+													padding: '4px 10px', borderRadius: 9999,
+													background: T.redSubtle, border: `1px solid ${T.redBorder}`,
+													color: T.red, fontSize: 12, fontWeight: 600,
+													display: 'inline-flex', alignItems: 'center', gap: 5,
+												}}>
+													<span style={{ width: 6, height: 6, borderRadius: '50%', background: T.red }} />
+													{item.current_status}
+												</span>
+												<i className="ri-arrow-right-s-line" style={{ fontSize: 20, color: ds('#666', '#aaa', isDark) }} />
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+				)}
 
 				{/* PRE-ORDER PRODUCTS CATALOG VIEW */}
 				{screen === 'products' && (
