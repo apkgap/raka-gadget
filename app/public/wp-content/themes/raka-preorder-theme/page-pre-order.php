@@ -189,7 +189,7 @@ if ( $is_logged_in ) {
     .hero__left {
       position: relative;
       background: var(--panel);
-      padding: clamp(8px, 1.8vw, 24px) clamp(14px, 2.2vw, 36px);
+      padding: clamp(8px, 1.8vw, 24px) clamp(14px, 2.2vw, 36px) max(clamp(20px, 3.5vh, 36px), env(safe-area-inset-bottom, 24px));
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -197,6 +197,7 @@ if ( $is_logged_in ) {
       min-height: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       border-right: 1px solid var(--line);
       box-shadow: none;
       border-radius: 0;
@@ -366,7 +367,7 @@ if ( $is_logged_in ) {
       margin: auto 0;
       text-align: center;
       position: relative;
-      padding: clamp(8px, 1.2vh, 18px) 0;
+      padding: clamp(6px, 1vh, 16px) 0 clamp(16px, 2.5vh, 28px);
       width: 100%;
     }
 

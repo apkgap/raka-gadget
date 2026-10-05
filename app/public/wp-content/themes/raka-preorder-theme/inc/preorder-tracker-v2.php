@@ -64,7 +64,7 @@ function raka_render_preorder_tracker_v2(): string {
 		}
 	</style>
 
-	<div id="raka-tracker-v2" class="w-full text-left font-hn select-none text-neutral-900 dark:text-white transition-all duration-300">
+	<div id="raka-tracker-v2" class="w-full text-left font-hn select-none text-neutral-900 dark:text-white transition-all duration-300 pb-5 sm:pb-8">
 		
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3 sm:space-y-3.5">
@@ -159,7 +159,7 @@ function raka_render_preorder_tracker_v2(): string {
 		</div>
 
 		<!-- ── 2. MULTI-ITEM LIST VIEW (Phone Search / My Pre-orders) ── -->
-		<div id="raka-tracker-list-view" class="hidden w-full p-3 sm:p-4 md:p-5 rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 shadow-sm space-y-2.5 sm:space-y-3">
+		<div id="raka-tracker-list-view" class="hidden w-full p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 shadow-sm space-y-2.5 sm:space-y-3 mb-2">
 			
 			<!-- List Header (Pinned at Top of Frame) -->
 			<div id="raka-list-header-bar" class="flex items-center justify-between gap-2 pb-2 sm:pb-2.5 border-b border-black/10 dark:border-white/10 shrink-0">
@@ -180,14 +180,14 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Dynamic List Container with custom scroll -->
-			<div id="raka-tracker-list-container" class="space-y-2 sm:space-y-2.5 max-h-[300px] sm:max-h-[340px] md:max-h-[380px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+			<div id="raka-tracker-list-container" class="space-y-2 sm:space-y-2.5 max-h-[240px] sm:max-h-[290px] md:max-h-[340px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				<!-- Dynamically populated via JS -->
 			</div>
 
 		</div>
 
 		<!-- ── 3. SINGLE RESULT / DETAIL VIEW ── -->
-		<div id="raka-tracker-result-view" class="hidden w-full p-3 sm:p-4 md:p-5 rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 shadow-sm space-y-2.5 sm:space-y-3">
+		<div id="raka-tracker-result-view" class="hidden w-full p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 shadow-sm space-y-2.5 sm:space-y-3 mb-2">
 			
 			<!-- Top Header: Order ID & Back Button -->
 			<div id="raka-res-header-bar" class="flex items-center justify-between gap-2 pb-2 sm:pb-2.5 border-b border-black/10 dark:border-white/10 shrink-0">
@@ -206,7 +206,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Scrollable Container for Result Body -->
-			<div id="raka-res-scroll-body" class="space-y-2.5 sm:space-y-3 max-h-[300px] sm:max-h-[340px] md:max-h-[380px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
+			<div id="raka-res-scroll-body" class="space-y-2.5 sm:space-y-3 max-h-[240px] sm:max-h-[290px] md:max-h-[340px] overflow-y-auto pr-1 sm:pr-1.5 custom-tracker-scroll">
 				
 				<!-- Product Details & Summary Card -->
 				<div id="raka-res-product-card" class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-neutral-900/90 border border-black/5 dark:border-white/10 flex gap-3 sm:gap-3.5 items-start shadow-xs">
