@@ -8,6 +8,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$hero_css_path = get_template_directory() . '/assets/css/standalone-hero.css';
+$hero_css_ver  = file_exists( $hero_css_path ) ? (string) filemtime( $hero_css_path ) : '1.0.0';
+$hero_js_path  = get_template_directory() . '/assets/js/standalone-hero.js';
+$hero_js_ver   = file_exists( $hero_js_path ) ? (string) filemtime( $hero_js_path ) : '1.0.0';
 ?>
 <!DOCTYPE html>
 <html id="raka-standalone-html" <?php language_attributes(); ?> class="light">
@@ -19,6 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<!-- RemixIcon -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 	
+	<!-- Standalone Hero Dedicated Stylesheet -->
+	<link rel="stylesheet" href="<?php echo esc_url( get_template_directory_uri() . '/assets/css/standalone-hero.css?ver=' . $hero_css_ver ); ?>">
+
 	<script id="raka-theme-instant-init">
 		(function() {
 			try {
@@ -34,7 +42,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		})();
 	</script>
 
+	<!-- Standalone Hero Dedicated JS Script -->
+	<script src="<?php echo esc_url( get_template_directory_uri() . '/assets/js/standalone-hero.js?ver=' . $hero_js_ver ); ?>" defer></script>
+
 	<?php wp_head(); ?>
 </head>
-<body id="raka-standalone-body" <?php body_class( 'bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 antialiased min-h-screen overflow-x-hidden' ); ?>>
+<body id="raka-standalone-body" <?php body_class( 'mindora-preorder-body' ); ?>>
 <?php wp_body_open(); ?>
