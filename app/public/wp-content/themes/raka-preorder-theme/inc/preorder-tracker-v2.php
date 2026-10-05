@@ -113,7 +113,6 @@ function raka_render_preorder_tracker_v2(): string {
 			<div id="raka-turnstile-wrapper" class="flex flex-col items-center justify-center min-h-[65px] rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/5 p-2 overflow-hidden">
 				<div
 					id="raka-turnstile-widget"
-					class="cf-turnstile"
 					data-sitekey="<?php echo esc_attr( $turnstile_sitekey ); ?>"
 					data-theme="auto"
 				></div>
