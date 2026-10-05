@@ -15,23 +15,23 @@ $current_user = wp_get_current_user();
 $is_logged_in = is_user_logged_in();
 ?>
 <!-- Topbar Header -->
-<header id="raka-hero-topbar" class="topbar">
+<header id="raka-hero-topbar" class="flex items-center justify-between gap-3 flex-none sticky top-0 z-50 bg-white/95 dark:bg-[#111111]/95 backdrop-blur-md pt-1.5 pb-2.5 mb-1.5 border-b border-black/5 dark:border-white/10 transition-colors">
 	<!-- Brand -->
-	<div id="raka-topbar-brand-wrap" class="nav-left flex items-center">
-		<a id="raka-topbar-brand-link" class="brand flex items-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-			<img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-			<img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+	<div id="raka-topbar-brand-wrap" class="flex items-center gap-2.5 sm:gap-6">
+		<a id="raka-topbar-brand-link" class="inline-flex items-center gap-2 select-none" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+			<img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto max-h-7 object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+			<img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto max-h-7 object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
 		</a>
 	</div>
 
 	<!-- Controls -->
-	<div id="raka-topbar-controls" class="theme-topbar-controls">
+	<div id="raka-topbar-controls" class="flex items-center gap-1.5 sm:gap-2.5">
 		
 		<!-- User Account Dropdown -->
 		<div id="raka-account-menu-wrap" class="relative">
 			<button
 				id="raka-account-btn"
-				class="theme-ctrl-btn"
+				class="w-8.5 h-8.5 sm:w-9.5 sm:h-9.5 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/80 text-neutral-900 dark:text-white hover:scale-105 transition-all cursor-pointer shrink-0 relative"
 				type="button"
 				onclick="window.toggleRakaAccountMenu(event)"
 				aria-label="<?php esc_attr_e( 'Account Menu', 'raka-preorder-theme' ); ?>"
@@ -58,7 +58,7 @@ $is_logged_in = is_user_logged_in();
 							<?php echo esc_html( strtoupper( substr( $current_user->display_name, 0, 1 ) ) ); ?>
 						</div>
 						<div id="raka-account-user-meta" class="min-w-0 flex-1">
-							<p id="raka-account-user-name" class="text-xs font-bold truncate font-hn leading-tight"><?php echo esc_html( $current_user->display_name ); ?></p>
+							<p id="raka-account-user-name" class="text-xs font-bold truncate font-sans leading-tight"><?php echo esc_html( $current_user->display_name ); ?></p>
 							<p id="raka-account-user-email" class="text-[10px] text-neutral-500 dark:text-neutral-400 truncate font-mono mt-0.5"><?php echo esc_html( $current_user->user_email ); ?></p>
 						</div>
 					</div>
@@ -80,8 +80,8 @@ $is_logged_in = is_user_logged_in();
 					$login_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/login/' );
 				?>
 					<div id="raka-account-guest-header" class="pb-3 mb-3 border-b border-black/10 dark:border-white/10">
-						<h4 id="raka-account-guest-title" class="text-xs font-bold font-hn leading-tight"><?php esc_html_e( 'RAKA GADGET Account', 'raka-preorder-theme' ); ?></h4>
-						<p id="raka-account-guest-sub" class="text-[10px] text-neutral-500 dark:text-neutral-400 font-hn mt-0.5"><?php esc_html_e( 'Sign in to access order tracking & perks', 'raka-preorder-theme' ); ?></p>
+						<h4 id="raka-account-guest-title" class="text-xs font-bold font-sans leading-tight"><?php esc_html_e( 'RAKA GADGET Account', 'raka-preorder-theme' ); ?></h4>
+						<p id="raka-account-guest-sub" class="text-[10px] text-neutral-500 dark:text-neutral-400 font-sans mt-0.5"><?php esc_html_e( 'Sign in to access order tracking & perks', 'raka-preorder-theme' ); ?></p>
 					</div>
 					<div id="raka-account-guest-actions" class="flex flex-col gap-2">
 						<a id="raka-guest-login-btn" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs font-bold tracking-wider uppercase transition-all shadow-md" href="<?php echo esc_url( $login_url ); ?>">
@@ -100,7 +100,7 @@ $is_logged_in = is_user_logged_in();
 		<!-- Cart Drawer Button -->
 		<a
 			id="raka-cart-btn"
-			class="theme-ctrl-btn"
+			class="w-8.5 h-8.5 sm:w-9.5 sm:h-9.5 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/80 text-neutral-900 dark:text-white hover:scale-105 transition-all cursor-pointer shrink-0 relative"
 			href="<?php echo esc_url( $cart_url ); ?>"
 			onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
 			aria-label="Shopping Cart"
@@ -118,7 +118,7 @@ $is_logged_in = is_user_logged_in();
 		<!-- Theme Mode Switcher -->
 		<button
 			id="raka-theme-btn"
-			class="theme-ctrl-btn"
+			class="w-8.5 h-8.5 sm:w-9.5 sm:h-9.5 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/80 text-neutral-900 dark:text-white hover:scale-105 transition-all cursor-pointer shrink-0"
 			type="button"
 			onclick="window.toggleRakaTheme(event)"
 			aria-label="Toggle dark / light mode"
