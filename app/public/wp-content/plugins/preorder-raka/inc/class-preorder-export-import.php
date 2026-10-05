@@ -308,6 +308,57 @@ class Preorder_Raka_Export_Import {
 	}
 
 	/**
+	 * Attach image from URL as Featured Image / Post Thumbnail.
+	 *
+	 * @param string $url Image URL.
+	 * @param int    $post_id Target Post ID.
+	 * @return int Attachment ID on success, 0 on failure.
+	 */
+	public static function attach_image_from_url( string $url, int $post_id ): int {
+		$url = trim( $url );
+		if ( empty( $url ) || ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			return 0;
+		}
+
+		// Check if URL is already a local attachment
+		$local_att_id = attachment_url_to_postid( $url );
+		if ( $local_att_id > 0 ) {
+			set_post_thumbnail( $post_id, $local_att_id );
+			return $local_att_id;
+		}
+
+		// Check if already in media library by source URL meta
+		global $wpdb;
+		$existing_id = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_source_url' AND meta_value = %s LIMIT 1",
+			$url
+		) );
+
+		if ( $existing_id > 0 && 'attachment' === get_post_type( $existing_id ) ) {
+			set_post_thumbnail( $post_id, $existing_id );
+			return $existing_id;
+		}
+
+		// Download and sideload image into media library
+		if ( ! function_exists( 'media_sideload_image' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/media.php';
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+		}
+
+		$att_id = media_sideload_image( $url, $post_id, null, 'id' );
+
+		if ( is_numeric( $att_id ) && (int) $att_id > 0 ) {
+			$att_id = (int) $att_id;
+			update_post_meta( $att_id, '_source_url', esc_url_raw( $url ) );
+			set_post_thumbnail( $post_id, $att_id );
+			return $att_id;
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Handle Export Request.
 	 */
 	public static function handle_export(): void {
@@ -350,6 +401,12 @@ class Preorder_Raka_Export_Import {
 				$steps = [];
 			}
 
+			$image_url = get_the_post_thumbnail_url( $p->ID, 'full' ) ?: '';
+			$product_id = (int) get_post_meta( $p->ID, '_preorder_product_id', true );
+			if ( empty( $image_url ) && $product_id > 0 ) {
+				$image_url = get_the_post_thumbnail_url( $product_id, 'full' ) ?: '';
+			}
+
 			$data[] = [
 				'id'                  => $p->ID,
 				'title'               => $p->post_title,
@@ -358,8 +415,9 @@ class Preorder_Raka_Export_Import {
 				'preorder_no'         => (string) get_post_meta( $p->ID, '_preorder_no', true ),
 				'phone'               => (string) get_post_meta( $p->ID, '_preorder_phone', true ),
 				'citizen_id_last4'    => (string) get_post_meta( $p->ID, '_preorder_citizen_id_last4', true ),
-				'product_id'          => (int) get_post_meta( $p->ID, '_preorder_product_id', true ),
+				'product_id'          => $product_id,
 				'product_name'        => (string) get_post_meta( $p->ID, '_preorder_product', true ),
+				'image_url'           => $image_url,
 				'price'               => (float) get_post_meta( $p->ID, '_preorder_price', true ),
 				'qty'                 => (int) ( get_post_meta( $p->ID, '_preorder_qty', true ) ?: 1 ),
 				'shipping'            => (float) ( get_post_meta( $p->ID, '_preorder_shipping', true ) ?: 0 ),
@@ -390,6 +448,7 @@ class Preorder_Raka_Export_Import {
 				'phone',
 				'citizen_id_last4',
 				'product_name',
+				'image_url',
 				'price',
 				'qty',
 				'shipping',
@@ -407,6 +466,7 @@ class Preorder_Raka_Export_Import {
 					$row['phone'],
 					$row['citizen_id_last4'],
 					$row['product_name'],
+					$row['image_url'],
 					$row['price'],
 					$row['qty'],
 					$row['shipping'],
@@ -612,17 +672,18 @@ class Preorder_Raka_Export_Import {
 				continue;
 			}
 
-			$title       = sanitize_text_field( (string) ( $rec['title'] ?? ( 'พรีออเดอร์ ' . $order_no ) ) );
-			$phone       = sanitize_text_field( (string) ( $rec['phone'] ?? '' ) );
-			$citizen_id  = sanitize_text_field( (string) ( $rec['citizen_id_last4'] ?? '' ) );
+			$title        = sanitize_text_field( (string) ( $rec['title'] ?? ( 'พรีออเดอร์ ' . $order_no ) ) );
+			$phone        = sanitize_text_field( (string) ( $rec['phone'] ?? '' ) );
+			$citizen_id   = sanitize_text_field( (string) ( $rec['citizen_id_last4'] ?? '' ) );
 			$product_name = sanitize_text_field( (string) ( $rec['product_name'] ?? '' ) );
-			$price       = (float) ( $rec['price'] ?? 0 );
-			$qty         = max( 1, (int) ( $rec['qty'] ?? 1 ) );
-			$shipping    = (float) ( $rec['shipping'] ?? 0 );
-			$tracking    = sanitize_text_field( (string) ( $rec['tracking'] ?? '' ) );
-			$address     = sanitize_textarea_field( (string) ( $rec['address'] ?? '' ) );
-			$step_idx    = max( 0, (int) ( $rec['current_step_idx'] ?? 0 ) );
-			$status      = in_array( $rec['status'] ?? 'publish', [ 'publish', 'draft', 'pending' ], true ) ? $rec['status'] : 'publish';
+			$image_url    = esc_url_raw( trim( (string) ( $rec['image_url'] ?? '' ) ) );
+			$price        = (float) ( $rec['price'] ?? 0 );
+			$qty          = max( 1, (int) ( $rec['qty'] ?? 1 ) );
+			$shipping     = (float) ( $rec['shipping'] ?? 0 );
+			$tracking     = sanitize_text_field( (string) ( $rec['tracking'] ?? '' ) );
+			$address      = sanitize_textarea_field( (string) ( $rec['address'] ?? '' ) );
+			$step_idx     = max( 0, (int) ( $rec['current_step_idx'] ?? 0 ) );
+			$status       = in_array( $rec['status'] ?? 'publish', [ 'publish', 'draft', 'pending' ], true ) ? $rec['status'] : 'publish';
 
 			// Parse steps
 			$steps = [];
@@ -666,6 +727,24 @@ class Preorder_Raka_Export_Import {
 						update_post_meta( $post_id, '_preorder_steps', $steps );
 					}
 
+					// Process image
+					if ( ! empty( $image_url ) ) {
+						self::attach_image_from_url( $image_url, $post_id );
+					} else {
+						// Fallback to match product thumbnail
+						$prod_id = (int) get_post_meta( $post_id, '_preorder_product_id', true );
+						if ( ! $prod_id && ! empty( $product_name ) ) {
+							$matched = get_page_by_title( $product_name, OBJECT, 'preorder_product' );
+							if ( $matched ) {
+								$prod_id = $matched->ID;
+								update_post_meta( $post_id, '_preorder_product_id', $prod_id );
+							}
+						}
+						if ( $prod_id && has_post_thumbnail( $prod_id ) && ! has_post_thumbnail( $post_id ) ) {
+							set_post_thumbnail( $post_id, (int) get_post_thumbnail_id( $prod_id ) );
+						}
+					}
+
 					$updated++;
 					$details[] = sprintf( 'อัปเดต #%s: %s', $order_no, $title );
 				} else {
@@ -691,6 +770,24 @@ class Preorder_Raka_Export_Import {
 					update_post_meta( $post_id, '_preorder_current_step_idx', $step_idx );
 					if ( ! empty( $steps ) ) {
 						update_post_meta( $post_id, '_preorder_steps', $steps );
+					}
+
+					// Process image
+					if ( ! empty( $image_url ) ) {
+						self::attach_image_from_url( $image_url, $post_id );
+					} else {
+						// Fallback to match product thumbnail
+						$prod_id = 0;
+						if ( ! empty( $product_name ) ) {
+							$matched = get_page_by_title( $product_name, OBJECT, 'preorder_product' );
+							if ( $matched ) {
+								$prod_id = $matched->ID;
+								update_post_meta( $post_id, '_preorder_product_id', $prod_id );
+							}
+						}
+						if ( $prod_id && has_post_thumbnail( $prod_id ) ) {
+							set_post_thumbnail( $post_id, (int) get_post_thumbnail_id( $prod_id ) );
+						}
 					}
 
 					$created++;
@@ -756,8 +853,9 @@ class Preorder_Raka_Export_Import {
 				continue;
 			}
 
-			$price = (float) ( $rec['price'] ?? 0 );
-			$desc  = sanitize_textarea_field( (string) ( $rec['description'] ?? '' ) );
+			$price     = (float) ( $rec['price'] ?? 0 );
+			$desc      = sanitize_textarea_field( (string) ( $rec['description'] ?? '' ) );
+			$image_url = esc_url_raw( trim( (string) ( $rec['image_url'] ?? '' ) ) );
 
 			// Check if product exists by title
 			$existing = get_page_by_title( $title, OBJECT, 'preorder_product' );
@@ -768,6 +866,9 @@ class Preorder_Raka_Export_Import {
 					'post_content' => $desc,
 				] );
 				update_post_meta( $existing->ID, '_preorder_price', $price );
+				if ( ! empty( $image_url ) ) {
+					self::attach_image_from_url( $image_url, $existing->ID );
+				}
 				$updated++;
 				$details[] = sprintf( 'อัปเดตสินค้า: %s (฿%s)', $title, number_format( $price ) );
 			} elseif ( ! $existing ) {
@@ -779,6 +880,9 @@ class Preorder_Raka_Export_Import {
 				] );
 				if ( $pid && ! is_wp_error( $pid ) ) {
 					update_post_meta( $pid, '_preorder_price', $price );
+					if ( ! empty( $image_url ) ) {
+						self::attach_image_from_url( $image_url, $pid );
+					}
 					$created++;
 					$details[] = sprintf( 'เพิ่มสินค้าใหม่: %s (฿%s)', $title, number_format( $price ) );
 				}
@@ -811,8 +915,8 @@ class Preorder_Raka_Export_Import {
 				$out = fopen( 'php://output', 'w' );
 				fprintf( $out, chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) );
 				fputcsv( $out, [ 'title', 'price', 'image_url', 'description', 'status' ] );
-				fputcsv( $out, [ 'Wooting 60HE+ Custom Keyboard (Pre-order)', '8900', 'https://example.com/keyboard.jpg', 'สวิตช์ Lekker Hall Effect ปรับแต่งได้ตามต้องการ', 'publish' ] );
-				fputcsv( $out, [ 'Finalmouse UltralightX Lion (Pre-order)', '7900', 'https://example.com/mouse.jpg', 'เมาส์เกมมิ่งคาร์บอนไฟเบอร์ไร้สายน้ำหนัก 31 กรัม', 'publish' ] );
+				fputcsv( $out, [ 'Wooting 60HE+ Custom Keyboard (Pre-order)', '8900', 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800', 'สวิตช์ Lekker Hall Effect ปรับแต่งได้ตามต้องการ', 'publish' ] );
+				fputcsv( $out, [ 'Finalmouse UltralightX Lion (Pre-order)', '7900', 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=800', 'เมาส์เกมมิ่งคาร์บอนไฟเบอร์ไร้สายน้ำหนัก 31 กรัม', 'publish' ] );
 				fclose( $out );
 			} else {
 				header( 'Content-Type: application/json; charset=UTF-8' );
@@ -823,7 +927,7 @@ class Preorder_Raka_Export_Import {
 						[
 							'title'       => 'Wooting 60HE+ Custom Keyboard (Pre-order)',
 							'price'       => 8900,
-							'image_url'   => 'https://example.com/keyboard.jpg',
+							'image_url'   => 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800',
 							'description' => 'สวิตช์ Lekker Hall Effect ปรับแต่งได้ตามต้องการ',
 							'status'      => 'publish',
 						],
@@ -842,6 +946,7 @@ class Preorder_Raka_Export_Import {
 					'phone',
 					'citizen_id_last4',
 					'product_name',
+					'image_url',
 					'price',
 					'qty',
 					'shipping',
@@ -867,6 +972,7 @@ class Preorder_Raka_Export_Import {
 					'0812345678',
 					'5678',
 					'Wooting 60HE+ Custom Keyboard (Pre-order)',
+					'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800',
 					'8900',
 					'1',
 					'100',
@@ -889,6 +995,7 @@ class Preorder_Raka_Export_Import {
 							'phone'            => '0812345678',
 							'citizen_id_last4' => '5678',
 							'product_name'     => 'Wooting 60HE+ Custom Keyboard (Pre-order)',
+							'image_url'        => 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800',
 							'price'            => 8900,
 							'qty'              => 1,
 							'shipping'         => 100,
@@ -914,3 +1021,4 @@ class Preorder_Raka_Export_Import {
 		exit;
 	}
 }
+
