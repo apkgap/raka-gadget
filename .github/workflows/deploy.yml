@@ -14,7 +14,7 @@ jobs:
       - name: 🚚 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🚀 FTP Deploy Plugin (preorder-raka)
+      - name: 🚀 FTP Deploy All Plugins (wp-content/plugins)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -25,31 +25,8 @@ jobs:
           security: loose
           security-mode: loose
           log-level: verbose
-          local-dir: ./app/public/wp-content/plugins/preorder-raka/
-          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/preorder-raka/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/src/**
-            **/package.json
-            **/package-lock.json
-            **/AGENTS.md
-            **/.windsurf/**
-
-      - name: 🚀 FTP Deploy Plugin (my-wc-passkeys)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          security: loose
-          security-mode: loose
-          log-level: verbose
-          local-dir: ./app/public/wp-content/plugins/my-wc-passkeys/
-          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/my-wc-passkeys/
+          local-dir: ./app/public/wp-content/plugins/
+          server-dir: ${{ secrets.FTP_PLUGIN_DIR }}/
           exclude: |
             **/.git*
             **/.git*/**
@@ -82,4 +59,3 @@ jobs:
             **/package-lock.json
             **/AGENTS.md
             **/.windsurf/**
-
