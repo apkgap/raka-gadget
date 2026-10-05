@@ -315,15 +315,52 @@
       width: 100%;
     }
 
+    .stage__emblem {
+      width: clamp(48px, 4.2vw, 68px);
+      height: clamp(48px, 4.2vw, 68px);
+      border-radius: 50%;
+      background: var(--box);
+      border: 1px solid var(--line);
+      margin-bottom: clamp(8px, 1.2vh, 14px);
+      box-shadow: 0 8px 24px -10px rgba(0,0,0,0.12);
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stage__emblem img {
+      width: 60%;
+      height: 60%;
+      max-width: 36px;
+      max-height: 36px;
+      object-fit: contain;
+    }
+
     .headline {
       margin: 0 0 clamp(8px, 1.2vh, 14px) 0;
-      font-size: clamp(24px, 2.5vw, 36px);
-      line-height: 1.1;
-      letter-spacing: 0.04em;
+      font-size: clamp(20px, 2.2vw, 32px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
       font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif;
-      font-weight: 900;
-      text-transform: uppercase;
+      font-weight: 300;
       color: var(--ink);
+    }
+
+    .headline b {
+      font-weight: 800;
+    }
+
+    .squiggle {
+      width: clamp(120px, 16vw, 180px);
+      height: auto;
+      color: #0d0f0f;
+      margin: 0 auto clamp(12px, 1.8vh, 20px);
+      display: block;
+    }
+
+    html.dark .squiggle {
+      color: #f4f6f5;
     }
 
     .stage__form-mount {
