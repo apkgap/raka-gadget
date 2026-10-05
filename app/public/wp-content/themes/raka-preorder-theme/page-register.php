@@ -51,756 +51,6 @@ $account_label = esc_html__( 'Login', 'raka-preorder-theme' );
   <title><?php wp_title( '|', true, 'right' ); ?> <?php bloginfo( 'name' ); ?> — สมัครสมาชิก</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
   <?php wp_head(); ?>
-  <style>
-    :root {
-      --ink: #0d0f0f;
-      --ink-soft: #5b6260;
-      --line: #e8ebea;
-      --panel: #ffffff;
-      --box: #f5f7f6;
-      --radius-panel: 30px;
-      --radius-box: 18px;
-      --pad: clamp(16px, 2vw, 32px);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body, button, input, select, textarea {
-      font-family: "Helvetica Neue ME", "Helvetica Neue", Prompt, sans-serif !important;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    body.admin-bar {
-      padding-top: 32px !important;
-    }
-
-    @media screen and (max-width: 782px) {
-      body.admin-bar {
-        padding-top: 46px !important;
-      }
-    }
-
-    @media screen and (max-width: 600px) {
-      #wpadminbar {
-        position: fixed !important;
-      }
-    }
-
-    body {
-      color: var(--ink);
-      background: #eef2f1;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html.nav-lock, body.nav-lock {
-      overflow: hidden !important;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    button,
-    button *,
-    .btn,
-    .btn *,
-    input[type="button"],
-    input[type="submit"],
-    input[type="reset"],
-    a.button,
-    a.btn,
-    [role="button"],
-    [role="button"] * {
-      font-weight: 400 !important;
-    }
-
-    button {
-      font: inherit;
-      color: inherit;
-      border: 0;
-      background: none;
-      cursor: pointer;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    /* ═════════ 5. LAYOUT CSS (2-COLUMN ARCHITECTURE) ═════════ */
-    .hero {
-      position: relative;
-      height: 100vh;
-      height: 100svh;
-      min-height: 540px;
-      width: 100%;
-      overflow: hidden;
-      isolation: isolate;
-      background: var(--panel);
-      display: grid;
-      grid-template-columns: 100%;
-    }
-
-    .admin-bar .hero {
-      height: calc(100vh - 32px) !important;
-      height: calc(100svh - 32px) !important;
-    }
-
-    @media screen and (max-width: 782px) {
-      .admin-bar .hero {
-        height: calc(100vh - 46px) !important;
-        height: calc(100svh - 46px) !important;
-      }
-    }
-
-    .admin-bar #raka-menu-overlay,
-    .admin-bar #raka-cart-drawer {
-      top: 32px !important;
-      height: calc(100vh - 32px) !important;
-    }
-
-    @media screen and (max-width: 782px) {
-      .admin-bar #raka-menu-overlay,
-      .admin-bar #raka-cart-drawer {
-        top: 46px !important;
-        height: calc(100vh - 46px) !important;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .hero {
-        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-      }
-    }
-
-    .hero__left {
-      position: relative;
-      background: var(--panel);
-      padding: clamp(8px, 1.8vw, 24px) clamp(14px, 2.2vw, 36px);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      height: 100%;
-      min-height: 0;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      border-right: 1px solid var(--line);
-      box-shadow: none;
-      border-radius: 0;
-    }
-
-    .hero__right {
-      position: relative;
-      background: #000000;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      display: none;
-    }
-
-    @media (min-width: 1024px) {
-      .hero__right {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    }
-
-    .hero__video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      animation: in-bg 1.35s cubic-bezier(.16, 1, .3, 1) both;
-    }
-
-    .panel {
-      position: relative;
-      background: var(--panel);
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-
-    /* ═════════ 6. TOPBAR (STICKY WITH THEME CONTROLS) ═════════ */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex: 0 0 auto;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: var(--panel);
-      padding-top: 6px;
-      padding-bottom: 10px;
-      margin-bottom: 6px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      transition: border-color 0.2s ease, background-color 0.2s ease;
-    }
-
-    html.dark .topbar {
-      border-bottom-color: rgba(255, 255, 255, 0.07);
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand img {
-      height: clamp(22px, 1.8vw, 28px);
-      max-height: 28px;
-      width: auto;
-      object-fit: contain;
-    }
-
-    html.dark .brand img#raka-topbar-brand-img-light {
-      display: none !important;
-    }
-    html.dark .brand img#raka-topbar-brand-img-dark {
-      display: block !important;
-    }
-    html:not(.dark) .brand img#raka-topbar-brand-img-dark {
-      display: none !important;
-    }
-    html:not(.dark) .brand img#raka-topbar-brand-img-light {
-      display: block !important;
-    }
-
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: clamp(10px, 1.6vw, 24px);
-    }
-
-    #raka-menu-btn {
-      background: transparent;
-      border: none;
-      padding: 4px 2px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: flex-end;
-      cursor: pointer;
-      width: clamp(26px, 2.2vw, 32px);
-      height: clamp(18px, 1.6vw, 22px);
-      transition: opacity .25s ease;
-    }
-
-    #raka-menu-btn:hover {
-      opacity: .7;
-    }
-
-    #raka-menu-btn span {
-      display: block;
-      height: 2px;
-      background: #0d121c;
-      border-radius: 2px;
-      transform-origin: center;
-      transition: transform .5s cubic-bezier(.16, 1, .3, 1), width .4s cubic-bezier(.16, 1, .3, 1), opacity .3s ease;
-    }
-
-    html.dark #raka-menu-btn span {
-      background: #ffffff;
-    }
-
-    #raka-menu-btn:hover #burger-mid {
-      width: 100% !important;
-    }
-
-    .theme-topbar-controls {
-      display: flex;
-      align-items: center;
-      gap: clamp(6px, 0.65vw, 10px);
-    }
-
-    .theme-ctrl-btn {
-      position: relative;
-      width: clamp(34px, 2.6vw, 38px);
-      height: clamp(34px, 2.6vw, 38px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: var(--box);
-      border: 1px solid var(--line);
-      color: var(--ink);
-      transition: transform 0.25s ease, background-color 0.2s ease;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .theme-ctrl-btn:hover {
-      transform: scale(1.08);
-      background: #ffffff;
-    }
-
-    /* ═════════ 7. STAGE ═════════ */
-    .stage {
-      flex: 1 1 auto;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-      padding: clamp(10px, 1.4vh, 20px) 0;
-      width: 100%;
-    }
-
-    .stage__emblem {
-      width: clamp(48px, 4.2vw, 68px);
-      height: clamp(48px, 4.2vw, 68px);
-      border-radius: 50%;
-      background: var(--box);
-      border: 1px solid var(--line);
-      display: grid;
-      place-items: center;
-      margin-bottom: clamp(8px, 1.2vh, 14px);
-      box-shadow: 0 8px 24px -10px rgba(0,0,0,0.12);
-      flex: 0 0 auto;
-    }
-
-    .stage__emblem img {
-      width: 60%;
-      height: 60%;
-      object-fit: contain;
-    }
-
-    .headline {
-      margin: 0;
-      font-size: clamp(24px, 2.7vw, 38px);
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif;
-      font-weight: 500;
-    }
-
-    .headline b {
-      font-weight: 800;
-    }
-
-    .squiggle {
-      width: clamp(140px, 15vw, 240px);
-      margin: clamp(5px, 0.8vh, 10px) auto clamp(10px, 1.4vh, 16px);
-      display: block;
-      color: var(--ink);
-    }
-
-    .stage__form-mount {
-      width: 100%;
-      max-width: 860px;
-      margin: 0 auto;
-      text-align: left;
-    }
-
-    /* ═════════ 8. BOTTOM ROW — 3 CARDS ═════════ */
-    .cards {
-      flex: 0 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(8px, 0.85vw, 14px);
-      margin-top: clamp(8px, 1.2vh, 14px);
-    }
-
-    .card {
-      background: var(--box);
-      border-radius: var(--radius-box);
-      padding: clamp(10px, 1vw, 16px);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: clamp(8px, 1.2vh, 14px);
-      min-height: clamp(120px, 14vh, 160px);
-      border: 1px solid var(--line);
-    }
-
-    .card__top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .card__title {
-      font-size: clamp(11.5px, 0.88vw, 13.5px);
-      font-weight: 600;
-      line-height: 1.3;
-      letter-spacing: -.015em;
-      margin: 0;
-      flex: 1 1 auto;
-      min-width: 0;
-      text-wrap: pretty;
-    }
-
-    .info {
-      width: clamp(18px, 1.4vw, 22px);
-      height: clamp(18px, 1.4vw, 22px);
-      border-radius: 50%;
-      background: var(--ink);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 10px;
-      font-weight: 700;
-      font-style: italic;
-      flex: 0 0 auto;
-    }
-
-    .card__row {
-      display: flex;
-      align-items: center;
-      gap: clamp(8px, .75vw, 12px);
-    }
-
-    .bubble {
-      width: clamp(28px, 2.2vw, 36px);
-      height: clamp(28px, 2.2vw, 36px);
-      border: 1px solid #d9dedc;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-      color: var(--ink);
-    }
-
-    .bubble svg {
-      width: 50%;
-      height: 50%;
-    }
-
-    .card__note {
-      font-size: clamp(10.5px, 0.75vw, 12px);
-      line-height: 1.4;
-      color: var(--ink-soft);
-      margin: 0;
-      flex: 1 1 auto;
-      min-width: 0;
-      text-wrap: pretty;
-    }
-
-    /* ═════════ 9. COLUMN 2 — FLOATING CONTROLS OVER VIDEO ═════════ */
-    .side {
-      position: relative;
-      min-height: 0;
-      padding: clamp(6px, 1vw, 18px);
-    }
-
-    .side__top {
-      position: absolute;
-      top: clamp(6px, 1vw, 18px);
-      right: clamp(6px, 1vw, 18px);
-      display: flex;
-      align-items: center;
-      gap: clamp(6px, .6vw, 10px);
-    }
-
-    .pill-btn {
-      width: clamp(40px, 3.2vw, 52px);
-      height: clamp(40px, 3.2vw, 52px);
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .92);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      display: grid;
-      place-items: center;
-      box-shadow: 0 10px 26px -14px rgba(10, 28, 24, .45);
-      transition: transform .2s ease, background-color .2s ease;
-    }
-
-    .pill-btn:hover {
-      background: #ffffff;
-      transform: translateY(-2px);
-    }
-
-    .pill-btn svg {
-      width: 38%;
-      height: 38%;
-    }
-
-    .account {
-      display: flex;
-      align-items: center;
-      gap: clamp(6px, .6vw, 10px);
-      background: rgba(255, 255, 255, .92);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      border-radius: 999px;
-      padding: 4px 6px 4px clamp(10px, 0.9vw, 16px);
-      box-shadow: 0 10px 26px -14px rgba(10, 28, 24, .45);
-      transition: transform .2s ease, background-color .2s ease;
-      cursor: pointer;
-    }
-
-    .account:hover {
-      background: #ffffff;
-      transform: translateY(-2px);
-    }
-
-    .account__plus {
-      width: 14px;
-      height: 14px;
-      flex: 0 0 auto;
-    }
-
-    .account__label {
-      font-size: clamp(12px, 0.9vw, 15px);
-      color: #7d8785;
-      font-weight: 600;
-    }
-
-    .account__avatar {
-      width: clamp(28px, 2.3vw, 38px);
-      height: clamp(28px, 2.3vw, 38px);
-      border-radius: 50%;
-      overflow: hidden;
-      background: linear-gradient(150deg, #dfe7e5, #c3d2cf);
-      flex: 0 0 auto;
-      display: grid;
-      place-items: center;
-    }
-
-    .account__avatar img {
-      width: 65%;
-      height: 65%;
-      object-fit: contain;
-    }
-
-    .arrow-fab {
-      position: absolute;
-      right: clamp(10px, 2.2vw, 44px);
-      bottom: clamp(10px, 2.2vw, 44px);
-      width: clamp(58px, 5vw, 86px);
-      height: clamp(58px, 5vw, 86px);
-      border-radius: 50%;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 18px 40px -20px rgba(10, 28, 24, .5);
-      transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .3s ease;
-      color: #0d121c;
-      text-decoration: none;
-    }
-
-    .arrow-fab:hover {
-      transform: scale(1.08) translateY(-2px);
-      box-shadow: 0 22px 45px -15px rgba(10, 28, 24, .6);
-      color: #0d121c;
-    }
-
-    .arrow-fab i {
-      font-size: clamp(24px, 2.2vw, 36px);
-      line-height: 1;
-      color: #0d121c;
-      display: block;
-      transition: transform .25s ease;
-    }
-
-    .arrow-fab:hover i {
-      transform: scale(1.08);
-    }
-
-    .arrow-fab svg {
-      width: 34%;
-      height: 34%;
-    }
-
-    /* ═════════ 10. ENTRY ANIMATIONS ═════════ */
-    @keyframes in-up {
-      from { opacity: 0; transform: translate3d(0, 18px, 0); }
-      to   { opacity: 1; transform: translate3d(0, 0, 0); }
-    }
-
-    @keyframes in-bg {
-      from { opacity: 0; transform: scale(1.06); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes in-draw {
-      from { stroke-dashoffset: 420; }
-      to   { stroke-dashoffset: 0; }
-    }
-
-    .topbar .brand,
-    .topbar .menu,
-    .topbar .theme-topbar-controls,
-    .stage .stage__emblem,
-    .stage .headline,
-    .stage .squiggle,
-    .cards .card,
-    .side .pill-btn,
-    .side .account,
-    .side .arrow-fab {
-      animation: in-up .78s cubic-bezier(.16, 1, .3, 1) both;
-    }
-
-    .topbar .brand       { animation-delay: .06s; }
-    .topbar .menu        { animation-delay: .14s; }
-    .topbar .theme-topbar-controls { animation-delay: .22s; }
-    .stage .stage__emblem{ animation-delay: .18s; }
-    .stage .headline     { animation-delay: .28s; }
-    .stage .squiggle     { animation-delay: .38s; }
-    .cards .card:nth-child(1) { animation-delay: .42s; }
-    .cards .card:nth-child(2) { animation-delay: .52s; }
-    .cards .card:nth-child(3) { animation-delay: .62s; }
-    .side .pill-btn      { animation-delay: .2s; }
-    .side .account       { animation-delay: .3s; }
-    .side .arrow-fab     { animation-delay: .7s; }
-
-    .stage .squiggle path {
-      stroke-dasharray: 420;
-      stroke-dashoffset: 420;
-      animation: in-draw 1.15s cubic-bezier(.16, 1, .3, 1) both .48s;
-    }
-
-    .anim-done {
-      animation: none !important;
-    }
-
-    /* ═════════ 13. RESPONSIVE ═════════ */
-    @media (max-width: 1023px) {
-      .hero {
-        height: auto;
-        min-height: 100svh;
-        display: flex;
-        flex-direction: column;
-      }
-      .hero__left {
-        border-right: none;
-        padding: 16px;
-        min-height: 100svh;
-      }
-      .hero__right {
-        display: none !important;
-      }
-      .stage {
-        padding: 24px 0 20px;
-      }
-      .headline {
-        font-size: clamp(22px, 6.5vw, 32px);
-      }
-      .squiggle {
-        width: min(72%, 220px);
-      }
-    }
-
-    @media (max-width: 420px) {
-      .headline {
-        font-size: clamp(20px, 6.5vw, 28px);
-      }
-      .account__label {
-        display: none;
-      }
-      .stats {
-        gap: 10px;
-      }
-      .stat__num {
-        font-size: clamp(20px, 6.5vw, 28px);
-      }
-      .teaser__thumb {
-        width: 68px;
-      }
-    }
-
-    /* ═════════ DARK MODE ADAPTATIONS ═════════ */
-    html.dark {
-      --ink: #f5f5f5;
-      --ink-soft: #a1a1aa;
-      --line: #27272a;
-      --panel: #111111;
-      --box: #18181b;
-    }
-
-    html.dark body {
-      background: #09090b;
-      color: #f5f5f5;
-    }
-
-    html.dark .panel {
-      background: var(--panel);
-      box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    html.dark .hero__scrim {
-      background: linear-gradient(90deg, rgba(9, 9, 11, 0.85) 0%, rgba(9, 9, 11, 0.4) 45%, rgba(9, 9, 11, 0) 70%);
-    }
-
-    html.dark .stage__emblem {
-      background: #18181b;
-      border-color: #27272a;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    }
-
-    html.dark .squiggle {
-      color: #e4e4e7;
-    }
-
-    html.dark .pill-btn {
-      background: rgba(24, 24, 27, 0.88);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.7);
-    }
-
-    html.dark .pill-btn:hover {
-      background: rgba(39, 39, 42, 0.95);
-    }
-
-    html.dark .account {
-      background: rgba(24, 24, 27, 0.88);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.7);
-    }
-
-    html.dark .account:hover {
-      background: rgba(39, 39, 42, 0.95);
-    }
-
-    html.dark .arrow-fab {
-      background: #18181b;
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 22px 50px -15px rgba(0, 0, 0, 0.9);
-    }
-
-    html.dark .arrow-fab i {
-      color: #ffffff;
-    }
-
-    html.dark .theme-ctrl-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-    }
-
-    html.dark .theme-ctrl-btn:hover {
-      background: rgba(255, 255, 255, 0.16);
-    }
-
-  </style>
-
   <script id="raka-global-theme-helpers">
     window.toggleRakaTheme = function(event) {
       const html = document.documentElement;
@@ -875,30 +125,30 @@ $account_label = esc_html__( 'Login', 'raka-preorder-theme' );
   </script>
 
 </head>
-<body <?php body_class( 'mindora-register-body' ); ?>>
+<body <?php body_class( 'mindora-register-body bg-neutral-100 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 antialiased min-h-screen' ); ?>>
 
-  <section id="hero" class="hero">
+  <section id="hero" class="relative w-full min-h-screen bg-white dark:bg-neutral-950 grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] overflow-x-hidden lg:overflow-hidden">
 
     <!-- COLUMN 1 (LEFT): The Content & Register Container -->
-    <div id="raka-hero-left" class="hero__left panel">
+    <div id="raka-hero-left" class="w-full flex flex-col justify-between p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 overflow-y-auto min-h-screen lg:min-h-0">
 
       <!-- Topbar Header -->
-      <header id="raka-hero-topbar" class="topbar">
-        <div id="raka-topbar-brand-wrap" class="nav-left flex items-center">
-          <a id="raka-topbar-brand-link" class="brand flex items-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+      <header id="raka-hero-topbar" class="w-full flex items-center justify-between pb-4 sm:pb-6 shrink-0">
+        <div id="raka-topbar-brand-wrap" class="flex items-center">
+          <a id="raka-topbar-brand-link" class="flex items-center" href="<?php echo esc_url( home_url( '/' ) ); ?>">
             <img id="raka-topbar-brand-img-light" class="h-6 sm:h-7 w-auto object-contain block dark:hidden" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal.png' ); ?>" alt="RAKA GADGET">
             <img id="raka-topbar-brand-img-dark" class="h-6 sm:h-7 w-auto object-contain hidden dark:block" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-raka-horizontal-white.png' ); ?>" alt="RAKA GADGET">
           </a>
         </div>
 
         <!-- THEME HEADER CONTROLS -->
-        <div id="raka-topbar-controls" class="theme-topbar-controls">
+        <div id="raka-topbar-controls" class="flex items-center gap-2 sm:gap-3">
 
           <!-- User Account Dropdown -->
           <div id="raka-account-menu-wrap" class="relative">
             <button
               id="raka-account-btn"
-              class="theme-ctrl-btn"
+              class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/10 dark:border-white/15 text-neutral-900 dark:text-white transition-all cursor-pointer focus:outline-none"
               type="button"
               onclick="window.toggleRakaAccountMenu(event)"
               aria-label="<?php esc_attr_e( 'Account Menu', 'raka-preorder-theme' ); ?>"
@@ -928,7 +178,7 @@ $account_label = esc_html__( 'Login', 'raka-preorder-theme' );
           <!-- Cart Drawer Button -->
           <a
             id="raka-cart-btn"
-            class="theme-ctrl-btn"
+            class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/10 dark:border-white/15 text-neutral-900 dark:text-white transition-all cursor-pointer focus:outline-none"
             href="<?php echo esc_url( $cart_url ); ?>"
             onclick="if(window.openRakaCart){window.openRakaCart(event);return false;}"
             aria-label="Shopping Cart"
@@ -946,7 +196,7 @@ $account_label = esc_html__( 'Login', 'raka-preorder-theme' );
           <!-- Theme Mode Switcher -->
           <button
             id="raka-theme-btn"
-            class="theme-ctrl-btn"
+            class="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/10 dark:border-white/15 text-neutral-900 dark:text-white transition-all cursor-pointer focus:outline-none"
             type="button"
             onclick="window.toggleRakaTheme(event)"
             aria-label="Toggle dark / light mode"
@@ -972,17 +222,17 @@ $account_label = esc_html__( 'Login', 'raka-preorder-theme' );
       </header>
 
       <!-- Stage Center -->
-      <div id="raka-hero-stage" class="stage">
-        <div id="raka-stage-emblem" class="stage__emblem">
-          <img id="raka-stage-emblem-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Raka">
+      <div id="raka-hero-stage" class="w-full max-w-md mx-auto my-auto py-4 sm:py-6 flex flex-col items-center text-center">
+        <div id="raka-stage-emblem" class="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-neutral-950 dark:bg-white p-3.5 mb-4 flex items-center justify-center shadow-lg">
+          <img id="raka-stage-emblem-img" class="w-full h-full object-contain filter invert dark:invert-0" src="<?php echo esc_url( $logo_icon ); ?>" alt="Raka">
         </div>
-        <h1 id="raka-hero-headline" class="headline"><b>Join Us</b> create account<br />with <b>RAKA GADGET</b></h1>
-        <svg id="raka-hero-squiggle" class="squiggle" viewBox="0 0 320 26" aria-hidden="true">
+        <h1 id="raka-hero-headline" class="text-2xl sm:text-3xl md:text-4xl font-light tracking-tight text-neutral-950 dark:text-white mb-2 leading-tight"><b>Join Us</b> create account<br />with <b>RAKA GADGET</b></h1>
+        <svg id="raka-hero-squiggle" class="w-32 sm:w-44 h-auto text-neutral-950 dark:text-white mx-auto mb-6" viewBox="0 0 320 26" aria-hidden="true">
           <path d="M2 20C34 4 60 3 88 12s52 12 80 3 54-12 82-3 46 10 68 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
         </svg>
 
         <!-- Register Form Mount -->
-        <div id="raka-stage-form-mount" class="stage__form-mount">
+        <div id="raka-stage-form-mount" class="w-full text-left">
           <?php echo do_shortcode( '[wc_custom_register]' ); ?>
         </div>
       </div>
@@ -990,32 +240,32 @@ $account_label = esc_html__( 'Login', 'raka-preorder-theme' );
     </div>
 
     <!-- COLUMN 2 (RIGHT): Dedicated Video Column (No Overlap) -->
-    <div id="raka-hero-right" class="hero__right">
-      <video id="raka-hero-video" class="hero__video" autoplay muted loop playsinline preload="auto" poster="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_232824_93a0252b-e9f2-432f-9961-555a2e458100.png&w=1920&q=85">
+    <div id="raka-hero-right" class="relative hidden lg:block h-full w-full overflow-hidden bg-neutral-900">
+      <video id="raka-hero-video" class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline preload="auto" poster="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_232824_93a0252b-e9f2-432f-9961-555a2e458100.png&w=1920&q=85">
         <source src="<?php echo esc_url( $video_url ); ?>" type="video/mp4">
       </video>
 
       <!-- Floating Controls on Top Right of Video -->
-      <div id="raka-side-controls" class="side__top">
-        <a id="raka-explore-shop-btn" class="pill-btn" href="<?php echo esc_url( $shop_url ); ?>" aria-label="Explore Shop">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div id="raka-side-controls" class="absolute top-6 right-6 z-20 flex items-center gap-3">
+        <a id="raka-explore-shop-btn" class="w-11 h-11 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all hover:scale-105" href="<?php echo esc_url( $shop_url ); ?>" aria-label="Explore Shop">
+          <svg id="raka-explore-shop-svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>
           </svg>
         </a>
-        <a id="raka-side-account-btn" class="account" href="<?php echo esc_url( home_url( '/login/' ) ); ?>" aria-label="Login">
-          <svg class="account__plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <a id="raka-side-account-btn" class="flex items-center gap-2.5 py-1.5 pl-3.5 pr-1.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white transition-all text-xs font-semibold hover:scale-105" href="<?php echo esc_url( home_url( '/login/' ) ); ?>" aria-label="Login">
+          <svg id="raka-side-account-svg" class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
-          <span id="raka-account-pill-label" class="account__label"><?php esc_html_e( 'เข้าสู่ระบบ', 'raka-preorder-theme' ); ?></span>
-          <div id="raka-account-pill-avatar" class="account__avatar">
-            <img id="raka-account-avatar-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Account">
+          <span id="raka-account-pill-label" class="font-medium tracking-wide"><?php esc_html_e( 'เข้าสู่ระบบ', 'raka-preorder-theme' ); ?></span>
+          <div id="raka-account-pill-avatar" class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center overflow-hidden shrink-0 font-bold text-xs uppercase">
+            <img id="raka-account-avatar-img" class="w-full h-full object-cover" src="<?php echo esc_url( $logo_icon ); ?>" alt="Account">
           </div>
         </a>
       </div>
 
-      <a id="raka-side-cart-fab" class="arrow-fab" href="<?php echo esc_url( $shop_url ); ?>" aria-label="Shop Products">
-        <i id="raka-side-cart-fab-icon" class="ri-shopping-bag-3-line"></i>
+      <a id="raka-side-cart-fab" class="absolute bottom-6 right-6 z-20 w-12 h-12 rounded-full bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white shadow-2xl flex items-center justify-center border border-black/10 dark:border-white/20 transition-all hover:scale-110" href="<?php echo esc_url( $shop_url ); ?>" aria-label="Shop Products">
+        <i id="raka-side-cart-fab-icon" class="ri-shopping-bag-3-line text-xl"></i>
       </a>
     </div>
 
