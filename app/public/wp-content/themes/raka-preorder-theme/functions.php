@@ -61,6 +61,13 @@ function raka_preorder_theme_scripts() {
 		'2.0.0',
 		false // Load in header
 	);
+
+	// Enqueue Standalone Hero JS on standalone templates
+	if ( is_page_template( 'page-pre-order.php' ) || is_page_template( 'page-login.php' ) || is_page_template( 'page-register.php' ) ) {
+		$hero_js_path = get_template_directory() . '/assets/js/standalone-hero.js';
+		$hero_js_ver  = file_exists( $hero_js_path ) ? (string) filemtime( $hero_js_path ) : '1.0.0';
+		wp_enqueue_script( 'raka-standalone-hero', get_template_directory_uri() . '/assets/js/standalone-hero.js', [], $hero_js_ver, true );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'raka_preorder_theme_scripts' );
 
