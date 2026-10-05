@@ -362,24 +362,26 @@ if ( $is_logged_in ) {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      margin: auto 0;
       text-align: center;
       position: relative;
-      padding: clamp(10px, 1.4vh, 20px) 0;
+      padding: clamp(6px, 1vh, 16px) 0;
       width: 100%;
     }
 
     .stage__emblem {
-      width: clamp(48px, 4.2vw, 68px);
-      height: clamp(48px, 4.2vw, 68px);
+      width: clamp(44px, 3.8vw, 64px);
+      height: clamp(44px, 3.8vw, 64px);
       border-radius: 50%;
       background: var(--box);
       border: 1px solid var(--line);
       display: grid;
       place-items: center;
-      margin-bottom: clamp(8px, 1.2vh, 14px);
+      margin-bottom: clamp(6px, 1vh, 12px);
       box-shadow: 0 8px 24px -10px rgba(0,0,0,0.12);
       flex: 0 0 auto;
+      transition: all 0.3s ease;
     }
 
     .stage__emblem img {
@@ -390,11 +392,12 @@ if ( $is_logged_in ) {
 
     .headline {
       margin: 0;
-      font-size: clamp(24px, 2.7vw, 38px);
+      font-size: clamp(22px, 2.5vw, 36px);
       line-height: 1.15;
       letter-spacing: -0.02em;
       font-family: 'Helvetica Neue ME', 'Helvetica Neue', 'Prompt', 'Kanit', sans-serif;
       font-weight: 500;
+      transition: all 0.3s ease;
     }
 
     .headline b {
@@ -402,10 +405,28 @@ if ( $is_logged_in ) {
     }
 
     .squiggle {
-      width: clamp(140px, 15vw, 240px);
-      margin: clamp(5px, 0.8vh, 10px) auto clamp(10px, 1.4vh, 16px);
+      width: clamp(120px, 14vw, 220px);
+      margin: clamp(4px, 0.6vh, 8px) auto clamp(8px, 1vh, 14px);
       display: block;
       color: var(--ink);
+      transition: all 0.3s ease;
+    }
+
+    /* Compact stage when viewing results or multi-item list */
+    #raka-hero-stage:has(#raka-tracker-list-view:not(.hidden)) .stage__emblem,
+    #raka-hero-stage:has(#raka-tracker-result-view:not(.hidden)) .stage__emblem {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 4px;
+    }
+    #raka-hero-stage:has(#raka-tracker-list-view:not(.hidden)) .headline,
+    #raka-hero-stage:has(#raka-tracker-result-view:not(.hidden)) .headline {
+      font-size: clamp(18px, 1.8vw, 24px);
+    }
+    #raka-hero-stage:has(#raka-tracker-list-view:not(.hidden)) .squiggle,
+    #raka-hero-stage:has(#raka-tracker-result-view:not(.hidden)) .squiggle {
+      margin: 3px auto 8px;
+      width: 110px;
     }
 
     .stage__form-mount {

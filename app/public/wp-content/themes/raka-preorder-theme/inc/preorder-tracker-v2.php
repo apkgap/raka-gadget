@@ -178,7 +178,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Dynamic List Container with custom scroll -->
-			<div id="raka-tracker-list-container" class="space-y-2.5 max-h-[350px] sm:max-h-[380px] overflow-y-auto pr-1.5 custom-tracker-scroll">
+			<div id="raka-tracker-list-container" class="space-y-2.5 max-h-[300px] sm:max-h-[330px] overflow-y-auto pr-1.5 custom-tracker-scroll">
 				<!-- Dynamically populated via JS -->
 			</div>
 
@@ -204,7 +204,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Scrollable Container for Result Body -->
-			<div id="raka-res-scroll-body" class="space-y-3 max-h-[350px] sm:max-h-[380px] overflow-y-auto pr-1.5 custom-tracker-scroll">
+			<div id="raka-res-scroll-body" class="space-y-3 max-h-[300px] sm:max-h-[330px] overflow-y-auto pr-1.5 custom-tracker-scroll">
 				
 				<!-- Product Details & Summary Card -->
 				<div id="raka-res-product-card" class="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-neutral-900/90 border border-black/5 dark:border-white/10 flex gap-3.5 items-start shadow-xs">
