@@ -876,3 +876,115 @@ function preorder_raka_enqueue_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'preorder_raka_enqueue_assets' );
 
+/**
+ * Custom Columns for Pre-order Products List Table.
+ */
+function preorder_raka_product_columns( array $columns ): array {
+	$new_columns = [];
+	$new_columns['cb']        = $columns['cb'] ?? '<input type="checkbox" />';
+	$new_columns['thumb']     = esc_html__( 'รูปภาพ', 'preorder-raka' );
+	$new_columns['title']     = esc_html__( 'ชื่อสินค้า', 'preorder-raka' );
+	$new_columns['price']     = esc_html__( 'ราคาพรีออเดอร์', 'preorder-raka' );
+	$new_columns['date']      = $columns['date'] ?? esc_html__( 'วันที่', 'preorder-raka' );
+	return $new_columns;
+}
+add_filter( 'manage_preorder_product_posts_columns', 'preorder_raka_product_columns' );
+
+/**
+ * Render Custom Columns for Pre-order Products.
+ */
+function preorder_raka_product_column_content( string $column, int $post_id ): void {
+	if ( 'thumb' === $column ) {
+		$thumb_url = get_the_post_thumbnail_url( $post_id, 'thumbnail' );
+		if ( $thumb_url ) {
+			echo '<div style="width:50px;height:50px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;background:#f8fafc;display:flex;align-items:center;justify-content:center;">';
+			echo '<img src="' . esc_url( $thumb_url ) . '" alt="" style="width:100%;height:100%;object-fit:cover;" />';
+			echo '</div>';
+		} else {
+			echo '<div style="width:50px;height:50px;border-radius:8px;background:#f1f5f9;border:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><span class="dashicons dashicons-format-image" style="font-size:20px;"></span></div>';
+		}
+	} elseif ( 'price' === $column ) {
+		$price = (float) get_post_meta( $post_id, '_preorder_price', true );
+		echo '<strong style="color:#0f172a;font-size:13px;">฿' . esc_html( number_format( $price ) ) . '</strong>';
+	}
+}
+add_action( 'manage_preorder_product_posts_custom_column', 'preorder_raka_product_column_content', 10, 2 );
+
+/**
+ * Custom Columns for Pre-orders List Table.
+ */
+function preorder_raka_preorder_columns( array $columns ): array {
+	$new_columns = [];
+	$new_columns['cb']          = $columns['cb'] ?? '<input type="checkbox" />';
+	$new_columns['thumb']       = esc_html__( 'รูปภาพ', 'preorder-raka' );
+	$new_columns['preorder_no'] = esc_html__( 'รหัสพรีออเดอร์', 'preorder-raka' );
+	$new_columns['customer']    = esc_html__( 'ลูกค้า / เบอร์โทร', 'preorder-raka' );
+	$new_columns['product']     = esc_html__( 'สินค้า', 'preorder-raka' );
+	$new_columns['price']       = esc_html__( 'ยอดรวม', 'preorder-raka' );
+	$new_columns['step']        = esc_html__( 'สถานะขั้นตอน', 'preorder-raka' );
+	$new_columns['tracking']    = esc_html__( 'Tracking', 'preorder-raka' );
+	$new_columns['date']        = $columns['date'] ?? esc_html__( 'วันที่', 'preorder-raka' );
+	return $new_columns;
+}
+add_filter( 'manage_preorder_posts_columns', 'preorder_raka_preorder_columns' );
+
+/**
+ * Render Custom Columns for Pre-orders.
+ */
+function preorder_raka_preorder_column_content( string $column, int $post_id ): void {
+	if ( 'thumb' === $column ) {
+		$thumb_url = get_the_post_thumbnail_url( $post_id, 'thumbnail' );
+		if ( ! $thumb_url ) {
+			$prod_id = (int) get_post_meta( $post_id, '_preorder_product_id', true );
+			if ( $prod_id > 0 ) {
+				$thumb_url = get_the_post_thumbnail_url( $prod_id, 'thumbnail' );
+			}
+		}
+		if ( $thumb_url ) {
+			echo '<div style="width:46px;height:46px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;background:#f8fafc;display:flex;align-items:center;justify-content:center;">';
+			echo '<img src="' . esc_url( $thumb_url ) . '" alt="" style="width:100%;height:100%;object-fit:cover;" />';
+			echo '</div>';
+		} else {
+			echo '<div style="width:46px;height:46px;border-radius:8px;background:#f1f5f9;border:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><span class="dashicons dashicons-cart" style="font-size:18px;"></span></div>';
+		}
+	} elseif ( 'preorder_no' === $column ) {
+		$no = (string) get_post_meta( $post_id, '_preorder_no', true );
+		$edit_link = get_edit_post_link( $post_id );
+		echo '<strong><a href="' . esc_url( $edit_link ) . '" style="color:#2563eb;font-weight:700;">#' . esc_html( $no ?: $post_id ) . '</a></strong>';
+	} elseif ( 'customer' === $column ) {
+		$phone = (string) get_post_meta( $post_id, '_preorder_phone', true );
+		$title = get_the_title( $post_id );
+		echo '<div style="font-weight:600;color:#0f172a;">' . esc_html( $title ) . '</div>';
+		if ( $phone ) {
+			echo '<div style="font-size:12px;color:#64748b;"><span class="dashicons dashicons-phone" style="font-size:13px;width:13px;height:13px;line-height:13px;"></span> ' . esc_html( $phone ) . '</div>';
+		}
+	} elseif ( 'product' === $column ) {
+		$prod_name = (string) get_post_meta( $post_id, '_preorder_product', true );
+		$qty       = (int) ( get_post_meta( $post_id, '_preorder_qty', true ) ?: 1 );
+		echo '<div style="font-size:13px;color:#1e293b;font-weight:500;">' . esc_html( $prod_name ?: '-' ) . '</div>';
+		if ( $qty > 1 ) {
+			echo '<span style="font-size:11px;background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#475569;">จำนวน: ' . esc_html( (string) $qty ) . ' ชิ้น</span>';
+		}
+	} elseif ( 'price' === $column ) {
+		$price = (float) get_post_meta( $post_id, '_preorder_price', true );
+		$ship  = (float) get_post_meta( $post_id, '_preorder_shipping', true );
+		$total = $price + $ship;
+		echo '<strong style="color:#0f172a;font-size:13px;">฿' . esc_html( number_format( $total ) ) . '</strong>';
+		if ( $ship > 0 ) {
+			echo '<div style="font-size:11px;color:#94a3b8;">(ค่าส่ง ฿' . esc_html( number_format( $ship ) ) . ')</div>';
+		}
+	} elseif ( 'step' === $column ) {
+		$step_idx = (int) get_post_meta( $post_id, '_preorder_current_step_idx', true );
+		$steps    = get_post_meta( $post_id, '_preorder_steps', true );
+		$step_title = is_array( $steps ) && isset( $steps[ $step_idx ]['title'] ) ? $steps[ $step_idx ]['title'] : ( 'Step ' . ( $step_idx + 1 ) );
+		echo '<span style="display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;">' . esc_html( $step_title ) . '</span>';
+	} elseif ( 'tracking' === $column ) {
+		$tracking = (string) get_post_meta( $post_id, '_preorder_tracking', true );
+		if ( $tracking ) {
+			echo '<code style="font-size:11px;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;color:#0f172a;">' . esc_html( $tracking ) . '</code>';
+		} else {
+			echo '<span style="color:#94a3b8;font-size:12px;">-</span>';
+		}
+	}
+}
+add_action( 'manage_preorder_posts_custom_column', 'preorder_raka_preorder_column_content', 10, 2 );
