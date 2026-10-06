@@ -34,13 +34,13 @@ function raka_render_preorder_tracker_v2(): string {
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 	<?php endif; ?>
 
-	<div id="raka-tracker-v2" class="w-full flex flex-col text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 max-w-2xl mx-auto">
+	<div id="raka-tracker-v2" class="w-full flex flex-col text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 w-full mx-auto">
 
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
-		<div id="raka-tracker-search-view" class="w-full space-y-3 sm:space-y-3.5">
+		<div id="raka-tracker-search-view" class="w-full max-w-[600px] mx-auto space-y-3 sm:space-y-3.5">
 
 			<!-- Mode Selector Tab Switcher -->
-			<div id="raka-track-tab-wrap" class="grid grid-cols-2 p-1 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10">
+			<div id="raka-track-tab-wrap" class="grid grid-cols-2 p-1 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-black/10 dark:border-white/10 w-full max-w-[600px] mx-auto">
 				<button
 					type="button"
 					id="raka-tab-btn-order"
@@ -62,7 +62,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Primary Input Group -->
-			<div id="raka-track-primary-group" class="space-y-1.5">
+			<div id="raka-track-primary-group" class="space-y-1.5 w-full max-w-[600px] mx-auto">
 				<label id="raka-track-primary-label" for="raka-track-primary-input" class="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
 					<?php esc_html_e( 'ORDER NUMBER / หมายเลขคำสั่งซื้อ', 'raka-preorder-theme' ); ?>
 				</label>
@@ -80,7 +80,7 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Cloudflare Turnstile CAPTCHA Widget -->
-			<div id="raka-turnstile-wrapper" class="flex flex-col items-center justify-center min-h-[65px] rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/5 p-2 overflow-hidden">
+			<div id="raka-turnstile-wrapper" class="flex flex-col items-center justify-center min-h-[65px] rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/40 border border-black/5 dark:border-white/5 p-2 overflow-hidden w-full max-w-[600px] mx-auto">
 				<div
 					id="raka-turnstile-widget"
 					data-sitekey="<?php echo esc_attr( $turnstile_sitekey ); ?>"
@@ -89,13 +89,13 @@ function raka_render_preorder_tracker_v2(): string {
 			</div>
 
 			<!-- Error Alert Message -->
-			<div id="raka-tracker-error-msg" class="hidden p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs sm:text-sm flex items-center gap-2.5">
+			<div id="raka-tracker-error-msg" class="hidden p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs sm:text-sm flex items-center gap-2.5 w-full max-w-[600px] mx-auto">
 				<i id="raka-tracker-error-icon" class="ri-error-warning-line text-lg shrink-0"></i>
 				<span id="raka-tracker-error-text" class="leading-tight"></span>
 			</div>
 
 			<!-- Search & My Preorders Buttons -->
-			<div id="raka-tracker-submit-wrap" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-2.5 pt-1.5 sm:pt-2 w-full">
+			<div id="raka-tracker-submit-wrap" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-2.5 pt-1.5 sm:pt-2 w-full max-w-[600px] mx-auto">
 				<button
 					type="button"
 					id="raka-tracker-submit-btn"

@@ -951,3 +951,11 @@
   animation: rakaFadeInUp 0.22s ease-out forwards;
 }
 
+#raka-tracker-search-view,
+#raka-track-tab-wrap,
+#raka-track-primary-group {
+  max-width: 600px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
