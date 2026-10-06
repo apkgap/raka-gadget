@@ -890,8 +890,8 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    height: 100%;
     min-height: 0;
+    justify-content: flex-start;
   }
   #raka-tracker-result-view.flex,
   #raka-tracker-list-view.flex,

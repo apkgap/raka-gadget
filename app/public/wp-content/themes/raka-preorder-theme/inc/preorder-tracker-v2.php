@@ -34,7 +34,7 @@ function raka_render_preorder_tracker_v2(): string {
 		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 	<?php endif; ?>
 
-	<div id="raka-tracker-v2" class="w-full h-full flex flex-col flex-1 text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 pb-16 sm:pb-8 justify-center">
+	<div id="raka-tracker-v2" class="w-full flex flex-col flex-1 text-left font-hn text-neutral-900 dark:text-white transition-all duration-300 pb-16 sm:pb-8 justify-start max-w-2xl mx-auto pt-1 sm:pt-2">
 
 		<!-- ── 1. SEARCH / INPUT VIEW ── -->
 		<div id="raka-tracker-search-view" class="w-full space-y-3 sm:space-y-3.5">
