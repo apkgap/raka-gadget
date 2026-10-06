@@ -30,7 +30,7 @@ get_header( 'standalone' );
 		<?php get_template_part( 'template-parts/header/standalone-topbar' ); ?>
 
 		<!-- Stage Center -->
-		<div id="raka-hero-stage" class="stage">
+		<div id="raka-hero-stage" class="stage my-auto">
 			<div id="raka-stage-emblem" class="stage__emblem">
 				<img id="raka-stage-emblem-img" src="<?php echo esc_url( $logo_icon ); ?>" alt="Raka">
 			</div>

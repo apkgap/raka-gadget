@@ -21,7 +21,7 @@ get_header( 'standalone' );
 		<?php get_template_part( 'template-parts/header/standalone-topbar' ); ?>
 
 		<!-- Stage Center -->
-		<div id="raka-hero-stage" class="stage">
+		<div id="raka-hero-stage" class="stage my-auto">
 			<h1 id="raka-hero-headline" class="headline font-extrabold tracking-wide uppercase">TRACKING</h1>
 			
 			<!-- Pre-Order Form Mount (V2) -->
