@@ -223,10 +223,10 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 		<!-- 5. Dual Column Continuous Slide-Up Stream (Left & Right Flanks) -->
 		<div id="hero-streams-container" class="absolute inset-0 z-20 pointer-events-none overflow-hidden">
 			<!-- Left Flank Stream -->
-			<div id="hero-stream-col-left" class="hero-stream-column absolute top-0 bottom-0 left-2.5 sm:left-6 md:left-10 lg:left-14 w-[92%] sm:w-[380px] lg:w-[420px] pointer-events-none overflow-hidden [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]">
-				<div id="hero-stream-track-left" class="hero-stream-track flex flex-col gap-4 sm:gap-6 pt-[80vh] pb-[60vh] will-change-transform">
+			<div id="hero-stream-col-left" class="hero-stream-column absolute top-0 bottom-0 left-2.5 sm:left-6 md:left-10 lg:left-14 w-[92%] sm:w-[380px] lg:w-[420px] pointer-events-none overflow-hidden sm:[mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]">
+				<div id="hero-stream-track-left" class="hero-stream-track flex flex-col gap-4 sm:gap-6 pt-[80vh] pb-[60vh] will-change-transform transform-gpu">
 					<?php foreach ( $left_hero_cards as $card_i => $card ) : ?>
-						<div id="hero-stream-left-card-<?php echo esc_attr( (string) $card_i ); ?>" class="hero-stream-card pointer-events-auto">
+						<div id="hero-stream-left-card-<?php echo esc_attr( (string) $card_i ); ?>" class="hero-stream-card pointer-events-auto transform-gpu">
 							<?php raka_render_hero_card_item( $card ); ?>
 						</div>
 					<?php endforeach; ?>
@@ -234,10 +234,10 @@ if ( ! function_exists( 'raka_render_hero_card_item' ) ) {
 			</div>
 
 			<!-- Right Flank Stream -->
-			<div id="hero-stream-col-right" class="hero-stream-column absolute top-0 bottom-0 right-2.5 sm:right-6 md:right-10 lg:right-14 w-[92%] sm:w-[380px] lg:w-[420px] pointer-events-none overflow-hidden hidden sm:block [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]">
-				<div id="hero-stream-track-right" class="hero-stream-track flex flex-col gap-4 sm:gap-6 pt-[110vh] pb-[60vh] will-change-transform">
+			<div id="hero-stream-col-right" class="hero-stream-column absolute top-0 bottom-0 right-2.5 sm:right-6 md:right-10 lg:right-14 w-[92%] sm:w-[380px] lg:w-[420px] pointer-events-none overflow-hidden hidden sm:block sm:[mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]">
+				<div id="hero-stream-track-right" class="hero-stream-track flex flex-col gap-4 sm:gap-6 pt-[110vh] pb-[60vh] will-change-transform transform-gpu">
 					<?php foreach ( $right_hero_cards as $card_i => $card ) : ?>
-						<div id="hero-stream-right-card-<?php echo esc_attr( (string) $card_i ); ?>" class="hero-stream-card pointer-events-auto">
+						<div id="hero-stream-right-card-<?php echo esc_attr( (string) $card_i ); ?>" class="hero-stream-card pointer-events-auto transform-gpu">
 							<?php raka_render_hero_card_item( $card ); ?>
 						</div>
 					<?php endforeach; ?>
@@ -871,6 +871,7 @@ $cat_icon_map = [
 		const canvas = document.getElementById('hero-canvas');
 		if (!section || !video || !canvas) return;
 
+		const isMobile = window.innerWidth < 768 || ('ontouchstart' in window && window.innerWidth < 1024);
 		const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 		const overlayPng   = document.getElementById('hero-overlay-png-wrap');
 		const heroSec1     = document.getElementById('hero-section-1');
@@ -880,11 +881,11 @@ $cat_icon_map = [
 		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 		// Fast & Responsive Smoothing Constants
-		const LERP_TAU = 28;
+		const LERP_TAU = isMobile ? 40 : 28;
 		const SNAP = 0.001;
-		const LRU_MAX = 36;
-		const LEAD = 24;
-		const WATCHDOG_MS = 45000;
+		const LRU_MAX = isMobile ? 12 : 36;
+		const LEAD = isMobile ? 10 : 24;
+		const WATCHDOG_MS = 30000;
 		const VIDEO_URL = video.src;
 
 		let start = 0;
@@ -895,6 +896,8 @@ $cat_icon_map = [
 		let lastTime = performance.now();
 		let isSeekingVideo = false;
 		let pendingVideoSeek = null;
+		let isHeroVisible = true;
+		let rafId = null;
 
 		function measure() {
 			const rect = section.getBoundingClientRect();
@@ -924,7 +927,8 @@ $cat_icon_map = [
 				pendingVideoSeek = time;
 				return;
 			}
-			if (Math.abs(video.currentTime - time) > 0.008) {
+			const diff = Math.abs(video.currentTime - time);
+			if (diff > (isMobile ? 0.04 : 0.008)) {
 				isSeekingVideo = true;
 				try {
 					if (typeof video.fastSeek === 'function') {
@@ -973,7 +977,7 @@ $cat_icon_map = [
 				trackLeft.style.transform = `translate3d(0, -${leftTranslate.toFixed(1)}px, 0)`;
 			}
 
-			if (trackRight) {
+			if (trackRight && !isMobile) {
 				const rightTotal = Math.max(0, trackRight.scrollHeight - (window.innerHeight * 0.65));
 				const rightTranslate = streamProg * rightTotal;
 				trackRight.style.transform = `translate3d(0, -${rightTranslate.toFixed(1)}px, 0)`;
@@ -985,6 +989,10 @@ $cat_icon_map = [
 			progress = Math.max(0, Math.min(1, (scrollY - start) / (end - start)));
 			if (video.duration) {
 				targetTime = progress * video.duration;
+			}
+			if (isMobile) {
+				applyPositions(progress);
+				performVideoSeek(targetTime);
 			}
 		}, { passive: true });
 
@@ -1038,6 +1046,11 @@ $cat_icon_map = [
 		}
 
 		function rAF(now) {
+			if (!isHeroVisible) {
+				rafId = null;
+				return;
+			}
+
 			const dt = Math.min(0.1, (now - lastTime) / 1000);
 			lastTime = now;
 
@@ -1057,7 +1070,7 @@ $cat_icon_map = [
 				: progress;
 			applyPositions(animProgress);
 
-			if (bank.ready && bank.frames.length > 0) {
+			if (!isMobile && bank.ready && bank.frames.length > 0) {
 				const targetMicros = currentTime * 1e6;
 				const idx = binarySearchNearest(targetMicros);
 				const bm = bank.lru.get(idx);
@@ -1070,20 +1083,33 @@ $cat_icon_map = [
 					}
 				}
 				warmLRU(idx);
-			} else {
+			} else if (!isMobile) {
 				performVideoSeek(currentTime);
 			}
 
-			requestAnimationFrame(rAF);
+			rafId = requestAnimationFrame(rAF);
+		}
+
+		// Use IntersectionObserver to pause loop when scrolled past hero
+		if ('IntersectionObserver' in window) {
+			const heroObserver = new IntersectionObserver((entries) => {
+				const entry = entries[0];
+				isHeroVisible = entry.isIntersecting;
+				if (isHeroVisible && !rafId) {
+					lastTime = performance.now();
+					rafId = requestAnimationFrame(rAF);
+				}
+			}, { threshold: 0.01 });
+			heroObserver.observe(section);
 		}
 
 		video.addEventListener('loadedmetadata', () => {
-			requestAnimationFrame(rAF);
-			startFrameBankPipeline();
+			if (!rafId && isHeroVisible) rafId = requestAnimationFrame(rAF);
+			if (!isMobile) startFrameBankPipeline();
 		});
 		if (video.readyState >= 1) {
-			requestAnimationFrame(rAF);
-			startFrameBankPipeline();
+			if (!rafId && isHeroVisible) rafId = requestAnimationFrame(rAF);
+			if (!isMobile) startFrameBankPipeline();
 		}
 
 		function loadScript(src) {
@@ -1099,7 +1125,7 @@ $cat_icon_map = [
 
 		let pipelineStarted = false;
 		function startFrameBankPipeline() {
-			if (pipelineStarted) return;
+			if (pipelineStarted || isMobile) return;
 			if (prefersReducedMotion || typeof window.VideoDecoder === 'undefined') return;
 			pipelineStarted = true;
 
