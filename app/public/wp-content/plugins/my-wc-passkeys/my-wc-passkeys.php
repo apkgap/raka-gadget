@@ -3,7 +3,7 @@
  * Plugin Name:       My WooCommerce Passkeys (WebAuthn / FIDO2)
  * Plugin URI:        https://raka-gadget.com/passkeys
  * Description:       Enterprise-grade Passkeys authentication for WordPress and WooCommerce. Enables seamless biometric login (Touch ID, Face ID, Windows Hello) without modifying legacy password or social login flows.
- * Version:           1.0.0
+ * Version:           1.1.1
  * Author:            Senior Core Developer
  * Author URI:        https://raka-gadget.com
  * Text Domain:       my-wc-passkeys

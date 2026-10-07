@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Pre-order Raka Status Page
  * Description: Core functionality and CPT registration for Pre-order Raka tracking system with React.
- * Version: 1.0.0
+ * Version: 1.1.1
  * Author: raka gadget
  * Text Domain: preorder-raka
  * Requires PHP: 7.4
