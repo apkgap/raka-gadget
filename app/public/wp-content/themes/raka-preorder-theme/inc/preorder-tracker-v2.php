@@ -570,7 +570,7 @@ function raka_render_preorder_tracker_v2(): string {
 						params.append('cf_turnstile_response', activeToken);
 					}
 
-					if (currentUserId > 0) {
+					if (currentMode !== 'phone' && currentUserId > 0) {
 						params.append('user_id', currentUserId);
 					}
 
