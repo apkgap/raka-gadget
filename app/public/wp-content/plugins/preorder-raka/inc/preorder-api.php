@@ -251,8 +251,9 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	$my_orders  = $request->get_param( 'my_orders' );
 	$user_id    = intval( $request->get_param( 'user_id' ) );
 
-	// ── 0. Handle Current Member / User ID Preorder List Query ──
-	if ( ! empty( $my_orders ) || ! empty( $user_id ) ) {
+	// ── 0. Handle Current Member / User ID Preorder List Query (Only when explicit my_orders=1 or user_id without specific phone/order search) ──
+	$is_my_orders_query = ! empty( $my_orders ) || ( ! empty( $user_id ) && empty( $order_no ) && empty( $phone ) && empty( $post_id ) );
+	if ( $is_my_orders_query ) {
 		$target_user_id = $user_id > 0 ? $user_id : get_current_user_id();
 		if ( $target_user_id <= 0 && ! is_user_logged_in() ) {
 			return new WP_Error( 'login_required', 'กรุณาเข้าสู่ระบบเพื่อดูรายการพรีออเดอร์ของคุณ', [
@@ -388,27 +389,52 @@ function preorder_raka_get_status( WP_REST_Request $request ) {
 	} elseif ( ! empty( $phone ) ) {
 		$is_phone_query = true;
 		$phone_digits   = preg_replace( '/[^0-9]/', '', $phone );
-		$args['numberposts'] = 50;
-		$args['meta_query']  = [
-			'relation' => 'OR',
-			[
+		
+		$phone_vars = array_unique( array_filter( [
+			$phone,
+			$phone_digits,
+			preg_replace( '/(\d{3})(\d{3})(\d{4})/', '$1-$2-$3', $phone_digits ),
+			preg_replace( '/(\d{2})(\d{4})(\d{4})/', '$1-$2-$3', $phone_digits ),
+			preg_replace( '/(\d{3})(\d{3})(\d{4})/', '$1 $2 $3', $phone_digits ),
+			ltrim( $phone_digits, '0' ),
+		] ) );
+
+		$phone_meta_queries = [ 'relation' => 'OR' ];
+		foreach ( $phone_vars as $pv ) {
+			$phone_meta_queries[] = [
 				'key'     => '_preorder_phone',
-				'value'   => $phone,
+				'value'   => $pv,
 				'compare' => '=',
-			],
-			[
+			];
+			$phone_meta_queries[] = [
 				'key'     => '_preorder_phone',
-				'value'   => $phone_digits,
+				'value'   => $pv,
 				'compare' => 'LIKE',
-			],
-		];
-		$args['orderby'] = 'date';
-		$args['order']   = 'DESC';
+			];
+		}
+
+		$args['numberposts'] = 100;
+		$args['meta_query']  = $phone_meta_queries;
+		$args['orderby']     = 'date';
+		$args['order']       = 'DESC';
 	} else {
 		return new WP_Error( 'missing_params', 'กรุณาระบุหมายเลขคำสั่งซื้อหรือเบอร์โทรศัพท์สำหรับค้นหา', [ 'status' => 400 ] );
 	}
 
 	$posts = get_posts( $args );
+
+	// For phone queries: post-filter strictly to ensure exact phone digits match
+	if ( $is_phone_query && ! empty( $posts ) && ! empty( $phone_digits ) ) {
+		$strictly_matched = [];
+		foreach ( $posts as $p ) {
+			$p_phone = (string) get_post_meta( $p->ID, '_preorder_phone', true );
+			$p_digits = preg_replace( '/[^0-9]/', '', $p_phone );
+			if ( $p_digits === $phone_digits || ( strlen( $phone_digits ) >= 8 && ( substr( $p_digits, -8 ) === substr( $phone_digits, -8 ) || strpos( $p_digits, $phone_digits ) !== false ) ) ) {
+				$strictly_matched[] = $p;
+			}
+		}
+		$posts = $strictly_matched;
+	}
 
 	if ( empty( $posts ) ) {
 		return new WP_Error( 'not_found', 'ไม่พบข้อมูลการพรีออเดอร์จากข้อมูลที่ระบุ', [ 'status' => 404 ] );
