@@ -45,7 +45,7 @@ jobs:
           echo "Target Preorder Directory: $PREORDER_DIR"
           echo "Target Passkeys Directory: $PASSKEYS_DIR"
 
-          lftp -c "
+          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" <<EOF
           set ftp:ssl-allow yes;
           set ssl:verify-certificate no;
           set ftp:passive-mode yes;
@@ -53,35 +53,35 @@ jobs:
           set net:timeout 120;
           set net:max-retries 10;
           set net:reconnect-interval-base 3;
-          open -u ${{ secrets.FTP_USERNAME }},'${{ secrets.FTP_PASSWORD }}' ${{ secrets.FTP_SERVER }};
 
-          echo '=== [1/3] Deploying raka-preorder-theme ===';
-          mirror -R -v --only-newer \
+          echo "=== [1/3] Deploying raka-preorder-theme ===";
+          mirror -R -v \
             --exclude-glob .git* \
             --exclude-glob node_modules/ \
             --exclude-glob src/ \
             --exclude-glob package*.json \
             --exclude-glob AGENTS.md \
             --exclude-glob .windsurf/ \
-            ./app/public/wp-content/themes/raka-preorder-theme/ \$THEME_DIR/;
+            ./app/public/wp-content/themes/raka-preorder-theme/ "$THEME_DIR/";
 
-          echo '=== [2/3] Deploying preorder-raka plugin ===';
-          mirror -R -v --only-newer \
+          echo "=== [2/3] Deploying preorder-raka plugin ===";
+          mirror -R -v \
             --exclude-glob .git* \
             --exclude-glob node_modules/ \
             --exclude-glob src/ \
             --exclude-glob package*.json \
             --exclude-glob AGENTS.md \
             --exclude-glob .windsurf/ \
-            ./app/public/wp-content/plugins/preorder-raka/ \$PREORDER_DIR/;
+            ./app/public/wp-content/plugins/preorder-raka/ "$PREORDER_DIR/";
 
-          echo '=== [3/3] Deploying my-wc-passkeys plugin ===';
-          mirror -R -v --only-newer \
+          echo "=== [3/3] Deploying my-wc-passkeys plugin ===";
+          mirror -R -v \
             --exclude-glob .git* \
             --exclude-glob node_modules/ \
             --exclude-glob src/ \
             --exclude-glob package*.json \
             --exclude-glob AGENTS.md \
             --exclude-glob .windsurf/ \
-            ./app/public/wp-content/plugins/my-wc-passkeys/ \$PASSKEYS_DIR/;
-          "
+            ./app/public/wp-content/plugins/my-wc-passkeys/ "$PASSKEYS_DIR/";
+          quit
+          EOF
