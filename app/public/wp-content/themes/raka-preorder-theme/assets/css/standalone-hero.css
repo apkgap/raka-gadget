@@ -28,7 +28,8 @@
 
     @media (min-width: 1024px) {
       html, body {
-        height: 100%;
+        height: auto;
+        min-height: 100%;
       }
     }
 
@@ -105,14 +106,15 @@
 
     @media (min-width: 1024px) {
       .hero {
-        height: 100vh;
-        height: 100svh;
-        overflow: hidden;
+        min-height: 100vh;
+        min-height: 100svh;
+        height: auto;
+        overflow: visible;
         grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
       }
       .admin-bar .hero {
-        height: calc(100vh - 32px) !important;
-        height: calc(100svh - 32px) !important;
+        min-height: calc(100vh - 32px) !important;
+        min-height: calc(100svh - 32px) !important;
       }
     }
 
@@ -137,11 +139,8 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      height: 100%;
-      min-height: 0;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
+      min-height: 100vh;
+      min-height: 100svh;
       border-right: 1px solid var(--line);
       box-shadow: none;
       border-radius: 0;
@@ -161,6 +160,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        height: 100svh;
+      }
+      .admin-bar .hero__right {
+        top: 32px;
+        height: calc(100vh - 32px);
+        height: calc(100svh - 32px);
       }
     }
 
