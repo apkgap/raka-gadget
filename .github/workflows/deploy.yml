@@ -72,7 +72,10 @@ jobs:
           THEME_RAW="${{ secrets.FTP_THEME_DIR }}"
           PLUGIN_RAW="${{ secrets.FTP_PLUGIN_DIR }}"
 
+          # Strip leading and trailing slashes for clean relative path handling on Plesk FTP chroot
+          THEME_RAW="${THEME_RAW#/}"
           THEME_RAW="${THEME_RAW%/}"
+          PLUGIN_RAW="${PLUGIN_RAW#/}"
           PLUGIN_RAW="${PLUGIN_RAW%/}"
 
           if [[ "$THEME_RAW" == *"raka-preorder-theme" ]]; then
@@ -89,12 +92,16 @@ jobs:
             PASSKEYS_DIR="${PLUGIN_RAW}/my-wc-passkeys"
           fi
 
-          echo "Deploy Theme:    ${{ steps.changes.outputs.theme }}"
-          echo "Deploy Preorder: ${{ steps.changes.outputs.preorder }}"
-          echo "Deploy Passkeys: ${{ steps.changes.outputs.passkeys }}"
+          echo "Target Theme Dir:    $THEME_DIR"
+          echo "Target Preorder Dir: $PREORDER_DIR"
+          echo "Target Passkeys Dir: $PASSKEYS_DIR"
+          echo "Deploy Theme:        ${{ steps.changes.outputs.theme }}"
+          echo "Deploy Preorder:     ${{ steps.changes.outputs.preorder }}"
+          echo "Deploy Passkeys:     ${{ steps.changes.outputs.passkeys }}"
 
           LFTP_COMMANDS="$( mktemp )"
           {
+            echo 'set cmd:fail-exit yes;'
             echo 'set ftp:ssl-allow yes;'
             echo 'set ssl:verify-certificate no;'
             echo 'set ftp:passive-mode yes;'
@@ -121,4 +128,5 @@ jobs:
             echo 'quit'
           } > "$LFTP_COMMANDS"
 
+          cat "$LFTP_COMMANDS"
           lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" -f "$LFTP_COMMANDS"
