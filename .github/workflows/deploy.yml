@@ -15,13 +15,59 @@ jobs:
     name: FTP Sync Engine
     runs-on: ubuntu-latest
     steps:
-      - name: 🚚 Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      - name: 📦 Install lftp Engine
+      - name: Detect changed deploy components
+        id: changes
+        shell: bash
+        run: |
+          DEPLOY_THEME=false
+          DEPLOY_PREORDER=false
+          DEPLOY_PASSKEYS=false
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            DEPLOY_THEME=true
+            DEPLOY_PREORDER=true
+            DEPLOY_PASSKEYS=true
+          else
+            if ! CHANGED_FILES="$( git diff --name-only "${GITHUB_SHA}^" "$GITHUB_SHA" )"; then
+              echo "Could not determine changed files; deploying all components."
+              DEPLOY_THEME=true
+              DEPLOY_PREORDER=true
+              DEPLOY_PASSKEYS=true
+            elif grep -qE '^(\.github/workflows/deploy\.yml|app/public/wp-content/themes/raka-preorder-theme/)' <<< "$CHANGED_FILES"; then
+              DEPLOY_THEME=true
+            fi
+
+            if grep -qE '^(\.github/workflows/deploy\.yml|app/public/wp-content/plugins/preorder-raka/)' <<< "$CHANGED_FILES"; then
+              DEPLOY_PREORDER=true
+            fi
+
+            if grep -qE '^(\.github/workflows/deploy\.yml|app/public/wp-content/plugins/my-wc-passkeys/)' <<< "$CHANGED_FILES"; then
+              DEPLOY_PASSKEYS=true
+            fi
+          fi
+
+          if [[ "$DEPLOY_THEME" == true || "$DEPLOY_PREORDER" == true || "$DEPLOY_PASSKEYS" == true ]]; then
+            DEPLOY_ANY=true
+          else
+            DEPLOY_ANY=false
+          fi
+
+          echo "theme=$DEPLOY_THEME" >> "$GITHUB_OUTPUT"
+          echo "preorder=$DEPLOY_PREORDER" >> "$GITHUB_OUTPUT"
+          echo "passkeys=$DEPLOY_PASSKEYS" >> "$GITHUB_OUTPUT"
+          echo "any=$DEPLOY_ANY" >> "$GITHUB_OUTPUT"
+
+      - name: Install lftp
+        if: steps.changes.outputs.any == 'true'
         run: sudo apt-get update -y && sudo apt-get install -y lftp
 
-      - name: 🚀 Deploy Components via lftp (Robust PASV Mode)
+      - name: Deploy changed components via lftp
+        if: steps.changes.outputs.any == 'true'
         run: |
           THEME_RAW="${{ secrets.FTP_THEME_DIR }}"
           PLUGIN_RAW="${{ secrets.FTP_PLUGIN_DIR }}"
@@ -29,14 +75,12 @@ jobs:
           THEME_RAW="${THEME_RAW%/}"
           PLUGIN_RAW="${PLUGIN_RAW%/}"
 
-          # Auto-resolve exact Theme directory
           if [[ "$THEME_RAW" == *"raka-preorder-theme" ]]; then
             THEME_DIR="$THEME_RAW"
           else
             THEME_DIR="${THEME_RAW}/raka-preorder-theme"
           fi
 
-          # Auto-resolve exact Plugin directories
           if [[ "$PLUGIN_RAW" == *"preorder-raka" ]]; then
             PREORDER_DIR="$PLUGIN_RAW"
             PASSKEYS_DIR="${PLUGIN_RAW%/preorder-raka}/my-wc-passkeys"
@@ -45,47 +89,36 @@ jobs:
             PASSKEYS_DIR="${PLUGIN_RAW}/my-wc-passkeys"
           fi
 
-          echo "Target Theme Directory:    $THEME_DIR"
-          echo "Target Preorder Directory: $PREORDER_DIR"
-          echo "Target Passkeys Directory: $PASSKEYS_DIR"
+          echo "Deploy Theme:    ${{ steps.changes.outputs.theme }}"
+          echo "Deploy Preorder: ${{ steps.changes.outputs.preorder }}"
+          echo "Deploy Passkeys: ${{ steps.changes.outputs.passkeys }}"
 
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" <<EOF
-          set ftp:ssl-allow yes;
-          set ssl:verify-certificate no;
-          set ftp:passive-mode yes;
-          set ftp:use-epsv no;
-          set net:timeout 120;
-          set net:max-retries 10;
-          set net:reconnect-interval-base 3;
+          LFTP_COMMANDS="$( mktemp )"
+          {
+            echo 'set ftp:ssl-allow yes;'
+            echo 'set ssl:verify-certificate no;'
+            echo 'set ftp:passive-mode yes;'
+            echo 'set ftp:use-epsv no;'
+            echo 'set net:timeout 120;'
+            echo 'set net:max-retries 10;'
+            echo 'set net:reconnect-interval-base 3;'
 
-          echo "=== [1/3] Deploying raka-preorder-theme ===";
-          mirror -R -v --only-newer \
-            --exclude-glob .git* \
-            --exclude-glob node_modules/ \
-            --exclude-glob src/ \
-            --exclude-glob package*.json \
-            --exclude-glob AGENTS.md \
-            --exclude-glob .windsurf/ \
-            ./app/public/wp-content/themes/raka-preorder-theme/ "$THEME_DIR/";
+            if [[ "${{ steps.changes.outputs.theme }}" == 'true' ]]; then
+              echo 'echo "=== Deploying raka-preorder-theme ===";'
+              echo "mirror -R -v --only-newer --exclude-glob .git* --exclude-glob node_modules/ --exclude-glob src/ --exclude-glob package*.json --exclude-glob AGENTS.md --exclude-glob .windsurf/ ./app/public/wp-content/themes/raka-preorder-theme/ \"$THEME_DIR/\";"
+            fi
 
-          echo "=== [2/3] Deploying preorder-raka plugin ===";
-          mirror -R -v --only-newer \
-            --exclude-glob .git* \
-            --exclude-glob node_modules/ \
-            --exclude-glob src/ \
-            --exclude-glob package*.json \
-            --exclude-glob AGENTS.md \
-            --exclude-glob .windsurf/ \
-            ./app/public/wp-content/plugins/preorder-raka/ "$PREORDER_DIR/";
+            if [[ "${{ steps.changes.outputs.preorder }}" == 'true' ]]; then
+              echo 'echo "=== Deploying preorder-raka plugin ===";'
+              echo "mirror -R -v --only-newer --exclude-glob .git* --exclude-glob node_modules/ --exclude-glob src/ --exclude-glob package*.json --exclude-glob AGENTS.md --exclude-glob .windsurf/ ./app/public/wp-content/plugins/preorder-raka/ \"$PREORDER_DIR/\";"
+            fi
 
-          echo "=== [3/3] Deploying my-wc-passkeys plugin ===";
-          mirror -R -v --only-newer \
-            --exclude-glob .git* \
-            --exclude-glob node_modules/ \
-            --exclude-glob src/ \
-            --exclude-glob package*.json \
-            --exclude-glob AGENTS.md \
-            --exclude-glob .windsurf/ \
-            ./app/public/wp-content/plugins/my-wc-passkeys/ "$PASSKEYS_DIR/";
-          quit
-          EOF
+            if [[ "${{ steps.changes.outputs.passkeys }}" == 'true' ]]; then
+              echo 'echo "=== Deploying my-wc-passkeys plugin ===";'
+              echo "mirror -R -v --only-newer --exclude-glob .git* --exclude-glob node_modules/ --exclude-glob src/ --exclude-glob package*.json --exclude-glob AGENTS.md --exclude-glob .windsurf/ ./app/public/wp-content/plugins/my-wc-passkeys/ \"$PASSKEYS_DIR/\";"
+            fi
+
+            echo 'quit'
+          } > "$LFTP_COMMANDS"
+
+          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" -f "$LFTP_COMMANDS"
