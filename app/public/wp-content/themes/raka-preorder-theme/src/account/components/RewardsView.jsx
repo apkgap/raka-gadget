@@ -243,12 +243,14 @@ export default function RewardsView( { config, showToast } ) {
 										<h4 id={ `raka-reward-name-${ item.id }` } className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-2">
 											{ item.name }
 										</h4>
-										<div id={ `raka-reward-val-row-${ item.id }` } className="flex items-center gap-2">
-											<span id={ `raka-reward-free-${ item.id }` } className="text-xs font-bold text-red-600 dark:text-red-500">ฟรี (0 ฿)</span>
+										<div id={ `raka-reward-val-row-${ item.id }` } className="flex items-center gap-2 flex-wrap">
+											<span id={ `raka-reward-free-${ item.id }` } className="text-xs font-bold text-red-600 dark:text-red-500 whitespace-nowrap">ฟรี (0 ฿)</span>
 											{ item.price_label && (
-												<span id={ `raka-reward-val-orig-${ item.id }` } className="text-[11px] text-neutral-400 line-through">
-													{ item.price_label }
-												</span>
+												<span
+													id={ `raka-reward-val-orig-${ item.id }` }
+													className="text-[11px] text-neutral-400 line-through whitespace-nowrap"
+													dangerouslySetInnerHTML={ { __html: item.price_label } }
+												/>
 											) }
 										</div>
 									</div>

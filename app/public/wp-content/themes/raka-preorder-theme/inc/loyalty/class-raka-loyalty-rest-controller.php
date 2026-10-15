@@ -361,7 +361,7 @@ class Raka_Loyalty_REST_Controller {
 				'id'          => $pid,
 				'name'        => $product->get_name(),
 				'price_raw'   => $product->get_price(),
-				'price_label' => wc_price( $product->get_price() ),
+				'price_label' => html_entity_decode( wp_strip_all_tags( wc_price( $product->get_price() ) ), ENT_QUOTES, 'UTF-8' ),
 				'cost'        => $cost,
 				'image_url'   => $img_url,
 				'is_in_stock' => $product->is_in_stock(),
