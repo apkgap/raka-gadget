@@ -866,22 +866,40 @@ function preorder_raka_enqueue_assets() {
 		$custom_logo_id  = get_theme_mod( 'custom_logo' );
 		$custom_logo_url = $custom_logo_id ? wp_get_attachment_image_url( $custom_logo_id, 'full' ) : '';
 
+		$turnstile_enabled = function_exists( 'raka_is_turnstile_enabled' ) ? raka_is_turnstile_enabled() : true;
+		$turnstile_sitekey = function_exists( 'raka_get_turnstile_sitekey' ) ? raka_get_turnstile_sitekey() : '0x4AAAAAAFNWAI83P9cCw0AU';
+		$turnstile_theme   = function_exists( 'raka_get_turnstile_theme' ) ? raka_get_turnstile_theme() : 'auto';
+
+		if ( $turnstile_enabled ) {
+			wp_enqueue_script(
+				'cloudflare-turnstile-api',
+				'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',
+				[],
+				null,
+				true
+			);
+		}
+
 		wp_localize_script(
 			'preorder-raka-app',
 			'preorderRakaSettings',
 			[
-				'root'       => esc_url_raw( rest_url( 'preorder-raka/v1' ) ),
-				'nonce'      => wp_create_nonce( 'wp_rest' ),
-				'home'       => esc_url( home_url() ),
-				'logoUrl'    => esc_url( $custom_logo_url ),
-				'siteName'   => esc_html( get_bloginfo( 'name' ) ),
-				'siteDesc'   => esc_html( get_bloginfo( 'description' ) ),
-				'isLoggedIn' => is_user_logged_in(),
-				'userId'     => get_current_user_id(),
-				'userName'   => is_user_logged_in() ? ( wp_get_current_user()->display_name ?: wp_get_current_user()->user_login ) : '',
-				'loginUrl'   => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url( home_url( '/pre-order/' ) ),
+				'root'             => esc_url_raw( rest_url( 'preorder-raka/v1' ) ),
+				'nonce'            => wp_create_nonce( 'wp_rest' ),
+				'home'             => esc_url( home_url() ),
+				'logoUrl'          => esc_url( $custom_logo_url ),
+				'siteName'         => esc_html( get_bloginfo( 'name' ) ),
+				'siteDesc'         => esc_html( get_bloginfo( 'description' ) ),
+				'isLoggedIn'       => is_user_logged_in(),
+				'userId'           => get_current_user_id(),
+				'userName'         => is_user_logged_in() ? ( wp_get_current_user()->display_name ?: wp_get_current_user()->user_login ) : '',
+				'loginUrl'         => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url( home_url( '/pre-order/' ) ),
+				'turnstileEnabled' => (bool) $turnstile_enabled,
+				'turnstileSitekey' => esc_attr( $turnstile_sitekey ),
+				'turnstileTheme'   => esc_attr( $turnstile_theme ),
 			]
 		);
+
 
 	}
 }

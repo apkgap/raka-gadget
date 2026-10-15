@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
 
 // ─── Design Tokens — Red × Black ──────────────────────────────────────────────
 const T = {
@@ -176,10 +177,16 @@ const PreOrderApp = ({ postId }) => {
 	const [productsLoading, setProductsLoading] = useState(false);
 	const [productSearch, setProductSearch]     = useState('');
 
+	// Cloudflare Turnstile CAPTCHA state
+	const [turnstileToken, setTurnstileToken]   = useState('');
+	const turnstileContainerRef                 = useRef(null);
+	const turnstileWidgetIdRef                  = useRef(null);
+
 	// My Pre-orders state
 	const [myOrders, setMyOrders]               = useState([]);
 	const [myOrdersLoading, setMyOrdersLoading] = useState(false);
 	const [myOrdersError, setMyOrdersError]     = useState(null);
+
 
 	// Handle resize for custom responsive styling in JS
 	useEffect(() => {
@@ -350,11 +357,59 @@ const PreOrderApp = ({ postId }) => {
 		return () => { isSubscribed = false; };
 	}, [postId]);
 
-	const fetchStatus = async ({ pId, pOrderNo, pPhone, pCitizen, pType }) => {
+	// Cloudflare Turnstile widget initialization effect
+	useEffect(() => {
+		if (!settings.turnstileEnabled || !settings.turnstileSitekey) return;
+
+		let intervalId = null;
+
+		const renderTurnstileWidget = () => {
+			if (!window.turnstile || !turnstileContainerRef.current) return;
+			if (turnstileContainerRef.current.hasChildNodes() && turnstileWidgetIdRef.current !== null) return;
+
+			try {
+				const widgetId = window.turnstile.render(turnstileContainerRef.current, {
+					sitekey: settings.turnstileSitekey,
+					theme: settings.turnstileTheme || 'auto',
+					callback: (token) => {
+						setTurnstileToken(token);
+						setError(null);
+					},
+					'expired-callback': () => {
+						setTurnstileToken('');
+					},
+					'error-callback': () => {
+						setTurnstileToken('');
+					},
+				});
+				turnstileWidgetIdRef.current = widgetId;
+			} catch (e) {
+				console.log('Turnstile render init:', e);
+			}
+		};
+
+		if (window.turnstile) {
+			renderTurnstileWidget();
+		} else {
+			intervalId = setInterval(() => {
+				if (window.turnstile) {
+					clearInterval(intervalId);
+					renderTurnstileWidget();
+				}
+			}, 250);
+		}
+
+		return () => {
+			if (intervalId) clearInterval(intervalId);
+		};
+	}, [screen, settings.turnstileEnabled, settings.turnstileSitekey, settings.turnstileTheme]);
+
+	const fetchStatus = async ({ pId, pOrderNo, pPhone, pCitizen, pType, pTurnstileToken }) => {
 		const targetPhone = pPhone !== undefined ? pPhone : phone;
 		const targetCitizen = pCitizen !== undefined ? pCitizen : citizenId;
 		const targetType = pType || verificationType;
 		const targetOrderNo = pOrderNo || orderNo;
+		const activeTurnstileToken = pTurnstileToken !== undefined ? pTurnstileToken : (turnstileToken || (window.turnstile && turnstileWidgetIdRef.current !== null ? window.turnstile.getResponse(turnstileWidgetIdRef.current) : ''));
 
 		setLoading(true); setError(null);
 		try {
@@ -372,6 +427,10 @@ const PreOrderApp = ({ postId }) => {
 				if (targetType === 'phone') params.set('phone', targetPhone);
 				else params.set('citizen_id', targetCitizen);
 
+				if (activeTurnstileToken) {
+					params.set('cf_turnstile_response', activeTurnstileToken);
+				}
+
 				url = `${basePath}?${params.toString()}`;
 			} else {
 				const baseUrl = `${rootUrl.replace(/\/$/, '')}/status`;
@@ -381,6 +440,10 @@ const PreOrderApp = ({ postId }) => {
 
 				if (targetType === 'phone') params.append('phone', targetPhone);
 				else params.append('citizen_id', targetCitizen);
+
+				if (activeTurnstileToken) {
+					params.append('cf_turnstile_response', activeTurnstileToken);
+				}
 
 				url = `${baseUrl}?${params.toString()}`;
 			}
@@ -392,9 +455,18 @@ const PreOrderApp = ({ postId }) => {
 			saveAuthCache(targetPhone, targetCitizen, targetType);
 
 			setPreorderData(data.data); setScreen('result');
-		} catch (err) { setError(err.message); }
+		} catch (err) {
+			setError(err.message);
+			if (window.turnstile && turnstileWidgetIdRef.current !== null) {
+				try {
+					window.turnstile.reset(turnstileWidgetIdRef.current);
+					setTurnstileToken('');
+				} catch (e) {}
+			}
+		}
 		finally { setLoading(false); }
 	};
+
 
 	const handleSearch = async (e) => {
 		if (e) e.preventDefault();
@@ -464,6 +536,27 @@ const PreOrderApp = ({ postId }) => {
 					value={phone} onChange={e => setPhone(e.target.value)}
 					onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)} required/>
 			</div>
+
+			{/* Cloudflare Turnstile CAPTCHA Widget */}
+			{settings.turnstileEnabled && (
+				<div
+					id="preorder-raka-turnstile-container"
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						minHeight: 65,
+						borderRadius: 14,
+						background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+						border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+						padding: '8px 12px',
+						overflow: 'hidden',
+					}}
+				>
+					<div ref={turnstileContainerRef} id="preorder-raka-turnstile-widget" />
+				</div>
+			)}
 
 			{/* Error box */}
 			{error && (
