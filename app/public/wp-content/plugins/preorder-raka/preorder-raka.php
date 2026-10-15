@@ -708,6 +708,13 @@ function preorder_raka_save_post( $post_id ) {
 		}
 	}
 
+	if ( isset( $_POST['preorder_raka_user_id'] ) ) {
+		$u_id = intval( $_POST['preorder_raka_user_id'] );
+		update_post_meta( $post_id, '_preorder_user_id', $u_id );
+		update_post_meta( $post_id, '_customer_user', $u_id );
+	}
+
+
 	// Auto-sync product thumbnail if not set
 	if ( ! empty( $_POST['preorder_raka_product_id'] ) ) {
 		$selected_prod_id = intval( $_POST['preorder_raka_product_id'] );

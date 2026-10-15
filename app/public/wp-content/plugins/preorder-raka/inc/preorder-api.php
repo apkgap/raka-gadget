@@ -176,12 +176,28 @@ function preorder_raka_format_single_item( $post ) {
  */
 function preorder_raka_get_post_member_id( int $post_id ): int {
 	// 1. Check direct user ID meta
-	$user_id = (int) get_post_meta( $post_id, '_preorder_user_id', true );
-	if ( ! $user_id ) {
-		$user_id = (int) get_post_meta( $post_id, '_customer_user', true );
+	$raw_user_id = get_post_meta( $post_id, '_preorder_user_id', true );
+	if ( $raw_user_id === '0' || $raw_user_id === 0 ) {
+		// Explicitly selected as guest / general customer (-- ลูกค้าทั่วไป / ไม่ระบุ --)
+		return 0;
 	}
+
+	$user_id = (int) $raw_user_id;
+	if ( ! $user_id ) {
+		$raw_cust = get_post_meta( $post_id, '_customer_user', true );
+		if ( $raw_cust === '0' || $raw_cust === 0 ) {
+			return 0;
+		}
+		$user_id = (int) $raw_cust;
+	}
+
 	if ( $user_id > 0 && get_userdata( $user_id ) ) {
 		return $user_id;
+	}
+
+	// If explicit user ID was already evaluated and is 0/empty, do not guess phone/email for guest orders
+	if ( metadata_exists( 'post', $post_id, '_preorder_user_id' ) ) {
+		return 0;
 	}
 
 	// 2. Check author if non-admin member
@@ -194,11 +210,12 @@ function preorder_raka_get_post_member_id( int $post_id ): int {
 		}
 	}
 
-	// 3. Match phone number with registered users in WP
+	// 3. Match phone number with registered users in WP (only for legacy orders without _preorder_user_id meta)
 	$phone = get_post_meta( $post_id, '_preorder_phone', true );
 	if ( ! empty( $phone ) ) {
 		$clean_phone = preg_replace( '/[^0-9]/', '', (string) $phone );
 		if ( strlen( $clean_phone ) >= 9 ) {
+
 			$matched_users = get_users( [
 				'meta_query' => [
 					'relation' => 'OR',
@@ -651,7 +668,11 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 	if ( $user_id > 0 ) {
 		update_post_meta( $post_id, '_preorder_user_id', $user_id );
 		update_post_meta( $post_id, '_customer_user', $user_id );
+	} else {
+		update_post_meta( $post_id, '_preorder_user_id', 0 );
+		update_post_meta( $post_id, '_customer_user', 0 );
 	}
+
 
 	if ( ! empty( $email ) ) {
 		update_post_meta( $post_id, '_preorder_email', $email );
