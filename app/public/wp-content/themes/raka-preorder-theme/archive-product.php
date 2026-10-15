@@ -41,7 +41,7 @@ $all_cats = get_terms( [
 		<div id="shop-layout-wrap" class="flex flex-col lg:flex-row items-start gap-8 xl:gap-12">
 
 			<!-- 1. Left Sticky Sidebar Filter (Desktop) -->
-			<div id="shop-desktop-sidebar-wrap" class="hidden lg:block w-64 xl:w-72 flex-shrink-0 sticky top-28 self-start">
+			<div id="shop-desktop-sidebar-wrap" class="hidden lg:block w-64 xl:w-72 flex-shrink-0 sticky top-28 self-start max-h-[calc(100vh-8rem)] overflow-y-auto pr-1">
 				<?php raka_render_shop_sidebar_filters( 'desktop' ); ?>
 			</div>
 

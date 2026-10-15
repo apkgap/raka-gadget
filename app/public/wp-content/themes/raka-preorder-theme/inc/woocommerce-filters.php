@@ -516,8 +516,11 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 				</div>
 			</details>
 
-			<!-- ── 6. Apply Filter Action Button ── -->
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-action-section" class="pt-2">
+			<!-- ── 6. Apply Filter Action Button (Sticky/Fixed for Easy Access) ── -->
+			<div
+				id="<?php echo esc_attr( $id_prefix ); ?>-action-section"
+				class="sticky bottom-0 z-30 pt-3 pb-2 bg-gradient-to-t from-white via-white/95 to-transparent dark:from-obsidian dark:via-obsidian/95 dark:to-transparent -mx-1 px-1"
+			>
 				<?php if ( ! empty( $state['orderby'] ) && $state['orderby'] !== 'menu_order' ) : ?>
 					<input type="hidden" name="orderby" value="<?php echo esc_attr( $state['orderby'] ); ?>">
 				<?php endif; ?>
@@ -525,7 +528,7 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 				<button
 					id="<?php echo esc_attr( $id_prefix ); ?>-btn-apply-filters"
 					type="submit"
-					class="w-full h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-sm font-mono font-bold uppercase tracking-wider shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+					class="w-full h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-sm font-mono font-bold uppercase tracking-wider shadow-lg hover:shadow-xl hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
 				>
 					<i class="ri-search-2-line text-base"></i>
 					<span>APPLY & SEARCH</span>
