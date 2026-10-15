@@ -63,6 +63,32 @@ export default function LoyaltySettingsTab( {
 	const [ adjustReason, setAdjustReason ] = useState( '' );
 	const [ adjusting, setAdjusting ] = useState( false );
 
+	// Reward Products search, filter & pagination state
+	const [ productSearch, setProductSearch ] = useState( '' );
+	const [ showOnlySelected, setShowOnlySelected ] = useState( false );
+	const [ productPage, setProductPage ] = useState( 1 );
+	const PRODUCTS_PER_PAGE = 24;
+
+	const filteredProducts = ( wcProducts || [] ).filter( ( p ) => {
+		const isSelected = ( loyaltyOpts.reward_product_ids || [] ).includes( p.id );
+		if ( showOnlySelected && ! isSelected ) {
+			return false;
+		}
+		if ( productSearch.trim() ) {
+			const term = productSearch.toLowerCase().trim();
+			const titleMatch = ( p.title || '' ).toLowerCase().includes( term );
+			const idMatch = String( p.id ).includes( term );
+			return titleMatch || idMatch;
+		}
+		return true;
+	} );
+
+	const totalProductPages = Math.ceil( filteredProducts.length / PRODUCTS_PER_PAGE ) || 1;
+	const pagedProducts = filteredProducts.slice(
+		( productPage - 1 ) * PRODUCTS_PER_PAGE,
+		productPage * PRODUCTS_PER_PAGE
+	);
+
 	const updateLoyaltyField = ( field, val ) => {
 		const updated = {
 			...loyaltyOpts,
@@ -414,60 +440,185 @@ export default function LoyaltySettingsTab( {
 
 					{ /* Reward Catalog Products Card */ }
 					<Card style={ { gridColumn: '1 / -1' } }>
-						<CardHeader>
-							<h3 style={ { margin: 0, fontSize: '15px', fontWeight: 700 } }>
-								{ __( 'สินค้าในแคตตาล็อกของรางวัล (แลกฟรีด้วย 100 แต้ม)', 'raka-preorder-theme' ) }
-							</h3>
+						<CardHeader style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' } }>
+							<div>
+								<h3 style={ { margin: 0, fontSize: '15px', fontWeight: 700 } }>
+									{ __( 'สินค้าในแคตตาล็อกของรางวัล (แลกฟรีด้วย 100 แต้ม)', 'raka-preorder-theme' ) }
+								</h3>
+								<span style={ { fontSize: '12px', color: '#64748b' } }>
+									{ __( 'เลือกไว้แล้ว', 'raka-preorder-theme' ) } <strong style={ { color: '#ef4444' } }>{ ( loyaltyOpts.reward_product_ids || [] ).length }</strong> { __( 'รายการ', 'raka-preorder-theme' ) }
+								</span>
+							</div>
+
+							{ /* Search & Filter Controls */ }
+							<div style={ { display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' } }>
+								<input
+									type="text"
+									placeholder={ __( 'ค้นหาชื่อสินค้า...', 'raka-preorder-theme' ) }
+									value={ productSearch }
+									onChange={ ( e ) => {
+										setProductSearch( e.target.value );
+										setProductPage( 1 );
+									} }
+									style={ {
+										padding: '6px 12px',
+										fontSize: '13px',
+										borderRadius: '6px',
+										border: '1px solid #cbd5e1',
+										minWidth: '200px',
+										outline: 'none',
+									} }
+								/>
+
+								<button
+									type="button"
+									onClick={ () => {
+										setShowOnlySelected( ! showOnlySelected );
+										setProductPage( 1 );
+									} }
+									style={ {
+										padding: '6px 12px',
+										fontSize: '12px',
+										fontWeight: 600,
+										borderRadius: '6px',
+										border: showOnlySelected ? '1px solid #ef4444' : '1px solid #cbd5e1',
+										background: showOnlySelected ? '#fef2f2' : '#ffffff',
+										color: showOnlySelected ? '#ef4444' : '#475569',
+										cursor: 'pointer',
+									} }
+								>
+									{ showOnlySelected ? __( 'แสดงทั้งหมด', 'raka-preorder-theme' ) : __( 'แสดงเฉพาะที่เลือก', 'raka-preorder-theme' ) }
+								</button>
+							</div>
 						</CardHeader>
 						<CardBody>
 							<p style={ { fontSize: '12px', color: '#64748b', marginBottom: '16px' } }>
 								{ __( 'คลิกเลือกสินค้า WooCommerce ที่ต้องการเปิดให้สมาชิกระดับ 100 แต้มขึ้นไปเลือกแลกฟรี (ระบบจะตั้งราคา 0฿ พร้อม HMAC Signature ป้องกันการดัดแปลง)', 'raka-preorder-theme' ) }
 							</p>
 
-							<div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px', maxHeight: '420px', overflowY: 'auto', padding: '4px' } }>
-								{ wcProducts.map( ( p ) => {
-									const isSelected = ( loyaltyOpts.reward_product_ids || [] ).includes( p.id );
-									return (
-										<div
-											key={ p.id }
-											onClick={ () => toggleRewardProduct( p.id ) }
-											style={ {
-												display: 'flex',
-												alignItems: 'center',
-												gap: '10px',
-												padding: '10px',
-												borderRadius: '10px',
-												border: isSelected ? '2px solid #ef4444' : '1px solid #e2e8f0',
-												background: isSelected ? '#fef2f2' : '#ffffff',
-												cursor: 'pointer',
-												transition: 'all 0.15s ease',
-											} }
-										>
-											<input
-												type="checkbox"
-												checked={ isSelected }
-												onChange={ () => {} }
-												style={ { margin: 0 } }
-											/>
-											{ p.image_url && (
-												<img
-													src={ p.image_url }
-													alt={ p.title }
-													style={ { width: '36px', height: '36px', objectFit: 'cover', borderRadius: '6px', background: '#f1f5f9' } }
+							{ filteredProducts.length === 0 ? (
+								<div style={ { padding: '40px', textAlign: 'center', color: '#94a3b8', fontSize: '13px', background: '#f8fafc', borderRadius: '8px' } }>
+									{ __( 'ไม่พบสินค้าที่ตรงกับคำค้นหา', 'raka-preorder-theme' ) }
+								</div>
+							) : (
+								<div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px', padding: '4px' } }>
+									{ pagedProducts.map( ( p ) => {
+										const isSelected = ( loyaltyOpts.reward_product_ids || [] ).includes( p.id );
+										return (
+											<div
+												key={ p.id }
+												onClick={ () => toggleRewardProduct( p.id ) }
+												style={ {
+													display: 'flex',
+													alignItems: 'center',
+													gap: '10px',
+													padding: '10px',
+													borderRadius: '10px',
+													border: isSelected ? '2px solid #ef4444' : '1px solid #e2e8f0',
+													background: isSelected ? '#fef2f2' : '#ffffff',
+													cursor: 'pointer',
+													transition: 'all 0.15s ease',
+												} }
+											>
+												<input
+													type="checkbox"
+													checked={ isSelected }
+													onChange={ () => {} }
+													style={ { margin: 0, cursor: 'pointer' } }
 												/>
-											) }
-											<div style={ { flex: 1, minWidth: 0 } }>
-												<div style={ { fontSize: '12px', fontWeight: 600, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }>
-													{ p.title }
-												</div>
-												<div style={ { fontSize: '11px', color: '#64748b' } }>
-													{ p.price || '0฿' }
+												{ p.image_url && (
+													<img
+														src={ p.image_url }
+														alt={ p.title }
+														style={ { width: '36px', height: '36px', objectFit: 'cover', borderRadius: '6px', background: '#f1f5f9' } }
+													/>
+												) }
+												<div style={ { flex: 1, minWidth: 0 } }>
+													<div style={ { fontSize: '12px', fontWeight: 600, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }>
+														{ p.title }
+													</div>
+													<div style={ { fontSize: '11px', color: '#64748b' } }>
+														{ p.price || '0฿' }
+													</div>
 												</div>
 											</div>
-										</div>
-									);
-								} ) }
-							</div>
+										);
+									} ) }
+								</div>
+							) }
+
+							{ /* Pagination Controls */ }
+							{ totalProductPages > 1 && (
+								<div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e2e8f0', fontSize: '12px', color: '#64748b' } }>
+									<div>
+										{ __( 'แสดงหน้า', 'raka-preorder-theme' ) } { productPage } / { totalProductPages } ({ filteredProducts.length } { __( 'รายการ', 'raka-preorder-theme' ) })
+									</div>
+									<div style={ { display: 'flex', gap: '6px' } }>
+										<button
+											type="button"
+											disabled={ productPage <= 1 }
+											onClick={ () => setProductPage( ( prev ) => Math.max( 1, prev - 1 ) ) }
+											style={ {
+												padding: '6px 12px',
+												borderRadius: '6px',
+												border: '1px solid #cbd5e1',
+												background: productPage <= 1 ? '#f1f5f9' : '#ffffff',
+												cursor: productPage <= 1 ? 'not-allowed' : 'pointer',
+												fontSize: '12px',
+												fontWeight: 600,
+											} }
+										>
+											{ __( '« ก่อนหน้า', 'raka-preorder-theme' ) }
+										</button>
+
+										{ Array.from( { length: totalProductPages }, ( _, i ) => i + 1 )
+											.filter( ( p ) => p === 1 || p === totalProductPages || Math.abs( p - productPage ) <= 2 )
+											.map( ( p, idx, arr ) => {
+												const prevP = arr[ idx - 1 ];
+												const showEllipsis = prevP && p - prevP > 1;
+												return (
+													<span key={ p } style={ { display: 'inline-flex', alignItems: 'center', gap: '6px' } }>
+														{ showEllipsis && <span style={ { padding: '0 4px', color: '#94a3b8' } }>...</span> }
+														<button
+															type="button"
+															onClick={ () => setProductPage( p ) }
+															style={ {
+																width: '32px',
+																height: '32px',
+																borderRadius: '6px',
+																border: p === productPage ? '1px solid #ef4444' : '1px solid #cbd5e1',
+																background: p === productPage ? '#ef4444' : '#ffffff',
+																color: p === productPage ? '#ffffff' : '#334155',
+																fontSize: '12px',
+																fontWeight: p === productPage ? 700 : 500,
+																cursor: 'pointer',
+															} }
+														>
+															{ p }
+														</button>
+													</span>
+												);
+											} ) }
+
+										<button
+											type="button"
+											disabled={ productPage >= totalProductPages }
+											onClick={ () => setProductPage( ( prev ) => Math.min( totalProductPages, prev + 1 ) ) }
+											style={ {
+												padding: '6px 12px',
+												borderRadius: '6px',
+												border: '1px solid #cbd5e1',
+												background: productPage >= totalProductPages ? '#f1f5f9' : '#ffffff',
+												cursor: productPage >= totalProductPages ? 'not-allowed' : 'pointer',
+												fontSize: '12px',
+												fontWeight: 600,
+											} }
+										>
+											{ __( 'ถัดไป »', 'raka-preorder-theme' ) }
+										</button>
+									</div>
+								</div>
+							) }
 						</CardBody>
 					</Card>
 				</div>
