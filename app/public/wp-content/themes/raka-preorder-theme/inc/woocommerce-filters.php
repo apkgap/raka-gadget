@@ -240,31 +240,32 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 				$cat_active_count = count( $active_cats_selected );
 			?>
 				<details id="<?php echo esc_attr( $id_prefix ); ?>-cat-section" class="raka-filter-accordion border-b border-black/5 dark:border-white/5 pb-4 group" open>
-					<summary class="cursor-pointer select-none py-1 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-						<div class="flex items-center gap-2">
-							<span>CATEGORIES</span>
+					<summary class="cursor-pointer select-none py-1 flex items-start justify-between gap-2 text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+						<div class="flex-1 min-w-0">
+							<div class="flex items-center gap-2">
+								<span>CATEGORIES</span>
+								<?php if ( $cat_active_count > 0 ) : ?>
+									<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
+										<?php echo (int) $cat_active_count; ?>
+									</span>
+								<?php endif; ?>
+							</div>
 							<?php if ( $cat_active_count > 0 ) : ?>
-								<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
-									<?php echo (int) $cat_active_count; ?>
-								</span>
+								<div class="pt-1.5 flex flex-wrap gap-1">
+									<?php foreach ( $active_cats_selected as $act_name ) : ?>
+										<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">
+											<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
+											<span><?php echo esc_html( $act_name ); ?></span>
+										</span>
+									<?php endforeach; ?>
+								</div>
 							<?php endif; ?>
 						</div>
-						<div class="flex items-center gap-2 text-neutral-400">
+						<div class="flex items-center gap-2 text-neutral-400 flex-shrink-0 pt-0.5">
 							<span class="text-[11px] opacity-70"><?php echo count( $categories ); ?></span>
 							<i class="ri-arrow-down-s-line text-base raka-accordion-arrow"></i>
 						</div>
 					</summary>
-
-					<?php if ( $cat_active_count > 0 ) : ?>
-						<div class="pt-1.5 pb-1 flex flex-wrap gap-1">
-							<?php foreach ( $active_cats_selected as $act_name ) : ?>
-								<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-800 dark:text-neutral-200 text-[11px] font-sans font-medium">
-									<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
-									<?php echo esc_html( $act_name ); ?>
-								</span>
-							<?php endforeach; ?>
-						</div>
-					<?php endif; ?>
 
 					<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-list" class="pt-2 space-y-1 max-h-56 overflow-y-auto pr-1">
 						<?php foreach ( $categories as $cat ) :
@@ -305,31 +306,32 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 				$brand_active_count = count( $active_brands_selected );
 			?>
 				<details id="<?php echo esc_attr( $id_prefix ); ?>-brand-section" class="raka-filter-accordion border-b border-black/5 dark:border-white/5 pb-4 group" open>
-					<summary class="cursor-pointer select-none py-1 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-						<div class="flex items-center gap-2">
-							<span>BRANDS</span>
+					<summary class="cursor-pointer select-none py-1 flex items-start justify-between gap-2 text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+						<div class="flex-1 min-w-0">
+							<div class="flex items-center gap-2">
+								<span>BRANDS</span>
+								<?php if ( $brand_active_count > 0 ) : ?>
+									<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
+										<?php echo (int) $brand_active_count; ?>
+									</span>
+								<?php endif; ?>
+							</div>
 							<?php if ( $brand_active_count > 0 ) : ?>
-								<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
-									<?php echo (int) $brand_active_count; ?>
-								</span>
+								<div class="pt-1.5 flex flex-wrap gap-1">
+									<?php foreach ( $active_brands_selected as $b_name ) : ?>
+										<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">
+											<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
+											<span><?php echo esc_html( $b_name ); ?></span>
+										</span>
+									<?php endforeach; ?>
+								</div>
 							<?php endif; ?>
 						</div>
-						<div class="flex items-center gap-2 text-neutral-400">
+						<div class="flex items-center gap-2 text-neutral-400 flex-shrink-0 pt-0.5">
 							<span class="text-[11px] opacity-70"><?php echo count( $brands ); ?></span>
 							<i class="ri-arrow-down-s-line text-base raka-accordion-arrow"></i>
 						</div>
 					</summary>
-
-					<?php if ( $brand_active_count > 0 ) : ?>
-						<div class="pt-1.5 pb-1 flex flex-wrap gap-1">
-							<?php foreach ( $active_brands_selected as $b_name ) : ?>
-								<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-800 dark:text-neutral-200 text-[11px] font-sans font-medium">
-									<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
-									<?php echo esc_html( $b_name ); ?>
-								</span>
-							<?php endforeach; ?>
-						</div>
-					<?php endif; ?>
 
 					<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-list" class="pt-2 space-y-1 max-h-56 overflow-y-auto pr-1">
 						<?php foreach ( $brands as $brand ) :

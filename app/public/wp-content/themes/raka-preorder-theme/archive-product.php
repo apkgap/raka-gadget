@@ -263,6 +263,15 @@ $all_cats = get_terms( [
 		transition: transform 0.2s ease;
 	}
 
+	/* ── Asynchronous Filter Transition & Loading ── */
+	#shop-products-content-wrap {
+		transition: opacity 0.25s ease;
+	}
+	#shop-products-content-wrap.raka-filter-loading {
+		opacity: 0.45;
+		pointer-events: none;
+	}
+
 	/* ── Modern Custom Black/White Checkboxes & Radios ── */
 	.raka-custom-checkbox {
 		appearance: none;
@@ -438,9 +447,183 @@ $all_cats = get_terms( [
 			initPriceSlider(prefix);
 		};
 
+		// ── Asynchronous Filter Handler (AJAX) ──
+		var isFiltering = false;
+
+		function handleAsyncFilterSubmit(formEl) {
+			if (isFiltering) return;
+			isFiltering = true;
+
+			var formData = new FormData(formEl);
+			var params = new URLSearchParams();
+
+			for (var pair of formData.entries()) {
+				var key = pair[0];
+				var val = pair[1];
+				if (val !== '' && val !== null) {
+					params.append(key, val);
+				}
+			}
+
+			var targetUrl = formEl.action.split('?')[0];
+			var queryStr = params.toString();
+			var fetchUrl = queryStr ? targetUrl + '?' + queryStr : targetUrl;
+
+			// Close mobile drawer if open
+			if (window.rakaCloseMobileFilters) {
+				window.rakaCloseMobileFilters();
+			}
+
+			// Add visual loading state
+			var contentWrap = document.getElementById('shop-products-content-wrap');
+			var desktopSidebar = document.getElementById('shop-desktop-sidebar-wrap');
+			var mobileBody = document.getElementById('mobile-filters-body');
+
+			if (contentWrap) contentWrap.classList.add('raka-filter-loading');
+
+			fetch(fetchUrl, {
+				headers: { 'X-Requested-With': 'XMLHttpRequest' }
+			})
+			.then(function(res) {
+				if (!res.ok) throw new Error('Network error');
+				return res.text();
+			})
+			.then(function(html) {
+				var parser = new DOMParser();
+				var doc = parser.parseFromString(html, 'text/html');
+
+				// 1. Update Products & Toolbar Content
+				var newContent = doc.getElementById('shop-products-content-wrap');
+				if (newContent && contentWrap) {
+					contentWrap.innerHTML = newContent.innerHTML;
+				}
+
+				// 2. Update Desktop Sidebar Filters (keeping state synced)
+				var newDesktopSidebar = doc.getElementById('shop-desktop-sidebar-wrap');
+				if (newDesktopSidebar && desktopSidebar) {
+					desktopSidebar.innerHTML = newDesktopSidebar.innerHTML;
+				}
+
+				// 3. Update Mobile Drawer Filters
+				var newMobileBody = doc.getElementById('mobile-filters-body');
+				if (newMobileBody && mobileBody) {
+					mobileBody.innerHTML = newMobileBody.innerHTML;
+				}
+
+				// 4. Update Header Count / Badge
+				var newCount = doc.getElementById('btn-mobile-filter-num');
+				var curCount = document.getElementById('btn-mobile-filter-num');
+				var mobileBtn = document.getElementById('btn-mobile-filter-open');
+				if (newCount && curCount) {
+					curCount.textContent = newCount.textContent;
+				} else if (newCount && mobileBtn && !curCount) {
+					mobileBtn.appendChild(newCount);
+				} else if (!newCount && curCount) {
+					curCount.remove();
+				}
+
+				// 5. Update browser URL without reloading
+				if (window.history && window.history.pushState) {
+					window.history.pushState({ path: fetchUrl }, '', fetchUrl);
+				}
+
+				// 6. Re-init listeners on freshly inserted DOM elements
+				bindAsyncFilterEvents();
+				initPriceSlider('desktop');
+				initPriceSlider('mobile');
+
+				// Scroll up smoothly to top of products on mobile
+				if (window.innerWidth < 1024 && contentWrap) {
+					contentWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			})
+			.catch(function(err) {
+				console.error('Async filter error:', err);
+				// Fallback to normal submit on failure
+				formEl.submit();
+			})
+			.finally(function() {
+				isFiltering = false;
+				if (contentWrap) contentWrap.classList.remove('raka-filter-loading');
+			});
+		}
+
+		function bindAsyncFilterEvents() {
+			var desktopForm = document.getElementById('desktop-filter-form');
+			var mobileForm = document.getElementById('mobile-filter-form');
+
+			if (desktopForm && !desktopForm.dataset.asyncBound) {
+				desktopForm.dataset.asyncBound = 'true';
+				desktopForm.addEventListener('submit', function(e) {
+					e.preventDefault();
+					handleAsyncFilterSubmit(desktopForm);
+				});
+			}
+
+			if (mobileForm && !mobileForm.dataset.asyncBound) {
+				mobileForm.dataset.asyncBound = 'true';
+				mobileForm.addEventListener('submit', function(e) {
+					e.preventDefault();
+					handleAsyncFilterSubmit(mobileForm);
+				});
+			}
+
+			// Intercept Reset / Pill / Clear clicks to keep it asynchronous
+			document.querySelectorAll('a[id*="filter-reset-btn"], a[id*="pill-active-"], a[id*="btn-no-products-reset"]').forEach(function(link) {
+				if (!link.dataset.asyncBound) {
+					link.dataset.asyncBound = 'true';
+					link.addEventListener('click', function(e) {
+						e.preventDefault();
+						var targetHref = link.getAttribute('href');
+						if (!targetHref) return;
+
+						var contentWrap = document.getElementById('shop-products-content-wrap');
+						if (contentWrap) contentWrap.classList.add('raka-filter-loading');
+
+						fetch(targetHref, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+							.then(function(res) { return res.text(); })
+							.then(function(html) {
+								var parser = new DOMParser();
+								var doc = parser.parseFromString(html, 'text/html');
+
+								var newContent = doc.getElementById('shop-products-content-wrap');
+								var desktopSidebar = document.getElementById('shop-desktop-sidebar-wrap');
+								var newDesktopSidebar = doc.getElementById('shop-desktop-sidebar-wrap');
+								var mobileBody = document.getElementById('mobile-filters-body');
+								var newMobileBody = doc.getElementById('mobile-filters-body');
+
+								if (newContent && contentWrap) contentWrap.innerHTML = newContent.innerHTML;
+								if (newDesktopSidebar && desktopSidebar) desktopSidebar.innerHTML = newDesktopSidebar.innerHTML;
+								if (newMobileBody && mobileBody) mobileBody.innerHTML = newMobileBody.innerHTML;
+
+								if (window.history && window.history.pushState) {
+									window.history.pushState({ path: targetHref }, '', targetHref);
+								}
+
+								bindAsyncFilterEvents();
+								initPriceSlider('desktop');
+								initPriceSlider('mobile');
+							})
+							.catch(function() {
+								window.location.href = targetHref;
+							})
+							.finally(function() {
+								if (contentWrap) contentWrap.classList.remove('raka-filter-loading');
+							});
+					});
+				}
+			});
+		}
+
+		// Handle browser Back / Forward buttons
+		window.addEventListener('popstate', function() {
+			window.location.reload();
+		});
+
 		document.addEventListener('DOMContentLoaded', function() {
 			initPriceSlider('desktop');
 			initPriceSlider('mobile');
+			bindAsyncFilterEvents();
 		});
 	})();
 </script>
