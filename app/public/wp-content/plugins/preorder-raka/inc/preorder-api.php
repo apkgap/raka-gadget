@@ -144,14 +144,68 @@ function preorder_raka_format_single_item( $post ) {
 	$cur_idx_int = intval( $current_idx );
 	$cur_status_title = ! empty( $formatted_steps[ $cur_idx_int ]['title'] ) ? $formatted_steps[ $cur_idx_int ]['title'] : ( ! empty( $formatted_steps[0]['title'] ) ? $formatted_steps[0]['title'] : 'รับคำสั่งซื้อเรียบร้อย' );
 
+	$items_meta = $get_meta( '_preorder_items', [] );
+	$items_list = [];
+
+	if ( is_array( $items_meta ) && ! empty( $items_meta ) ) {
+		foreach ( $items_meta as $it ) {
+			$it_p_id   = isset( $it['product_id'] ) ? intval( $it['product_id'] ) : 0;
+			$it_name   = isset( $it['product_name'] ) ? sanitize_text_field( $it['product_name'] ) : '';
+			$it_price  = isset( $it['price'] ) ? intval( $it['price'] ) : 0;
+			$it_qty    = isset( $it['qty'] ) ? max( 1, intval( $it['qty'] ) ) : 1;
+			$it_img    = isset( $it['image_url'] ) ? esc_url_raw( $it['image_url'] ) : '';
+			$it_eta    = isset( $it['estimate_days'] ) ? sanitize_text_field( $it['estimate_days'] ) : '';
+
+			if ( empty( $it_img ) && $it_p_id > 0 ) {
+				$it_thumb = get_the_post_thumbnail_url( $it_p_id, 'large' );
+				if ( $it_thumb ) {
+					$it_img = $it_thumb;
+				}
+			}
+
+			$items_list[] = [
+				'product_id'    => $it_p_id,
+				'product_name'  => $it_name,
+				'price'         => $it_price,
+				'qty'           => $it_qty,
+				'subtotal'      => $it_price * $it_qty,
+				'image_url'     => $it_img,
+				'estimate_days' => $it_eta,
+			];
+		}
+	}
+
+	// Fallback to legacy single product fields if items list is empty
+	if ( empty( $items_list ) ) {
+		$items_list[] = [
+			'product_id'    => intval( $product_id ),
+			'product_name'  => $product_name ?: $preorder->post_title,
+			'price'         => $price,
+			'qty'           => $qty,
+			'subtotal'      => $price * $qty,
+			'image_url'     => $featured_image_url ? esc_url_raw( $featured_image_url ) : '',
+			'estimate_days' => $get_meta( '_preorder_estimate_days' ) ?: '7-14 วัน',
+		];
+	}
+
+	$calc_items_total = 0;
+	foreach ( $items_list as $it ) {
+		$calc_items_total += $it['subtotal'];
+	}
+
+	$total = $calc_items_total + $shipping;
+
 	return [
 		'id'               => $pid,
 		'order_no'         => $get_meta( '_preorder_no' ) ?: 'PRE-' . $pid,
-		'product_name'     => $product_name ?: $preorder->post_title,
-		'image_url'        => $featured_image_url ? esc_url_raw( $featured_image_url ) : '',
-		'price'            => $price,
-		'qty'              => $qty,
+		'product_name'     => $product_name ?: ( ! empty( $items_list[0]['product_name'] ) ? $items_list[0]['product_name'] : $preorder->post_title ),
+		'image_url'        => $featured_image_url ? esc_url_raw( $featured_image_url ) : ( ! empty( $items_list[0]['image_url'] ) ? $items_list[0]['image_url'] : '' ),
+		'price'            => $price ?: ( ! empty( $items_list[0]['price'] ) ? $items_list[0]['price'] : 0 ),
+		'qty'              => $qty ?: ( ! empty( $items_list[0]['qty'] ) ? $items_list[0]['qty'] : 1 ),
 		'shipping'         => $shipping,
+		'items'            => $items_list,
+		'items_count'      => count( $items_list ),
+		'items_subtotal'   => $calc_items_total,
 		'total'            => $total,
 		'estimate_days'    => $get_meta( '_preorder_estimate_days' ) ?: '7-14 วัน',
 		'address'          => $get_meta( '_preorder_address' ),
@@ -673,6 +727,73 @@ function preorder_raka_create_preorder( WP_REST_Request $request ) {
 		update_post_meta( $post_id, '_customer_user', 0 );
 	}
 
+	$raw_items = $request->get_param( 'items' );
+	$items     = [];
+
+	if ( is_array( $raw_items ) && ! empty( $raw_items ) ) {
+		foreach ( $raw_items as $it ) {
+			$it_name = isset( $it['product_name'] ) ? sanitize_text_field( $it['product_name'] ) : '';
+			if ( empty( $it_name ) && ! empty( $it['name'] ) ) {
+				$it_name = sanitize_text_field( $it['name'] );
+			}
+			$it_p_id  = isset( $it['product_id'] ) ? intval( $it['product_id'] ) : 0;
+			$it_price = isset( $it['price'] ) ? intval( $it['price'] ) : 0;
+			$it_qty   = isset( $it['qty'] ) ? max( 1, intval( $it['qty'] ) ) : 1;
+			$it_img   = isset( $it['image_url'] ) ? esc_url_raw( $it['image_url'] ) : '';
+			$it_eta   = isset( $it['estimate_days'] ) ? sanitize_text_field( $it['estimate_days'] ) : '';
+
+			if ( empty( $it_img ) && $it_p_id > 0 ) {
+				$it_thumb = get_the_post_thumbnail_url( $it_p_id, 'large' );
+				if ( $it_thumb ) {
+					$it_img = $it_thumb;
+				}
+			}
+
+			if ( ! empty( $it_name ) || $it_p_id > 0 ) {
+				$items[] = [
+					'product_id'    => $it_p_id,
+					'product_name'  => $it_name,
+					'price'         => $it_price,
+					'qty'           => $it_qty,
+					'subtotal'      => $it_price * $it_qty,
+					'image_url'     => $it_img,
+					'estimate_days' => $it_eta ?: $estimate_days,
+				];
+			}
+		}
+	}
+
+	// Fallback to single product fields if items is not passed
+	if ( empty( $items ) && ( ! empty( $product_name ) || $product_id > 0 ) ) {
+		$items[] = [
+			'product_id'    => $product_id,
+			'product_name'  => $product_name,
+			'price'         => $price,
+			'qty'           => $qty,
+			'subtotal'      => $price * $qty,
+			'image_url'     => $product_id ? ( get_the_post_thumbnail_url( $product_id, 'large' ) ?: '' ) : '',
+			'estimate_days' => $estimate_days,
+		];
+	}
+
+	if ( ! empty( $items ) ) {
+		update_post_meta( $post_id, '_preorder_items', $items );
+		// Ensure primary product fields reflect first item or summary
+		if ( empty( $product_name ) && ! empty( $items[0]['product_name'] ) ) {
+			$product_name = count( $items ) > 1 
+				? $items[0]['product_name'] . ' (และอีก ' . ( count( $items ) - 1 ) . ' รายการ)'
+				: $items[0]['product_name'];
+			update_post_meta( $post_id, '_preorder_product', $product_name );
+		}
+		if ( ! $product_id && ! empty( $items[0]['product_id'] ) ) {
+			$product_id = $items[0]['product_id'];
+			update_post_meta( $post_id, '_preorder_product_id', $product_id );
+			$first_thumb = get_post_thumbnail_id( $product_id );
+			if ( $first_thumb && ! has_post_thumbnail( $post_id ) ) {
+				set_post_thumbnail( $post_id, $first_thumb );
+			}
+		}
+	}
 
 	if ( ! empty( $email ) ) {
 		update_post_meta( $post_id, '_preorder_email', $email );

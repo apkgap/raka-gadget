@@ -1246,8 +1246,8 @@ const PreOrderApp = ({ postId }) => {
 							{/* Right details column */}
 							<div id="preorder-raka-details-col" style={{ flex: '1 1 280px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-								{/* Product image */}
-								{preorderData.image_url && (
+								{/* Product image (if single or primary) */}
+								{preorderData.image_url && (!preorderData.items || preorderData.items.length <= 1) && (
 									<div id="preorder-raka-product-img-box" style={{
 										width: '100%', height: 210, borderRadius: 16, overflow: 'hidden',
 										border: `1px solid ${ds(T.line, T.lLine, isDark)}`,
@@ -1255,6 +1255,51 @@ const PreOrderApp = ({ postId }) => {
 									}}>
 										<img id="preorder-raka-product-img" src={preorderData.image_url} alt={preorderData.product_name}
 											style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>
+									</div>
+								)}
+
+								{/* Multi-Item Product List Card */}
+								{preorderData.items && preorderData.items.length > 0 && (
+									<div id="preorder-raka-items-card" style={S.card}>
+										<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+											<span style={{ ...S.sectionLabel, marginBottom: 0 }}>
+												<i className="ri-shopping-bag-3-line" style={{ marginRight: 4 }}/>รายการสินค้า ({preorderData.items.length})
+											</span>
+											<span style={{ fontSize: 12, color: T.red, fontWeight: 600 }}>
+												{preorderData.items.reduce((acc, it) => acc + (it.qty || 1), 0)} ชิ้น
+											</span>
+										</div>
+
+										<div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+											{preorderData.items.map((it, i) => (
+												<div key={i} style={{
+													display: 'flex', alignItems: 'center', gap: 10,
+													padding: '8px 10px', borderRadius: 10,
+													background: ds('rgba(255,255,255,0.03)', 'rgba(0,0,0,0.02)', isDark),
+													border: `1px solid ${ds('rgba(255,255,255,0.06)', 'rgba(0,0,0,0.06)', isDark)}`
+												}}>
+													{it.image_url ? (
+														<img src={it.image_url} alt={it.product_name} style={{ width: 42, height: 42, objectFit: 'cover', borderRadius: 8, flexShrink: 0, border: `1px solid ${ds(T.line, T.lLine, isDark)}` }} />
+													) : (
+														<div style={{ width: 42, height: 42, borderRadius: 8, background: ds(T.bg3, T.lBg3, isDark), display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: ds('#666', '#aaa', isDark) }}>
+															<i className="ri-box-3-line" style={{ fontSize: 18 }} />
+														</div>
+													)}
+													<div style={{ flex: 1, minWidth: 0 }}>
+														<div style={{ fontSize: 13, fontWeight: 500, color: ds('#eee', '#222', isDark), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+															{it.product_name}
+														</div>
+														<div style={{ fontSize: 11, color: ds('#888', '#666', isDark), marginTop: 2, display: 'flex', gap: 6 }}>
+															<span>฿{(it.price || 0).toLocaleString()}</span>
+															<span>× {it.qty || 1}</span>
+														</div>
+													</div>
+													<div style={{ fontSize: 13, fontWeight: 600, color: ds('#fff', '#111', isDark), flexShrink: 0 }}>
+														฿{((it.price || 0) * (it.qty || 1)).toLocaleString()}
+													</div>
+												</div>
+											))}
+										</div>
 									</div>
 								)}
 

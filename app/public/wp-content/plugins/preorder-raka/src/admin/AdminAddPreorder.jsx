@@ -35,6 +35,7 @@ const AdminAddPreorder = () => {
 		line: '',
 	});
 
+	const [items, setItems] = useState([]);
 	const [selectedImage, setSelectedImage] = useState('');
 	const [products, setProducts] = useState([]);
 	const [wcOrders, setWcOrders] = useState([]);
@@ -123,15 +124,30 @@ const AdminAddPreorder = () => {
 				...prev,
 				wc_order_id: '',
 			}));
+			setItems([]);
 			return;
 		}
 
 		const order = wcOrders.find(o => o.id === parseInt(orderId, 10));
 		if (order) {
-			const firstItem = order.items && order.items.length > 0 ? order.items[0] : null;
-			const pName = order.items && order.items.length > 1
-				? `${firstItem.name} (และสินค้าอื่นอีก ${order.items.length - 1} รายการ)`
-				: (firstItem ? firstItem.name : `คำสั่งซื้อ #${order.order_no}`);
+			// Extract all items from WC order
+			const orderItems = (order.items && order.items.length > 0)
+				? order.items.map(it => ({
+						product_id: it.product_id,
+						product_name: it.name,
+						price: Math.round(it.price || 0),
+						qty: it.qty || 1,
+						image_url: it.thumb_url || '',
+						estimate_days: it.eta || '7-14 วัน',
+				  }))
+				: [];
+
+			setItems(orderItems);
+
+			const firstItem = orderItems[0] || null;
+			const pName = orderItems.length > 1
+				? `${firstItem.product_name} (และสินค้าอื่นอีก ${orderItems.length - 1} รายการ)`
+				: (firstItem ? firstItem.product_name : `คำสั่งซื้อ #${order.order_no}`);
 
 			setFormData(prev => ({
 				...prev,
@@ -144,39 +160,112 @@ const AdminAddPreorder = () => {
 				user_id: order.user_id ? String(order.user_id) : prev.user_id,
 				product_id: firstItem ? String(firstItem.product_id) : prev.product_id,
 				product_name: pName,
-				price: firstItem ? Math.round(firstItem.price) : Math.round(order.total),
+				price: firstItem ? firstItem.price : Math.round(order.total),
 				qty: firstItem ? firstItem.qty : 1,
 				shipping: Math.round(order.shipping || 0),
-				estimate_days: firstItem && firstItem.eta ? firstItem.eta : '7-14 วัน',
+				estimate_days: firstItem && firstItem.estimate_days ? firstItem.estimate_days : '7-14 วัน',
 			}));
 
-			if (firstItem && firstItem.thumb_url) {
-				setSelectedImage(firstItem.thumb_url);
+			if (firstItem && firstItem.image_url) {
+				setSelectedImage(firstItem.image_url);
 			}
 		}
 	};
 
-	// Handle product change
-	const handleProductChange = (val) => {
-		const selectedId = (val && typeof val === 'object' && val.target) ? val.target.value : val;
-		if (!selectedId) {
-			setFormData(prev => ({ ...prev, product_id: '', product_name: '', price: '' }));
-			setSelectedImage('');
-			return;
-		}
+	// Add item to multi-product list from product dropdown
+	const handleAddProductItem = (selectedId) => {
+		if (!selectedId) return;
 		const prod = products.find(p => p.id === parseInt(selectedId, 10));
-		if (prod) {
-			setFormData(prev => ({
-				...prev,
-				product_id: prod.id,
-				product_name: prod.title || '',
-				price: prod.price ? Math.round(prod.price) : prev.price,
-				estimate_days: prod.eta || prev.estimate_days,
-			}));
-			if (prod.image_url) {
-				setSelectedImage(prod.image_url);
+		if (!prod) return;
+
+		const newItem = {
+			product_id: prod.id,
+			product_name: prod.title || '',
+			price: prod.price ? Math.round(prod.price) : 0,
+			qty: 1,
+			image_url: prod.image_url || '',
+			estimate_days: prod.eta || '7-14 วัน',
+		};
+
+		setItems(prev => {
+			const updated = [...prev, newItem];
+			// Sync primary form field with first item
+			if (updated.length === 1) {
+				setFormData(f => ({
+					...f,
+					product_id: newItem.product_id,
+					product_name: newItem.product_name,
+					price: newItem.price,
+					qty: newItem.qty,
+					estimate_days: newItem.estimate_days,
+				}));
+				setSelectedImage(newItem.image_url);
+			} else {
+				setFormData(f => ({
+					...f,
+					product_name: `${updated[0].product_name} (และอีก ${updated.length - 1} รายการ)`,
+				}));
 			}
-		}
+			return updated;
+		});
+	};
+
+	// Add manual custom item
+	const handleAddCustomItem = () => {
+		const newItem = {
+			product_id: 0,
+			product_name: 'สินค้าพรีออเดอร์ใหม่',
+			price: 0,
+			qty: 1,
+			image_url: '',
+			estimate_days: '7-14 วัน',
+		};
+		setItems(prev => [...prev, newItem]);
+	};
+
+	// Remove item from multi-product list
+	const handleRemoveItem = (index) => {
+		setItems(prev => {
+			const updated = prev.filter((_, idx) => idx !== index);
+			if (updated.length > 0) {
+				setFormData(f => ({
+					...f,
+					product_id: updated[0].product_id,
+					product_name: updated.length > 1
+						? `${updated[0].product_name} (และอีก ${updated.length - 1} รายการ)`
+						: updated[0].product_name,
+					price: updated[0].price,
+					qty: updated[0].qty,
+				}));
+				setSelectedImage(updated[0].image_url || '');
+			} else {
+				setFormData(f => ({
+					...f,
+					product_id: '',
+					product_name: '',
+					price: '',
+					qty: 1,
+				}));
+				setSelectedImage('');
+			}
+			return updated;
+		});
+	};
+
+	// Update specific item in items list
+	const handleUpdateItem = (index, field, val) => {
+		setItems(prev => {
+			const updated = [...prev];
+			updated[index] = { ...updated[index], [field]: val };
+			// keep formData sync
+			if (index === 0 && (field === 'price' || field === 'qty' || field === 'product_name')) {
+				setFormData(f => ({
+					...f,
+					[field === 'product_name' ? 'product_name' : field]: val,
+				}));
+			}
+			return updated;
+		});
 	};
 
 	// Handle user member change
@@ -206,6 +295,10 @@ const AdminAddPreorder = () => {
 		setFormData(prev => ({ ...prev, order_no: generateRandomOrderNo() }));
 	};
 
+	// Calculate subtotal of items
+	const itemsSubtotal = items.reduce((sum, it) => sum + (parseInt(it.price || 0, 10) * parseInt(it.qty || 1, 10)), 0);
+	const orderTotal = (items.length > 0 ? itemsSubtotal : (parseInt(formData.price || 0, 10) * parseInt(formData.qty || 1, 10))) + parseInt(formData.shipping || 0, 10);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setSubmitting(true);
@@ -213,6 +306,20 @@ const AdminAddPreorder = () => {
 		setCreatedData(null);
 
 		try {
+			const payload = {
+				...formData,
+				items: items.length > 0 ? items : [
+					{
+						product_id: parseInt(formData.product_id || 0, 10),
+						product_name: formData.product_name,
+						price: parseInt(formData.price || 0, 10),
+						qty: parseInt(formData.qty || 1, 10),
+						estimate_days: formData.estimate_days,
+						image_url: selectedImage || '',
+					}
+				],
+			};
+
 			const baseUrl = `${settings.root.replace(/\/$/, '')}/create`;
 			const res = await fetch(baseUrl, {
 				method: 'POST',
@@ -220,7 +327,7 @@ const AdminAddPreorder = () => {
 					'Content-Type': 'application/json',
 					'X-WP-Nonce': settings.nonce,
 				},
-				body: JSON.stringify(formData),
+				body: JSON.stringify(payload),
 			});
 			const data = await res.json();
 
@@ -229,7 +336,7 @@ const AdminAddPreorder = () => {
 			}
 
 			setCreatedData(data.data);
-			setResultMsg({ type: 'success', text: `บันทึกรายการพรีออเดอร์ ${data.data.order_no} สำเร็จเรียบร้อย!` });
+			setResultMsg({ type: 'success', text: `บันทึกรายการพรีออเดอร์ ${data.data.order_no} สำเร็จเรียบร้อย! (${payload.items.length} รายการสินค้า)` });
 
 			// Reset form for next entry with new random order_no
 			setFormData({
@@ -253,6 +360,7 @@ const AdminAddPreorder = () => {
 				facebook: '',
 				line: '',
 			});
+			setItems([]);
 			setSelectedImage('');
 		} catch (err) {
 			setResultMsg({ type: 'error', text: err.message });
@@ -426,114 +534,162 @@ const AdminAddPreorder = () => {
 					</div>
 				)}
 
-				{/* ── SECTION 1: Product & Variation Selection ── */}
+				{/* ── SECTION 1: Product & Variation Selection (Multiple Items Supported) ── */}
 				<div style={{ marginBottom: 28 }}>
-					<h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px', color: '#0f172a', borderBottom: '2px solid #f1f5f9', paddingBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-						<i className="ri-shopping-bag-3-fill" style={{ color: '#2563eb' }}/> 1. รายละเอียดสินค้าและราคา (Product & Variations)
-					</h2>
+					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #f1f5f9', paddingBottom: 10, marginBottom: 16 }}>
+						<h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+							<i className="ri-shopping-bag-3-fill" style={{ color: '#2563eb' }}/> 1. รายการสินค้าพรีออเดอร์ (รองรับหลายสินค้าใน 1 ออเดอร์)
+						</h2>
+						<span style={{ fontSize: 13, fontWeight: 600, color: '#2563eb', background: '#eff6ff', padding: '4px 12px', borderRadius: 9999 }}>
+							รวม {items.length} รายการ
+						</span>
+					</div>
 
-					<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'start' }}>
-						{/* Product Select */}
-						<div style={{ gridColumn: 'span 2' }}>
-							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
-								เลือกสินค้า / ตัวเลือกย่อย (WooCommerce Products & Variations)
-							</label>
-							<SearchableSelect
-								options={productOptions}
-								value={formData.product_id}
-								onChange={handleProductChange}
-								placeholder="-- พิมพ์ค้นหาชื่อสินค้า, รหัส SKU, หรือเลือกจากหมวดหมู่เพื่อดึงราคาและรูปภาพอัตโนมัติ --"
-								groupBy={true}
-							/>
-						</div>
-
-						{/* Product Name */}
-						<div style={{ gridColumn: 'span 2' }}>
-							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
-								ชื่อสินค้า / แคมเปญ (แสดงในหน้าลูกค้า)
-							</label>
-							<div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-								{selectedImage && (
-									<img
-										src={selectedImage}
-										alt="Product Preview"
-										style={{ width: 46, height: 46, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 2 }}
-									/>
-								)}
-								<input
-									type="text"
-									placeholder="เช่น ATK Blazing Sky ZERO - ZERO EXTREME+ (Black)"
-									value={formData.product_name}
-									onChange={(e) => handleChange('product_name', e.target.value)}
-									style={{ flex: 1, padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
-									required
+					{/* Product Add Bar */}
+					<div style={{ background: '#f8fafc', padding: 18, borderRadius: 12, border: '1px solid #e2e8f0', marginBottom: 20 }}>
+						<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
+							ค้นหาและเพิ่มสินค้าเข้าไปในออเดอร์ (เลือกจากสินค้า / ตัวเลือกย่อย):
+						</label>
+						<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+							<div style={{ flex: '1 1 320px' }}>
+								<SearchableSelect
+									options={productOptions}
+									value=""
+									onChange={(val) => {
+										handleAddProductItem(val);
+									}}
+									placeholder="-- พิมพ์ค้นหาชื่อสินค้า, รหัส SKU เพื่อกดเพิ่มในรายการ --"
+									groupBy={true}
 								/>
 							</div>
+							<button
+								type="button"
+								onClick={handleAddCustomItem}
+								className="button"
+								style={{ height: 40, padding: '0 16px', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}
+							>
+								<i className="ri-add-line" style={{ fontSize: 16 }}/> เพิ่มรายการกำหนดเอง
+							</button>
 						</div>
+					</div>
 
-						{/* Price */}
-						<div>
-							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
-								ราคาสินค้าต่อชิ้น (บาท)
-							</label>
-							<input
-								type="number"
-								placeholder="เช่น 2490"
-								value={formData.price}
-								onChange={(e) => handleChange('price', e.target.value)}
-								style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
-								required
-							/>
+					{/* Items Table / Card Repeater */}
+					{items.length === 0 ? (
+						<div style={{ padding: '24px 20px', textAlign: 'center', border: '2px dashed #cbd5e1', borderRadius: 12, color: '#64748b', marginBottom: 16 }}>
+							<i className="ri-inbox-archive-line" style={{ fontSize: 32, color: '#94a3b8', display: 'block', marginBottom: 8 }}/>
+							<strong style={{ display: 'block', color: '#334155', marginBottom: 4 }}>ยังไม่มีสินค้าในพรีออเดอร์นี้</strong>
+							<span style={{ fontSize: 13 }}>เลือกสินค้าจากช่องค้นหาด้านบน หรือเลือกจากคำสั่งซื้อ WooCommerce เพื่อใส่สินค้าอัตโนมัติ</span>
 						</div>
+					) : (
+						<div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+							{items.map((item, idx) => (
+								<div key={idx} style={{
+									display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12,
+									background: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+									flexWrap: 'wrap'
+								}}>
+									{/* Index badge */}
+									<span style={{ width: 24, height: 24, borderRadius: '50%', background: '#0f172a', color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+										{idx + 1}
+									</span>
 
-						{/* Qty */}
-						<div>
-							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
-								จำนวน (ชิ้น)
-							</label>
-							<input
-								type="number"
-								min={1}
-								value={formData.qty}
-								onChange={(e) => handleChange('qty', e.target.value)}
-								style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
-								required
-							/>
+									{/* Thumbnail preview */}
+									<div style={{ width: 48, height: 48, borderRadius: 8, border: '1px solid #cbd5e1', overflow: 'hidden', flexShrink: 0, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+										{item.image_url ? (
+											<img src={item.image_url} alt={item.product_name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+										) : (
+											<i className="ri-image-line" style={{ color: '#94a3b8', fontSize: 20 }}/>
+										)}
+									</div>
+
+									{/* Product Name input */}
+									<div style={{ flex: '2 1 200px' }}>
+										<label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#64748b', marginBottom: 4 }}>ชื่อสินค้า / รุ่น</label>
+										<input
+											type="text"
+											value={item.product_name}
+											onChange={(e) => handleUpdateItem(idx, 'product_name', e.target.value)}
+											style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 500 }}
+											required
+										/>
+									</div>
+
+									{/* Price */}
+									<div style={{ flex: '1 1 100px' }}>
+										<label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#64748b', marginBottom: 4 }}>ราคา/ชิ้น (฿)</label>
+										<input
+											type="number"
+											min={0}
+											value={item.price}
+											onChange={(e) => handleUpdateItem(idx, 'price', e.target.value)}
+											style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 600 }}
+											required
+										/>
+									</div>
+
+									{/* Qty */}
+									<div style={{ flex: '0 1 70px' }}>
+										<label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#64748b', marginBottom: 4 }}>จำนวน</label>
+										<input
+											type="number"
+											min={1}
+											value={item.qty}
+											onChange={(e) => handleUpdateItem(idx, 'qty', e.target.value)}
+											style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 13, textAlign: 'center' }}
+											required
+										/>
+									</div>
+
+									{/* Subtotal */}
+									<div style={{ flex: '1 1 110px', textAlign: 'right' }}>
+										<label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#64748b', marginBottom: 4 }}>รวม (฿)</label>
+										<span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>
+											฿{((parseInt(item.price || 0, 10)) * (parseInt(item.qty || 1, 10))).toLocaleString()}
+										</span>
+									</div>
+
+									{/* Delete button */}
+									<button
+										type="button"
+										onClick={() => handleRemoveItem(idx)}
+										title="ลบรายการนี้"
+										style={{ background: '#fee2e2', border: '1px solid #fecaca', color: '#dc2626', width: 34, height: 34, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+									>
+										<i className="ri-delete-bin-line" style={{ fontSize: 16 }}/>
+									</button>
+								</div>
+							))}
 						</div>
+					)}
 
-						{/* Shipping Fee */}
+					{/* Summary bar for products */}
+					<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, background: '#f8fafc', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0', alignItems: 'center' }}>
 						<div>
-							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
-								ค่าจัดส่ง (บาท)
-							</label>
+							<label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 4 }}>ค่าจัดส่ง (บาท)</label>
 							<input
 								type="number"
 								min={0}
 								value={formData.shipping}
 								onChange={(e) => handleChange('shipping', e.target.value)}
-								style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+								style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
 							/>
 						</div>
 
-						{/* Estimate Days / ETA */}
 						<div>
-							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
-								ระยะเวลารอสินค้า (ETA)
-							</label>
+							<label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 4 }}>ระยะเวลารอสินค้าเฉลี่ย (ETA)</label>
 							<input
 								type="text"
 								placeholder="เช่น 7-14 วัน หรือ ปลายเดือนนี้"
 								value={formData.estimate_days}
 								onChange={(e) => handleChange('estimate_days', e.target.value)}
-								style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+								style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
 							/>
 						</div>
 
-						{/* Total Calculated Preview Box */}
-						<div style={{ background: '#f8fafc', padding: '14px 18px', borderRadius: 10, border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-							<span style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>ยอดรวมคำนวณสุทธิ</span>
-							<span style={{ fontSize: 22, color: '#0f172a', fontWeight: 800 }}>
-								฿{((parseInt(formData.price || 0, 10) * parseInt(formData.qty || 1, 10)) + parseInt(formData.shipping || 0, 10)).toLocaleString()}
+						<div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+							<span style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>ยอดรวมทั้งออเดอร์สุทธิ</span>
+							<span style={{ fontSize: 24, color: '#0f172a', fontWeight: 800 }}>
+								฿{orderTotal.toLocaleString()}
 							</span>
 						</div>
 					</div>
