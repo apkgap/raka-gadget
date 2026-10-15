@@ -548,9 +548,82 @@ $all_cats = get_terms( [
 			});
 		}
 
+		// ── Real-time instant preview of active choices on checkbox/radio click ──
+		function updateAccordionSummaryUI(prefix) {
+			var form = document.getElementById(prefix + '-filter-form');
+			if (!form) return;
+
+			// 1. Categories
+			var catCbs = form.querySelectorAll('input[name="filter_cat[]"]:checked');
+			var catBadge = document.getElementById(prefix + '-cat-badge');
+			var catPills = document.getElementById(prefix + '-cat-pills');
+			if (catBadge) {
+				catBadge.textContent = catCbs.length;
+				if (catCbs.length > 0) catBadge.classList.remove('hidden');
+				else catBadge.classList.add('hidden');
+			}
+			if (catPills) {
+				if (catCbs.length > 0) {
+					catPills.classList.remove('hidden');
+					var catHtml = '';
+					catCbs.forEach(function(cb) {
+						var name = cb.getAttribute('data-name') || cb.value;
+						catHtml += '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">' +
+							'<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>' +
+							'<span>' + name + '</span>' +
+						'</span>';
+					});
+					catPills.innerHTML = catHtml;
+				} else {
+					catPills.classList.add('hidden');
+					catPills.innerHTML = '';
+				}
+			}
+
+			// 2. Brands
+			var brandCbs = form.querySelectorAll('input[name="filter_brand[]"]:checked');
+			var brandBadge = document.getElementById(prefix + '-brand-badge');
+			var brandPills = document.getElementById(prefix + '-brand-pills');
+			if (brandBadge) {
+				brandBadge.textContent = brandCbs.length;
+				if (brandCbs.length > 0) brandBadge.classList.remove('hidden');
+				else brandBadge.classList.add('hidden');
+			}
+			if (brandPills) {
+				if (brandCbs.length > 0) {
+					brandPills.classList.remove('hidden');
+					var brandHtml = '';
+					brandCbs.forEach(function(cb) {
+						var name = cb.getAttribute('data-name') || cb.value;
+						brandHtml += '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">' +
+							'<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>' +
+							'<span>' + name + '</span>' +
+						'</span>';
+					});
+					brandPills.innerHTML = brandHtml;
+				} else {
+					brandPills.classList.add('hidden');
+					brandPills.innerHTML = '';
+				}
+			}
+		}
+
 		function bindAsyncFilterEvents() {
 			var desktopForm = document.getElementById('desktop-filter-form');
 			var mobileForm = document.getElementById('mobile-filter-form');
+
+			// Live sync when checking/unchecking boxes immediately
+			['desktop', 'mobile'].forEach(function(pfx) {
+				var f = document.getElementById(pfx + '-filter-form');
+				if (f && !f.dataset.syncBound) {
+					f.dataset.syncBound = 'true';
+					f.addEventListener('change', function(e) {
+						if (e.target.name === 'filter_cat[]' || e.target.name === 'filter_brand[]') {
+							updateAccordionSummaryUI(pfx);
+						}
+					});
+				}
+			});
 
 			if (desktopForm && !desktopForm.dataset.asyncBound) {
 				desktopForm.dataset.asyncBound = 'true';

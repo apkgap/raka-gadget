@@ -244,22 +244,18 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-2">
 								<span>CATEGORIES</span>
-								<?php if ( $cat_active_count > 0 ) : ?>
-									<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
-										<?php echo (int) $cat_active_count; ?>
-									</span>
-								<?php endif; ?>
+								<span id="<?php echo esc_attr( $id_prefix ); ?>-cat-badge" class="<?php echo $cat_active_count > 0 ? '' : 'hidden'; ?> px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
+									<?php echo (int) $cat_active_count; ?>
+								</span>
 							</div>
-							<?php if ( $cat_active_count > 0 ) : ?>
-								<div class="pt-1.5 flex flex-wrap gap-1">
-									<?php foreach ( $active_cats_selected as $act_name ) : ?>
-										<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">
-											<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
-											<span><?php echo esc_html( $act_name ); ?></span>
-										</span>
-									<?php endforeach; ?>
-								</div>
-							<?php endif; ?>
+							<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-pills" class="<?php echo $cat_active_count > 0 ? '' : 'hidden'; ?> pt-1.5 flex flex-wrap gap-1">
+								<?php foreach ( $active_cats_selected as $act_name ) : ?>
+									<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">
+										<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
+										<span><?php echo esc_html( $act_name ); ?></span>
+									</span>
+								<?php endforeach; ?>
+							</div>
 						</div>
 						<div class="flex items-center gap-2 text-neutral-400 flex-shrink-0 pt-0.5">
 							<span class="text-[11px] opacity-70"><?php echo count( $categories ); ?></span>
@@ -281,6 +277,7 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 										type="checkbox"
 										name="filter_cat[]"
 										value="<?php echo esc_attr( $cat->slug ); ?>"
+										data-name="<?php echo esc_attr( $cat->name ); ?>"
 										<?php checked( $is_checked ); ?>
 										class="raka-custom-checkbox"
 									/>
@@ -310,22 +307,18 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-2">
 								<span>BRANDS</span>
-								<?php if ( $brand_active_count > 0 ) : ?>
-									<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
-										<?php echo (int) $brand_active_count; ?>
-									</span>
-								<?php endif; ?>
+								<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-badge" class="<?php echo $brand_active_count > 0 ? '' : 'hidden'; ?> px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
+									<?php echo (int) $brand_active_count; ?>
+								</span>
 							</div>
-							<?php if ( $brand_active_count > 0 ) : ?>
-								<div class="pt-1.5 flex flex-wrap gap-1">
-									<?php foreach ( $active_brands_selected as $b_name ) : ?>
-										<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">
-											<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
-											<span><?php echo esc_html( $b_name ); ?></span>
-										</span>
-									<?php endforeach; ?>
-								</div>
-							<?php endif; ?>
+							<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-pills" class="<?php echo $brand_active_count > 0 ? '' : 'hidden'; ?> pt-1.5 flex flex-wrap gap-1">
+								<?php foreach ( $active_brands_selected as $b_name ) : ?>
+									<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-900 dark:text-neutral-100 text-[11px] font-sans font-medium">
+										<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
+										<span><?php echo esc_html( $b_name ); ?></span>
+									</span>
+								<?php endforeach; ?>
+							</div>
 						</div>
 						<div class="flex items-center gap-2 text-neutral-400 flex-shrink-0 pt-0.5">
 							<span class="text-[11px] opacity-70"><?php echo count( $brands ); ?></span>
@@ -347,6 +340,7 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 										type="checkbox"
 										name="filter_brand[]"
 										value="<?php echo esc_attr( $brand->slug ); ?>"
+										data-name="<?php echo esc_attr( $brand->name ); ?>"
 										<?php checked( $is_checked ); ?>
 										class="raka-custom-checkbox"
 									/>
