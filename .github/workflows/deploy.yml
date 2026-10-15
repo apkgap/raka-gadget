@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: ftp-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: FTP Sync Engine
@@ -55,7 +59,7 @@ jobs:
           set net:reconnect-interval-base 3;
 
           echo "=== [1/3] Deploying raka-preorder-theme ===";
-          mirror -R -v \
+          mirror -R -v --only-newer \
             --exclude-glob .git* \
             --exclude-glob node_modules/ \
             --exclude-glob src/ \
@@ -65,7 +69,7 @@ jobs:
             ./app/public/wp-content/themes/raka-preorder-theme/ "$THEME_DIR/";
 
           echo "=== [2/3] Deploying preorder-raka plugin ===";
-          mirror -R -v \
+          mirror -R -v --only-newer \
             --exclude-glob .git* \
             --exclude-glob node_modules/ \
             --exclude-glob src/ \
@@ -75,7 +79,7 @@ jobs:
             ./app/public/wp-content/plugins/preorder-raka/ "$PREORDER_DIR/";
 
           echo "=== [3/3] Deploying my-wc-passkeys plugin ===";
-          mirror -R -v \
+          mirror -R -v --only-newer \
             --exclude-glob .git* \
             --exclude-glob node_modules/ \
             --exclude-glob src/ \

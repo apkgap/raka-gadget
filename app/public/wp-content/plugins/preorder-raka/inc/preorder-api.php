@@ -691,10 +691,11 @@ function preorder_raka_get_products() {
 	if ( function_exists( 'wc_get_products' ) ) {
 		$wc_products = wc_get_products([
 			'status'  => 'publish',
-			'limit'   => 150,
+			'limit'   => -1,
 			'orderby' => 'title',
 			'order'   => 'ASC',
 		]);
+
 
 		foreach ( $wc_products as $prod ) {
 			$p_id        = $prod->get_id();
@@ -719,7 +720,12 @@ function preorder_raka_get_products() {
 						}
 					}
 					$var_suffix    = ! empty( $var_attrs ) ? ' (' . implode( ' / ', $var_attrs ) . ')' : ' #' . $var_id;
-					$var_img_url   = ! empty( $var_data['image']['src'] ) ? $var_data['image']['src'] : $img_url;
+					$var_thumb_id  = get_post_thumbnail_id( $var_id );
+					if ( $var_thumb_id ) {
+						$var_img_url = wp_get_attachment_image_url( $var_thumb_id, 'medium' ) ?: wp_get_attachment_url( $var_thumb_id );
+					} else {
+						$var_img_url = ! empty( $var_data['image']['src'] ) ? $var_data['image']['src'] : $img_url;
+					}
 					$var_price     = ! empty( $var_data['display_price'] ) ? (float) $var_data['display_price'] : $p_price;
 					$var_is_pre    = function_exists( 'raka_is_product_preorder' ) ? raka_is_product_preorder( $var_obj ) : $is_preorder;
 					$var_eta       = function_exists( 'raka_get_product_preorder_eta' ) ? raka_get_product_preorder_eta( $var_obj ) : $eta;
