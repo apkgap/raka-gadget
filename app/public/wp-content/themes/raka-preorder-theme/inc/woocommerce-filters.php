@@ -32,7 +32,12 @@ function raka_filter_woocommerce_product_query( $query, $query_vars = [] ): void
 
 	// 2. Brand Filter
 	if ( ! empty( $_GET['filter_brand'] ) ) {
-		$brands = array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $_GET['filter_brand'] ) ) ) );
+		$raw_brands = $_GET['filter_brand'];
+		if ( is_array( $raw_brands ) ) {
+			$brands = array_filter( array_map( 'sanitize_title', wp_unslash( $raw_brands ) ) );
+		} else {
+			$brands = array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $raw_brands ) ) ) );
+		}
 		if ( ! empty( $brands ) ) {
 			$tax_query[] = [
 				'taxonomy' => 'product_brand',
@@ -45,7 +50,12 @@ function raka_filter_woocommerce_product_query( $query, $query_vars = [] ): void
 
 	// 3. Category Filter (when not already on category page or for multi-cat filtering)
 	if ( ! empty( $_GET['filter_cat'] ) ) {
-		$cats = array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $_GET['filter_cat'] ) ) ) );
+		$raw_cats = $_GET['filter_cat'];
+		if ( is_array( $raw_cats ) ) {
+			$cats = array_filter( array_map( 'sanitize_title', wp_unslash( $raw_cats ) ) );
+		} else {
+			$cats = array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $raw_cats ) ) ) );
+		}
 		if ( ! empty( $cats ) ) {
 			$tax_query[] = [
 				'taxonomy' => 'product_cat',
@@ -121,8 +131,12 @@ add_action( 'woocommerce_product_query', 'raka_filter_woocommerce_product_query'
  * Get current filter state from request
  */
 function raka_get_current_filter_state(): array {
-	$brands       = ! empty( $_GET['filter_brand'] ) ? array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $_GET['filter_brand'] ) ) ) ) : [];
-	$cats         = ! empty( $_GET['filter_cat'] ) ? array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $_GET['filter_cat'] ) ) ) ) : [];
+	$raw_brands   = ! empty( $_GET['filter_brand'] ) ? $_GET['filter_brand'] : [];
+	$brands       = is_array( $raw_brands ) ? array_filter( array_map( 'sanitize_title', wp_unslash( $raw_brands ) ) ) : array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $raw_brands ) ) ) );
+
+	$raw_cats     = ! empty( $_GET['filter_cat'] ) ? $_GET['filter_cat'] : [];
+	$cats         = is_array( $raw_cats ) ? array_filter( array_map( 'sanitize_title', wp_unslash( $raw_cats ) ) ) : array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $raw_cats ) ) ) );
+
 	$stock        = ! empty( $_GET['filter_stock'] ) ? sanitize_key( wp_unslash( $_GET['filter_stock'] ) ) : '';
 	$min_price    = isset( $_GET['min_price'] ) && $_GET['min_price'] !== '' ? floatval( $_GET['min_price'] ) : null;
 	$max_price    = isset( $_GET['max_price'] ) && $_GET['max_price'] !== '' ? floatval( $_GET['max_price'] ) : null;
@@ -171,245 +185,358 @@ function raka_render_shop_sidebar_filters( string $id_prefix = 'shop' ): void {
 	$current_cat_slug   = is_a( $queried_obj, 'WP_Term' ) && $queried_obj->taxonomy === 'product_cat' ? $queried_obj->slug : '';
 	$current_brand_slug = is_a( $queried_obj, 'WP_Term' ) && $queried_obj->taxonomy === 'product_brand' ? $queried_obj->slug : '';
 	?>
-	<aside id="<?php echo esc_attr( $id_prefix ); ?>-filters-sidebar" class="w-full space-y-6">
-		
-		<!-- ── Filter Top Header: Title & Clear All ── -->
-		<div id="<?php echo esc_attr( $id_prefix ); ?>-filter-head" class="flex items-center justify-between pb-4 border-b border-black/10 dark:border-white/10">
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-filter-title-wrap" class="flex items-center gap-2">
-				<i id="<?php echo esc_attr( $id_prefix ); ?>-filter-icon" class="ri-filter-3-line text-base text-neutral-900 dark:text-white"></i>
-				<h2 id="<?php echo esc_attr( $id_prefix ); ?>-filter-title" class="text-sm font-mono font-bold uppercase tracking-[0.15em] text-neutral-900 dark:text-white">
-					FILTERS
-				</h2>
-				<?php if ( $state['active_count'] > 0 ) : ?>
-					<span id="<?php echo esc_attr( $id_prefix ); ?>-filter-badge" class="w-5 h-5 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-mono font-bold flex items-center justify-center">
-						<?php echo (int) $state['active_count']; ?>
-					</span>
+	<aside id="<?php echo esc_attr( $id_prefix ); ?>-filters-sidebar" class="w-full">
+		<form id="<?php echo esc_attr( $id_prefix ); ?>-filter-form" method="get" action="<?php echo esc_url( $shop_link ); ?>" class="space-y-6">
+			
+			<!-- ── Filter Top Header: Title & Clear All ── -->
+			<div id="<?php echo esc_attr( $id_prefix ); ?>-filter-head" class="flex items-center justify-between pb-4 border-b border-black/10 dark:border-white/10">
+				<div id="<?php echo esc_attr( $id_prefix ); ?>-filter-title-wrap" class="flex items-center gap-2">
+					<i id="<?php echo esc_attr( $id_prefix ); ?>-filter-icon" class="ri-filter-3-line text-base text-neutral-900 dark:text-white"></i>
+					<h2 id="<?php echo esc_attr( $id_prefix ); ?>-filter-title" class="text-sm font-mono font-bold uppercase tracking-[0.15em] text-neutral-900 dark:text-white">
+						FILTERS
+					</h2>
+					<?php if ( $state['active_count'] > 0 ) : ?>
+						<span id="<?php echo esc_attr( $id_prefix ); ?>-filter-badge" class="w-5 h-5 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-mono font-bold flex items-center justify-center">
+							<?php echo (int) $state['active_count']; ?>
+						</span>
+					<?php endif; ?>
+				</div>
+
+				<?php if ( $state['active_count'] > 0 || $current_cat_slug || $current_brand_slug ) : ?>
+					<a
+						id="<?php echo esc_attr( $id_prefix ); ?>-filter-reset-btn"
+						href="<?php echo esc_url( $shop_link ); ?>"
+						class="text-xs font-mono font-semibold uppercase tracking-wider text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors flex items-center gap-1"
+					>
+						<i id="<?php echo esc_attr( $id_prefix ); ?>-filter-reset-ico" class="ri-refresh-line text-xs"></i>
+						<span>RESET</span>
+					</a>
 				<?php endif; ?>
 			</div>
 
-			<?php if ( $state['active_count'] > 0 || $current_cat_slug || $current_brand_slug ) : ?>
-				<a
-					id="<?php echo esc_attr( $id_prefix ); ?>-filter-reset-btn"
-					href="<?php echo esc_url( $shop_link ); ?>"
-					class="text-xs font-mono font-semibold uppercase tracking-wider text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors flex items-center gap-1"
-				>
-					<i id="<?php echo esc_attr( $id_prefix ); ?>-filter-reset-ico" class="ri-refresh-line text-xs"></i>
-					<span>RESET</span>
-				</a>
-			<?php endif; ?>
-		</div>
-
-		<!-- ── 1. Search Within Shop Filter ── -->
-		<div id="<?php echo esc_attr( $id_prefix ); ?>-search-block" class="space-y-2">
-			<form id="<?php echo esc_attr( $id_prefix ); ?>-search-form" method="get" action="<?php echo esc_url( $shop_link ); ?>" class="relative">
-				<input
-					id="<?php echo esc_attr( $id_prefix ); ?>-search-input"
-					type="text"
-					name="filter_q"
-					value="<?php echo esc_attr( $state['search'] ); ?>"
-					placeholder="Search catalogue..."
-					class="w-full h-10 pl-9 pr-3 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-sans text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors"
-				/>
-				<i id="<?php echo esc_attr( $id_prefix ); ?>-search-ico" class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none"></i>
-				<?php
-				// Preserve existing active filters in search form
-				if ( ! empty( $state['brands'] ) ) {
-					echo '<input type="hidden" name="filter_brand" value="' . esc_attr( implode( ',', $state['brands'] ) ) . '">';
-				}
-				if ( ! empty( $state['cats'] ) ) {
-					echo '<input type="hidden" name="filter_cat" value="' . esc_attr( implode( ',', $state['cats'] ) ) . '">';
-				}
-				if ( ! empty( $state['stock'] ) ) {
-					echo '<input type="hidden" name="filter_stock" value="' . esc_attr( $state['stock'] ) . '">';
-				}
-				?>
-			</form>
-		</div>
-
-		<!-- ── 2. Categories Accordion ── -->
-		<?php if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) : ?>
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-section" class="border-b border-black/5 dark:border-white/5 pb-5 space-y-3">
-				<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center justify-between">
-					<span>CATEGORIES</span>
-					<span class="text-xs opacity-60"><?php echo count( $categories ); ?></span>
-				</div>
-
-				<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-list" class="space-y-1 max-h-56 overflow-y-auto pr-1">
-					<?php foreach ( $categories as $cat ) :
-						$is_checked = in_array( $cat->slug, $state['cats'], true ) || $current_cat_slug === $cat->slug;
-						$cat_toggle_url = raka_get_filter_toggle_url( 'filter_cat', $cat->slug );
-					?>
-						<a
-							id="<?php echo esc_attr( $id_prefix ); ?>-cat-item-<?php echo esc_attr( $cat->slug ); ?>"
-							href="<?php echo esc_url( $cat_toggle_url ); ?>"
-							class="group flex items-center justify-between py-2 px-2.5 rounded-lg text-sm transition-colors <?php echo $is_checked ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
-						>
-							<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-info-<?php echo esc_attr( $cat->slug ); ?>" class="flex items-center gap-2 truncate">
-								<?php
-								if ( function_exists( 'raka_get_term_icon_html' ) ) {
-									echo raka_get_term_icon_html( $cat->term_id, 'text-sm flex-shrink-0' );
-								}
-								?>
-								<span class="truncate"><?php echo esc_html( $cat->name ); ?></span>
-							</div>
-							<span id="<?php echo esc_attr( $id_prefix ); ?>-cat-count-<?php echo esc_attr( $cat->slug ); ?>" class="text-xs opacity-60 font-mono flex-shrink-0 pl-2">
-								<?php echo (int) $cat->count; ?>
-							</span>
-						</a>
-					<?php endforeach; ?>
+			<!-- ── 1. Search Within Shop Filter ── -->
+			<div id="<?php echo esc_attr( $id_prefix ); ?>-search-block" class="space-y-2">
+				<div class="relative">
+					<input
+						id="<?php echo esc_attr( $id_prefix ); ?>-search-input"
+						type="text"
+						name="filter_q"
+						value="<?php echo esc_attr( $state['search'] ); ?>"
+						placeholder="Search catalogue..."
+						class="w-full h-10 pl-9 pr-3 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-sans text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors"
+					/>
+					<i id="<?php echo esc_attr( $id_prefix ); ?>-search-ico" class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none"></i>
 				</div>
 			</div>
-		<?php endif; ?>
 
-		<!-- ── 3. Brands Accordion ── -->
-		<?php if ( ! empty( $brands ) && ! is_wp_error( $brands ) ) : ?>
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-section" class="border-b border-black/5 dark:border-white/5 pb-5 space-y-3">
-				<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center justify-between">
-					<span>BRANDS</span>
-					<span class="text-xs opacity-60"><?php echo count( $brands ); ?></span>
-				</div>
-
-				<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-list" class="space-y-1 max-h-56 overflow-y-auto pr-1">
-					<?php foreach ( $brands as $brand ) :
-						$is_checked = in_array( $brand->slug, $state['brands'], true ) || $current_brand_slug === $brand->slug;
-						$brand_toggle_url = raka_get_filter_toggle_url( 'filter_brand', $brand->slug );
-					?>
-						<a
-							id="<?php echo esc_attr( $id_prefix ); ?>-brand-item-<?php echo esc_attr( $brand->slug ); ?>"
-							href="<?php echo esc_url( $brand_toggle_url ); ?>"
-							class="group flex items-center justify-between py-2 px-2.5 rounded-lg text-sm transition-colors <?php echo $is_checked ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
-						>
-							<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-info-<?php echo esc_attr( $brand->slug ); ?>" class="flex items-center gap-2 truncate">
-								<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-box-<?php echo esc_attr( $brand->slug ); ?>" class="w-4 h-4 rounded border <?php echo $is_checked ? 'bg-white text-black dark:bg-black dark:text-white border-transparent' : 'border-neutral-400 dark:border-neutral-600'; ?> flex items-center justify-center text-xs">
-									<?php if ( $is_checked ) : ?>
-										<i class="ri-check-line"></i>
-									<?php endif; ?>
+			<!-- ── 2. Categories Accordion (Checkboxes) ── -->
+			<?php if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) :
+				$active_cats_selected = [];
+				foreach ( $categories as $cat ) {
+					if ( in_array( $cat->slug, $state['cats'], true ) || $current_cat_slug === $cat->slug ) {
+						$active_cats_selected[] = $cat->name;
+					}
+				}
+				$cat_active_count = count( $active_cats_selected );
+			?>
+				<details id="<?php echo esc_attr( $id_prefix ); ?>-cat-section" class="raka-filter-accordion border-b border-black/5 dark:border-white/5 pb-4 group" open>
+					<summary class="cursor-pointer select-none py-1 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+						<div class="flex items-center gap-2">
+							<span>CATEGORIES</span>
+							<?php if ( $cat_active_count > 0 ) : ?>
+								<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
+									<?php echo (int) $cat_active_count; ?>
 								</span>
-								<span class="truncate"><?php echo esc_html( $brand->name ); ?></span>
-							</div>
-							<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-count-<?php echo esc_attr( $brand->slug ); ?>" class="text-xs opacity-60 font-mono flex-shrink-0 pl-2">
-								<?php echo (int) $brand->count; ?>
+							<?php endif; ?>
+						</div>
+						<div class="flex items-center gap-2 text-neutral-400">
+							<span class="text-[11px] opacity-70"><?php echo count( $categories ); ?></span>
+							<i class="ri-arrow-down-s-line text-base raka-accordion-arrow"></i>
+						</div>
+					</summary>
+
+					<?php if ( $cat_active_count > 0 ) : ?>
+						<div class="pt-1.5 pb-1 flex flex-wrap gap-1">
+							<?php foreach ( $active_cats_selected as $act_name ) : ?>
+								<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-800 dark:text-neutral-200 text-[11px] font-sans font-medium">
+									<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
+									<?php echo esc_html( $act_name ); ?>
+								</span>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+
+					<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-list" class="pt-2 space-y-1 max-h-56 overflow-y-auto pr-1">
+						<?php foreach ( $categories as $cat ) :
+							$is_checked = in_array( $cat->slug, $state['cats'], true ) || $current_cat_slug === $cat->slug;
+						?>
+							<label
+								id="<?php echo esc_attr( $id_prefix ); ?>-cat-label-<?php echo esc_attr( $cat->slug ); ?>"
+								class="group flex items-center justify-between py-2 px-2.5 rounded-lg text-sm transition-colors cursor-pointer select-none hover:bg-black/5 dark:hover:bg-white/5"
+							>
+								<div id="<?php echo esc_attr( $id_prefix ); ?>-cat-info-<?php echo esc_attr( $cat->slug ); ?>" class="flex items-center gap-2.5 truncate">
+									<input
+										id="<?php echo esc_attr( $id_prefix ); ?>-cat-cb-<?php echo esc_attr( $cat->slug ); ?>"
+										type="checkbox"
+										name="filter_cat[]"
+										value="<?php echo esc_attr( $cat->slug ); ?>"
+										<?php checked( $is_checked ); ?>
+										class="raka-custom-checkbox"
+									/>
+									<span class="truncate text-neutral-800 dark:text-neutral-200 <?php echo $is_checked ? 'font-semibold text-black dark:text-white' : ''; ?>"><?php echo esc_html( $cat->name ); ?></span>
+								</div>
+								<span id="<?php echo esc_attr( $id_prefix ); ?>-cat-count-<?php echo esc_attr( $cat->slug ); ?>" class="text-xs opacity-60 font-mono flex-shrink-0 pl-2">
+									<?php echo (int) $cat->count; ?>
+								</span>
+							</label>
+						<?php endforeach; ?>
+					</div>
+				</details>
+			<?php endif; ?>
+
+			<!-- ── 3. Brands Accordion (Checkboxes) ── -->
+			<?php if ( ! empty( $brands ) && ! is_wp_error( $brands ) ) :
+				$active_brands_selected = [];
+				foreach ( $brands as $brand ) {
+					if ( in_array( $brand->slug, $state['brands'], true ) || $current_brand_slug === $brand->slug ) {
+						$active_brands_selected[] = $brand->name;
+					}
+				}
+				$brand_active_count = count( $active_brands_selected );
+			?>
+				<details id="<?php echo esc_attr( $id_prefix ); ?>-brand-section" class="raka-filter-accordion border-b border-black/5 dark:border-white/5 pb-4 group" open>
+					<summary class="cursor-pointer select-none py-1 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+						<div class="flex items-center gap-2">
+							<span>BRANDS</span>
+							<?php if ( $brand_active_count > 0 ) : ?>
+								<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
+									<?php echo (int) $brand_active_count; ?>
+								</span>
+							<?php endif; ?>
+						</div>
+						<div class="flex items-center gap-2 text-neutral-400">
+							<span class="text-[11px] opacity-70"><?php echo count( $brands ); ?></span>
+							<i class="ri-arrow-down-s-line text-base raka-accordion-arrow"></i>
+						</div>
+					</summary>
+
+					<?php if ( $brand_active_count > 0 ) : ?>
+						<div class="pt-1.5 pb-1 flex flex-wrap gap-1">
+							<?php foreach ( $active_brands_selected as $b_name ) : ?>
+								<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-800 dark:text-neutral-200 text-[11px] font-sans font-medium">
+									<i class="ri-checkbox-circle-fill text-[10px] text-neutral-900 dark:text-white"></i>
+									<?php echo esc_html( $b_name ); ?>
+								</span>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+
+					<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-list" class="pt-2 space-y-1 max-h-56 overflow-y-auto pr-1">
+						<?php foreach ( $brands as $brand ) :
+							$is_checked = in_array( $brand->slug, $state['brands'], true ) || $current_brand_slug === $brand->slug;
+						?>
+							<label
+								id="<?php echo esc_attr( $id_prefix ); ?>-brand-label-<?php echo esc_attr( $brand->slug ); ?>"
+								class="group flex items-center justify-between py-2 px-2.5 rounded-lg text-sm transition-colors cursor-pointer select-none hover:bg-black/5 dark:hover:bg-white/5"
+							>
+								<div id="<?php echo esc_attr( $id_prefix ); ?>-brand-info-<?php echo esc_attr( $brand->slug ); ?>" class="flex items-center gap-2.5 truncate">
+									<input
+										id="<?php echo esc_attr( $id_prefix ); ?>-brand-cb-<?php echo esc_attr( $brand->slug ); ?>"
+										type="checkbox"
+										name="filter_brand[]"
+										value="<?php echo esc_attr( $brand->slug ); ?>"
+										<?php checked( $is_checked ); ?>
+										class="raka-custom-checkbox"
+									/>
+									<span class="truncate text-neutral-800 dark:text-neutral-200 <?php echo $is_checked ? 'font-semibold text-black dark:text-white' : ''; ?>"><?php echo esc_html( $brand->name ); ?></span>
+								</div>
+								<span id="<?php echo esc_attr( $id_prefix ); ?>-brand-count-<?php echo esc_attr( $brand->slug ); ?>" class="text-xs opacity-60 font-mono flex-shrink-0 pl-2">
+									<?php echo (int) $brand->count; ?>
+								</span>
+							</label>
+						<?php endforeach; ?>
+					</div>
+				</details>
+			<?php endif; ?>
+
+			<!-- ── 4. Price Range Filter (Dual Slider + Inputs Accordion) ── -->
+			<?php
+			$is_price_filtered = ( $state['min_price'] !== null && $state['min_price'] > 0 ) || ( $state['max_price'] !== null && $state['max_price'] < 8000 );
+			?>
+			<details id="<?php echo esc_attr( $id_prefix ); ?>-price-section" class="raka-filter-accordion border-b border-black/5 dark:border-white/5 pb-4 group" open>
+				<summary class="cursor-pointer select-none py-1 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+					<div class="flex items-center gap-2">
+						<span>PRICE RANGE</span>
+						<?php if ( $is_price_filtered ) : ?>
+							<span class="w-2 h-2 rounded-full bg-neutral-900 dark:bg-white"></span>
+						<?php endif; ?>
+					</div>
+					<div class="flex items-center gap-2">
+						<span id="<?php echo esc_attr( $id_prefix ); ?>-price-display" class="text-xs font-mono text-neutral-900 dark:text-white font-semibold">
+							฿<?php echo number_format( (float) ( $state['min_price'] ?? 0 ) ); ?> - ฿<?php echo number_format( (float) ( $state['max_price'] ?? 8000 ) ); ?>
+						</span>
+						<i class="ri-arrow-down-s-line text-base raka-accordion-arrow text-neutral-400"></i>
+					</div>
+				</summary>
+
+				<div class="pt-3 space-y-3.5">
+					<!-- Dual Range Slider Track -->
+					<div id="<?php echo esc_attr( $id_prefix ); ?>-slider-wrap" class="relative py-2">
+						<div class="relative h-1.5 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full">
+							<div
+								id="<?php echo esc_attr( $id_prefix ); ?>-slider-progress"
+								class="absolute top-0 bottom-0 bg-neutral-900 dark:bg-white rounded-full pointer-events-none"
+								style="left: 0%; right: 0%;"
+							></div>
+						</div>
+						<input
+							id="<?php echo esc_attr( $id_prefix ); ?>-range-min"
+							type="range"
+							min="0"
+							max="8000"
+							step="50"
+							value="<?php echo esc_attr( (string) ( $state['min_price'] ?? 0 ) ); ?>"
+							class="raka-range-slider absolute inset-0 w-full h-full appearance-none bg-transparent pointer-events-none cursor-pointer z-10"
+						/>
+						<input
+							id="<?php echo esc_attr( $id_prefix ); ?>-range-max"
+							type="range"
+							min="0"
+							max="8000"
+							step="50"
+							value="<?php echo esc_attr( (string) ( $state['max_price'] ?? 8000 ) ); ?>"
+							class="raka-range-slider absolute inset-0 w-full h-full appearance-none bg-transparent pointer-events-none cursor-pointer z-20"
+						/>
+					</div>
+
+					<!-- Number Inputs (Min - Max) -->
+					<div id="<?php echo esc_attr( $id_prefix ); ?>-price-inputs" class="flex items-center gap-2 pt-1">
+						<div id="<?php echo esc_attr( $id_prefix ); ?>-min-wrap" class="relative flex-1">
+							<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-400">฿</span>
+							<input
+								id="<?php echo esc_attr( $id_prefix ); ?>-min-price-input"
+								type="number"
+								name="min_price"
+								min="0"
+								max="8000"
+								value="<?php echo $state['min_price'] !== null ? esc_attr( (string) $state['min_price'] ) : ''; ?>"
+								placeholder="0"
+								class="w-full h-9 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
+							/>
+						</div>
+						<span class="text-neutral-400 text-sm">&ndash;</span>
+						<div id="<?php echo esc_attr( $id_prefix ); ?>-max-wrap" class="relative flex-1">
+							<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-400">฿</span>
+							<input
+								id="<?php echo esc_attr( $id_prefix ); ?>-max-price-input"
+								type="number"
+								name="max_price"
+								min="0"
+								max="8000"
+								value="<?php echo $state['max_price'] !== null ? esc_attr( (string) $state['max_price'] ) : ''; ?>"
+								placeholder="8,000"
+								class="w-full h-9 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
+							/>
+						</div>
+					</div>
+
+					<!-- Quick Budget Presets -->
+					<div id="<?php echo esc_attr( $id_prefix ); ?>-price-presets" class="flex flex-wrap gap-1.5 pt-1">
+						<?php
+						$presets = [
+							[ 'label' => '< ฿1,000', 'min' => 0, 'max' => 1000 ],
+							[ 'label' => '฿1K - ฿3K', 'min' => 1000, 'max' => 3000 ],
+							[ 'label' => '฿3K - ฿5K', 'min' => 3000, 'max' => 5000 ],
+							[ 'label' => '฿5,000+',  'min' => 5000, 'max' => 8000 ],
+						];
+						foreach ( $presets as $idx => $p ) :
+						?>
+							<button
+								id="<?php echo esc_attr( $id_prefix ); ?>-preset-<?php echo (int) $idx; ?>"
+								type="button"
+								onclick="window.rakaSetPricePreset('<?php echo esc_attr( $id_prefix ); ?>', <?php echo (int) $p['min']; ?>, <?php echo (int) $p['max']; ?>)"
+								class="px-2.5 py-1 rounded-md text-xs font-mono font-medium uppercase tracking-wider bg-black/5 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+							>
+								<?php echo esc_html( $p['label'] ); ?>
+							</button>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</details>
+
+			<!-- ── 5. Stock & Availability Filter (Radio Accordion) ── -->
+			<?php
+			$stock_options = [
+				''           => [ 'label' => 'All Items', 'ico' => 'ri-apps-line' ],
+				'instock'    => [ 'label' => 'In Stock', 'ico' => 'ri-checkbox-circle-line' ],
+				'preorder'   => [ 'label' => 'Pre-Order', 'ico' => 'ri-time-line' ],
+				'outofstock' => [ 'label' => 'Sold Out', 'ico' => 'ri-close-circle-line' ],
+			];
+			$current_stock_label = ! empty( $state['stock'] ) && isset( $stock_options[ $state['stock'] ] )
+				? $stock_options[ $state['stock'] ]['label']
+				: '';
+			?>
+			<details id="<?php echo esc_attr( $id_prefix ); ?>-stock-section" class="raka-filter-accordion border-b border-black/5 dark:border-white/5 pb-4 group" open>
+				<summary class="cursor-pointer select-none py-1 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+					<div class="flex items-center gap-2">
+						<span>AVAILABILITY</span>
+						<?php if ( ! empty( $current_stock_label ) ) : ?>
+							<span class="px-1.5 py-0.2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[10px] font-bold">
+								1
 							</span>
-						</a>
+						<?php endif; ?>
+					</div>
+					<div class="flex items-center gap-2 text-neutral-400">
+						<?php if ( ! empty( $current_stock_label ) ) : ?>
+							<span class="text-[11px] text-neutral-900 dark:text-white font-sans font-medium"><?php echo esc_html( $current_stock_label ); ?></span>
+						<?php endif; ?>
+						<i class="ri-arrow-down-s-line text-base raka-accordion-arrow"></i>
+					</div>
+				</summary>
+
+				<div id="<?php echo esc_attr( $id_prefix ); ?>-stock-options" class="pt-2 space-y-1">
+					<?php
+					foreach ( $stock_options as $key => $opt ) :
+						$is_stock_active = ( $state['stock'] === $key );
+					?>
+						<label
+							id="<?php echo esc_attr( $id_prefix ); ?>-stock-lbl-<?php echo esc_attr( $key ?: 'all' ); ?>"
+							class="flex items-center justify-between py-2 px-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer select-none hover:bg-black/5 dark:hover:bg-white/5"
+						>
+							<div class="flex items-center gap-2.5">
+								<input
+									id="<?php echo esc_attr( $id_prefix ); ?>-stock-radio-<?php echo esc_attr( $key ?: 'all' ); ?>"
+									type="radio"
+									name="filter_stock"
+									value="<?php echo esc_attr( $key ); ?>"
+									<?php checked( $is_stock_active ); ?>
+									class="raka-custom-radio"
+								/>
+								<span class="text-neutral-800 dark:text-neutral-200 <?php echo $is_stock_active ? 'font-semibold text-black dark:text-white' : ''; ?>"><?php echo esc_html( $opt['label'] ); ?></span>
+							</div>
+							<i class="<?php echo esc_attr( $opt['ico'] ); ?> text-sm text-neutral-400"></i>
+						</label>
 					<?php endforeach; ?>
 				</div>
-			</div>
-		<?php endif; ?>
+			</details>
 
-		<!-- ── 4. Price Range Filter ── -->
-		<div id="<?php echo esc_attr( $id_prefix ); ?>-price-section" class="border-b border-black/5 dark:border-white/5 pb-5 space-y-3">
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-price-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-				<span>PRICE RANGE (THB)</span>
-			</div>
+			<!-- ── 6. Apply Filter Action Button ── -->
+			<div id="<?php echo esc_attr( $id_prefix ); ?>-action-section" class="pt-2">
+				<?php if ( ! empty( $state['orderby'] ) && $state['orderby'] !== 'menu_order' ) : ?>
+					<input type="hidden" name="orderby" value="<?php echo esc_attr( $state['orderby'] ); ?>">
+				<?php endif; ?>
 
-			<form id="<?php echo esc_attr( $id_prefix ); ?>-price-form" method="get" action="<?php echo esc_url( $shop_link ); ?>" class="space-y-3">
-				<div id="<?php echo esc_attr( $id_prefix ); ?>-price-inputs" class="flex items-center gap-2">
-					<div id="<?php echo esc_attr( $id_prefix ); ?>-min-wrap" class="relative flex-1">
-						<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-400">฿</span>
-						<input
-							id="<?php echo esc_attr( $id_prefix ); ?>-min-price-input"
-							type="number"
-							name="min_price"
-							value="<?php echo $state['min_price'] !== null ? esc_attr( (string) $state['min_price'] ) : ''; ?>"
-							placeholder="Min"
-							class="w-full h-9 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
-						/>
-					</div>
-					<span class="text-neutral-400 text-sm">&ndash;</span>
-					<div id="<?php echo esc_attr( $id_prefix ); ?>-max-wrap" class="relative flex-1">
-						<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-neutral-400">฿</span>
-						<input
-							id="<?php echo esc_attr( $id_prefix ); ?>-max-price-input"
-							type="number"
-							name="max_price"
-							value="<?php echo $state['max_price'] !== null ? esc_attr( (string) $state['max_price'] ) : ''; ?>"
-							placeholder="Max"
-							class="w-full h-9 pl-6 pr-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm font-mono text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-black dark:focus:border-white"
-						/>
-					</div>
-					<button
-						id="<?php echo esc_attr( $id_prefix ); ?>-price-apply-btn"
-						type="submit"
-						class="h-9 px-3.5 rounded-lg bg-black text-white dark:bg-white dark:text-black text-xs font-mono font-bold uppercase hover:opacity-80 active:scale-95 transition-all"
-					>
-						GO
-					</button>
-				</div>
-
-				<!-- Preserve other filters -->
-				<?php
-				if ( ! empty( $state['brands'] ) ) {
-					echo '<input type="hidden" name="filter_brand" value="' . esc_attr( implode( ',', $state['brands'] ) ) . '">';
-				}
-				if ( ! empty( $state['cats'] ) ) {
-					echo '<input type="hidden" name="filter_cat" value="' . esc_attr( implode( ',', $state['cats'] ) ) . '">';
-				}
-				if ( ! empty( $state['stock'] ) ) {
-					echo '<input type="hidden" name="filter_stock" value="' . esc_attr( $state['stock'] ) . '">';
-				}
-				if ( ! empty( $state['search'] ) ) {
-					echo '<input type="hidden" name="filter_q" value="' . esc_attr( $state['search'] ) . '">';
-				}
-				?>
-			</form>
-
-			<!-- Quick Budget Presets -->
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-price-presets" class="flex flex-wrap gap-1.5 pt-1">
-				<?php
-				$price_tiers = [
-					[ 'label' => '< ฿1,000', 'min' => 0, 'max' => 1000 ],
-					[ 'label' => '฿1K - ฿3K', 'min' => 1000, 'max' => 3000 ],
-					[ 'label' => '฿3K - ฿6K', 'min' => 3000, 'max' => 6000 ],
-					[ 'label' => '฿6,000+', 'min' => 6000, 'max' => '' ],
-				];
-				foreach ( $price_tiers as $idx => $tier ) :
-					$tier_url = add_query_arg( [
-						'min_price' => $tier['min'],
-						'max_price' => $tier['max'],
-					] );
-					$is_tier_active = ( $state['min_price'] == $tier['min'] && ( $tier['max'] === '' ? $state['max_price'] === null : $state['max_price'] == $tier['max'] ) );
-				?>
-					<a
-						id="<?php echo esc_attr( $id_prefix ); ?>-tier-<?php echo (int) $idx; ?>"
-						href="<?php echo esc_url( $tier_url ); ?>"
-						class="px-2.5 py-1 rounded text-xs font-mono font-medium uppercase tracking-wider transition-colors <?php echo $is_tier_active ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'bg-black/5 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:opacity-75'; ?>"
-					>
-						<?php echo esc_html( $tier['label'] ); ?>
-					</a>
-				<?php endforeach; ?>
-			</div>
-		</div>
-
-		<!-- ── 5. Stock & Availability Filter ── -->
-		<div id="<?php echo esc_attr( $id_prefix ); ?>-stock-section" class="space-y-3">
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-stock-title" class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-				<span>AVAILABILITY</span>
+				<button
+					id="<?php echo esc_attr( $id_prefix ); ?>-btn-apply-filters"
+					type="submit"
+					class="w-full h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-sm font-mono font-bold uppercase tracking-wider shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+				>
+					<i class="ri-search-2-line text-base"></i>
+					<span>APPLY & SEARCH</span>
+				</button>
 			</div>
 
-			<div id="<?php echo esc_attr( $id_prefix ); ?>-stock-options" class="space-y-1">
-				<?php
-				$stock_options = [
-					''           => [ 'label' => 'All Items', 'ico' => 'ri-apps-line' ],
-					'instock'    => [ 'label' => 'In Stock', 'ico' => 'ri-checkbox-circle-line' ],
-					'preorder'   => [ 'label' => 'Pre-Order', 'ico' => 'ri-time-line' ],
-					'outofstock' => [ 'label' => 'Sold Out', 'ico' => 'ri-close-circle-line' ],
-				];
-				foreach ( $stock_options as $key => $opt ) :
-					$is_stock_active = ( $state['stock'] === $key );
-					$stock_url       = $key ? add_query_arg( 'filter_stock', $key ) : remove_query_arg( 'filter_stock' );
-				?>
-					<a
-						id="<?php echo esc_attr( $id_prefix ); ?>-stock-opt-<?php echo esc_attr( $key ?: 'all' ); ?>"
-						href="<?php echo esc_url( $stock_url ); ?>"
-						class="flex items-center gap-2 py-2 px-2.5 rounded-lg text-sm font-medium transition-colors <?php echo $is_stock_active ? 'bg-black text-white dark:bg-white dark:text-black font-semibold' : 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/5'; ?>"
-					>
-						<i class="<?php echo esc_attr( $opt['ico'] ); ?> text-base"></i>
-						<span><?php echo esc_html( $opt['label'] ); ?></span>
-					</a>
-				<?php endforeach; ?>
-			</div>
-		</div>
-
+		</form>
 	</aside>
 	<?php
 }

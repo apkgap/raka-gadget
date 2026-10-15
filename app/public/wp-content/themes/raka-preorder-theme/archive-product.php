@@ -173,7 +173,7 @@ $all_cats = get_terms( [
 			<button
 				id="btn-mobile-filter-apply"
 				type="button"
-				onclick="window.rakaCloseMobileFilters()"
+				onclick="var f = document.getElementById('mobile-filter-form'); if(f){ f.submit(); } else { window.rakaCloseMobileFilters(); }"
 				class="w-full h-11 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-sm font-mono font-bold uppercase tracking-wider shadow-md active:scale-95 transition-transform cursor-pointer"
 			>
 				APPLY FILTERS
@@ -205,6 +205,244 @@ $all_cats = get_terms( [
 			document.body.style.overflow = '';
 		}
 	};
+</script>
+
+<style id="raka-price-slider-css">
+	.raka-range-slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 18px;
+		height: 18px;
+		border-radius: 50%;
+		background: #171717;
+		border: 2px solid #ffffff;
+		box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+		cursor: pointer;
+		pointer-events: auto;
+		transition: transform 0.15s ease;
+	}
+	.dark .raka-range-slider::-webkit-slider-thumb {
+		background: #ffffff;
+		border: 2px solid #171717;
+		box-shadow: 0 1px 4px rgba(0,0,0,0.6);
+	}
+	.raka-range-slider::-webkit-slider-thumb:hover {
+		transform: scale(1.15);
+	}
+	.raka-range-slider::-moz-range-thumb {
+		width: 18px;
+		height: 18px;
+		border-radius: 50%;
+		background: #171717;
+		border: 2px solid #ffffff;
+		box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+		cursor: pointer;
+		pointer-events: auto;
+		transition: transform 0.15s ease;
+	}
+	.dark .raka-range-slider::-moz-range-thumb {
+		background: #ffffff;
+		border: 2px solid #171717;
+		box-shadow: 0 1px 4px rgba(0,0,0,0.6);
+	}
+	.raka-range-slider::-moz-range-thumb:hover {
+		transform: scale(1.15);
+	}
+
+	/* ── Filter Accordion Styles ── */
+	details.raka-filter-accordion summary::-webkit-details-marker {
+		display: none;
+	}
+	details.raka-filter-accordion summary {
+		list-style: none;
+	}
+	details.raka-filter-accordion[open] .raka-accordion-arrow {
+		transform: rotate(180deg);
+	}
+	.raka-accordion-arrow {
+		transition: transform 0.2s ease;
+	}
+
+	/* ── Modern Custom Black/White Checkboxes & Radios ── */
+	.raka-custom-checkbox {
+		appearance: none;
+		-webkit-appearance: none;
+		width: 16px;
+		height: 16px;
+		border-radius: 4px;
+		border: 1px solid rgba(0, 0, 0, 0.25);
+		background-color: transparent;
+		cursor: pointer;
+		display: inline-grid;
+		place-content: center;
+		transition: all 0.15s ease;
+		margin: 0;
+		flex-shrink: 0;
+	}
+	.dark .raka-custom-checkbox {
+		border-color: rgba(255, 255, 255, 0.25);
+	}
+	.raka-custom-checkbox:hover {
+		border-color: #000000;
+	}
+	.dark .raka-custom-checkbox:hover {
+		border-color: #ffffff;
+	}
+	.raka-custom-checkbox:checked {
+		background-color: #000000 !important;
+		border-color: #000000 !important;
+	}
+	.dark .raka-custom-checkbox:checked {
+		background-color: #ffffff !important;
+		border-color: #ffffff !important;
+	}
+	.raka-custom-checkbox:checked::before {
+		content: "";
+		width: 8px;
+		height: 5px;
+		border-left: 2px solid #ffffff;
+		border-bottom: 2px solid #ffffff;
+		transform: rotate(-45deg) translate(1px, -1px);
+	}
+	.dark .raka-custom-checkbox:checked::before {
+		border-left-color: #000000;
+		border-bottom-color: #000000;
+	}
+
+	.raka-custom-radio {
+		appearance: none;
+		-webkit-appearance: none;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		border: 1px solid rgba(0, 0, 0, 0.25);
+		background-color: transparent;
+		cursor: pointer;
+		display: inline-grid;
+		place-content: center;
+		transition: all 0.15s ease;
+		margin: 0;
+		flex-shrink: 0;
+	}
+	.dark .raka-custom-radio {
+		border-color: rgba(255, 255, 255, 0.25);
+	}
+	.raka-custom-radio:hover {
+		border-color: #000000;
+	}
+	.dark .raka-custom-radio:hover {
+		border-color: #ffffff;
+	}
+	.raka-custom-radio:checked {
+		border-color: #000000 !important;
+	}
+	.dark .raka-custom-radio:checked {
+		border-color: #ffffff !important;
+	}
+	.raka-custom-radio:checked::before {
+		content: "";
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background-color: #000000;
+	}
+	.dark .raka-custom-radio:checked::before {
+		background-color: #ffffff;
+	}
+</style>
+
+<script id="raka-price-slider-js">
+	(function() {
+		function initPriceSlider(prefix) {
+			var rMin = document.getElementById(prefix + '-range-min');
+			var rMax = document.getElementById(prefix + '-range-max');
+			var iMin = document.getElementById(prefix + '-min-price-input');
+			var iMax = document.getElementById(prefix + '-max-price-input');
+			var prog = document.getElementById(prefix + '-slider-progress');
+			var disp = document.getElementById(prefix + '-price-display');
+
+			if (!rMin || !rMax) return;
+
+			var maxRange = 8000;
+			var minGap = 100;
+
+			function updateProgress() {
+				var vMin = parseInt(rMin.value, 10);
+				var vMax = parseInt(rMax.value, 10);
+
+				var leftPercent = (vMin / maxRange) * 100;
+				var rightPercent = 100 - (vMax / maxRange) * 100;
+
+				if (prog) {
+					prog.style.left = leftPercent + '%';
+					prog.style.right = rightPercent + '%';
+				}
+
+				if (disp) {
+					disp.textContent = '฿' + vMin.toLocaleString() + ' - ฿' + vMax.toLocaleString();
+				}
+			}
+
+			rMin.addEventListener('input', function() {
+				if (parseInt(rMax.value, 10) - parseInt(rMin.value, 10) < minGap) {
+					rMin.value = parseInt(rMax.value, 10) - minGap;
+				}
+				if (iMin) iMin.value = rMin.value;
+				updateProgress();
+			});
+
+			rMax.addEventListener('input', function() {
+				if (parseInt(rMax.value, 10) - parseInt(rMin.value, 10) < minGap) {
+					rMax.value = parseInt(rMin.value, 10) + minGap;
+				}
+				if (iMax) iMax.value = rMax.value;
+				updateProgress();
+			});
+
+			if (iMin) {
+				iMin.addEventListener('change', function() {
+					var val = parseInt(iMin.value, 10) || 0;
+					if (val < 0) val = 0;
+					if (val > parseInt(rMax.value, 10) - minGap) val = parseInt(rMax.value, 10) - minGap;
+					rMin.value = val;
+					iMin.value = val;
+					updateProgress();
+				});
+			}
+
+			if (iMax) {
+				iMax.addEventListener('change', function() {
+					var val = parseInt(iMax.value, 10) || maxRange;
+					if (val > maxRange) val = maxRange;
+					if (val < parseInt(rMin.value, 10) + minGap) val = parseInt(rMin.value, 10) + minGap;
+					rMax.value = val;
+					iMax.value = val;
+					updateProgress();
+				});
+			}
+
+			updateProgress();
+		}
+
+		window.rakaSetPricePreset = function(prefix, min, max) {
+			var rMin = document.getElementById(prefix + '-range-min');
+			var rMax = document.getElementById(prefix + '-range-max');
+			var iMin = document.getElementById(prefix + '-min-price-input');
+			var iMax = document.getElementById(prefix + '-max-price-input');
+
+			if (rMin) rMin.value = min;
+			if (rMax) rMax.value = max;
+			if (iMin) iMin.value = min;
+			if (iMax) iMax.value = max;
+
+			initPriceSlider(prefix);
+		};
+
+		document.addEventListener('DOMContentLoaded', function() {
+			initPriceSlider('desktop');
+			initPriceSlider('mobile');
+		});
+	})();
 </script>
 
 <?php

@@ -33,15 +33,58 @@ class Captcha {
 	public static function init(): void {
 		// 1. Enqueue Frontend Scripts conditionally
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_scripts' ] );
+		add_action( 'login_enqueue_scripts', [ __CLASS__, 'enqueue_login_scripts' ] );
 
-		// 2. Hook Verify on Login (Authenticate filter, Priority 25)
+		// 2. Render CAPTCHA on standard wp-login.php form
+		add_action( 'login_form', [ __CLASS__, 'render_login_form_captcha' ] );
+
+		// 3. Hook Verify on Login (Authenticate filter, Priority 25)
 		add_filter( 'authenticate', [ __CLASS__, 'verify_login_captcha' ], 25, 3 );
 
-		// 3. Hook Verify on WooCommerce Native Registration
+		// 4. Hook Verify on WooCommerce Native Registration
 		add_action( 'woocommerce_register_post', [ __CLASS__, 'verify_wc_register_captcha' ], 10, 3 );
 
-		// 4. Hook Verify on Standard WordPress Registration
+		// 5. Hook Verify on Standard WordPress Registration
 		add_filter( 'registration_errors', [ __CLASS__, 'verify_wp_register_captcha' ], 10, 3 );
+	}
+
+	/**
+	 * Enqueue scripts for standard wp-login.php page.
+	 */
+	public static function enqueue_login_scripts(): void {
+		$secret = self::get_secret_key();
+		if ( empty( $secret ) ) {
+			return;
+		}
+
+		if ( self::PROVIDER === 'turnstile' ) {
+			wp_enqueue_script(
+				'cloudflare-turnstile',
+				'https://challenges.cloudflare.com/turnstile/v0/api.js',
+				[],
+				null,
+				true
+			);
+		} else {
+			wp_enqueue_script(
+				'google-recaptcha',
+				'https://www.google.com/recaptcha/api.js',
+				[],
+				null,
+				true
+			);
+		}
+	}
+
+	/**
+	 * Output CAPTCHA field inside standard wp-login.php.
+	 */
+	public static function render_login_form_captcha(): void {
+		$secret = self::get_secret_key();
+		if ( empty( $secret ) ) {
+			return;
+		}
+		echo self::render( 'light' );
 	}
 
 	/**
@@ -157,13 +200,13 @@ class Captcha {
 			}
 		}
 
-		if ( empty( $token ) ) {
-			return false;
-		}
-
 		$secret_key = self::get_secret_key();
 		if ( empty( $secret_key ) ) {
 			return true; // Bypass safely if secret key not configured yet
+		}
+
+		if ( empty( $token ) ) {
+			return false;
 		}
 
 		$verify_url = ( self::PROVIDER === 'turnstile' ) ? self::TURNSTILE_VERIFY_URL : self::RECAPTCHA_VERIFY_URL;

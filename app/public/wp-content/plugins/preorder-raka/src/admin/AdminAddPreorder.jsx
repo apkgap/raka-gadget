@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SearchableSelect from './SearchableSelect';
 
 const generateRandomOrderNo = () => {
 	const randNum = Math.floor(100000 + Math.random() * 900000);
@@ -156,8 +157,8 @@ const AdminAddPreorder = () => {
 	};
 
 	// Handle product change
-	const handleProductChange = (e) => {
-		const selectedId = e.target.value;
+	const handleProductChange = (val) => {
+		const selectedId = (val && typeof val === 'object' && val.target) ? val.target.value : val;
 		if (!selectedId) {
 			setFormData(prev => ({ ...prev, product_id: '', product_name: '', price: '' }));
 			setSelectedImage('');
@@ -179,8 +180,8 @@ const AdminAddPreorder = () => {
 	};
 
 	// Handle user member change
-	const handleUserChange = (e) => {
-		const uid = e.target.value;
+	const handleUserChange = (val) => {
+		const uid = (val && typeof val === 'object' && val.target) ? val.target.value : val;
 		if (!uid) {
 			setFormData(prev => ({ ...prev, user_id: '' }));
 			return;
@@ -260,13 +261,30 @@ const AdminAddPreorder = () => {
 		}
 	};
 
-	// Group products by group
-	const groupedProducts = products.reduce((acc, p) => {
-		const groupName = p.group || 'อื่น ๆ';
-		if (!acc[groupName]) acc[groupName] = [];
-		acc[groupName].push(p);
-		return acc;
-	}, {});
+	// Format options for Select2 SearchableSelect
+	const productOptions = products.map(p => ({
+		value: p.id,
+		label: p.title + (p.sku ? ` (SKU: ${p.sku})` : ''),
+		sub: `฿${(p.price || 0).toLocaleString()} ${p.is_preorder ? '⚡[Pre-Order]' : ''} ${p.eta ? '• ' + p.eta : ''}`,
+		image: p.image_url || '',
+		group: p.group || 'อื่น ๆ',
+		raw: p
+	}));
+
+	const orderOptions = wcOrders.map(ord => ({
+		value: ord.id,
+		label: `#${ord.order_no} | ${ord.customer_name} (${ord.phone || 'ไม่มีเบอร์'})`,
+		sub: `฿${(ord.total || 0).toLocaleString()} [${ord.status_label}] (${ord.date}) ${ord.has_preorder ? '⚡ มีสินค้าพรีออเดอร์' : ''}`,
+		group: ord.status_label || 'คำสั่งซื้อ',
+		raw: ord
+	}));
+
+	const userOptions = users.map(u => ({
+		value: u.id,
+		label: `#${u.id}: ${u.name}`,
+		sub: `${u.email}${u.phone ? ` • ${u.phone}` : ''}`,
+		raw: u
+	}));
 
 	return (
 		<div style={{ maxWidth: 1080, margin: '20px auto 40px', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
@@ -393,20 +411,13 @@ const AdminAddPreorder = () => {
 							<i className="ri-search-eye-line" style={{ color: '#16a34a', marginRight: 6 }}/>
 							เลือกคำสั่งซื้อ WooCommerce ที่ต้องการออกสถานะพรีออเดอร์:
 						</label>
-						<select
+						<SearchableSelect
+							options={orderOptions}
 							value={formData.wc_order_id}
-							onChange={(e) => handleSelectWcOrder(e.target.value)}
-							style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #94a3b8', background: '#ffffff', fontSize: 13, fontWeight: 500 }}
-						>
-							<option value="">-- คลิกเลือกรายการคำสั่งซื้อล่าสุด ({wcOrders.length} รายการ) --</option>
-							{wcOrders.map(ord => (
-								<option key={ord.id} value={ord.id}>
-									#{ord.order_no} | {ord.customer_name} ({ord.phone || 'ไม่มีเบอร์'}) | ฿{ord.total.toLocaleString()} [{ord.status_label}] ({ord.date})
-									{ord.has_preorder ? ' ⚡ มีสินค้าพรีออเดอร์' : ''}
-									{ord.is_already_synced ? ' (สร้างพรีออเดอร์แล้ว)' : ''}
-								</option>
-							))}
-						</select>
+							onChange={handleSelectWcOrder}
+							placeholder={`-- พิมพ์ค้นหาเลขที่ออเดอร์ หรือชื่อลูกค้า (${wcOrders.length} รายการ) --`}
+							groupBy={false}
+						/>
 						{formData.wc_order_id && (
 							<div style={{ marginTop: 10, fontSize: 12, color: '#16a34a', display: 'flex', alignItems: 'center', gap: 6 }}>
 								<i className="ri-check-double-line"/> ดึงข้อมูลจาก WooCommerce Order #{formData.wc_order_id} สำเร็จ! ข้อมูลด้านล่างถูกกรอกให้อัตโนมัติแล้ว
@@ -427,22 +438,13 @@ const AdminAddPreorder = () => {
 							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
 								เลือกสินค้า / ตัวเลือกย่อย (WooCommerce Products & Variations)
 							</label>
-							<select
+							<SearchableSelect
+								options={productOptions}
 								value={formData.product_id}
 								onChange={handleProductChange}
-								style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', background: '#ffffff', fontSize: 13 }}
-							>
-								<option value="">-- เลือกสินค้าจากระบบร้านค้าเพื่อดึงราคาและรูปภาพอัตโนมัติ --</option>
-								{Object.keys(groupedProducts).map(grp => (
-									<optgroup key={grp} label={grp}>
-										{groupedProducts[grp].map(p => (
-											<option key={p.id} value={p.id}>
-												{p.title} {p.sku ? `(SKU: ${p.sku})` : ''} - ฿{p.price.toLocaleString()} {p.is_preorder ? '⚡[Pre-Order]' : ''}
-											</option>
-										))}
-									</optgroup>
-								))}
-							</select>
+								placeholder="-- พิมพ์ค้นหาชื่อสินค้า, รหัส SKU, หรือเลือกจากหมวดหมู่เพื่อดึงราคาและรูปภาพอัตโนมัติ --"
+								groupBy={true}
+							/>
 						</div>
 
 						{/* Product Name */}
@@ -573,18 +575,13 @@ const AdminAddPreorder = () => {
 							<label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
 								ผูกกับสมาชิกเว็บไซต์ (Member Account)
 							</label>
-							<select
+							<SearchableSelect
+								options={userOptions}
 								value={formData.user_id}
 								onChange={handleUserChange}
-								style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', background: '#ffffff', fontSize: 13 }}
-							>
-								<option value="">-- ไม่ระบุ / ลูกค้าทั่วไป (Guest Order) --</option>
-								{users.map(u => (
-									<option key={u.id} value={u.id}>
-										#{u.id}: {u.name} ({u.email}){u.phone ? ` - ${u.phone}` : ''}
-									</option>
-								))}
-							</select>
+								placeholder="-- ค้นหาชื่อสมาชิก, อีเมล, เบอร์โทร หรือปล่อยว่างสำหรับลูกค้าทั่วไป --"
+								groupBy={false}
+							/>
 						</div>
 
 						{/* Customer Name */}
