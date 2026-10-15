@@ -516,7 +516,30 @@ function raka_sync_wc_order_to_preorder_plugin( int $order_id ): void {
 		return;
 	}
 
-	// 5. Store Metadata
+	// 5. Store Metadata & Multiple Items
+	$saved_items = [];
+	$total_items_qty = 0;
+	foreach ( $preorder_items as $p_item ) {
+		$p_obj       = $p_item['product'];
+		$p_price     = (int) round( $p_item['total'] / max( 1, $p_item['qty'] ) );
+		$thumb_id    = $p_obj ? $p_obj->get_image_id() : 0;
+		$thumb_url   = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'medium' ) : '';
+		$p_eta       = raka_get_product_preorder_eta( $p_obj ) ?: '7-14 วัน';
+
+		$saved_items[] = [
+			'product_id'    => $p_item['product_id'],
+			'product_name'  => $p_item['name'],
+			'price'         => $p_price,
+			'qty'           => $p_item['qty'],
+			'subtotal'      => $p_item['total'],
+			'image_url'     => $thumb_url,
+			'estimate_days' => $p_eta,
+		];
+		$total_items_qty += $p_item['qty'];
+	}
+
+	update_post_meta( $preorder_post_id, '_preorder_items', $saved_items );
+
 	$item_price = (int) round( $first_item['total'] / max( 1, $first_item['qty'] ) );
 	update_post_meta( $preorder_post_id, '_preorder_wc_order_id', $order_id );
 	update_post_meta( $preorder_post_id, '_preorder_no', $order_no );
@@ -525,12 +548,19 @@ function raka_sync_wc_order_to_preorder_plugin( int $order_id ): void {
 	update_post_meta( $preorder_post_id, '_preorder_product_id', $first_item['product_id'] );
 	update_post_meta( $preorder_post_id, '_preorder_product', $product_name );
 	update_post_meta( $preorder_post_id, '_preorder_price', $item_price );
-	update_post_meta( $preorder_post_id, '_preorder_qty', $first_item['qty'] );
+	update_post_meta( $preorder_post_id, '_preorder_qty', $total_items_qty );
 	update_post_meta( $preorder_post_id, '_preorder_shipping', (int) round( $order->get_shipping_total() ) );
 	update_post_meta( $preorder_post_id, '_preorder_address', wp_strip_all_tags( $address ) );
 	$eta = raka_get_product_preorder_eta( $first_item['product'] );
 	update_post_meta( $preorder_post_id, '_preorder_estimate_days', $eta ?: '7-14 วัน' );
 	update_post_meta( $preorder_post_id, '_preorder_current_step_idx', 0 );
+
+	// Link user id if member order
+	$order_user_id = (int) $order->get_user_id();
+	if ( $order_user_id > 0 ) {
+		update_post_meta( $preorder_post_id, '_preorder_user_id', $order_user_id );
+		update_post_meta( $preorder_post_id, '_customer_user', $order_user_id );
+	}
 
 	// Set featured image
 	$thumb_id = get_post_thumbnail_id( $first_item['product_id'] );
