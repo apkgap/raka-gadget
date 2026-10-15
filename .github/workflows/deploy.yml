@@ -102,6 +102,7 @@ jobs:
 
           LFTP_COMMANDS="$( mktemp )"
           {
+            echo "open -u \"${{ secrets.FTP_USERNAME }}\",\"${{ secrets.FTP_PASSWORD }}\" \"${{ secrets.FTP_SERVER }}\""
             echo 'set cmd:fail-exit yes;'
             echo 'set ftp:ssl-allow yes;'
             echo 'set ssl:verify-certificate no;'
@@ -129,5 +130,4 @@ jobs:
             echo 'quit'
           } > "$LFTP_COMMANDS"
 
-          cat "$LFTP_COMMANDS"
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" -f "$LFTP_COMMANDS"
+          lftp -f "$LFTP_COMMANDS"
