@@ -20,7 +20,8 @@ $post_id = get_the_ID();
 	<div id="raka-preorder-single-wrapper" class="w-full max-w-6xl mx-auto flex flex-col items-center">
 
 		<!-- Mount PreOrderApp with data-post-id -->
-		<div id="preorder-raka-single-app" class="w-full max-w-5xl mx-auto text-left rounded-3xl overflow-hidden border border-neutral-200/80 dark:border-neutral-800 transition-all duration-300" data-post-id="<?php echo esc_attr( (string) $post_id ); ?>">
+		<div id="preorder-raka-single-app" class="w-full max-w-5xl mx-auto" data-post-id="<?php echo esc_attr( (string) $post_id ); ?>">
+
 			<div id="preorder-raka-loading-box" class="flex flex-col items-center justify-center py-28 text-neutral-400 dark:text-neutral-500 font-sans">
 				<div id="preorder-raka-loading-spinner" class="relative w-12 h-12 animate-spin mb-4" aria-hidden="true">
 					<i class="ri-loader-4-line text-4xl text-red-600 dark:text-red-500"></i>
