@@ -69,19 +69,32 @@ export default function LoyaltySettingsTab( {
 	const [ productPage, setProductPage ] = useState( 1 );
 	const PRODUCTS_PER_PAGE = 24;
 
-	const filteredProducts = ( wcProducts || [] ).filter( ( p ) => {
-		const isSelected = ( loyaltyOpts.reward_product_ids || [] ).includes( p.id );
-		if ( showOnlySelected && ! isSelected ) {
-			return false;
-		}
-		if ( productSearch.trim() ) {
-			const term = productSearch.toLowerCase().trim();
-			const titleMatch = ( p.title || '' ).toLowerCase().includes( term );
-			const idMatch = String( p.id ).includes( term );
-			return titleMatch || idMatch;
-		}
-		return true;
-	} );
+	const selectedIds = ( loyaltyOpts.reward_product_ids || [] ).map( Number );
+
+	const filteredProducts = ( wcProducts || [] )
+		.filter( ( p ) => {
+			const isSelected = selectedIds.includes( Number( p.id ) );
+			if ( showOnlySelected && ! isSelected ) {
+				return false;
+			}
+			if ( productSearch.trim() ) {
+				const term = productSearch.toLowerCase().trim();
+				const titleMatch = ( p.title || '' ).toLowerCase().includes( term );
+				const idMatch = String( p.id ).includes( term );
+				return titleMatch || idMatch;
+			}
+			return true;
+		} )
+		.sort( ( a, b ) => {
+			// If not searching, bubble selected items to top for convenience
+			if ( ! productSearch.trim() && ! showOnlySelected ) {
+				const aSel = selectedIds.includes( Number( a.id ) );
+				const bSel = selectedIds.includes( Number( b.id ) );
+				if ( aSel && ! bSel ) return -1;
+				if ( ! aSel && bSel ) return 1;
+			}
+			return 0;
+		} );
 
 	const totalProductPages = Math.ceil( filteredProducts.length / PRODUCTS_PER_PAGE ) || 1;
 	const pagedProducts = filteredProducts.slice(
@@ -503,7 +516,7 @@ export default function LoyaltySettingsTab( {
 							) : (
 								<div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px', padding: '4px' } }>
 									{ pagedProducts.map( ( p ) => {
-										const isSelected = ( loyaltyOpts.reward_product_ids || [] ).includes( p.id );
+										const isSelected = selectedIds.includes( Number( p.id ) );
 										return (
 											<div
 												key={ p.id }
@@ -512,11 +525,13 @@ export default function LoyaltySettingsTab( {
 													display: 'flex',
 													alignItems: 'center',
 													gap: '10px',
-													padding: '10px',
+													padding: '10px 12px',
 													borderRadius: '10px',
 													border: isSelected ? '2px solid #ef4444' : '1px solid #e2e8f0',
 													background: isSelected ? '#fef2f2' : '#ffffff',
+													boxShadow: isSelected ? '0 2px 8px rgba(239, 68, 68, 0.15)' : 'none',
 													cursor: 'pointer',
+													position: 'relative',
 													transition: 'all 0.15s ease',
 												} }
 											>
@@ -524,21 +539,51 @@ export default function LoyaltySettingsTab( {
 													type="checkbox"
 													checked={ isSelected }
 													onChange={ () => {} }
-													style={ { margin: 0, cursor: 'pointer' } }
+													style={ {
+														margin: 0,
+														cursor: 'pointer',
+														accentColor: '#ef4444',
+														width: '16px',
+														height: '16px',
+													} }
 												/>
 												{ p.image_url && (
 													<img
 														src={ p.image_url }
 														alt={ p.title }
-														style={ { width: '36px', height: '36px', objectFit: 'cover', borderRadius: '6px', background: '#f1f5f9' } }
+														style={ {
+															width: '38px',
+															height: '38px',
+															objectFit: 'cover',
+															borderRadius: '6px',
+															background: '#f1f5f9',
+															border: isSelected ? '1px solid #fca5a5' : '1px solid #e2e8f0',
+														} }
 													/>
 												) }
 												<div style={ { flex: 1, minWidth: 0 } }>
-													<div style={ { fontSize: '12px', fontWeight: 600, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }>
-														{ p.title }
+													<div style={ { display: 'flex', alignItems: 'center', gap: '6px' } }>
+														<div style={ { fontSize: '12px', fontWeight: isSelected ? 700 : 600, color: isSelected ? '#991b1b' : '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }>
+															{ p.title }
+														</div>
 													</div>
-													<div style={ { fontSize: '11px', color: '#64748b' } }>
-														{ p.price || '0฿' }
+													<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' } }>
+														<span style={ { fontSize: '11px', color: '#64748b' } }>
+															{ p.price || '0฿' }
+														</span>
+														{ isSelected && (
+															<span style={ {
+																fontSize: '10px',
+																fontWeight: 700,
+																color: '#ffffff',
+																background: '#ef4444',
+																padding: '1px 6px',
+																borderRadius: '4px',
+																letterSpacing: '0.02em',
+															} }>
+																ACTIVE
+															</span>
+														) }
 													</div>
 												</div>
 											</div>
