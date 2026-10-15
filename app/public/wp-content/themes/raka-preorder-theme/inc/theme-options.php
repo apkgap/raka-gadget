@@ -469,6 +469,19 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 	// Loyalty & Rewards Engine Settings
 	if ( isset( $raw_data['loyalty'] ) && is_array( $raw_data['loyalty'] ) ) {
 		$raw_loyalty = $raw_data['loyalty'];
+		$clean_product_ids = array_values( array_filter( array_map( 'absint', (array) ( $raw_loyalty['reward_product_ids'] ?? [] ) ) ) );
+		
+		$clean_product_points = [];
+		if ( isset( $raw_loyalty['reward_product_points'] ) && is_array( $raw_loyalty['reward_product_points'] ) ) {
+			foreach ( $raw_loyalty['reward_product_points'] as $pid => $pts ) {
+				$pid = absint( $pid );
+				$pts = max( 1.0, (float) $pts );
+				if ( $pid > 0 ) {
+					$clean_product_points[ $pid ] = $pts;
+				}
+			}
+		}
+
 		$clean_options['loyalty'] = [
 			'enabled'                    => ! empty( $raw_loyalty['enabled'] ),
 			'spend_per_point'            => max( 1.0, (float) ( $raw_loyalty['spend_per_point'] ?? 100.0 ) ),
@@ -476,7 +489,8 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 			'tier_threshold_gold'        => max( 1.0, (float) ( $raw_loyalty['tier_threshold_gold'] ?? 2000.0 ) ),
 			'preorder_points_multiplier' => max( 0.1, (float) ( $raw_loyalty['preorder_points_multiplier'] ?? 1.0 ) ),
 			'lot_expiry_days'            => max( 1, (int) ( $raw_loyalty['lot_expiry_days'] ?? 365 ) ),
-			'reward_product_ids'         => array_values( array_filter( array_map( 'absint', (array) ( $raw_loyalty['reward_product_ids'] ?? [] ) ) ) ),
+			'reward_product_ids'         => $clean_product_ids,
+			'reward_product_points'      => $clean_product_points,
 		];
 	} else {
 		$clean_options['loyalty'] = [
@@ -487,6 +501,7 @@ function raka_rest_save_settings( WP_REST_Request $request ) {
 			'preorder_points_multiplier' => 1.0,
 			'lot_expiry_days'            => 365,
 			'reward_product_ids'         => [],
+			'reward_product_points'      => [],
 		];
 	}
 

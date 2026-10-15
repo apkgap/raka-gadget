@@ -209,7 +209,7 @@ export default function RewardsView( { config, showToast } ) {
 					<div id="raka-catalog-title-group" className="flex items-center gap-2">
 						<i id="raka-catalog-icon" className="ri-gift-line text-lg text-red-600"></i>
 						<h3 id="raka-catalog-title" className="text-base sm:text-lg font-bold text-neutral-950 dark:text-white">
-							แคตตาล็อกของรางวัลพรีเมียม (100 แต้ม)
+							แคตตาล็อกของรางวัลพรีเมียม
 						</h3>
 					</div>
 					<span id="raka-catalog-count-badge" className="text-xs font-semibold text-neutral-500">

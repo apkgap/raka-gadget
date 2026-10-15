@@ -306,6 +306,13 @@ export default function LoyaltySettingsTab( {
 		updateLoyaltyField( 'reward_product_ids', next );
 	};
 
+	const updateRewardProductPoints = ( pid, pointsVal ) => {
+		const currPts = { ...( loyaltyOpts.reward_product_points || {} ) };
+		const num = Math.max( 1, parseFloat( pointsVal ) || 1 );
+		currPts[ pid ] = num;
+		updateLoyaltyField( 'reward_product_points', currPts );
+	};
+
 	return (
 		<div style={ { spaceY: '20px' } }>
 			{ /* Sub-navigation Pills */ }
@@ -456,7 +463,7 @@ export default function LoyaltySettingsTab( {
 						<CardHeader style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' } }>
 							<div>
 								<h3 style={ { margin: 0, fontSize: '15px', fontWeight: 700 } }>
-									{ __( 'สินค้าในแคตตาล็อกของรางวัล (แลกฟรีด้วย 100 แต้ม)', 'raka-preorder-theme' ) }
+									{ __( 'สินค้าในแคตตาล็อกของรางวัล (กำหนดแต้มแลกรายสินค้า)', 'raka-preorder-theme' ) }
 								</h3>
 								<span style={ { fontSize: '12px', color: '#64748b' } }>
 									{ __( 'เลือกไว้แล้ว', 'raka-preorder-theme' ) } <strong style={ { color: '#ef4444' } }>{ ( loyaltyOpts.reward_product_ids || [] ).length }</strong> { __( 'รายการ', 'raka-preorder-theme' ) }
@@ -517,75 +524,123 @@ export default function LoyaltySettingsTab( {
 								<div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px', padding: '4px' } }>
 									{ pagedProducts.map( ( p ) => {
 										const isSelected = selectedIds.includes( Number( p.id ) );
+										const currentPts = ( loyaltyOpts.reward_product_points || {} )[ p.id ] ?? 100;
 										return (
 											<div
 												key={ p.id }
-												onClick={ () => toggleRewardProduct( p.id ) }
 												style={ {
 													display: 'flex',
-													alignItems: 'center',
-													gap: '10px',
+													flexDirection: 'column',
+													gap: '8px',
 													padding: '10px 12px',
 													borderRadius: '10px',
 													border: isSelected ? '2px solid #ef4444' : '1px solid #e2e8f0',
 													background: isSelected ? '#fef2f2' : '#ffffff',
 													boxShadow: isSelected ? '0 2px 8px rgba(239, 68, 68, 0.15)' : 'none',
-													cursor: 'pointer',
-													position: 'relative',
 													transition: 'all 0.15s ease',
 												} }
 											>
-												<input
-													type="checkbox"
-													checked={ isSelected }
-													onChange={ () => {} }
+												<div
+													onClick={ () => toggleRewardProduct( p.id ) }
 													style={ {
-														margin: 0,
+														display: 'flex',
+														alignItems: 'center',
+														gap: '10px',
 														cursor: 'pointer',
-														accentColor: '#ef4444',
-														width: '16px',
-														height: '16px',
 													} }
-												/>
-												{ p.image_url && (
-													<img
-														src={ p.image_url }
-														alt={ p.title }
+												>
+													<input
+														type="checkbox"
+														checked={ isSelected }
+														onChange={ () => {} }
 														style={ {
-															width: '38px',
-															height: '38px',
-															objectFit: 'cover',
-															borderRadius: '6px',
-															background: '#f1f5f9',
-															border: isSelected ? '1px solid #fca5a5' : '1px solid #e2e8f0',
+															margin: 0,
+															cursor: 'pointer',
+															accentColor: '#ef4444',
+															width: '16px',
+															height: '16px',
 														} }
 													/>
-												) }
-												<div style={ { flex: 1, minWidth: 0 } }>
-													<div style={ { display: 'flex', alignItems: 'center', gap: '6px' } }>
+													{ p.image_url && (
+														<img
+															src={ p.image_url }
+															alt={ p.title }
+															style={ {
+																width: '38px',
+																height: '38px',
+																objectFit: 'cover',
+																borderRadius: '6px',
+																background: '#f1f5f9',
+																border: isSelected ? '1px solid #fca5a5' : '1px solid #e2e8f0',
+															} }
+														/>
+													) }
+													<div style={ { flex: 1, minWidth: 0 } }>
 														<div style={ { fontSize: '12px', fontWeight: isSelected ? 700 : 600, color: isSelected ? '#991b1b' : '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }>
 															{ p.title }
 														</div>
-													</div>
-													<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' } }>
-														<span style={ { fontSize: '11px', color: '#64748b' } }>
-															{ p.price || '0฿' }
-														</span>
-														{ isSelected && (
-															<span style={ {
-																fontSize: '10px',
-																fontWeight: 700,
-																color: '#ffffff',
-																background: '#ef4444',
-																padding: '1px 6px',
-																borderRadius: '4px',
-																letterSpacing: '0.02em',
-															} }>
-																ACTIVE
+														<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' } }>
+															<span style={ { fontSize: '11px', color: '#64748b' } }>
+																{ p.price || '0฿' }
 															</span>
-														) }
+															{ isSelected && (
+																<span style={ {
+																	fontSize: '10px',
+																	fontWeight: 700,
+																	color: '#ffffff',
+																	background: '#ef4444',
+																	padding: '1px 6px',
+																	borderRadius: '4px',
+																	letterSpacing: '0.02em',
+																} }>
+																	ACTIVE
+																</span>
+															) }
+														</div>
 													</div>
 												</div>
+
+												{ /* Points Input (Only active when selected) */ }
+												{ isSelected && (
+													<div
+														style={ {
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'space-between',
+															gap: '8px',
+															paddingTop: '6px',
+															borderTop: '1px dashed #fca5a5',
+														} }
+														onClick={ ( e ) => e.stopPropagation() }
+													>
+														<span style={ { fontSize: '11px', fontWeight: 600, color: '#7f1d1d' } }>
+															{ __( 'แต้มที่ใช้แลก:', 'raka-preorder-theme' ) }
+														</span>
+														<div style={ { display: 'flex', alignItems: 'center', gap: '4px' } }>
+															<input
+																type="number"
+																min="1"
+																step="1"
+																value={ currentPts }
+																onChange={ ( e ) => updateRewardProductPoints( p.id, e.target.value ) }
+																style={ {
+																	width: '75px',
+																	height: '26px',
+																	fontSize: '12px',
+																	fontWeight: 700,
+																	color: '#b91c1c',
+																	textAlign: 'right',
+																	borderRadius: '4px',
+																	border: '1px solid #f87171',
+																	background: '#ffffff',
+																	padding: '2px 6px',
+																	outline: 'none',
+																} }
+															/>
+															<span style={ { fontSize: '11px', color: '#7f1d1d' } }>{ __( 'แต้ม', 'raka-preorder-theme' ) }</span>
+														</div>
+													</div>
+												) }
 											</div>
 										);
 									} ) }

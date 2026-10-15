@@ -330,9 +330,10 @@ class Raka_Loyalty_REST_Controller {
 	 * Helper to get available catalog items with eligibility.
 	 */
 	private static function get_user_catalog_items( int $user_id, float $available, string $tier ): array {
-		$options      = get_option( 'raka_theme_options', [] );
-		$loyalty_opts = $options['loyalty'] ?? [];
-		$product_ids  = (array) ( $loyalty_opts['reward_product_ids'] ?? [] );
+		$options        = get_option( 'raka_theme_options', [] );
+		$loyalty_opts   = $options['loyalty'] ?? [];
+		$product_ids    = (array) ( $loyalty_opts['reward_product_ids'] ?? [] );
+		$product_points = (array) ( $loyalty_opts['reward_product_points'] ?? [] );
 
 		$items = [];
 		foreach ( $product_ids as $pid ) {
@@ -345,7 +346,9 @@ class Raka_Loyalty_REST_Controller {
 				continue;
 			}
 
-			$cost = 100.0;
+			$cost = isset( $product_points[ $pid ] ) && (float) $product_points[ $pid ] > 0
+				? (float) $product_points[ $pid ]
+				: 100.0;
 			$is_redeemable = $available >= $cost;
 			$reason        = $is_redeemable ? '' : sprintf( 'ต้องการอีก %s แต้ม', number_format( $cost - $available, 0 ) );
 
@@ -381,13 +384,20 @@ class Raka_Loyalty_REST_Controller {
 			return new WP_REST_Response( [ 'success' => false, 'message' => 'Cart not initialized' ], 400 );
 		}
 
+		$options        = get_option( 'raka_theme_options', [] );
+		$loyalty_opts   = $options['loyalty'] ?? [];
+		$product_points = (array) ( $loyalty_opts['reward_product_points'] ?? [] );
+
+		$cost = isset( $product_points[ $product_id ] ) && (float) $product_points[ $product_id ] > 0
+			? (float) $product_points[ $product_id ]
+			: 100.0;
+
 		$available = Raka_Loyalty_Service::get_available_points( $user_id );
-		$cost      = 100.0;
 
 		if ( $available < $cost ) {
 			return new WP_REST_Response( [
 				'success' => false,
-				'message' => 'คะแนนสะสมของคุณไม่เพียงพอสำหรับการแลกของรางวัลนี้ (ต้องการ 100 แต้ม)',
+				'message' => sprintf( 'คะแนนสะสมของคุณไม่เพียงพอสำหรับการแลกของรางวัลนี้ (ต้องการ %s แต้ม)', number_format( $cost, 0 ) ),
 			], 400 );
 		}
 
