@@ -162,7 +162,7 @@ export default function LoyaltyRewardSelector( { config } ) {
 									{ item.name }
 								</p>
 								<p id={ `raka-cart-reward-pts-${ item.id }` } className="text-[11px] text-red-600 dark:text-red-400 font-semibold">
-									ฟรี (100 แต้ม)
+									ฟรี ({ item.cost || 100 } แต้ม)
 								</p>
 							</div>
 						</div>
