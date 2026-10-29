@@ -144,7 +144,16 @@ class WSR_POS
         $results = array();
         foreach ($query->posts as $post) {
             $price = get_post_meta($post->ID, 'wsr_default_price', true);
+            if ($price === '' || (float)$price <= 0) {
+                $price = get_post_meta($post->ID, '_price', true);
+                if ($price === '') {
+                    $price = get_post_meta($post->ID, '_regular_price', true);
+                }
+            }
             $cost = get_post_meta($post->ID, 'wsr_default_cost', true);
+            if ($cost === '') {
+                $cost = get_post_meta($post->ID, '_cost', true);
+            }
             $lazada_order = get_post_meta($post->ID, 'wsr_lazada_order', true);
             $stock = '';
 

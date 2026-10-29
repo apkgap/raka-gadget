@@ -21,6 +21,10 @@ class WSR_WooCommerce_Cost_Profit
         add_action('woocommerce_variation_options_pricing', array($this, 'add_cost_price_field_variation'), 10, 3);
         add_action('woocommerce_save_product_variation', array($this, 'save_cost_price_field_variation'), 10, 2);
 
+        // Keep wsr_default_price in sync with WooCommerce product price
+        add_action('woocommerce_process_product_meta', array($this, 'sync_wc_price_to_wsr_default_price'), 20, 1);
+        add_action('woocommerce_save_product_variation', array($this, 'sync_wc_variation_price_to_wsr_default_price'), 20, 2);
+
         // 3. Show Cost & Profit in WooCommerce Order Item Row (Admin Order Screen)
         add_action('woocommerce_admin_order_item_headers', array($this, 'order_item_headers'));
         add_action('woocommerce_admin_order_item_values', array($this, 'order_item_values'), 10, 3);
@@ -489,6 +493,32 @@ class WSR_WooCommerce_Cost_Profit
         $matched  = get_page_by_title($sr_title, OBJECT, 'sales_record');
         if ($matched) {
             update_post_meta($matched->ID, 'wsr_status', 'refunded');
+        }
+    }
+
+    /**
+     * Keep wsr_default_price synchronized with WooCommerce price on save
+     */
+    public function sync_wc_price_to_wsr_default_price($product_id)
+    {
+        $product = wc_get_product($product_id);
+        if (! $product) return;
+        $price = $product->get_price();
+        if ($price === '') {
+            $price = $product->get_regular_price();
+        }
+        if ($price !== '' && (float) $price > 0) {
+            update_post_meta($product_id, 'wsr_default_price', (float) $price);
+        }
+    }
+
+    public function sync_wc_variation_price_to_wsr_default_price($variation_id, $i)
+    {
+        $variation = wc_get_product($variation_id);
+        if (! $variation) return;
+        $price = $variation->get_price();
+        if ($price !== '' && (float) $price > 0) {
+            update_post_meta($variation_id, 'wsr_default_price', (float) $price);
         }
     }
 }
