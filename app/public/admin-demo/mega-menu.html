@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[#F8FAFC]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Menu Settings — Modern Admin UI</title>
+    <!-- Google Fonts: Inter & Noto Sans Thai -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4169F7',
+                        'primary-hover': '#3154D9',
+                        main: '#0F172A',
+                        secondary: '#64748B',
+                        card: '#FFFFFF',
+                        canvas: '#F8FAFC',
+                        border: '#E2E8F0'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02)',
+                        'dropdown': '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03)'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for in-browser JSX parsing -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            color: #0F172A;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+        .sidebar-scroll {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="h-full bg-[#F8FAFC] text-main">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        // --- MOCK DATA ---
+        const INITIAL_MENU_ITEMS = [
+            {
+                id: 'm1',
+                label: 'Home',
+                url: '/',
+                isMega: false,
+                dropdownWidth: 'container',
+                columnCount: 4,
+                showIcons: false,
+                openNewTab: false,
+                hoverDropdown: true,
+                mobileAccordion: true,
+                columns: []
+            },
+            {
+                id: 'm2',
+                label: 'Products',
+                url: '/products',
+                isMega: true,
+                dropdownWidth: 'full',
+                columnCount: 4,
+                showIcons: true,
+                openNewTab: false,
+                hoverDropdown: true,
+                mobileAccordion: true,
+                columns: [
+                    {
+                        id: 'col1',
+                        title: 'Categories',
+                        items: [
+                            { id: 'c1-1', title: 'Clothing', url: '/category/clothing', badge: 'Hot' },
+                            { id: 'c1-2', title: 'Shoes', url: '/category/shoes' },
+                            { id: 'c1-3', title: 'Accessories', url: '/category/accessories' },
+                            { id: 'c1-4', title: 'All Products', url: '/shop' }
+                        ]
+                    },
+                    {
+                        id: 'col2',
+                        title: 'Solutions',
+                        items: [
+                            { id: 'c2-1', title: 'For Small Business', url: '/solutions/small-business' },
+                            { id: 'c2-2', title: 'For Enterprise', url: '/solutions/enterprise', badge: 'Popular' },
+                            { id: 'c2-3', title: 'For Education', url: '/solutions/education' }
+                        ]
+                    },
+                    {
+                        id: 'col3',
+                        title: 'Explore',
+                        items: [
+                            { id: 'c3-1', title: 'Features', url: '/features' },
+                            { id: 'c3-2', title: 'Integrations', url: '/integrations' },
+                            { id: 'c3-3', title: 'Pricing Plans', url: '/pricing' }
+                        ]
+                    },
+                    {
+                        id: 'col4',
+                        title: 'Support',
+                        items: [
+                            { id: 'c4-1', title: 'Help Center', url: '/help' },
+                            { id: 'c4-2', title: 'Documentation', url: '/docs' },
+                            { id: 'c4-3', title: 'Contact Support', url: '/contact' }
+                        ]
+                    }
+                ],
+                children: [
+                    { id: 'm2-1', label: 'Clothing', url: '/category/clothing' },
+                    { id: 'm2-2', label: 'Shoes', url: '/category/shoes' },
+                    { id: 'm2-3', label: 'Categories', url: '/categories' },
+                    { id: 'm2-4', label: 'Solutions', url: '/solutions' },
+                    { id: 'm2-5', label: 'Explore', url: '/explore' },
+                    { id: 'm2-6', label: 'Support', url: '/support' },
+                ]
+            },
+            {
+                id: 'm3',
+                label: 'Solutions',
+                url: '/solutions',
+                isMega: false,
+                dropdownWidth: 'container',
+                columnCount: 3,
+                showIcons: false,
+                openNewTab: false,
+                hoverDropdown: true,
+                mobileAccordion: true,
+                columns: []
+            },
+            {
+                id: 'm4',
+                label: 'Resources',
+                url: '/resources',
+                isMega: false,
+                dropdownWidth: 'container',
+                columnCount: 2,
+                showIcons: false,
+                openNewTab: false,
+                hoverDropdown: true,
+                mobileAccordion: true,
+                columns: []
+            },
+            {
+                id: 'm5',
+                label: 'About',
+                url: '/about',
+                isMega: false,
+                dropdownWidth: 'container',
+                columnCount: 2,
+                showIcons: false,
+                openNewTab: false,
+                hoverDropdown: true,
+                mobileAccordion: true,
+                columns: []
+            }
+        ];
+
+        const WP_PAGES = [
+            { id: 'p1', title: 'Home', url: '/' },
+            { id: 'p2', title: 'About Us', url: '/about' },
+            { id: 'p3', title: 'Contact', url: '/contact' },
+            { id: 'p4', title: 'Shop', url: '/shop' },
+            { id: 'p5', title: 'Blog', url: '/blog' },
+            { id: 'p6', title: 'FAQ', url: '/faq' },
+            { id: 'p7', title: 'Privacy Policy', url: '/privacy' }
+        ];
+
+        const WC_CATEGORIES = [
+            { id: 'cat1', name: 'Clothing', count: 24, url: '/category/clothing', icon: 'shirt' },
+            { id: 'cat2', name: 'Accessories', count: 18, url: '/category/accessories', icon: 'watch' },
+            { id: 'cat3', name: 'Shoes', count: 32, url: '/category/shoes', icon: 'footprints' },
+            { id: 'cat4', name: 'Home & Living', count: 15, url: '/category/home', icon: 'home' },
+            { id: 'cat5', name: 'Electronics', count: 12, url: '/category/electronics', icon: 'laptop' }
+        ];
+
+        const WC_PRODUCTS = [
+            { id: 'prod1', name: 'Classic White T-Shirt', sku: 'TS-001', price: '$29.00', url: '/product/white-tshirt', img: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=100&auto=format&fit=crop&q=80' },
+            { id: 'prod2', name: 'Running Sneakers', sku: 'SN-042', price: '$89.00', url: '/product/running-sneakers', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&auto=format&fit=crop&q=80' },
+            { id: 'prod3', name: 'Leather Backpack', sku: 'BP-109', price: '$120.00', url: '/product/leather-backpack', img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=100&auto=format&fit=crop&q=80' },
+            { id: 'prod4', name: 'Wireless Headphones', sku: 'WH-88', price: '$150.00', url: '/product/wireless-headphones', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&auto=format&fit=crop&q=80' },
+            { id: 'prod5', name: 'Minimal Desk Lamp', sku: 'DL-01', price: '$45.00', url: '/product/desk-lamp', img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=100&auto=format&fit=crop&q=80' }
+        ];
+
+        function App() {
+            // Main state
+            const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
+            const [selectedMenuId, setSelectedMenuId] = useState('m2');
+            const [expandedItems, setExpandedItems] = useState({ m2: true });
+            const [selectedColIndex, setSelectedColIndex] = useState(0);
+
+            // Global visibility toggles
+            const [globalHoverOpen, setGlobalHoverOpen] = useState(true);
+            const [globalShowIcons, setGlobalShowIcons] = useState(true);
+            const [globalMobileAccordion, setGlobalMobileAccordion] = useState(true);
+
+            // Content Picker State
+            const [pickerTab, setPickerTab] = useState('categories'); // 'pages', 'categories', 'products', 'custom'
+            const [pickerSearch, setPickerSearch] = useState('');
+            const [categoryFilter, setCategoryFilter] = useState('all');
+            const [selectedItems, setSelectedItems] = useState([]);
+            
+            // Custom link tab inputs
+            const [customLinkText, setCustomLinkText] = useState('');
+            const [customLinkUrl, setCustomLinkUrl] = useState('');
+            const [customLinkNewTab, setCustomLinkNewTab] = useState(false);
+
+            // Live Preview State
+            const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' or 'mobile'
+            const [previewActiveMenu, setPreviewActiveMenu] = useState('m2');
+            const [mobileOpenAccordions, setMobileOpenAccordions] = useState({ m2: true });
+
+            // Drag and drop helper state
+            const [draggingMenuIndex, setDraggingMenuIndex] = useState(null);
+            const [draggingColumnIndex, setDraggingColumnIndex] = useState(null);
+
+            // Toast notice
+            const [saveNotification, setSaveNotification] = useState(false);
+
+            // Re-render Lucide icons on any state change
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+
+            // Current selected menu item
+            const currentItem = useMemo(() => {
+                return menuItems.find(m => m.id === selectedMenuId) || menuItems[0] || null;
+            }, [menuItems, selectedMenuId]);
+
+            // Update property of current menu item
+            const updateCurrentItem = (field, value) => {
+                if (!selectedMenuId) return;
+                setMenuItems(prev => prev.map(m => {
+                    if (m.id === selectedMenuId) {
+                        return { ...m, [field]: value };
+                    }
+                    return m;
+                }));
+            };
+
+            // Toggle Expand/Collapse for nested items in Menu Structure
+            const toggleExpand = (id) => {
+                setExpandedItems(prev => ({ ...prev, [id]: !prev[id] }));
+            };
+
+            // Add new menu item to menu tree
+            const handleAddMenuItem = () => {
+                const newId = 'm_' + Date.now();
+                const newItem = {
+                    id: newId,
+                    label: 'New Nav Link',
+                    url: '/new-link',
+                    isMega: false,
+                    dropdownWidth: 'container',
+                    columnCount: 3,
+                    showIcons: true,
+                    openNewTab: false,
+                    hoverDropdown: true,
+                    mobileAccordion: true,
+                    columns: [
+                        { id: 'col_' + Date.now(), title: 'Column 1', items: [] }
+                    ]
+                };
+                setMenuItems([...menuItems, newItem]);
+                setSelectedMenuId(newId);
+            };
+
+            // Duplicate a menu item
+            const handleDuplicateMenuItem = (id, e) => {
+                e?.stopPropagation();
+                const itemToDup = menuItems.find(m => m.id === id);
+                if (!itemToDup) return;
+                const newId = 'm_' + Date.now();
+                const duplicated = JSON.parse(JSON.stringify(itemToDup));
+                duplicated.id = newId;
+                duplicated.label = duplicated.label + ' (Copy)';
+                const idx = menuItems.findIndex(m => m.id === id);
+                const updated = [...menuItems];
+                updated.splice(idx + 1, 0, duplicated);
+                setMenuItems(updated);
+                setSelectedMenuId(newId);
+            };
+
+            // Delete a menu item
+            const handleDeleteMenuItem = (id, e) => {
+                e?.stopPropagation();
+                if (menuItems.length <= 1) {
+                    alert('Cannot delete the last menu item.');
+                    return;
+                }
+                const updated = menuItems.filter(m => m.id !== id);
+                setMenuItems(updated);
+                if (selectedMenuId === id) {
+                    setSelectedMenuId(updated[0]?.id || null);
+                }
+            };
+
+            // Column count change handler
+            const handleColumnCountChange = (newCount) => {
+                newCount = parseInt(newCount, 10);
+                if (!currentItem) return;
+                let currentCols = currentItem.columns ? [...currentItem.columns] : [];
+                if (newCount > currentCols.length) {
+                    for (let i = currentCols.length; i < newCount; i++) {
+                        currentCols.push({
+                            id: 'col_' + Date.now() + '_' + i,
+                            title: `Column ${i + 1}`,
+                            items: []
+                        });
+                    }
+                } else if (newCount < currentCols.length) {
+                    currentCols = currentCols.slice(0, newCount);
+                }
+                updateCurrentItem('columnCount', newCount);
+                updateCurrentItem('columns', currentCols);
+                if (selectedColIndex >= newCount) {
+                    setSelectedColIndex(Math.max(0, newCount - 1));
+                }
+            };
+
+            // Column Header edit
+            const handleColumnTitleChange = (colIdx, title) => {
+                if (!currentItem || !currentItem.columns) return;
+                const updated = [...currentItem.columns];
+                updated[colIdx] = { ...updated[colIdx], title };
+                updateCurrentItem('columns', updated);
+            };
+
+            // Add new column directly in Section D
+            const handleAddColumn = () => {
+                if (!currentItem) return;
+                const currentCols = currentItem.columns ? [...currentItem.columns] : [];
+                if (currentCols.length >= 6) {
+                    alert('Maximum 6 columns allowed.');
+                    return;
+                }
+                const newCol = {
+                    id: 'col_' + Date.now(),
+                    title: `Column ${currentCols.length + 1}`,
+                    items: []
+                };
+                const updated = [...currentCols, newCol];
+                updateCurrentItem('columns', updated);
+                updateCurrentItem('columnCount', updated.length);
+                setSelectedColIndex(updated.length - 1);
+            };
+
+            // Remove column
+            const handleRemoveColumn = (colIdx) => {
+                if (!currentItem || !currentItem.columns) return;
+                if (currentItem.columns.length <= 1) {
+                    alert('A mega menu must have at least 1 column.');
+                    return;
+                }
+                const updated = currentItem.columns.filter((_, idx) => idx !== colIdx);
+                updateCurrentItem('columns', updated);
+                updateCurrentItem('columnCount', updated.length);
+                if (selectedColIndex >= updated.length) {
+                    setSelectedColIndex(Math.max(0, updated.length - 1));
+                }
+            };
+
+            // Remove item from a column
+            const handleRemoveColumnItem = (colIdx, itemIdx) => {
+                if (!currentItem || !currentItem.columns) return;
+                const cols = [...currentItem.columns];
+                cols[colIdx].items = cols[colIdx].items.filter((_, idx) => idx !== itemIdx);
+                updateCurrentItem('columns', cols);
+            };
+
+            // Selection in Content Picker
+            const toggleSelectItem = (itemObj) => {
+                const exists = selectedItems.find(i => i.id === itemObj.id);
+                if (exists) {
+                    setSelectedItems(selectedItems.filter(i => i.id !== itemObj.id));
+                } else {
+                    setSelectedItems([...selectedItems, itemObj]);
+                }
+            };
+
+            // Select all visible items in current tab
+            const handleSelectAllVisible = (itemsList) => {
+                const allSelected = itemsList.every(item => selectedItems.some(s => s.id === item.id));
+                if (allSelected) {
+                    // Deselect all in this list
+                    setSelectedItems(selectedItems.filter(s => !itemsList.some(item => item.id === s.id)));
+                } else {
+                    // Select all
+                    const newItems = itemsList.filter(item => !selectedItems.some(s => s.id === item.id));
+                    setSelectedItems([...selectedItems, ...newItems]);
+                }
+            };
+
+            // Add selected items to active column
+            const handleAddSelectedToColumn = () => {
+                if (selectedItems.length === 0 || !currentItem) return;
+
+                let cols = currentItem.columns ? [...currentItem.columns] : [];
+                if (cols.length === 0) {
+                    cols = [{ id: 'col_' + Date.now(), title: 'Column 1', items: [] }];
+                }
+
+                const targetIdx = (selectedColIndex >= 0 && selectedColIndex < cols.length) ? selectedColIndex : 0;
+                const targetCol = { ...cols[targetIdx] };
+
+                const newColumnItems = selectedItems.map(item => ({
+                    id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    title: item.title || item.name,
+                    url: item.url,
+                    sku: item.sku || null,
+                    badge: item.badge || null
+                }));
+
+                targetCol.items = [...targetCol.items, ...newColumnItems];
+                cols[targetIdx] = targetCol;
+
+                // Also update nested children for menu tree presentation
+                const newChildren = (currentItem.children ? [...currentItem.children] : []).concat(
+                    selectedItems.map(item => ({
+                        id: 'tree_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        label: item.title || item.name,
+                        url: item.url
+                    }))
+                );
+
+                updateCurrentItem('columns', cols);
+                updateCurrentItem('children', newChildren);
+                setSelectedItems([]);
+            };
+
+            // Add Custom Link
+            const handleAddCustomLink = () => {
+                if (!customLinkText.trim() || !customLinkUrl.trim()) {
+                    alert('Please provide both link text and URL');
+                    return;
+                }
+                const customObj = {
+                    id: 'custom_' + Date.now(),
+                    title: customLinkText,
+                    url: customLinkUrl,
+                    openNewTab: customLinkNewTab
+                };
+
+                let cols = currentItem.columns ? [...currentItem.columns] : [];
+                if (cols.length === 0) {
+                    cols = [{ id: 'col_' + Date.now(), title: 'Column 1', items: [] }];
+                }
+                const targetIdx = (selectedColIndex >= 0 && selectedColIndex < cols.length) ? selectedColIndex : 0;
+                cols[targetIdx].items.push(customObj);
+                updateCurrentItem('columns', cols);
+
+                setCustomLinkText('');
+                setCustomLinkUrl('');
+                setCustomLinkNewTab(false);
+            };
+
+            // Save changes trigger
+            const handleSaveChanges = () => {
+                setSaveNotification(true);
+                setTimeout(() => setSaveNotification(false), 3000);
+            };
+
+            // Filtered lists for Content Picker
+            const filteredPages = useMemo(() => {
+                return WP_PAGES.filter(p => p.title.toLowerCase().includes(pickerSearch.toLowerCase()));
+            }, [pickerSearch]);
+
+            const filteredCategories = useMemo(() => {
+                return WC_CATEGORIES.filter(c => {
+                    const matchesSearch = c.name.toLowerCase().includes(pickerSearch.toLowerCase());
+                    const matchesFilter = categoryFilter === 'all' || (categoryFilter === 'popular' && c.count > 20);
+                    return matchesSearch && matchesFilter;
+                });
+            }, [pickerSearch, categoryFilter]);
+
+            const filteredProducts = useMemo(() => {
+                return WC_PRODUCTS.filter(p => p.name.toLowerCase().includes(pickerSearch.toLowerCase()) || p.sku.toLowerCase().includes(pickerSearch.toLowerCase()));
+            }, [pickerSearch]);
+
+            return (
+                <div id="mega-menu-builder-app" class="min-h-screen flex flex-col bg-[#F8FAFC]">
+                    
+                    {/* Top Toast Banner */}
+                    {saveNotification && (
+                        <div id="toast-save" class="fixed top-5 right-5 z-50 flex items-center gap-3 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-lg border border-emerald-500 transition-all animate-bounce">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                            <span class="text-sm font-medium">Mega Menu configuration saved successfully! (Frontend Mock)</span>
+                        </div>
+                    )}
+
+                    {/* Top Header Bar */}
+                    <header id="app-header" class="bg-card border-b border-border sticky top-0 z-30 px-6 py-4">
+                        <div id="header-container" class="max-w-[1720px] mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div id="header-branding" class="flex items-center gap-3">
+                                <div id="logo-icon-box" class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                    <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                                </div>
+                                <div id="header-titles">
+                                    <div class="flex items-center gap-2">
+                                        <h1 id="page-main-title" class="text-xl font-bold tracking-tight text-main">Mega Menu Settings</h1>
+                                        <span id="badge-ui-only" class="text-[11px] font-semibold uppercase tracking-wider bg-blue-50 text-primary border border-blue-200 px-2.5 py-0.5 rounded-full">Frontend Preview</span>
+                                    </div>
+                                    <p id="page-subtitle" class="text-xs text-secondary mt-0.5">Create and customize your mega menu to help customers find what they need.</p>
+                                </div>
+                            </div>
+                            <div id="header-actions" class="flex items-center gap-3">
+                                <button
+                                    id="btn-preview-switch-quick"
+                                    type="button"
+                                    onClick={() => setPreviewMode(previewMode === 'desktop' ? 'mobile' : 'desktop')}
+                                    class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-secondary hover:text-main bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                                >
+                                    <i data-lucide={previewMode === 'desktop' ? 'smartphone' : 'monitor'} class="w-4 h-4"></i>
+                                    <span>Preview: {previewMode === 'desktop' ? 'Desktop' : 'Mobile'}</span>
+                                </button>
+                                <button
+                                    id="btn-save-changes"
+                                    type="button"
+                                    onClick={handleSaveChanges}
+                                    class="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
+                                >
+                                    <i data-lucide="save" class="w-4 h-4"></i>
+                                    <span>Save changes</span>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Workspace Layout: 3 Columns on Desktop */}
+                    <main id="main-content" class="flex-1 max-w-[1720px] w-full mx-auto px-4 sm:px-6 py-6">
+                        <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                            
+                            {/* ══════════════════════════════════════════════════════════
+                                COLUMN 1 (LEFT ~25%): Section A — Menu Structure
+                               ══════════════════════════════════════════════════════════ */}
+                            <div id="col-menu-structure" class="lg:col-span-3 space-y-4">
+                                <div id="card-menu-structure" class="bg-card rounded-xl border border-border p-4 shadow-card">
+                                    <div id="menu-struct-header" class="flex items-center justify-between pb-3 border-b border-border mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="list-tree" class="w-4 h-4 text-primary"></i>
+                                            <h2 id="menu-struct-title" class="text-sm font-bold text-main">Menu Structure</h2>
+                                        </div>
+                                        <button
+                                            id="btn-add-menu-item"
+                                            type="button"
+                                            onClick={handleAddMenuItem}
+                                            class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors"
+                                        >
+                                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                            <span>Add item</span>
+                                        </button>
+                                    </div>
+
+                                    <p id="menu-struct-hint" class="text-xs text-secondary mb-3">
+                                        Drag & reorder items. Click to configure mega menu settings.
+                                    </p>
+
+                                    {/* Tree List */}
+                                    <div id="menu-items-tree" class="space-y-1.5 sidebar-scroll pr-1">
+                                        {menuItems.map((item, index) => {
+                                            const isSelected = item.id === selectedMenuId;
+                                            const hasChildren = item.children && item.children.length > 0;
+                                            const isExpanded = !!expandedItems[item.id];
+
+                                            return (
+                                                <div id={`menu-tree-node-${item.id}`} key={item.id} class="space-y-1">
+                                                    <div
+                                                        id={`menu-tree-row-${item.id}`}
+                                                        onClick={() => setSelectedMenuId(item.id)}
+                                                        class={`group flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm transition-all cursor-pointer ${
+                                                            isSelected 
+                                                                ? 'bg-blue-50/70 border-primary/40 text-primary font-semibold shadow-xs ring-1 ring-primary/20' 
+                                                                : 'bg-white border-border/80 hover:border-slate-300 text-main font-medium'
+                                                        }`}
+                                                    >
+                                                        <div class="flex items-center gap-2.5 min-w-0">
+                                                            <span class="text-slate-400 group-hover:text-slate-600 cursor-grab active:cursor-grabbing">
+                                                                <i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i>
+                                                            </span>
+                                                            <i data-lucide={item.isMega ? 'layers' : 'link-2'} class={`w-4 h-4 shrink-0 ${isSelected ? 'text-primary' : 'text-slate-400'}`}></i>
+                                                            <span class="truncate">{item.label}</span>
+                                                            {item.isMega && (
+                                                                <span class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-primary uppercase">Mega</span>
+                                                            )}
+                                                        </div>
+
+                                                        <div class="flex items-center gap-1 shrink-0">
+                                                            {hasChildren && (
+                                                                <button
+                                                                    id={`btn-expand-${item.id}`}
+                                                                    type="button"
+                                                                    onClick={(e) => { e.stopPropagation(); toggleExpand(item.id); }}
+                                                                    class="p-1 text-slate-400 hover:text-main rounded-md hover:bg-slate-100"
+                                                                    title="Expand/Collapse"
+                                                                >
+                                                                    <i data-lucide={isExpanded ? 'chevron-down' : 'chevron-right'} class="w-3.5 h-3.5"></i>
+                                                                </button>
+                                                            )}
+                                                            <button
+                                                                id={`btn-dup-${item.id}`}
+                                                                type="button"
+                                                                onClick={(e) => handleDuplicateMenuItem(item.id, e)}
+                                                                class="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-slate-700 rounded-md hover:bg-slate-100 transition-opacity"
+                                                                title="Duplicate"
+                                                            >
+                                                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                                            </button>
+                                                            <button
+                                                                id={`btn-del-${item.id}`}
+                                                                type="button"
+                                                                onClick={(e) => handleDeleteMenuItem(item.id, e)}
+                                                                class="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-opacity"
+                                                                title="Delete"
+                                                            >
+                                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Nested children items */}
+                                                    {hasChildren && isExpanded && (
+                                                        <div id={`nested-children-${item.id}`} class="pl-6 space-y-1 border-l-2 border-slate-200 ml-4 my-1">
+                                                            {item.children.map((child) => (
+                                                                <div
+                                                                    key={child.id}
+                                                                    id={`child-item-${child.id}`}
+                                                                    class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-50/80 hover:bg-slate-100 text-xs text-secondary font-medium transition-colors"
+                                                                >
+                                                                    <div class="flex items-center gap-2 truncate">
+                                                                        <i data-lucide="corner-down-right" class="w-3 h-3 text-slate-400 shrink-0"></i>
+                                                                        <span class="truncate">{child.label}</span>
+                                                                    </div>
+                                                                    <span class="text-[10px] text-slate-400 truncate">{child.url}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ══════════════════════════════════════════════════════════
+                                COLUMN 2 (CENTER ~35%): Section B + Section C + Section D
+                               ══════════════════════════════════════════════════════════ */}
+                            <div id="col-settings-and-builder" class="lg:col-span-4 space-y-5">
+                                
+                                {/* ---------------- SECTION B: Edit Menu Item ---------------- */}
+                                <div id="card-edit-menu-item" class="bg-card rounded-xl border border-border p-4 shadow-card">
+                                    <div id="edit-item-header" class="flex items-center justify-between pb-3 border-b border-border mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="sliders" class="w-4 h-4 text-primary"></i>
+                                            <h2 id="edit-item-title" class="text-sm font-bold text-main">Edit Menu Item: <span class="text-primary">{currentItem?.label}</span></h2>
+                                        </div>
+                                    </div>
+
+                                    {currentItem ? (
+                                        <div id="edit-item-form" class="space-y-4">
+                                            {/* Label & URL */}
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label for="input-menu-label" class="block text-xs font-semibold text-secondary mb-1">Menu Label</label>
+                                                    <input
+                                                        id="input-menu-label"
+                                                        type="text"
+                                                        value={currentItem.label}
+                                                        onChange={(e) => updateCurrentItem('label', e.target.value)}
+                                                        class="w-full text-xs font-medium px-3 py-2 bg-white border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                                        placeholder="e.g. Products"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label for="input-menu-url" class="block text-xs font-semibold text-secondary mb-1">Navigation URL</label>
+                                                    <input
+                                                        id="input-menu-url"
+                                                        type="text"
+                                                        value={currentItem.url}
+                                                        onChange={(e) => updateCurrentItem('url', e.target.value)}
+                                                        class="w-full text-xs font-medium px-3 py-2 bg-white border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                                        placeholder="e.g. /products"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Mega Menu Toggle */}
+                                            <div id="toggle-mega-row" class="flex items-center justify-between p-3 bg-slate-50 border border-border rounded-xl">
+                                                <div>
+                                                    <div class="text-xs font-semibold text-main">Enable Mega Menu</div>
+                                                    <div class="text-[11px] text-secondary">Display a multi-column rich dropdown overlay</div>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input
+                                                        id="toggle-mega-switch"
+                                                        type="checkbox"
+                                                        checked={currentItem.isMega}
+                                                        onChange={(e) => updateCurrentItem('isMega', e.target.checked)}
+                                                        class="sr-only peer"
+                                                    />
+                                                    <div class="w-10 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                                </label>
+                                            </div>
+
+                                            {/* Mega Menu Extra Settings */}
+                                            {currentItem.isMega && (
+                                                <div id="mega-extra-settings" class="space-y-4 pt-1 border-t border-dashed border-border">
+                                                    {/* Dropdown Width Radio */}
+                                                    <div>
+                                                        <label class="block text-xs font-semibold text-secondary mb-1.5">Dropdown Width</label>
+                                                        <div class="grid grid-cols-2 gap-2">
+                                                            <button
+                                                                id="btn-width-full"
+                                                                type="button"
+                                                                onClick={() => updateCurrentItem('dropdownWidth', 'full')}
+                                                                class={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-medium transition-all ${
+                                                                    currentItem.dropdownWidth === 'full' 
+                                                                        ? 'bg-blue-50 border-primary text-primary font-semibold ring-1 ring-primary/20' 
+                                                                        : 'bg-white border-border text-secondary hover:border-slate-300'
+                                                                }`}
+                                                            >
+                                                                <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+                                                                <span>Full Width</span>
+                                                            </button>
+                                                            <button
+                                                                id="btn-width-container"
+                                                                type="button"
+                                                                onClick={() => updateCurrentItem('dropdownWidth', 'container')}
+                                                                class={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-medium transition-all ${
+                                                                    currentItem.dropdownWidth === 'container' 
+                                                                        ? 'bg-blue-50 border-primary text-primary font-semibold ring-1 ring-primary/20' 
+                                                                        : 'bg-white border-border text-secondary hover:border-slate-300'
+                                                                }`}
+                                                            >
+                                                                <i data-lucide="minimize" class="w-3.5 h-3.5"></i>
+                                                                <span>Container</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Columns Selection */}
+                                                    <div>
+                                                        <label for="select-columns" class="block text-xs font-semibold text-secondary mb-1">Columns</label>
+                                                        <select
+                                                            id="select-columns"
+                                                            value={currentItem.columnCount || 4}
+                                                            onChange={(e) => handleColumnCountChange(e.target.value)}
+                                                            class="w-full text-xs font-medium px-3 py-2 bg-white border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                                        >
+                                                            <option value={2}>2 Columns</option>
+                                                            <option value={3}>3 Columns</option>
+                                                            <option value={4}>4 Columns (Default)</option>
+                                                            <option value={5}>5 Columns</option>
+                                                            <option value={6}>6 Columns</option>
+                                                        </select>
+                                                    </div>
+
+                                                    {/* Additional Toggles */}
+                                                    <div class="space-y-2 pt-2">
+                                                        <label class="flex items-center justify-between text-xs text-main cursor-pointer">
+                                                            <span class="flex items-center gap-2">
+                                                                <i data-lucide="image" class="w-3.5 h-3.5 text-slate-400"></i>
+                                                                <span>Show menu icons</span>
+                                                            </span>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={currentItem.showIcons}
+                                                                onChange={(e) => updateCurrentItem('showIcons', e.target.checked)}
+                                                                class="rounded text-primary focus:ring-primary/20 w-4 h-4 border-slate-300"
+                                                            />
+                                                        </label>
+                                                        <label class="flex items-center justify-between text-xs text-main cursor-pointer">
+                                                            <span class="flex items-center gap-2">
+                                                                <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+                                                                <span>Open links in new tab</span>
+                                                            </span>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={currentItem.openNewTab}
+                                                                onChange={(e) => updateCurrentItem('openNewTab', e.target.checked)}
+                                                                class="rounded text-primary focus:ring-primary/20 w-4 h-4 border-slate-300"
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div class="text-xs text-secondary text-center py-6">Select a menu item from the left panel.</div>
+                                    )}
+                                </div>
+
+                                {/* ---------------- SECTION C: Add from WordPress & WooCommerce ---------------- */}
+                                <div id="card-wp-wc-picker" class="bg-card rounded-xl border border-border p-4 shadow-card">
+                                    <div id="picker-header" class="pb-3 border-b border-border mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="plus-circle" class="w-4 h-4 text-primary"></i>
+                                            <h2 id="picker-title" class="text-sm font-bold text-main">Add from WordPress & WooCommerce</h2>
+                                        </div>
+                                        <p id="picker-desc" class="text-xs text-secondary mt-1">
+                                            Select pages, categories, products, or add a custom link to your mega menu.
+                                        </p>
+                                    </div>
+
+                                    {/* 4 Tabs */}
+                                    <div id="picker-tabs" class="grid grid-cols-4 gap-1 p-1 bg-slate-100 rounded-lg text-xs font-semibold mb-3">
+                                        <button
+                                            id="tab-pages"
+                                            type="button"
+                                            onClick={() => setPickerTab('pages')}
+                                            class={`py-1.5 px-2 rounded-md transition-all text-center ${pickerTab === 'pages' ? 'bg-white text-main shadow-xs font-bold' : 'text-secondary hover:text-main'}`}
+                                        >
+                                            Pages
+                                        </button>
+                                        <button
+                                            id="tab-categories"
+                                            type="button"
+                                            onClick={() => setPickerTab('categories')}
+                                            class={`py-1.5 px-2 rounded-md transition-all text-center ${pickerTab === 'categories' ? 'bg-white text-main shadow-xs font-bold' : 'text-secondary hover:text-main'}`}
+                                        >
+                                            Categories
+                                        </button>
+                                        <button
+                                            id="tab-products"
+                                            type="button"
+                                            onClick={() => setPickerTab('products')}
+                                            class={`py-1.5 px-2 rounded-md transition-all text-center ${pickerTab === 'products' ? 'bg-white text-main shadow-xs font-bold' : 'text-secondary hover:text-main'}`}
+                                        >
+                                            Products
+                                        </button>
+                                        <button
+                                            id="tab-custom"
+                                            type="button"
+                                            onClick={() => setPickerTab('custom')}
+                                            class={`py-1.5 px-2 rounded-md transition-all text-center ${pickerTab === 'custom' ? 'bg-white text-main shadow-xs font-bold' : 'text-secondary hover:text-main'}`}
+                                        >
+                                            Custom Link
+                                        </button>
+                                    </div>
+
+                                    {/* Search Bar for items tabs */}
+                                    {pickerTab !== 'custom' && (
+                                        <div id="picker-search-bar" class="relative mb-3">
+                                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                                            <input
+                                                id="input-picker-search"
+                                                type="text"
+                                                value={pickerSearch}
+                                                onChange={(e) => setPickerSearch(e.target.value)}
+                                                placeholder="Search pages, categories or products..."
+                                                class="w-full pl-9 pr-3 py-2 text-xs font-medium bg-slate-50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* TAB 1: Pages */}
+                                    {pickerTab === 'pages' && (
+                                        <div id="tab-content-pages" class="space-y-1.5">
+                                            <div class="flex items-center justify-between text-xs text-secondary px-2 mb-1">
+                                                <span>{filteredPages.length} pages found</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSelectAllVisible(filteredPages)}
+                                                    class="text-primary hover:underline font-semibold"
+                                                >
+                                                    Select all
+                                                </button>
+                                            </div>
+                                            <div class="max-h-48 overflow-y-auto space-y-1 border border-border rounded-lg p-2 bg-slate-50/50">
+                                                {filteredPages.map(page => (
+                                                    <label key={page.id} class="flex items-center justify-between p-2 rounded-md bg-white hover:bg-blue-50/40 border border-border/60 text-xs cursor-pointer transition-colors">
+                                                        <div class="flex items-center gap-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedItems.some(s => s.id === page.id)}
+                                                                onChange={() => toggleSelectItem(page)}
+                                                                class="rounded text-primary focus:ring-primary/20 w-4 h-4 border-slate-300"
+                                                            />
+                                                            <span class="font-medium text-main">{page.title}</span>
+                                                        </div>
+                                                        <span class="text-[11px] text-slate-400">{page.url}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* TAB 2: Product Categories */}
+                                    {pickerTab === 'categories' && (
+                                        <div id="tab-content-categories" class="space-y-2">
+                                            <div class="flex items-center justify-between gap-2 px-1">
+                                                <select
+                                                    id="select-category-filter"
+                                                    value={categoryFilter}
+                                                    onChange={(e) => setCategoryFilter(e.target.value)}
+                                                    class="text-[11px] py-1 px-2 border border-border rounded bg-white text-secondary font-medium"
+                                                >
+                                                    <option value="all">All Categories</option>
+                                                    <option value="popular">Popular Categories (>20)</option>
+                                                </select>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSelectAllVisible(filteredCategories)}
+                                                    class="text-xs text-primary hover:underline font-semibold"
+                                                >
+                                                    Select all
+                                                </button>
+                                            </div>
+                                            <div class="max-h-48 overflow-y-auto space-y-1 border border-border rounded-lg p-2 bg-slate-50/50">
+                                                {filteredCategories.map(cat => (
+                                                    <label key={cat.id} class="flex items-center justify-between p-2 rounded-md bg-white hover:bg-blue-50/40 border border-border/60 text-xs cursor-pointer transition-colors">
+                                                        <div class="flex items-center gap-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedItems.some(s => s.id === cat.id)}
+                                                                onChange={() => toggleSelectItem({ id: cat.id, title: cat.name, url: cat.url })}
+                                                                class="rounded text-primary focus:ring-primary/20 w-4 h-4 border-slate-300"
+                                                            />
+                                                            <i data-lucide="tag" class="w-3.5 h-3.5 text-primary"></i>
+                                                            <span class="font-medium text-main">{cat.name}</span>
+                                                        </div>
+                                                        <span class="text-[10px] font-semibold bg-slate-100 text-secondary px-2 py-0.5 rounded-full">{cat.count} items</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* TAB 3: Products */}
+                                    {pickerTab === 'products' && (
+                                        <div id="tab-content-products" class="space-y-1.5">
+                                            <div class="flex items-center justify-between text-xs text-secondary px-2 mb-1">
+                                                <span>{filteredProducts.length} products found</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSelectAllVisible(filteredProducts)}
+                                                    class="text-primary hover:underline font-semibold"
+                                                >
+                                                    Select all
+                                                </button>
+                                            </div>
+                                            <div class="max-h-48 overflow-y-auto space-y-1 border border-border rounded-lg p-2 bg-slate-50/50">
+                                                {filteredProducts.map(prod => (
+                                                    <label key={prod.id} class="flex items-center justify-between p-2 rounded-md bg-white hover:bg-blue-50/40 border border-border/60 text-xs cursor-pointer transition-colors">
+                                                        <div class="flex items-center gap-2.5">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedItems.some(s => s.id === prod.id)}
+                                                                onChange={() => toggleSelectItem({ id: prod.id, title: prod.name, url: prod.url, sku: prod.sku })}
+                                                                class="rounded text-primary focus:ring-primary/20 w-4 h-4 border-slate-300"
+                                                            />
+                                                            <img src={prod.img} alt={prod.name} class="w-7 h-7 rounded object-cover border border-slate-200" />
+                                                            <div>
+                                                                <div class="font-medium text-main leading-snug">{prod.name}</div>
+                                                                <div class="text-[10px] text-slate-400">SKU: {prod.sku}</div>
+                                                            </div>
+                                                        </div>
+                                                        <span class="text-[11px] font-bold text-main">{prod.price}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* TAB 4: Custom Link */}
+                                    {pickerTab === 'custom' && (
+                                        <div id="tab-content-custom" class="space-y-3">
+                                            <div>
+                                                <label for="input-custom-text" class="block text-xs font-semibold text-secondary mb-1">Link Text</label>
+                                                <input
+                                                    id="input-custom-text"
+                                                    type="text"
+                                                    value={customLinkText}
+                                                    onChange={(e) => setCustomLinkText(e.target.value)}
+                                                    placeholder="e.g. Special Deal"
+                                                    class="w-full text-xs font-medium px-3 py-2 bg-white border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label for="input-custom-url" class="block text-xs font-semibold text-secondary mb-1">URL</label>
+                                                <input
+                                                    id="input-custom-url"
+                                                    type="text"
+                                                    value={customLinkUrl}
+                                                    onChange={(e) => setCustomLinkUrl(e.target.value)}
+                                                    placeholder="https://example.com/promo"
+                                                    class="w-full text-xs font-medium px-3 py-2 bg-white border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                                />
+                                            </div>
+                                            <label class="flex items-center gap-2 text-xs text-main cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={customLinkNewTab}
+                                                    onChange={(e) => setCustomLinkNewTab(e.target.checked)}
+                                                    class="rounded text-primary focus:ring-primary/20 w-4 h-4 border-slate-300"
+                                                />
+                                                <span>Open in New Tab</span>
+                                            </label>
+                                            <button
+                                                id="btn-add-custom-link"
+                                                type="button"
+                                                onClick={handleAddCustomLink}
+                                                class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition-colors"
+                                            >
+                                                + Add Custom Link
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Target Column info & Add Selected Button */}
+                                    {pickerTab !== 'custom' && (
+                                        <div id="picker-footer-actions" class="mt-3 pt-3 border-t border-border flex items-center justify-between">
+                                            <div class="text-[11px] text-secondary">
+                                                Target: <strong class="text-main">Column {(selectedColIndex + 1)}</strong>
+                                            </div>
+                                            <button
+                                                id="btn-add-selected-items"
+                                                type="button"
+                                                disabled={selectedItems.length === 0}
+                                                onClick={handleAddSelectedToColumn}
+                                                class={`inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl transition-all ${
+                                                    selectedItems.length > 0 
+                                                        ? 'bg-primary hover:bg-primary-hover text-white shadow-sm cursor-pointer' 
+                                                        : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                                }`}
+                                            >
+                                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                                <span>+ Add selected ({selectedItems.length})</span>
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* ---------------- SECTION D: Mega Menu Content Builder ---------------- */}
+                                {currentItem && currentItem.isMega && (
+                                    <div id="card-content-builder" class="bg-card rounded-xl border border-border p-4 shadow-card">
+                                        <div id="builder-header" class="flex items-center justify-between pb-3 border-b border-border mb-3">
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <i data-lucide="columns" class="w-4 h-4 text-primary"></i>
+                                                    <h2 id="builder-title" class="text-sm font-bold text-main">Mega Menu Content Builder</h2>
+                                                </div>
+                                                <p class="text-[11px] text-secondary mt-0.5">Click a column card to set active target for adding items</p>
+                                            </div>
+                                            <button
+                                                id="btn-builder-add-column"
+                                                type="button"
+                                                onClick={handleAddColumn}
+                                                class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors"
+                                            >
+                                                <i data-lucide="plus" class="w-3 h-3"></i>
+                                                <span>Add Col</span>
+                                            </button>
+                                        </div>
+
+                                        {/* Visual Column Cards */}
+                                        <div id="columns-grid-list" class="space-y-3">
+                                            {(currentItem.columns || []).map((col, colIdx) => {
+                                                const isTarget = selectedColIndex === colIdx;
+                                                return (
+                                                    <div
+                                                        key={col.id}
+                                                        id={`builder-col-${col.id}`}
+                                                        onClick={() => setSelectedColIndex(colIdx)}
+                                                        class={`p-3 rounded-xl border transition-all ${
+                                                            isTarget 
+                                                                ? 'bg-blue-50/40 border-primary ring-1 ring-primary/20' 
+                                                                : 'bg-slate-50/60 border-border hover:border-slate-300'
+                                                        }`}
+                                                    >
+                                                        <div class="flex items-center justify-between gap-2 mb-2">
+                                                            <div class="flex items-center gap-2 flex-1">
+                                                                <span class="cursor-grab text-slate-400">
+                                                                    <i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i>
+                                                                </span>
+                                                                <input
+                                                                    type="text"
+                                                                    value={col.title}
+                                                                    onChange={(e) => handleColumnTitleChange(colIdx, e.target.value)}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    class="text-xs font-bold text-main bg-white px-2 py-1 rounded border border-border/80 focus:border-primary focus:outline-none w-36"
+                                                                />
+                                                                <span class="text-[10px] text-slate-400">({col.items.length} items)</span>
+                                                            </div>
+                                                            <div class="flex items-center gap-1">
+                                                                {isTarget && (
+                                                                    <span class="text-[10px] font-semibold text-primary bg-blue-100/80 px-2 py-0.5 rounded-full">Target</span>
+                                                                )}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => { e.stopPropagation(); handleRemoveColumn(colIdx); }}
+                                                                    class="p-1 text-slate-400 hover:text-rose-600 rounded"
+                                                                    title="Remove column"
+                                                                >
+                                                                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Items in this Column */}
+                                                        <div class="space-y-1 pl-4 border-l-2 border-slate-200">
+                                                            {col.items.length === 0 ? (
+                                                                <div class="text-[11px] text-slate-400 italic py-1">No links added. Add items from Section C.</div>
+                                                            ) : (
+                                                                col.items.map((link, itemIdx) => (
+                                                                    <div key={link.id} class="group flex items-center justify-between px-2 py-1 rounded bg-white border border-border/60 text-xs">
+                                                                        <div class="flex items-center gap-1.5 truncate">
+                                                                            <i data-lucide="link" class="w-3 h-3 text-slate-400 shrink-0"></i>
+                                                                            <span class="truncate font-medium text-main">{link.title}</span>
+                                                                            {link.badge && (
+                                                                                <span class="text-[9px] bg-amber-100 text-amber-700 px-1 rounded font-bold">{link.badge}</span>
+                                                                            )}
+                                                                        </div>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => { e.stopPropagation(); handleRemoveColumnItem(colIdx, itemIdx); }}
+                                                                            class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-600 p-0.5"
+                                                                        >
+                                                                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                ))
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* ══════════════════════════════════════════════════════════
+                                COLUMN 3 (RIGHT ~40%): Section E — Live Preview
+                               ══════════════════════════════════════════════════════════ */}
+                            <div id="col-live-preview" class="lg:col-span-5 space-y-4">
+                                <div id="card-live-preview" class="bg-card rounded-xl border border-border p-4 shadow-card sticky top-24">
+                                    
+                                    {/* Preview Header & Controls */}
+                                    <div id="preview-control-bar" class="flex items-center justify-between pb-3 border-b border-border mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="eye" class="w-4 h-4 text-primary"></i>
+                                            <h2 id="preview-title" class="text-sm font-bold text-main">Live Preview</h2>
+                                            <span class="relative flex h-2 w-2">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Desktop vs Mobile Toggle Buttons */}
+                                        <div id="preview-mode-switch" class="inline-flex p-1 bg-slate-100 rounded-lg">
+                                            <button
+                                                id="btn-mode-desktop"
+                                                type="button"
+                                                onClick={() => setPreviewMode('desktop')}
+                                                class={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                                                    previewMode === 'desktop' 
+                                                        ? 'bg-white text-main shadow-xs font-bold' 
+                                                        : 'text-secondary hover:text-main'
+                                                }`}
+                                            >
+                                                <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+                                                <span>Desktop</span>
+                                            </button>
+                                            <button
+                                                id="btn-mode-mobile"
+                                                type="button"
+                                                onClick={() => setPreviewMode('mobile')}
+                                                class={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                                                    previewMode === 'mobile' 
+                                                        ? 'bg-white text-main shadow-xs font-bold' 
+                                                        : 'text-secondary hover:text-main'
+                                                }`}
+                                            >
+                                                <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+                                                <span>Mobile</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Simulated Browser Frame */}
+                                    <div id="browser-frame" class="border border-border rounded-xl overflow-hidden bg-white shadow-subtle">
+                                        
+                                        {/* Browser Chrome Header */}
+                                        <div id="browser-chrome" class="bg-slate-100 px-3 py-2 border-b border-border flex items-center justify-between text-xs text-secondary">
+                                            <div class="flex items-center gap-1.5">
+                                                <div class="w-2.5 h-2.5 rounded-full bg-rose-400"></div>
+                                                <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                                            </div>
+                                            <div class="bg-white px-3 py-0.5 rounded-md border border-slate-200 text-[11px] text-slate-500 font-mono flex items-center gap-1.5 max-w-xs truncate">
+                                                <i data-lucide="lock" class="w-3 h-3 text-emerald-600"></i>
+                                                <span>raka-gadget.local</span>
+                                            </div>
+                                            <div class="flex items-center gap-1 text-slate-400">
+                                                <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                                            </div>
+                                        </div>
+
+                                        {/* Store Navigation Bar */}
+                                        <div id="preview-navbar" class="px-4 py-3 bg-white border-b border-slate-100 flex items-center justify-between">
+                                            {/* Logo */}
+                                            <div id="preview-store-logo" class="flex items-center gap-2">
+                                                <div class="w-7 h-7 rounded-lg bg-main text-white flex items-center justify-center font-bold text-xs">
+                                                    R
+                                                </div>
+                                                <span class="font-bold text-xs tracking-tight text-main">RAKA GADGET</span>
+                                            </div>
+
+                                            {/* Desktop Navigation Items */}
+                                            {previewMode === 'desktop' && (
+                                                <nav id="preview-desktop-nav" class="hidden sm:flex items-center gap-4 text-xs font-semibold">
+                                                    {menuItems.map(item => {
+                                                        const isActive = previewActiveMenu === item.id;
+                                                        return (
+                                                            <div
+                                                                key={item.id}
+                                                                onClick={() => setPreviewActiveMenu(isActive ? null : item.id)}
+                                                                onMouseEnter={() => { if (globalHoverOpen && item.isMega) setPreviewActiveMenu(item.id); }}
+                                                                class={`py-1 cursor-pointer transition-colors relative flex items-center gap-1 ${
+                                                                    isActive ? 'text-primary' : 'text-slate-700 hover:text-main'
+                                                                }`}
+                                                            >
+                                                                <span>{item.label}</span>
+                                                                {item.isMega && (
+                                                                    <i data-lucide="chevron-down" class={`w-3 h-3 transition-transform ${isActive ? 'rotate-180 text-primary' : 'text-slate-400'}`}></i>
+                                                                )}
+                                                                {isActive && (
+                                                                    <div class="absolute bottom-[-13px] left-0 right-0 h-0.5 bg-primary"></div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </nav>
+                                            )}
+
+                                            {/* Icons on Right (Search & Cart) */}
+                                            <div id="preview-nav-icons" class="flex items-center gap-2.5 text-secondary">
+                                                <button type="button" class="p-1 hover:text-main rounded"><i data-lucide="search" class="w-4 h-4"></i></button>
+                                                <button type="button" class="p-1 hover:text-main rounded relative">
+                                                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                                    <span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Preview Content Area */}
+                                        <div id="preview-viewport-content" class="min-h-[380px] bg-slate-50 relative p-4">
+                                            
+                                            {/* ================= DESKTOP MEGA MENU DROPDOWN ================= */}
+                                            {previewMode === 'desktop' && (
+                                                <div>
+                                                    {(() => {
+                                                        const activeItemObj = menuItems.find(m => m.id === previewActiveMenu);
+                                                        if (!activeItemObj || !activeItemObj.isMega) {
+                                                            return (
+                                                                <div class="text-center py-16 text-slate-400 text-xs">
+                                                                    <i data-lucide="mouse-pointer" class="w-6 h-6 mx-auto mb-2 text-slate-300"></i>
+                                                                    Hover or click a menu item above with mega menu enabled (e.g. <strong>Products</strong>)
+                                                                </div>
+                                                            );
+                                                        }
+
+                                                        const cols = activeItemObj.columns || [];
+                                                        const colCount = activeItemObj.columnCount || 4;
+                                                        const isFull = activeItemObj.dropdownWidth === 'full';
+
+                                                        return (
+                                                            <div id="desktop-dropdown-overlay" class={`bg-white rounded-xl border border-border shadow-dropdown p-5 mx-auto transition-all animate-in fade-in slide-in-from-top-2 ${isFull ? 'w-full' : 'max-w-xl'}`}>
+                                                                <div class={`grid gap-5`} style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
+                                                                    {cols.map((col) => (
+                                                                        <div key={col.id} class="space-y-2">
+                                                                            <h4 class="text-xs font-bold text-main uppercase tracking-wider pb-1 border-b border-slate-100 flex items-center justify-between">
+                                                                                <span>{col.title}</span>
+                                                                            </h4>
+                                                                            <ul class="space-y-1.5">
+                                                                                {col.items.map((link) => (
+                                                                                    <li key={link.id}>
+                                                                                        <a href={link.url} onClick={(e) => e.preventDefault()} class="text-xs text-secondary hover:text-primary transition-colors flex items-center justify-between group">
+                                                                                            <span class="truncate">{link.title}</span>
+                                                                                            {link.badge && (
+                                                                                                <span class="text-[9px] font-bold bg-blue-100 text-primary px-1.5 py-0.2 rounded-full">{link.badge}</span>
+                                                                                            )}
+                                                                                        </a>
+                                                                                    </li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+
+                                                                {/* Promotional Card Footer within Mega Menu */}
+                                                                <div id="mega-promo-box" class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-xl border border-blue-100">
+                                                                    <div class="flex items-center gap-3">
+                                                                        <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+                                                                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                                                        </div>
+                                                                        <div>
+                                                                            <div class="text-xs font-bold text-main">New Fall Season Pre-Order</div>
+                                                                            <div class="text-[11px] text-secondary">Get 10% off with coupon code RAKA10</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <span class="text-xs font-semibold text-primary">Explore &rarr;</span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+                                            )}
+
+                                            {/* ================= MOBILE ACCORDION PREVIEW ================= */}
+                                            {previewMode === 'mobile' && (
+                                                <div id="mobile-viewport-container" class="max-w-xs mx-auto bg-white rounded-xl border border-border shadow-sm p-3">
+                                                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">Mobile Navigation</div>
+                                                    <div class="divide-y divide-slate-100">
+                                                        {menuItems.map(item => {
+                                                            const isAccOpen = !!mobileOpenAccordions[item.id];
+                                                            return (
+                                                                <div key={item.id} class="py-2">
+                                                                    <div
+                                                                        onClick={() => {
+                                                                            if (globalMobileAccordion && item.isMega) {
+                                                                                setMobileOpenAccordions(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+                                                                            }
+                                                                        }}
+                                                                        class="flex items-center justify-between text-xs font-semibold text-main cursor-pointer px-1 hover:text-primary"
+                                                                    >
+                                                                        <div class="flex items-center gap-2">
+                                                                            {globalShowIcons && <i data-lucide={item.isMega ? 'layers' : 'link'} class="w-3.5 h-3.5 text-slate-400"></i>}
+                                                                            <span>{item.label}</span>
+                                                                        </div>
+                                                                        {item.isMega && globalMobileAccordion && (
+                                                                            <i data-lucide={isAccOpen ? 'chevron-up' : 'chevron-down'} class="w-3.5 h-3.5 text-slate-400"></i>
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* Expanded Accordion in Mobile */}
+                                                                    {item.isMega && isAccOpen && (
+                                                                        <div class="mt-2 pl-4 pr-1 space-y-3 pt-2 border-t border-slate-50">
+                                                                            {(item.columns || []).map(col => (
+                                                                                <div key={col.id} class="space-y-1">
+                                                                                    <div class="text-[11px] font-bold text-secondary uppercase tracking-wider">{col.title}</div>
+                                                                                    <div class="space-y-1 pl-2 border-l border-slate-200">
+                                                                                        {col.items.map(link => (
+                                                                                            <div key={link.id} class="text-xs text-slate-700 py-0.5 flex items-center justify-between">
+                                                                                                <span>{link.title}</span>
+                                                                                                {link.badge && <span class="text-[9px] bg-slate-100 px-1 rounded">{link.badge}</span>}
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {/* ══════════════════════════════════════════════════════════
+                            SECTION F: Visibility & Behavior (Bottom Horizontal Card)
+                           ══════════════════════════════════════════════════════════ */}
+                        <div id="section-visibility-behavior" class="mt-6">
+                            <div id="card-visibility-settings" class="bg-card rounded-xl border border-border p-5 shadow-card">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <i data-lucide="settings-2" class="w-4 h-4 text-primary"></i>
+                                    <h3 class="text-sm font-bold text-main">Visibility & Behavior Settings</h3>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {/* Toggle 1: Hover to Open */}
+                                    <div class="flex items-start justify-between p-3.5 rounded-xl bg-slate-50 border border-border">
+                                        <div class="space-y-0.5 pr-2">
+                                            <div class="text-xs font-semibold text-main">Hover to open</div>
+                                            <p class="text-[11px] text-secondary">Open the mega menu dropdown on cursor hover instead of click</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                                            <input
+                                                id="toggle-hover-open"
+                                                type="checkbox"
+                                                checked={globalHoverOpen}
+                                                onChange={(e) => setGlobalHoverOpen(e.target.checked)}
+                                                class="sr-only peer"
+                                            />
+                                            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                        </label>
+                                    </div>
+
+                                    {/* Toggle 2: Show Icons */}
+                                    <div class="flex items-start justify-between p-3.5 rounded-xl bg-slate-50 border border-border">
+                                        <div class="space-y-0.5 pr-2">
+                                            <div class="text-xs font-semibold text-main">Show icons</div>
+                                            <p class="text-[11px] text-secondary">Display item category and navigation icons in menu headers</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                                            <input
+                                                id="toggle-show-icons"
+                                                type="checkbox"
+                                                checked={globalShowIcons}
+                                                onChange={(e) => setGlobalShowIcons(e.target.checked)}
+                                                class="sr-only peer"
+                                            />
+                                            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                        </label>
+                                    </div>
+
+                                    {/* Toggle 3: Mobile Accordion */}
+                                    <div class="flex items-start justify-between p-3.5 rounded-xl bg-slate-50 border border-border">
+                                        <div class="space-y-0.5 pr-2">
+                                            <div class="text-xs font-semibold text-main">Mobile accordion</div>
+                                            <p class="text-[11px] text-secondary">Collapse column submenus into expandable accordion on smaller screens</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                                            <input
+                                                id="toggle-mobile-accordion"
+                                                type="checkbox"
+                                                checked={globalMobileAccordion}
+                                                onChange={(e) => setGlobalMobileAccordion(e.target.checked)}
+                                                class="sr-only peer"
+                                            />
+                                            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </main>
+
+                    {/* Footer note */}
+                    <footer id="app-footer" class="py-4 border-t border-border bg-white text-center text-xs text-secondary">
+                        <div class="max-w-[1720px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+                            <span>Mega Menu Settings UI (Frontend Interactive Mockup)</span>
+                            <span class="font-mono text-[11px] text-slate-400">Design System: Clean SaaS · Inter / Noto Sans Thai · #4169F7</span>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        const rootElement = document.getElementById('root');
+        ReactDOM.render(<App />, rootElement);
+    </script>
+</body>
+</html>
