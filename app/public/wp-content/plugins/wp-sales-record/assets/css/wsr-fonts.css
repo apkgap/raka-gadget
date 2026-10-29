@@ -1,0 +1,28 @@
+@font-face {
+    font-family: 'Prompt';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/prompt/Prompt-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Prompt';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/prompt/Prompt-Medium.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Prompt';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/prompt/Prompt-SemiBold.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Prompt';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/prompt/Prompt-Bold.woff2') format('woff2');
+}

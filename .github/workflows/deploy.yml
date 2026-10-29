@@ -28,17 +28,20 @@ jobs:
           DEPLOY_THEME=false
           DEPLOY_PREORDER=false
           DEPLOY_PASSKEYS=false
+          DEPLOY_SALES_RECORD=false
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             DEPLOY_THEME=true
             DEPLOY_PREORDER=true
             DEPLOY_PASSKEYS=true
+            DEPLOY_SALES_RECORD=true
           else
             if ! CHANGED_FILES="$( git diff --name-only "${GITHUB_SHA}^" "$GITHUB_SHA" )"; then
               echo "Could not determine changed files; deploying all components."
               DEPLOY_THEME=true
               DEPLOY_PREORDER=true
               DEPLOY_PASSKEYS=true
+              DEPLOY_SALES_RECORD=true
             elif grep -qE '^(\.github/workflows/deploy\.yml|app/public/wp-content/themes/raka-preorder-theme/)' <<< "$CHANGED_FILES"; then
               DEPLOY_THEME=true
             fi
@@ -50,9 +53,13 @@ jobs:
             if grep -qE '^(\.github/workflows/deploy\.yml|app/public/wp-content/plugins/my-wc-passkeys/)' <<< "$CHANGED_FILES"; then
               DEPLOY_PASSKEYS=true
             fi
+
+            if grep -qE '^(\.github/workflows/deploy\.yml|app/public/wp-content/plugins/wp-sales-record/)' <<< "$CHANGED_FILES"; then
+              DEPLOY_SALES_RECORD=true
+            fi
           fi
 
-          if [[ "$DEPLOY_THEME" == true || "$DEPLOY_PREORDER" == true || "$DEPLOY_PASSKEYS" == true ]]; then
+          if [[ "$DEPLOY_THEME" == true || "$DEPLOY_PREORDER" == true || "$DEPLOY_PASSKEYS" == true || "$DEPLOY_SALES_RECORD" == true ]]; then
             DEPLOY_ANY=true
           else
             DEPLOY_ANY=false
@@ -61,6 +68,7 @@ jobs:
           echo "theme=$DEPLOY_THEME" >> "$GITHUB_OUTPUT"
           echo "preorder=$DEPLOY_PREORDER" >> "$GITHUB_OUTPUT"
           echo "passkeys=$DEPLOY_PASSKEYS" >> "$GITHUB_OUTPUT"
+          echo "sales_record=$DEPLOY_SALES_RECORD" >> "$GITHUB_OUTPUT"
           echo "any=$DEPLOY_ANY" >> "$GITHUB_OUTPUT"
 
       - name: Install lftp
@@ -88,17 +96,21 @@ jobs:
           if [[ "$PLUGIN_RAW" == *"preorder-raka" ]]; then
             PREORDER_DIR="$PLUGIN_RAW"
             PASSKEYS_DIR="${PLUGIN_RAW%/preorder-raka}/my-wc-passkeys"
+            SALES_RECORD_DIR="${PLUGIN_RAW%/preorder-raka}/wp-sales-record"
           else
             PREORDER_DIR="${PLUGIN_RAW}/preorder-raka"
             PASSKEYS_DIR="${PLUGIN_RAW}/my-wc-passkeys"
+            SALES_RECORD_DIR="${PLUGIN_RAW}/wp-sales-record"
           fi
 
-          echo "Target Theme Dir:    $THEME_DIR"
-          echo "Target Preorder Dir: $PREORDER_DIR"
-          echo "Target Passkeys Dir: $PASSKEYS_DIR"
-          echo "Deploy Theme:        ${{ steps.changes.outputs.theme }}"
-          echo "Deploy Preorder:     ${{ steps.changes.outputs.preorder }}"
-          echo "Deploy Passkeys:     ${{ steps.changes.outputs.passkeys }}"
+          echo "Target Theme Dir:        $THEME_DIR"
+          echo "Target Preorder Dir:     $PREORDER_DIR"
+          echo "Target Passkeys Dir:     $PASSKEYS_DIR"
+          echo "Target Sales Record Dir: $SALES_RECORD_DIR"
+          echo "Deploy Theme:            ${{ steps.changes.outputs.theme }}"
+          echo "Deploy Preorder:         ${{ steps.changes.outputs.preorder }}"
+          echo "Deploy Passkeys:         ${{ steps.changes.outputs.passkeys }}"
+          echo "Deploy Sales Record:     ${{ steps.changes.outputs.sales_record }}"
 
           LFTP_COMMANDS="$( mktemp )"
           {
@@ -125,6 +137,11 @@ jobs:
             if [[ "${{ steps.changes.outputs.passkeys }}" == 'true' ]]; then
               echo 'echo "=== Deploying my-wc-passkeys plugin ===";'
               echo "mirror -R -v --only-newer --exclude-glob .git* --exclude-glob node_modules/ --exclude-glob src/ --exclude-glob package*.json --exclude-glob AGENTS.md --exclude-glob .windsurf/ ./app/public/wp-content/plugins/my-wc-passkeys/ \"$PASSKEYS_DIR/\";"
+            fi
+
+            if [[ "${{ steps.changes.outputs.sales_record }}" == 'true' ]]; then
+              echo 'echo "=== Deploying wp-sales-record plugin ===";'
+              echo "mirror -R -v --only-newer --exclude-glob .git* --exclude-glob node_modules/ --exclude-glob src/ --exclude-glob package*.json --exclude-glob AGENTS.md --exclude-glob .windsurf/ ./app/public/wp-content/plugins/wp-sales-record/ \"$SALES_RECORD_DIR/\";"
             fi
 
             echo 'quit'
