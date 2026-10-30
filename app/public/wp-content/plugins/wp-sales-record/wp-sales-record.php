@@ -66,6 +66,7 @@ function wsr_enqueue_admin_scripts($hook_suffix)
     $allowed_screens = array(
         'customer',
         'product',
+        'edit-product',
         'sales_record',
         'toplevel_page_wsr-dashboard',
         'wsr-dashboard_page_wsr-graph-analysis',

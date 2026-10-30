@@ -66,7 +66,7 @@ class WSR_POS
 
         $args = array(
             'post_type'      => 'customer',
-            'posts_per_page' => 30,
+            'posts_per_page' => 200,
             'post_status'    => array('publish', 'private', 'draft', 'pending'),
             'orderby'        => 'title',
             'order'          => 'ASC',
@@ -121,7 +121,7 @@ class WSR_POS
         
         $args = array(
             'post_type' => 'product',
-            'posts_per_page' => 40,
+            'posts_per_page' => 200,
             'post_status' => 'publish',
         );
 

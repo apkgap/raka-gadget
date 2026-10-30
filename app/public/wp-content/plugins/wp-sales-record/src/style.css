@@ -110,7 +110,7 @@
     border: 1px solid var(--wsr-border);
     border-radius: var(--wsr-radius);
     box-shadow: var(--wsr-shadow);
-    overflow: hidden;
+    overflow: visible;
     transition: all .15s ease;
 }
 .wsr-card:hover {
@@ -124,6 +124,7 @@
     padding: 14px 18px;
     border-bottom: 1px solid var(--wsr-border);
     background: #fafbfc;
+    border-radius: var(--wsr-radius) var(--wsr-radius) 0 0;
 }
 .wsr-card__icon {
     width: 28px; height: 28px;
@@ -270,15 +271,14 @@
 /* ─── Search ─────────────────────────────────────── */
 .wsr-search { position: relative; }
 .wsr-search__results {
-    position: absolute;
-    top: calc(100% + 6px);
-    left: 0; right: 0;
+    position: relative;
+    margin-top: 8px;
     background: #fff;
-    border: 1px solid var(--wsr-border);
+    border: 1px solid #cbd5e1;
     border-radius: var(--wsr-radius-sm);
     box-shadow: var(--wsr-shadow-md);
-    z-index: 20;
-    max-height: 320px;
+    z-index: 30;
+    max-height: 280px;
     overflow-y: auto;
     animation: wsr-fadein-down .15s ease;
 }
@@ -1334,4 +1334,15 @@
     color: #b91c1c;
     border-color: #fecaca;
 }
+
+/* Fix WooCommerce product list table custom taxonomy columns squishing */
+table.wp-list-table .column-taxonomy-wsr_brand,
+table.wp-list-table .column-taxonomy-wsr_model,
+table.wp-list-table .column-taxonomy-wsr_product_cat {
+    width: 9%;
+    min-width: 85px;
+    white-space: normal;
+    word-break: keep-all;
+}
+
 

@@ -29,6 +29,8 @@ const POSSystem = () => {
     const [prodSearching, setProdSearching] = useState(false);
     const [prodError, setProdError] = useState('');
     const [custError, setCustError] = useState('');
+    const [custFocused, setCustFocused] = useState(false);
+    const [prodFocused, setProdFocused] = useState(false);
 
     // Cart State
     const [cart, setCart] = useState([]);
@@ -121,65 +123,115 @@ const POSSystem = () => {
         };
     }, [selectedCustomer]);
 
-    // Customer Search (server-side, debounced)
+    // Preload initial customers & products for instant 0ms search + focus list
+    useEffect(() => {
+        let canceled = false;
+        const preload = async () => {
+            try {
+                const [cRes, pRes] = await Promise.all([
+                    apiFetch({ path: '/wsr/v1/pos/search-customers' }),
+                    apiFetch({ path: '/wsr/v1/pos/search-products' }),
+                ]);
+                if (canceled) return;
+                if (Array.isArray(cRes)) setAllCustomers(cRes);
+                if (Array.isArray(pRes)) setAllProducts(pRes);
+            } catch (e) {
+                console.error('POS preload error:', e);
+            }
+        };
+        preload();
+        return () => {
+            canceled = true;
+        };
+    }, []);
+
+    // Customer Search (instant local filter + debounced server search, works from 1 char or on focus)
     useEffect(() => {
         const term = custSearch.trim();
-        if (term.length < 2) {
-            setCustResults([]);
+        if (term.length === 0) {
+            setCustResults(custFocused ? allCustomers.slice(0, 15) : []);
             setCustError('');
             setCustSearching(false);
             return;
         }
+
+        const lower = term.toLowerCase();
+        const localMatches = allCustomers.filter(c =>
+            (c.name && c.name.toLowerCase().includes(lower)) ||
+            (c.phone && String(c.phone).toLowerCase().includes(lower)) ||
+            (c.social && String(c.social).toLowerCase().includes(lower))
+        ).slice(0, 30);
+        setCustResults(localMatches);
+
         let canceled = false;
         setCustSearching(true);
         const timer = setTimeout(async () => {
             try {
                 const res = await apiFetch({ path: `/wsr/v1/pos/search-customers?q=${encodeURIComponent(term)}` });
                 if (canceled) return;
-                setCustResults(Array.isArray(res) ? res : []);
+                if (Array.isArray(res)) {
+                    const mergedMap = new Map();
+                    localMatches.forEach(item => mergedMap.set(item.id, item));
+                    res.forEach(item => mergedMap.set(item.id, item));
+                    setCustResults(Array.from(mergedMap.values()).slice(0, 30));
+                }
                 setCustError('');
             } catch (err) {
                 if (canceled) return;
-                setCustResults([]);
-                setCustError((err && err.message) || 'ค้นหาลูกค้าไม่สำเร็จ');
+                if (localMatches.length === 0) {
+                    setCustError((err && err.message) || 'ค้นหาลูกค้าไม่สำเร็จ');
+                }
             }
             if (!canceled) setCustSearching(false);
-        }, 250);
+        }, 200);
         return () => {
             canceled = true;
             clearTimeout(timer);
         };
-    }, [custSearch]);
+    }, [custSearch, custFocused, allCustomers]);
 
-    // Product Search (server-side, debounced)
+    // Product Search (instant local filter + debounced server search, works from 1 char or on focus)
     useEffect(() => {
         const term = prodSearch.trim();
         if (term.length === 0) {
-            setProdResults([]);
+            setProdResults(prodFocused ? allProducts.slice(0, 20) : []);
             setProdError('');
             setProdSearching(false);
             return;
         }
+
+        const lower = term.toLowerCase();
+        const localMatches = allProducts.filter(p =>
+            p.name && p.name.toLowerCase().includes(lower)
+        ).slice(0, 30);
+        setProdResults(localMatches);
+
         let canceled = false;
         setProdSearching(true);
         const timer = setTimeout(async () => {
             try {
                 const res = await apiFetch({ path: `/wsr/v1/pos/search-products?q=${encodeURIComponent(term)}` });
                 if (canceled) return;
-                setProdResults(Array.isArray(res) ? res : []);
+                if (Array.isArray(res)) {
+                    const mergedMap = new Map();
+                    localMatches.forEach(item => mergedMap.set(item.id, item));
+                    res.forEach(item => mergedMap.set(item.id, item));
+                    setProdResults(Array.from(mergedMap.values()).slice(0, 40));
+                }
                 setProdError('');
             } catch (err) {
                 if (canceled) return;
-                setProdResults([]);
-                setProdError((err && err.message) || 'ค้นหาสินค้าไม่สำเร็จ');
+                if (localMatches.length === 0) {
+                    setProdError((err && err.message) || 'ค้นหาสินค้าไม่สำเร็จ');
+                }
             }
             if (!canceled) setProdSearching(false);
-        }, 250);
+        }, 200);
         return () => {
             canceled = true;
             clearTimeout(timer);
         };
-    }, [prodSearch]);
+    }, [prodSearch, prodFocused, allProducts]);
 
     const addToCart = (product) => {
         setCart(prev => {
@@ -480,36 +532,61 @@ const POSSystem = () => {
                         </header>
                         <div className="wsr-card__body">
                             {!selectedCustomer && !isNewCustomer && (
-                                <div className="wsr-search">
-                                    <input
-                                        type="text"
-                                        placeholder="พิมพ์ชื่อลูกค้า หรือเบอร์โทร 2 หลักขึ้นไป…"
-                                        value={custSearch}
-                                        onChange={e => setCustSearch(e.target.value)}
-                                        className="wsr-pos-input"
-                                    />
-                                    {custResults.length > 0 && (
-                                        <div className="wsr-search__results">
-                                            {custResults.map(c => (
-                                                <div key={c.id} className="wsr-search__item" onClick={() => setSelectedCustomer(c)}>
-                                                    <div className="wsr-search__item-main">{c.name}</div>
-                                                    <div className="wsr-search__item-sub">{c.phone || '—'}{c.social ? ` · ${c.social}` : ''}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                    {custSearching && <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>กำลังค้นหา…</div>}
-                                    {custError && <div className="wsr-search__item-sub" style={{ padding: '8px 4px', color: '#ef4444' }}>{custError}</div>}
-                                    {!custSearching && !custError && custSearch.trim().length >= 2 && custResults.length === 0 && (
-                                        <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>ไม่พบลูกค้า "{custSearch.trim()}" — กด "เพิ่มลูกค้าใหม่" ด้านล่างได้เลย</div>
-                                    )}
+                                <>
+                                    <div className="wsr-search">
+                                        <input
+                                            type="text"
+                                            placeholder="คลิกเพื่อเลือกลูกค้า หรือพิมพ์ชื่อ / เบอร์โทรเพื่อค้นหา…"
+                                            value={custSearch}
+                                            onFocus={() => setCustFocused(true)}
+                                            onBlur={() => setTimeout(() => setCustFocused(false), 180)}
+                                            onChange={e => {
+                                                setCustSearch(e.target.value);
+                                                setCustFocused(true);
+                                            }}
+                                            className="wsr-pos-input"
+                                        />
+                                        {custResults.length > 0 && (
+                                            <div className="wsr-search__results">
+                                                {custResults.map(c => (
+                                                    <div
+                                                        key={c.id}
+                                                        className="wsr-search__item"
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault();
+                                                            setSelectedCustomer(c);
+                                                            setCustFocused(false);
+                                                        }}
+                                                        onClick={() => {
+                                                            setSelectedCustomer(c);
+                                                            setCustFocused(false);
+                                                        }}
+                                                    >
+                                                        <div className="wsr-search__item-main">{c.name}</div>
+                                                        <div className="wsr-search__item-sub">{c.phone && c.phone !== '-' ? c.phone : 'ไม่ระบุเบอร์'}{c.social ? ` · ${c.social}` : ''}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {custSearching && custResults.length === 0 && (
+                                            <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>กำลังค้นหา…</div>
+                                        )}
+                                        {custError && (
+                                            <div className="wsr-search__item-sub" style={{ padding: '8px 4px', color: '#ef4444' }}>{custError}</div>
+                                        )}
+                                        {!custSearching && !custError && custSearch.trim().length >= 1 && custResults.length === 0 && (
+                                            <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>
+                                                ไม่พบลูกค้า "{custSearch.trim()}" — กด "เพิ่มลูกค้าใหม่" ด้านล่างได้เลย
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="wsr-card__divider">
                                         <span>หรือ</span>
                                     </div>
                                     <button type="button" className="wsr-btn wsr-btn--outline wsr-btn--block" onClick={() => setIsNewCustomer(true)}>
                                         <RiAddCircleFill size={18} /> เพิ่มลูกค้าใหม่
                                     </button>
-                                </div>
+                                </>
                             )}
 
                             {selectedCustomer && (
@@ -558,15 +635,32 @@ const POSSystem = () => {
                             <div className="wsr-search wsr-search--accent">
                                 <input
                                     type="text"
-                                    placeholder="พิมพ์ชื่อสินค้าเพื่อเพิ่มลงตะกร้า…"
+                                    placeholder="คลิกเพื่อเลือกสินค้า หรือพิมพ์ชื่อสินค้าเพื่อค้นหา…"
                                     value={prodSearch}
-                                    onChange={e => setProdSearch(e.target.value)}
+                                    onFocus={() => setProdFocused(true)}
+                                    onBlur={() => setTimeout(() => setProdFocused(false), 180)}
+                                    onChange={e => {
+                                        setProdSearch(e.target.value);
+                                        setProdFocused(true);
+                                    }}
                                     className="wsr-pos-input wsr-pos-input--accent"
                                 />
                                 {prodResults.length > 0 && (
                                     <div className="wsr-search__results">
                                         {prodResults.map(p => (
-                                            <div key={p.id} className="wsr-search__item wsr-search__item--product" onClick={() => addToCart(p)}>
+                                            <div
+                                                key={p.id}
+                                                className="wsr-search__item wsr-search__item--product"
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    addToCart(p);
+                                                    setProdFocused(false);
+                                                }}
+                                                onClick={() => {
+                                                    addToCart(p);
+                                                    setProdFocused(false);
+                                                }}
+                                            >
                                                 <div className="wsr-search__item-body">
                                                     <div className="wsr-search__item-main">{p.name}</div>
                                                     <div className="wsr-search__item-sub">{p.stock === null ? 'มีของ: ไม่จำกัด' : (p.stock > 0 ? `มีของ: ${p.stock}` : 'สินค้าหมด')} · ทุน ฿{(p.cost || 0).toLocaleString()}</div>
