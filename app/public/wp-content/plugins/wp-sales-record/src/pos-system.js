@@ -780,6 +780,26 @@ const POSSystem = () => {
                     </div>
                 </aside>
             </div>
+
+            {/* Mobile Fixed Bottom Summary & Action Bar */}
+            <div className="wsr-pos-mobile-bar">
+                <div className="wsr-pos-mobile-bar__info">
+                    <span className="wsr-pos-mobile-bar__label">{cart.length} รายการ · สุทธิ:</span>
+                    <span className="wsr-pos-mobile-bar__amount">฿{netTotal.toLocaleString()}</span>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => {
+                        const side = document.querySelector('.wsr-pos__side');
+                        if (side) {
+                            side.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }}
+                    className="wsr-pos-mobile-bar__btn"
+                >
+                    ดูยอดสรุป / บันทึก
+                </button>
+            </div>
         </div>
     );
 };
