@@ -140,33 +140,62 @@ class WSR_POS
             $args['s'] = $keyword;
         }
 
-        $query = new WP_Query($args);
-        $results = array();
-        foreach ($query->posts as $post) {
-            $price = get_post_meta($post->ID, 'wsr_default_price', true);
-            if ($price === '' || (float)$price <= 0) {
-                $price = get_post_meta($post->ID, '_price', true);
-                if ($price === '') {
-                    $price = get_post_meta($post->ID, '_regular_price', true);
-                }
-            }
-            $cost = get_post_meta($post->ID, 'wsr_default_cost', true);
-            if ($cost === '') {
-                $cost = get_post_meta($post->ID, '_cost', true);
-            }
-            $lazada_order = get_post_meta($post->ID, 'wsr_lazada_order', true);
-            $stock = '';
-
-            $results[] = array(
-                'id' => $post->ID,
-                'name' => $post->post_title,
-                'price' => (float)$price,
-                'cost' => (float)$cost,
-                'lazada_order' => is_string($lazada_order) ? trim($lazada_order) : '',
-                'stock' => $stock !== '' ? (int)$stock : null
-            );
+        $include = array_filter(array_map('intval', explode(',', (string) $request->get_param('include'))));
+        if (!empty($include)) {
+            $args['post__in'] = $include;
+            $args['post_status'] = 'any';
+            $args['post_type'] = array('product', 'product_variation');
+            $args['orderby'] = 'post__in';
         }
 
+        $query = new WP_Query($args);
+        $results = array();
+
+        $push = function ($product, $name) use (&$results) {
+            $id = $product->get_id();
+            $price = $product->get_price();
+            if ($price === '' || (float) $price <= 0) {
+                $price = $product->get_regular_price();
+            }
+            if ($price === '' || (float) $price <= 0) {
+                $price = get_post_meta($id, 'wsr_default_price', true);
+            }
+            $cost = get_post_meta($id, 'wsr_default_cost', true);
+            if ($cost === '') {
+                $cost = get_post_meta($id, '_cost', true);
+            }
+            if ($cost === '' && $product->is_type('variation')) {
+                $cost = get_post_meta($product->get_parent_id(), 'wsr_default_cost', true);
+            }
+            $lazada_order = get_post_meta($id, 'wsr_lazada_order', true);
+            $stock = $product->managing_stock() ? $product->get_stock_quantity() : null;
+
+            $results[] = array(
+                'id' => $id,
+                'name' => $name,
+                'price' => (float) $price,
+                'cost' => (float) $cost,
+                'lazada_order' => is_string($lazada_order) ? trim($lazada_order) : '',
+                'stock' => $stock !== null ? (int) $stock : null,
+            );
+        };
+
+        foreach ($query->posts as $post) {
+            $product = function_exists('wc_get_product') ? wc_get_product($post->ID) : null;
+            if (! $product) {
+                continue;
+            }
+            if ($product->is_type('variable')) {
+                foreach ($product->get_children() as $vid) {
+                    $variation = wc_get_product($vid);
+                    if ($variation && $variation->get_status() === 'publish') {
+                        $push($variation, wp_strip_all_tags($variation->get_name()));
+                    }
+                }
+            } else {
+                $push($product, wp_strip_all_tags($product->get_name()));
+            }
+        }
         return rest_ensure_response($results);
     }
 

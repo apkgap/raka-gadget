@@ -2,6 +2,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { TextControl, SelectControl, TextareaControl, BaseControl, Button } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import Select from 'react-select'; // react-select for nice searchable dropdowns
+import AsyncSelect from 'react-select/async';
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 
 const SalesRecordMetaFields = ( { postId } ) => {
@@ -12,7 +13,7 @@ const SalesRecordMetaFields = ( { postId } ) => {
 
     // --- References to options ---
     const [ customerOptions, setCustomerOptions ] = useState( [] );
-    const [ productOptions, setProductOptions ] = useState( [] );
+    const [ lines, setLines ] = useState( [] );
 
     const [ selectedCustomerProfile, setSelectedCustomerProfile ] = useState( null );
     const [ customerAvatarPreviewUrl, setCustomerAvatarPreviewUrl ] = useState( '' );
@@ -43,16 +44,15 @@ const SalesRecordMetaFields = ( { postId } ) => {
                 const customers = await apiFetch( { path: '/wp/v2/customers?per_page=100' } );
                 setCustomerOptions( customers.map( c => ( { value: c.id, label: c.title.rendered } ) ) );
 
-                // Load Products
-                const products = await apiFetch( { path: '/wp/v2/products?per_page=100' } );
-                setProductOptions( products.map( p => ( { 
-                    value: p.id, 
-                    label: p.title.rendered,
-                    cost: p.meta.wsr_default_cost,
-                    price: p.meta.wsr_default_price,
-                    lazadaOrder: p.meta.wsr_lazada_order
-                } ) ) );
-                
+                // Load selected products (grouped by id => qty) with live WooCommerce price/cost
+                const ids = Array.isArray( post.meta?.wsr_product_ids ) ? post.meta.wsr_product_ids.map( Number ).filter( Boolean ) : [];
+                if ( ids.length ) {
+                    const qtyMap = {};
+                    ids.forEach( ( id ) => { qtyMap[ id ] = ( qtyMap[ id ] || 0 ) + 1; } );
+                    const uniq = Object.keys( qtyMap );
+                    const found = await apiFetch( { path: '/wsr/v1/pos/search-products?include=' + uniq.join( ',' ) } );
+                    setLines( found.map( ( p ) => ( { ...p, qty: qtyMap[ p.id ] || 1 } ) ) );
+                }
                 setIsLoading( false );
             } catch (error) {
                 console.error("Error loading sales record dependencies:", error);
@@ -171,43 +171,42 @@ const SalesRecordMetaFields = ( { postId } ) => {
         };
     }, [meta.wsr_observed_avatar_id, meta.wsr_observed_avatar_url]);
     
-    // Ensure wsr_product_ids is an array
-    const selectedProductIds = Array.isArray(meta.wsr_product_ids) ? meta.wsr_product_ids : [];
-    const selectedProducts = productOptions.filter( opt => selectedProductIds.includes( opt.value ) );
+    const selectedProductIds = lines.flatMap( ( l ) => Array( Math.max( 1, Number( l.qty ) || 1 ) ).fill( l.id ) );
 
-    // On Product Change -> Update Meta and Recalculate Defaults
-    const handleProductChange = ( selectedOptions ) => {
-        const newSelected = selectedOptions || [];
-        const newIds = newSelected.map( opt => opt.value );
-        
-        let newTotalCost = 0;
-        let newTotalPrice = 0;
-        
-        newSelected.forEach(opt => {
-             newTotalCost += Number(opt.cost) || 0;
-             newTotalPrice += Number(opt.price) || 0;
-        });
+    const loadProductOptions = ( input ) =>
+        apiFetch( { path: '/wsr/v1/pos/search-products?q=' + encodeURIComponent( input || '' ) } )
+            .then( ( list ) => list.slice( 0, 50 ).map( ( p ) => ( { value: p.id, label: p.name, product: p } ) ) )
+            .catch( () => [] );
 
-        const lazadaOrders = Array.from(
-            new Set(
-                newSelected
-                    .map((opt) => (opt && opt.lazadaOrder ? String(opt.lazadaOrder).trim() : ''))
-                    .filter((v) => v !== '')
-            )
-        );
-
-        const newMeta = {
-            ...meta,
-            wsr_product_ids: newIds,
-            wsr_cost_price: newTotalCost,
-            wsr_selling_price: newTotalPrice,
-            wsr_bargained_price: newTotalPrice,
-            wsr_lazada_order: lazadaOrders.join(', ')
-        };
-        
-        setMeta(newMeta);
+    // Recalculate totals from lines and sync into meta
+    const applyLines = ( nextLines ) => {
+        setLines( nextLines );
+        const totalCost = nextLines.reduce( ( s, l ) => s + ( Number( l.cost ) || 0 ) * ( Number( l.qty ) || 0 ), 0 );
+        const totalPrice = nextLines.reduce( ( s, l ) => s + ( Number( l.price ) || 0 ) * ( Number( l.qty ) || 0 ), 0 );
+        const lazada = Array.from( new Set( nextLines.map( ( l ) => String( l.lazada_order || '' ).trim() ).filter( Boolean ) ) );
+        setMeta( ( m ) => ( {
+            ...m,
+            wsr_cost_price: totalCost,
+            wsr_selling_price: totalPrice,
+            wsr_bargained_price: totalPrice,
+            wsr_lazada_order: lazada.length ? lazada.join( ', ' ) : m.wsr_lazada_order,
+        } ) );
     };
 
+    const addProduct = ( option ) => {
+        if ( ! option ) return;
+        const exists = lines.find( ( l ) => l.id === option.value );
+        if ( exists ) {
+            applyLines( lines.map( ( l ) => ( l.id === option.value ? { ...l, qty: ( Number( l.qty ) || 0 ) + 1 } : l ) ) );
+        } else {
+            applyLines( [ ...lines, { ...option.product, qty: 1 } ] );
+        }
+    };
+
+    const updateLine = ( id, key, value ) =>
+        applyLines( lines.map( ( l ) => ( l.id === id ? { ...l, [ key ]: value === '' ? '' : Number( value ) } : l ) ) );
+
+    const removeLine = ( id ) => applyLines( lines.filter( ( l ) => l.id !== id ) );
     if ( isLoading ) {
         return <p>กำลังโหลดข้อมูลรายการขาย...</p>;
     }
@@ -367,18 +366,45 @@ const SalesRecordMetaFields = ( { postId } ) => {
             </div>
             
             <div className="wsr-meta-field" style={{marginBottom: '20px'}}>
-                <BaseControl label="เลือกสินค้า">
-                    <Select
-                        isMulti
-                        value={selectedProducts}
-                        onChange={handleProductChange}
-                        options={productOptions}
-                        className="basic-multi-select"
+                <BaseControl label="เพิ่มสินค้า (ค้นหาจาก WooCommerce)">
+                    <AsyncSelect
+                        value={ null }
+                        loadOptions={ loadProductOptions }
+                        defaultOptions
+                        cacheOptions
+                        onChange={ addProduct }
                         classNamePrefix="select"
-                        placeholder="พิมพ์เพื่อค้นหาสินค้า..."
+                        placeholder="พิมพ์ชื่อสินค้าเพื่อค้นหา แล้วคลิกเพื่อเพิ่ม..."
+                        noOptionsMessage={ () => 'ไม่พบสินค้า' }
                     />
                 </BaseControl>
-                <p style={{fontSize: '11px', color: '#666', marginTop: '5px'}}>เมื่อเลือกสินค้า ระบบจะคำนวณราคาทุน/ราคาขายใหม่อัตโนมัติ</p>
+                { lines.length > 0 && (
+                    <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', marginTop: '12px', overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                            <thead>
+                                <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
+                                    <th style={{ padding: '8px 12px' }}>สินค้า</th>
+                                    <th style={{ padding: '8px', width: '70px' }}>จำนวน</th>
+                                    <th style={{ padding: '8px', width: '110px' }}>ต้นทุน/ชิ้น</th>
+                                    <th style={{ padding: '8px', width: '110px' }}>ราคา/ชิ้น</th>
+                                    <th style={{ padding: '8px', width: '40px' }}></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                { lines.map( ( l ) => (
+                                    <tr key={ l.id } style={{ borderTop: '1px solid #e2e8f0' }}>
+                                        <td style={{ padding: '8px 12px' }}>{ l.name }</td>
+                                        <td style={{ padding: '4px 8px' }}><input type="number" min="1" style={{ width: '100%' }} value={ l.qty } onChange={ ( e ) => updateLine( l.id, 'qty', e.target.value ) } /></td>
+                                        <td style={{ padding: '4px 8px' }}><input type="number" min="0" style={{ width: '100%' }} value={ l.cost } onChange={ ( e ) => updateLine( l.id, 'cost', e.target.value ) } /></td>
+                                        <td style={{ padding: '4px 8px' }}><input type="number" min="0" style={{ width: '100%' }} value={ l.price } onChange={ ( e ) => updateLine( l.id, 'price', e.target.value ) } /></td>
+                                        <td style={{ padding: '4px 8px' }}><Button isDestructive variant="tertiary" onClick={ () => removeLine( l.id ) } aria-label="ลบ">ลบ</Button></td>
+                                    </tr>
+                                ) ) }
+                            </tbody>
+                        </table>
+                    </div>
+                ) }
+                <p style={{fontSize: '11px', color: '#666', marginTop: '5px'}}>ปรับจำนวน/ต้นทุน/ราคาต่อชิ้นได้ ระบบจะรวมยอดต้นทุนและราคาขายให้อัตโนมัติ</p>
             </div>
 
             <hr style={{margin: '20px 0'}} />
