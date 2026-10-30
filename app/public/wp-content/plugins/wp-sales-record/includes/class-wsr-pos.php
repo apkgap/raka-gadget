@@ -62,34 +62,19 @@ class WSR_POS
 
     public function search_customers($request)
     {
-        $keyword = sanitize_text_field($request->get_param('q'));
-        
+        $keyword = sanitize_text_field((string) $request->get_param('q'));
+
         $args = array(
-            'post_type' => 'customer',
-            'posts_per_page' => -1,
-            'post_status' => 'publish',
+            'post_type'      => 'customer',
+            'posts_per_page' => 30,
+            'post_status'    => array('publish', 'private', 'draft', 'pending'),
+            'orderby'        => 'title',
+            'order'          => 'ASC',
         );
 
-        if (!empty($keyword)) {
-            // Search by title or metadata
-            $args['meta_query'] = array(
-                'relation' => 'OR',
-                array(
-                    'key' => 'wsr_customer_phone',
-                    'value' => $keyword,
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => 'wsr_customer_email',
-                    'value' => $keyword,
-                    'compare' => 'LIKE'
-                )
-            );
-            
-            // To also search title, we have to do a somewhat complex query, 
-            // but WP Core search works primarily on title/content. We'll use a hack or just rely on standard WP search plus filter
-            // Actually, querying both is slow. Let's just do a manual WP_Query with search
-            $args['_s'] = $keyword; // We will use a filter to include meta search
+        if ($keyword !== '') {
+            $args['_wsr_s'] = $keyword;
+            $args['suppress_filters'] = false;
         }
 
         add_filter('posts_search', array($this, 'custom_search_query'), 10, 2);
@@ -100,30 +85,34 @@ class WSR_POS
         foreach ($query->posts as $post) {
             $phone = get_post_meta($post->ID, 'wsr_customer_phone', true);
             $results[] = array(
-                'id' => $post->ID,
-                'name' => $post->post_title,
-                'phone' => $phone ? $phone : '-'
+                'id'     => $post->ID,
+                'name'   => $post->post_title,
+                'phone'  => $phone ? $phone : '-',
+                'social' => (string) get_post_meta($post->ID, 'wsr_social_name', true),
             );
         }
-        
-        // Return dummy customer if none matched but keyword looks like a new customer? 
-        // POS UI can handle "Create new customer"
 
         return rest_ensure_response($results);
     }
 
-    public function custom_search_query($search, $wp_query) {
+    public function custom_search_query($search, $wp_query)
+    {
         global $wpdb;
-        $q = $wp_query->query_vars;
-        if (isset($q['_s']) && !empty($q['_s'])) {
-            $keyword = esc_sql($wpdb->esc_like($q['_s']));
-            $search .= " OR EXISTS (
-                SELECT 1 FROM {$wpdb->postmeta}
-                WHERE post_id = {$wpdb->posts}.ID
-                AND (meta_key = 'wsr_customer_phone' AND meta_value LIKE '%{$keyword}%')
-            )";
+        $keyword = $wp_query->get('_wsr_s');
+        if (empty($keyword)) {
+            return $search;
         }
-        return $search;
+        $like = '%' . $wpdb->esc_like($keyword) . '%';
+        return $wpdb->prepare(
+            " AND ( {$wpdb->posts}.post_title LIKE %s OR EXISTS (
+                SELECT 1 FROM {$wpdb->postmeta} pm
+                WHERE pm.post_id = {$wpdb->posts}.ID
+                AND pm.meta_key IN ('wsr_customer_phone', 'wsr_customer_email', 'wsr_social_name')
+                AND pm.meta_value LIKE %s
+            ) ) ",
+            $like,
+            $like
+        );
     }
 
     public function search_products($request)
@@ -132,7 +121,7 @@ class WSR_POS
         
         $args = array(
             'post_type' => 'product',
-            'posts_per_page' => -1,
+            'posts_per_page' => 40,
             'post_status' => 'publish',
         );
 
@@ -143,6 +132,7 @@ class WSR_POS
         $include = array_filter(array_map('intval', explode(',', (string) $request->get_param('include'))));
         if (!empty($include)) {
             $args['post__in'] = $include;
+            $args['posts_per_page'] = -1;
             $args['post_status'] = 'any';
             $args['post_type'] = array('product', 'product_variation');
             $args['orderby'] = 'post__in';

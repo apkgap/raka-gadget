@@ -27,6 +27,8 @@ const POSSystem = () => {
     const [prodSearch, setProdSearch] = useState('');
     const [prodResults, setProdResults] = useState([]);
     const [prodSearching, setProdSearching] = useState(false);
+    const [prodError, setProdError] = useState('');
+    const [custError, setCustError] = useState('');
 
     // Cart State
     const [cart, setCart] = useState([]);
@@ -119,49 +121,65 @@ const POSSystem = () => {
         };
     }, [selectedCustomer]);
 
-    // Fetch Initial Data Once
+    // Customer Search (server-side, debounced)
     useEffect(() => {
-        const fetchInitialData = async () => {
-            try {
-                const [custRes, prodRes] = await Promise.all([
-                    apiFetch({ path: `/wsr/v1/pos/search-customers` }),
-                    apiFetch({ path: `/wsr/v1/pos/search-products` })
-                ]);
-                setAllCustomers(custRes || []);
-                setAllProducts(prodRes || []);
-            } catch (err) {
-                console.error("Error fetching POS data:", err);
-            }
-        };
-        fetchInitialData();
-    }, []);
-
-    // Customer Search Effect (Local)
-    useEffect(() => {
-        if (custSearch.length < 2) {
+        const term = custSearch.trim();
+        if (term.length < 2) {
             setCustResults([]);
+            setCustError('');
+            setCustSearching(false);
             return;
         }
-        const s = custSearch.toLowerCase();
-        const results = allCustomers.filter(c => 
-            (c.name && c.name.toLowerCase().includes(s)) ||
-            (c.phone && c.phone.includes(s))
-        ).slice(0, 15); // Limit results for UI performance
-        setCustResults(results);
-    }, [custSearch, allCustomers]);
+        let canceled = false;
+        setCustSearching(true);
+        const timer = setTimeout(async () => {
+            try {
+                const res = await apiFetch({ path: `/wsr/v1/pos/search-customers?q=${encodeURIComponent(term)}` });
+                if (canceled) return;
+                setCustResults(Array.isArray(res) ? res : []);
+                setCustError('');
+            } catch (err) {
+                if (canceled) return;
+                setCustResults([]);
+                setCustError((err && err.message) || 'ค้นหาลูกค้าไม่สำเร็จ');
+            }
+            if (!canceled) setCustSearching(false);
+        }, 250);
+        return () => {
+            canceled = true;
+            clearTimeout(timer);
+        };
+    }, [custSearch]);
 
-    // Product Search Effect (Local)
+    // Product Search (server-side, debounced)
     useEffect(() => {
-        if (prodSearch.length === 0) {
+        const term = prodSearch.trim();
+        if (term.length === 0) {
             setProdResults([]);
+            setProdError('');
+            setProdSearching(false);
             return;
         }
-        const s = prodSearch.toLowerCase();
-        const results = allProducts.filter(p => 
-            p.name && p.name.toLowerCase().includes(s)
-        ).slice(0, 20); // Limit results for UI performance
-        setProdResults(results);
-    }, [prodSearch, allProducts]);
+        let canceled = false;
+        setProdSearching(true);
+        const timer = setTimeout(async () => {
+            try {
+                const res = await apiFetch({ path: `/wsr/v1/pos/search-products?q=${encodeURIComponent(term)}` });
+                if (canceled) return;
+                setProdResults(Array.isArray(res) ? res : []);
+                setProdError('');
+            } catch (err) {
+                if (canceled) return;
+                setProdResults([]);
+                setProdError((err && err.message) || 'ค้นหาสินค้าไม่สำเร็จ');
+            }
+            if (!canceled) setProdSearching(false);
+        }, 250);
+        return () => {
+            canceled = true;
+            clearTimeout(timer);
+        };
+    }, [prodSearch]);
 
     const addToCart = (product) => {
         setCart(prev => {
@@ -475,10 +493,15 @@ const POSSystem = () => {
                                             {custResults.map(c => (
                                                 <div key={c.id} className="wsr-search__item" onClick={() => setSelectedCustomer(c)}>
                                                     <div className="wsr-search__item-main">{c.name}</div>
-                                                    <div className="wsr-search__item-sub">{c.phone || '—'}</div>
+                                                    <div className="wsr-search__item-sub">{c.phone || '—'}{c.social ? ` · ${c.social}` : ''}</div>
                                                 </div>
                                             ))}
                                         </div>
+                                    )}
+                                    {custSearching && <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>กำลังค้นหา…</div>}
+                                    {custError && <div className="wsr-search__item-sub" style={{ padding: '8px 4px', color: '#ef4444' }}>{custError}</div>}
+                                    {!custSearching && !custError && custSearch.trim().length >= 2 && custResults.length === 0 && (
+                                        <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>ไม่พบลูกค้า "{custSearch.trim()}" — กด "เพิ่มลูกค้าใหม่" ด้านล่างได้เลย</div>
                                     )}
                                     <div className="wsr-card__divider">
                                         <span>หรือ</span>
@@ -557,6 +580,12 @@ const POSSystem = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {prodSearching && <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>กำลังค้นหา…</div>}
+                            {prodError && <div className="wsr-search__item-sub" style={{ padding: '8px 4px', color: '#ef4444' }}>{prodError}</div>}
+                            {!prodSearching && !prodError && prodSearch.trim() !== '' && prodResults.length === 0 && (
+                                <div className="wsr-search__item-sub" style={{ padding: '8px 4px' }}>ไม่พบสินค้า "{prodSearch.trim()}"</div>
+                            )}
 
                             {/* Cart list */}
                             <div className="wsr-cart">
