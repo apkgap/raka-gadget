@@ -102,9 +102,9 @@ const POSSystem = () => {
 
                 // Auto-fill observed fields from customer data if still empty
                 const customerSocialUrl = customer?.meta?.wsr_social_url ? String(customer.meta.wsr_social_url) : '';
-                setObservedSocialUrl((prev) => (prev && prev.trim() !== '' ? prev : customerSocialUrl));
-                setObservedAvatarUrl((prev) => (prev && prev.trim() !== '' ? prev : avatarUrl));
-                setObservedAvatarId((prev) => (prev && String(prev).trim() !== '' ? prev : (avatarId > 0 ? String(avatarId) : '')));
+                setObservedSocialUrl(customerSocialUrl);
+                setObservedAvatarUrl(avatarUrl);
+                setObservedAvatarId(avatarId > 0 ? String(avatarId) : '');
             } catch (e) {
                 if (!canceled) {
                     setSelectedCustomerProfile(null);
@@ -175,25 +175,29 @@ const POSSystem = () => {
         setProdResults([]);
     };
 
+    const clampQty = (item, qty) => {
+        let q = Math.max(1, parseInt(qty, 10) || 1);
+        if (item.stock !== null && item.stock !== undefined && item.stock > 0) {
+            q = Math.min(q, item.stock);
+        }
+        return q;
+    };
+
     const updateQty = (id, delta) => {
-        setCart(prev => prev.map(p => {
-            if (p.id === id) {
-                const newQty = Math.max(1, p.qty + delta);
-                return { ...p, qty: newQty };
-            }
-            return p;
-        }));
+        setCart(prev => prev.map(p => (p.id === id ? { ...p, qty: clampQty(p, p.qty + delta) } : p)));
+    };
+
+    const setQty = (id, value) => {
+        setCart(prev => prev.map(p => (p.id === id ? { ...p, qty: value === '' ? '' : clampQty(p, value) } : p)));
     };
 
     const updateItemCost = (id, newCost) => {
-        setCart(prev => prev.map(p => {
-            if (p.id === id) {
-                return { ...p, cost: newCost === '' ? '' : parseFloat(newCost) || 0 };
-            }
-            return p;
-        }));
+        setCart(prev => prev.map(p => (p.id === id ? { ...p, cost: newCost === '' ? '' : parseFloat(newCost) || 0 } : p)));
     };
 
+    const updateItemPrice = (id, newPrice) => {
+        setCart(prev => prev.map(p => (p.id === id ? { ...p, price: newPrice === '' ? '' : parseFloat(newPrice) || 0 } : p)));
+    };
     const removeFromCart = (id) => {
         setCart(prev => prev.filter(p => p.id !== id));
     };
@@ -214,13 +218,6 @@ const POSSystem = () => {
         }
     }, [cart, lazadaOrder]);
 
-    useEffect(() => {
-        if (bargainedPrice === '') {
-            const subtotalDraft = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            setBargainedPrice(subtotalDraft ? String(subtotalDraft) : '');
-        }
-    }, [cart, bargainedPrice]);
-
     const submitOrder = async () => {
         if (cart.length === 0) return alert('กรุณาเลือกสินค้าอย่างน้อย 1 รายการ');
         if (!selectedCustomer && (!isNewCustomer || !newCustName)) return alert('กรุณาเลือกลูกค้า หรือกรอกชื่อลูกค้าใหม่');
@@ -231,7 +228,7 @@ const POSSystem = () => {
                 customer_id: selectedCustomer ? selectedCustomer.id : 0,
                 customer_name: isNewCustomer ? newCustName : (selectedCustomer ? selectedCustomer.name : ''),
                 customer_phone: isNewCustomer ? newCustPhone : '',
-                products: cart,
+                products: cart.map(i => ({ ...i, qty: Math.max(1, Number(i.qty) || 1), price: Number(i.price) || 0, cost: Number(i.cost) || 0 })),
                 shipping_paid: parseFloat(shippingPaid) || 0,
                 shipping_actual: parseFloat(shippingActual) || 0,
                 status: status,
@@ -500,7 +497,7 @@ const POSSystem = () => {
                                     <div className="wsr-selected__info">
                                         <div className="wsr-selected__name">{selectedCustomer.name}</div>
                                         <div className="wsr-selected__meta">{selectedCustomer.phone || '—'}</div>
-                                        {selectedCustomerProfile?.meta?.wsr_fb_flag ? (
+                                        {selectedCustomerProfile?.meta?.wsr_fb_flag && !['normal', 'ปกติ', ''].includes(String(selectedCustomerProfile.meta.wsr_fb_flag)) ? (
                                             <span className="wsr-flag wsr-flag--danger">{selectedCustomerProfile.meta.wsr_fb_flag}</span>
                                         ) : (
                                             <span className="wsr-flag">ลูกค้าปกติ</span>
@@ -549,7 +546,7 @@ const POSSystem = () => {
                                             <div key={p.id} className="wsr-search__item wsr-search__item--product" onClick={() => addToCart(p)}>
                                                 <div className="wsr-search__item-body">
                                                     <div className="wsr-search__item-main">{p.name}</div>
-                                                    <div className="wsr-search__item-sub">มีของ: {p.stock !== null ? p.stock : 'ไม่จำกัด'}</div>
+                                                    <div className="wsr-search__item-sub">{p.stock === null ? 'มีของ: ไม่จำกัด' : (p.stock > 0 ? `มีของ: ${p.stock}` : 'สินค้าหมด')} · ทุน ฿{(p.cost || 0).toLocaleString()}</div>
                                                 </div>
                                                 <div className="wsr-search__item-right">
                                                     <span className="wsr-price">฿{(p.price || 0).toLocaleString()}</span>
@@ -575,8 +572,23 @@ const POSSystem = () => {
                                             <li key={item.id} className="wsr-cart__item">
                                                 <div className="wsr-cart__info">
                                                     <div className="wsr-cart__name">{item.name}</div>
+                                                    {item.stock !== null && item.stock !== undefined && item.qty >= item.stock && <div className="wsr-search__item-sub" style={{ color: '#ef4444' }}>ถึงจำนวนสต็อกสูงสุด ({item.stock})</div>}
                                                     <div className="wsr-cart__price-meta">
-                                                        <span className="wsr-cart__price">฿{(item.price || 0).toLocaleString()} / ชิ้น</span>
+                                                        <div className="wsr-cart__cost-field">
+                                                            <label>ราคา/ชิ้น:</label>
+                                                            <div className="wsr-cart__cost-input-wrap">
+                                                                <span>฿</span>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    step="any"
+                                                                    value={item.price !== undefined ? item.price : ''}
+                                                                    onChange={e => updateItemPrice(item.id, e.target.value)}
+                                                                    className="wsr-cart__cost-input"
+                                                                    title="ราคาขายต่อชิ้น (แก้ไขได้)"
+                                                                />
+                                                            </div>
+                                                        </div>
                                                         <div className="wsr-cart__cost-field">
                                                             <label>ทุน/ชิ้น:</label>
                                                             <div className="wsr-cart__cost-input-wrap">
@@ -597,7 +609,7 @@ const POSSystem = () => {
                                                 </div>
                                                 <div className="wsr-qty">
                                                     <button type="button" className="wsr-qty__btn" onClick={() => updateQty(item.id, -1)}>−</button>
-                                                    <span className="wsr-qty__val">{item.qty}</span>
+                                                    <input type="number" min="1" className="wsr-qty__val" style={{ width: '48px', textAlign: 'center' }} value={item.qty} onChange={e => setQty(item.id, e.target.value)} onBlur={() => setQty(item.id, item.qty)} />
                                                     <button type="button" className="wsr-qty__btn" onClick={() => updateQty(item.id, 1)}>+</button>
                                                 </div>
                                                 <div className="wsr-cart__subtotal">฿{((item.price || 0) * (item.qty || 0)).toLocaleString()}</div>
@@ -682,7 +694,7 @@ const POSSystem = () => {
                                         </select>
                                     </div>
                                     <div className="wsr-field">
-                                        <label>ราคาที่ตกลงขายจริง (฿)</label>
+                                        <label>ราคาที่ตกลงขายจริง (฿) {bargainedPriceManuallyEdited && <button type="button" className="wsr-btn-link" onClick={() => setBargainedPriceManuallyEdited(false)}>ใช้ยอดรวมสินค้า</button>}</label>
                                         <input type="number" min="0" value={bargainedPrice} onChange={e => { setBargainedPrice(e.target.value); setBargainedPriceManuallyEdited(true); }} className="wsr-pos-input" />
                                     </div>
                                 </div>
@@ -744,7 +756,7 @@ const POSSystem = () => {
                                         <input type="number" min="0" value={shippingPaid} onChange={e => setShippingPaid(e.target.value)} className="wsr-pos-input" />
                                     </div>
                                     <div className="wsr-field">
-                                        <label>ค่าส่งจ่ายค่ายไปรษณีย์ (฿)</label>
+                                        <label>ค่าส่งที่ร้านจ่ายจริง (฿)</label>
                                         <input type="number" min="0" value={shippingActual} onChange={e => setShippingActual(e.target.value)} className="wsr-pos-input" />
                                     </div>
                                 </div>
@@ -768,6 +780,16 @@ const POSSystem = () => {
                                     <div className="wsr-pos-total__row">
                                         <span>ยอดหลังต่อรอง</span>
                                         <span>{isCalculating ? '…' : `฿${calc.bargained.toLocaleString()}`}</span>
+                                    </div>
+                                    {calc.bargained !== calc.totalSelling && (
+                                        <div className="wsr-pos-total__row">
+                                            <span>ส่วนต่างจากการต่อรอง</span>
+                                            <span>{`฿${(calc.bargained - calc.totalSelling).toLocaleString()}`}</span>
+                                        </div>
+                                    )}
+                                    <div className="wsr-pos-total__row">
+                                        <span>ต้นทุนรวม</span>
+                                        <span>{isCalculating ? '…' : `฿${calc.totalCost.toLocaleString()}`}</span>
                                     </div>
                                     <div className="wsr-pos-total__row">
                                         <span>ค่าจัดส่ง</span>
