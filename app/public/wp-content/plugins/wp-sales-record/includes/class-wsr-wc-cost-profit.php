@@ -349,7 +349,7 @@ class WSR_WooCommerce_Cost_Profit
      */
     public function add_order_sync_action($actions)
     {
-        $actions['wsr_sync_to_sales_record'] = '🔄 ซิงค์ออเดอร์นี้ไปยัง Sales Record';
+        $actions['wsr_sync_to_sales_record'] = 'ซิงค์ออเดอร์นี้ไปยัง Sales Record';
         return $actions;
     }
 
