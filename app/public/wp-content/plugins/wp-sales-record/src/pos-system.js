@@ -185,6 +185,15 @@ const POSSystem = () => {
         }));
     };
 
+    const updateItemCost = (id, newCost) => {
+        setCart(prev => prev.map(p => {
+            if (p.id === id) {
+                return { ...p, cost: newCost === '' ? '' : parseFloat(newCost) || 0 };
+            }
+            return p;
+        }));
+    };
+
     const removeFromCart = (id) => {
         setCart(prev => prev.filter(p => p.id !== id));
     };
@@ -566,7 +575,25 @@ const POSSystem = () => {
                                             <li key={item.id} className="wsr-cart__item">
                                                 <div className="wsr-cart__info">
                                                     <div className="wsr-cart__name">{item.name}</div>
-                                                    <div className="wsr-cart__price">฿{(item.price || 0).toLocaleString()} / ชิ้น</div>
+                                                    <div className="wsr-cart__price-meta">
+                                                        <span className="wsr-cart__price">฿{(item.price || 0).toLocaleString()} / ชิ้น</span>
+                                                        <div className="wsr-cart__cost-field">
+                                                            <label>ทุน/ชิ้น:</label>
+                                                            <div className="wsr-cart__cost-input-wrap">
+                                                                <span>฿</span>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    step="any"
+                                                                    placeholder="0"
+                                                                    value={item.cost !== undefined ? item.cost : ''}
+                                                                    onChange={e => updateItemCost(item.id, e.target.value)}
+                                                                    className="wsr-cart__cost-input"
+                                                                    title="ระบุต้นทุนเฉพาะของชิ้นนี้"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div className="wsr-qty">
                                                     <button type="button" className="wsr-qty__btn" onClick={() => updateQty(item.id, -1)}>−</button>
