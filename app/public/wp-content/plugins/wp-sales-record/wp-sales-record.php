@@ -90,6 +90,7 @@ function wsr_enqueue_admin_scripts($hook_suffix)
     }
 
     $asset = require $asset_file;
+    $asset_ver = file_exists(WSR_PLUGIN_DIR . 'build/index.js') ? (string)filemtime(WSR_PLUGIN_DIR . 'build/index.js') : $asset['version'];
 
     wp_enqueue_style(
         'wsr-fonts',
@@ -102,7 +103,7 @@ function wsr_enqueue_admin_scripts($hook_suffix)
         'wsr-admin-style',
         WSR_PLUGIN_URL . 'build/style-index.css',
         array('wp-components', 'wsr-fonts'),
-        $asset['version'],
+        $asset_ver,
         'all'
     );
 
@@ -110,7 +111,7 @@ function wsr_enqueue_admin_scripts($hook_suffix)
         'wsr-admin-script',
         WSR_PLUGIN_URL . 'build/index.js',
         array_merge($asset['dependencies'], array('wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data')),
-        $asset['version'],
+        $asset_ver,
         true
     );
 
