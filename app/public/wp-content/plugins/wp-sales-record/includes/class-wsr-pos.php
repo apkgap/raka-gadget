@@ -17,7 +17,7 @@ class WSR_POS
         add_submenu_page(
             'wsr-dashboard',
             'Mini POS / เพิ่มออเดอร์',
-            '📦 เพิ่มออเดอร์ (POS)',
+            'เพิ่มออเดอร์ (POS)',
             'manage_options',
             'wsr-pos',
             array($this, 'render_pos_page')

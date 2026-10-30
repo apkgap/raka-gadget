@@ -1,20 +1,21 @@
-/* ─── Design Tokens ─────────────────────────────── */
+/* ─── Design Tokens (Clean SaaS Theme) ─────────────────────────── */
 :root {
-    --wsr-font: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --wsr-bg: #f1f5f9;
+    --wsr-font: 'Inter', 'Noto Sans Thai', 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --wsr-bg: #f8fafc;
     --wsr-surface: #ffffff;
     --wsr-border: #e2e8f0;
     --wsr-text: #0f172a;
     --wsr-muted: #64748b;
-    --wsr-blue: #3b82f6;
+    --wsr-blue: #4169F7;
+    --wsr-blue-hover: #3154D9;
     --wsr-green: #10b981;
     --wsr-purple: #8b5cf6;
     --wsr-orange: #f97316;
     --wsr-red: #ef4444;
     --wsr-yellow: #f59e0b;
     --wsr-cyan: #06b6d4;
-    --wsr-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-    --wsr-shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.05);
+    --wsr-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --wsr-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
     --wsr-radius: 12px;
     --wsr-radius-sm: 8px;
 }
@@ -24,8 +25,8 @@
    ═══════════════════════════════════════════════════ */
 
 .wsr-pos-wrap {
-    background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-    padding: 24px 0;
+    background: #f8fafc;
+    padding: 20px 0;
     margin: 0 -20px;
     min-height: calc(100vh - 32px);
 }
@@ -60,8 +61,8 @@
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     color: #fff;
-    background: linear-gradient(135deg, var(--wsr-blue), var(--wsr-purple));
-    box-shadow: 0 4px 10px rgba(59,130,246,.3);
+    background: var(--wsr-blue);
+    box-shadow: 0 2px 6px rgba(65, 105, 247, 0.25);
 }
 .wsr-pos__brand-title {
     font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em;
@@ -110,9 +111,12 @@
     border-radius: var(--wsr-radius);
     box-shadow: var(--wsr-shadow);
     overflow: hidden;
-    transition: box-shadow .2s ease;
+    transition: all .15s ease;
 }
-.wsr-card:hover { box-shadow: var(--wsr-shadow-md); }
+.wsr-card:hover {
+    box-shadow: var(--wsr-shadow-md);
+    border-color: #cbd5e1;
+}
 .wsr-card__header {
     display: flex;
     align-items: center;
@@ -1090,3 +1094,83 @@
     border-radius: var(--wsr-radius);
     box-shadow: var(--wsr-shadow);
 }
+
+/* ═══════════════════════════════════════════════════
+   Classic Meta Box Modern Clean Layout
+   ═══════════════════════════════════════════════════ */
+.wsr-sales-panel {
+    font-family: var(--wsr-font);
+    color: var(--wsr-text);
+}
+
+.wsr-meta-card {
+    background: #ffffff;
+    border: 1px solid var(--wsr-border);
+    border-radius: var(--wsr-radius);
+    box-shadow: var(--wsr-shadow);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    transition: all 0.15s ease;
+}
+
+.wsr-meta-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--wsr-shadow-md);
+}
+
+.wsr-meta-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--wsr-border);
+}
+
+.wsr-meta-card__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--wsr-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wsr-meta-card__badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: #eff6ff;
+    color: var(--wsr-blue);
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #bfdbfe;
+}
+
+.wsr-calculation-result {
+    padding: 18px 20px;
+    border-radius: var(--wsr-radius-sm);
+    margin-top: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+}
+
+.wsr-profit-positive {
+    background-color: #f0fdf4;
+    color: #15803d;
+    border-color: #bbf7d0;
+}
+
+.wsr-profit-negative {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+

@@ -144,7 +144,7 @@ class WSR_Notifications
         }
         check_admin_referer('wsr_test_tg_nonce');
 
-        $sent = $this->send_telegram_message("✅ <b>ทดสอบระบบสำเร็จ!</b>\nWP Sales Record สามารถส่งข้อความเข้า Telegram ได้อย่างสมบูรณ์แบบครับ");
+        $sent = $this->send_telegram_message("<b>[ทดสอบระบบสำเร็จ]</b>\nWP Sales Record สามารถส่งข้อความเข้า Telegram ได้อย่างสมบูรณ์แบบครับ");
         
         $redirect_url = add_query_arg(
             array('page' => 'wsr-notifications', 'tg_test' => $sent ? 'success' : 'failed'),
@@ -171,12 +171,11 @@ class WSR_Notifications
             $customer_name = $customer_id > 0 ? get_the_title($customer_id) : 'ไม่ระบุ';
             $selling_price = (float) get_post_meta($post_id, 'wsr_selling_price', true);
             
-            $text = "🔔 <b>แจ้งเตือนออเดอร์ใหม่!</b>\n\n";
+            $text = "<b>[แจ้งเตือนออเดอร์ใหม่]</b>\n\n";
             $text .= "<b>ID:</b> #" . $post_id . "\n";
             $text .= "<b>ลูกค้า:</b> " . $customer_name . "\n";
             $text .= "<b>ยอดชำระ:</b> ฿" . number_format($selling_price, 2) . "\n";
-            $text .= "<b>สถานะ:</b> ชำระแล้ว\n\n";
-            $text .= "🎉 สู้ๆ ครับ!";
+            $text .= "<b>สถานะ:</b> ชำระแล้ว\n";
 
             $sent = $this->send_telegram_message($text);
             if ($sent) {
@@ -216,11 +215,10 @@ class WSR_Notifications
             $total_profit += $order_profit;
         }
 
-        $text = "📊 <b>สรุปยอดขายประจำวัน</b> (" . wp_date('d/m/Y') . ")\n\n";
+        $text = "<b>[สรุปยอดขายประจำวัน]</b> (" . wp_date('d/m/Y') . ")\n\n";
         $text .= "ออเดอร์ทั้งหมด: <b>{$total_orders}</b> รายการ\n";
         $text .= "ยอดขายรวม: <b>฿" . number_format($total_revenue, 2) . "</b>\n";
-        $text .= "กำไรสุทธิ: <b>฿" . number_format($total_profit, 2) . "</b>\n\n";
-        $text .= "พักผ่อนให้เพียงพอนะครับ! 🌙";
+        $text .= "กำไรสุทธิ: <b>฿" . number_format($total_profit, 2) . "</b>\n";
 
         $this->send_telegram_message($text);
     }

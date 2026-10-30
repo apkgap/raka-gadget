@@ -18,7 +18,7 @@ class WSR_Tools
         add_submenu_page(
             'wsr-dashboard',
             'จัดการหมวดหมู่สินค้า',
-            '🛠️ จัดการข้อมูล (Tools)',
+            'จัดการข้อมูล (Tools)',
             'manage_options',
             'wsr-tools',
             array($this, 'render_tools_page')

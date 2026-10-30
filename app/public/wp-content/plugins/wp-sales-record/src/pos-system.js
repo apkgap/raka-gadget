@@ -492,7 +492,7 @@ const POSSystem = () => {
                                         <div className="wsr-selected__name">{selectedCustomer.name}</div>
                                         <div className="wsr-selected__meta">{selectedCustomer.phone || '—'}</div>
                                         {selectedCustomerProfile?.meta?.wsr_fb_flag ? (
-                                            <span className="wsr-flag wsr-flag--danger">⚑ {selectedCustomerProfile.meta.wsr_fb_flag}</span>
+                                            <span className="wsr-flag wsr-flag--danger">{selectedCustomerProfile.meta.wsr_fb_flag}</span>
                                         ) : (
                                             <span className="wsr-flag">ลูกค้าปกติ</span>
                                         )}
@@ -608,7 +608,7 @@ const POSSystem = () => {
                                             </a>
                                         )}
                                         {selectedCustomerProfile.meta?.wsr_fb_flag_note && (
-                                            <div className="wsr-profile__note">📝 {selectedCustomerProfile.meta.wsr_fb_flag_note}</div>
+                                            <div className="wsr-profile__note">{selectedCustomerProfile.meta.wsr_fb_flag_note}</div>
                                         )}
                                     </div>
                                     <div className="wsr-profile__actions">
