@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>คำนวณต้นทุนและกำไรสินค้า</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="calculator.js?v=19" defer></script>
+</head>
+<body>
+<main>
+  <header><span class="eyebrow">RAKA GADGET · COST & PROFIT</span><h1>คำนวณต้นทุนและกำไร</h1><p>13 ชิ้น · กรอกราคาตั้งขายของแต่ละชิ้น แล้วกดคำนวณทั้งหมด</p></header>
+  <form id="calculator">
+    <section class="panel" aria-labelledby="items-title">
+      <h2 id="items-title">รายการสินค้า <span>13 ชิ้น</span></h2>
+      <p class="hint">ต้นทุนบาทอ้างอิงข้อมูลที่ให้มา (เรตประมาณ 5.13 บาท/หยวน) · ราคาขายเป็นบาท</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th scope="col">สินค้า / ชิ้น</th><th scope="col">ต้นทุนหยวน (¥)</th><th scope="col">ต้นทุนบาท (฿)</th><th scope="col">ราคาตั้งขาย (฿)</th><th scope="col">กำไร / ขาดทุน (฿)</th></tr></thead>
+        <tbody id="items"></tbody>
+        <tfoot><tr><th scope="row">รวม 13 ชิ้น</th><td id="total-yuan"></td><td id="total-cost"></td><td id="total-sale">—</td><td id="total-profit">—</td></tr></tfoot>
+      </table></div>
+      <p class="hint">สาย HM HUB C-C 2 เส้น แยกเป็นเส้นละ ¥31.66 และแบ่งต้นทุนรวม 324.83 บาทเป็น 162.42 + 162.41 บาท เพื่อรักษายอดเดิม</p>
+    </section>
+    <div class="actions"><button type="submit">คำนวณทั้งหมด <span aria-hidden="true">→</span></button><button id="export-json" class="secondary" type="button" disabled>Export JSON</button><button id="clear" class="secondary" type="button">ล้างราคาขาย</button><p id="status" role="status">กรอกราคาและคำนวณก่อน Export JSON</p></div>
+  </form>
+  <section class="summary" aria-label="ผลรวม">
+    <article><h2>ต้นทุนรวม</h2><p id="cost-card"></p><small>บาท · สินค้า 13 ชิ้น</small></article>
+    <article><h2>ราคาตั้งขายรวม</h2><p id="sale-card">—</p><small>บาท</small></article>
+    <article class="profit-card"><h2>กำไร / ขาดทุนรวม</h2><p id="profit-card">—</p><small>ราคาตั้งขายรวม − ต้นทุนรวม</small></article>
+  </section>
+  <p class="footnote">หน้านี้คำนวณกำไรตามราคาที่กรอกสำหรับสินค้า 13 ชิ้น · <a href="reconciliation.html">หน้าเทียบสลิป</a> และ <a href="profit-summary.html">หน้าสรุปยอดรับและต้นทุน</a> รวมยอดโอน X-raypad 778 บาทแล้ว และหักเฉพาะค่าส่ง 83 บาท เหลือยอดรับ 13,758.99 บาท<br>ราคา D-GLOW ที่แก้แล้วใน JSON คือ 1,070 บาท · ต้นทุนสินค้า 13 ชิ้นรวม 11,308.84 บาท · ยังไม่มีต้นทุน X-raypad</p>
+</main>
+</body>
+</html>

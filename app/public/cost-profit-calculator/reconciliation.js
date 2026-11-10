@@ -1,0 +1,72 @@
+(() => {
+  'use strict';
+  const data = window.rakaReconciliation;
+  const form = document.getElementById('compare');
+  if (!form || !data) return;
+  const cents = value => Math.round(value * 100);
+  const money = value => (value / 100).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const signed = value => (value > 0 ? '+' : '') + money(value);
+  const labels = ['ATK A9 Air','ATK RS7 Air (รวมมัดจำ)','D-GLOW CLEAR (Lumi)','HM Hub + สายสปริง (2 ชิ้น)','ATK Horizon Type-C','ยอดผ่อน — สมมติเทียบ 6 ชิ้นที่เหลือ (รอยืนยัน)','X-raypad — รวมยอดรับแล้ว','ค่าส่ง: Bolt','ค่าส่ง: Lalamove','Hiomu Custom RGB','สาย — รอจับคู่สินค้า'];
+  const groupFor = index => index === 7 ? 9 : index < 3 ? index : index < 5 ? 3 : index === 5 ? 4 : 5;
+  const cell = (row, text, heading = false) => {
+    const el = document.createElement(heading ? 'th' : 'td');
+    if (heading) el.scope = 'row';
+    el.textContent = text;
+    row.append(el);
+    return el;
+  };
+  const rowIn = id => {const row = document.createElement('tr');document.getElementById(id).append(row);return row;};
+  const expected = Array(11).fill(0);
+  data.items.forEach((item, index) => {
+    const group = groupFor(index);
+    expected[group] += cents(item.selling_price_thb);
+    const row = rowIn('products');
+    cell(row, `${index + 1}. ${item.name}`, true);
+    cell(row, `${item.quantity} ชิ้น`);
+    cell(row, money(cents(item.selling_price_thb)));
+    cell(row, labels[group]);
+  });
+  const received = Array(11).fill(0);
+  data.slips.forEach(slip => {
+    received[slip.group] += slip.amount_cents;
+    const row = rowIn('slips');
+    cell(row, `${slip.date} · ${slip.note}`, true);
+    cell(row, money(slip.amount_cents));
+    cell(row, labels[slip.group]);
+    const link = document.createElement('a');
+    link.href = `/wp-content/themes/raka-preorder-theme/assets/images/slip/${slip.file}.jpg`;
+    link.target = '_blank';link.rel = 'noopener';link.textContent = 'ดูสลิป';
+    cell(row, '').append(link);
+  });
+  const sum = values => values.reduce((a,b) => a+b,0);
+  document.getElementById('slips-total').textContent = money(sum(received));
+  const totalExpected = sum(expected);
+  const outside = sum(received.slice(7,9));
+  const totalReceived = sum(received) - outside;
+  document.getElementById('expected').textContent = money(totalExpected);
+  document.getElementById('products-total').textContent = money(totalExpected);
+  document.getElementById('received').textContent = money(totalReceived);
+  document.getElementById('difference').textContent = signed(totalReceived-totalExpected);
+  document.getElementById('difference').className = totalReceived < totalExpected ? 'negative' : 'positive';
+  document.getElementById('all-totals').textContent = `ทุกสลิป ${money(sum(received))} บาท − ค่าส่ง ${money(outside)} บาท = ยอดรับ ${money(totalReceived)} บาท รวม X-raypad ${money(received[6])} บาท และสายรอจับคู่ ${money(received[10])} บาท`;
+  const classify = (diff, tolerance) => diff === 0 ? ['ตรง','exact'] : Math.abs(diff) <= tolerance ? ['ใกล้เคียง','near'] : ['ไม่ตรง','mismatch'];
+  const compare = () => {
+    const tolerance = cents(Number(document.getElementById('tolerance').value));
+    document.getElementById('groups').replaceChildren();
+    expected.forEach((amount,index) => {
+      if (index === 7 || index === 8) return;
+      const row = rowIn('groups');
+      const diff = received[index] - amount;
+      cell(row, labels[index], true);cell(row,index === 6 ? 'ไม่มีราคาตั้งใน JSON' : money(amount));cell(row,money(received[index]));cell(row,index === 6 ? 'ยังเทียบรายสินค้าไม่ได้' : signed(diff));
+      const [label,style] = index === 6 ? ['รวมยอดรับแล้ว','near'] : index === 10 ? ['รอจับคู่','near'] : classify(diff,tolerance);
+      const badge = document.createElement('span');badge.className = `badge ${style}`;badge.textContent = label;
+      cell(row,'').append(badge);
+    });
+    const diff = totalReceived-totalExpected;
+    document.getElementById('overall').textContent = `${classify(diff,tolerance)[0]} · ${diff < 0 ? 'รับต่ำกว่าราคาตั้ง' : diff > 0 ? 'รับเกินราคาตั้ง' : 'ยอดเท่ากัน'} ${money(Math.abs(diff))} บาท · รวม X-raypad ที่ไม่มีราคาตั้งใน JSON และสาย 600 บาทรอจับคู่`;
+    document.getElementById('status').textContent = `เทียบแล้ว · เกณฑ์ ${money(tolerance)} บาท`;
+  };
+  form.addEventListener('submit',event => {event.preventDefault();if(form.reportValidity()) compare();});
+  form.addEventListener('input',() => {document.getElementById('status').textContent = 'เปลี่ยนเกณฑ์แล้ว · กดคำนวณเปรียบเทียบเพื่ออัปเดต';});
+  compare();
+})();

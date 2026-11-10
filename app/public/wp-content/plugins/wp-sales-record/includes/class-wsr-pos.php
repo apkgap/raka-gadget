@@ -175,7 +175,8 @@ class WSR_POS
             if (! $product) {
                 continue;
             }
-            if ($product->is_type('variable')) {
+            // Explicit IDs restore saved order lines, not every variation of a parent.
+            if ($product->is_type('variable') && empty($include)) {
                 foreach ($product->get_children() as $vid) {
                     $variation = wc_get_product($vid);
                     if ($variation && $variation->get_status() === 'publish') {
