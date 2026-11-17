@@ -14,7 +14,7 @@
     echo 'set ftp:ssl-allow yes;'
     echo 'set ssl:verify-certificate no;'
     echo 'set ftp:passive-mode yes;'
-    echo 'set ftp:use-epsv no;'
+    echo 'set ftp:prefer-epsv no;'
     # mirror commands here
     echo 'quit'
   } > "$LFTP_COMMANDS"

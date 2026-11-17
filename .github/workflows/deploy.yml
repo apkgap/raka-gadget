@@ -119,7 +119,7 @@ jobs:
             echo 'set ftp:ssl-allow yes;'
             echo 'set ssl:verify-certificate no;'
             echo 'set ftp:passive-mode yes;'
-            echo 'set ftp:use-epsv no;'
+            echo 'set ftp:prefer-epsv no;'
             echo 'set net:timeout 120;'
             echo 'set net:max-retries 10;'
             echo 'set net:reconnect-interval-base 3;'
