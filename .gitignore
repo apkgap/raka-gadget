@@ -19,3 +19,12 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Temporary data, benchmarks, and import/scratch scripts
+eyejoker_keyboard_benchmarks*
+import_*.php
+reference_*.csv
+sales_record_template.csv
+raka-cost-profit-*.json
+scripts/
+
+
