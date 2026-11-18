@@ -15,13 +15,13 @@ graph TD
     classDef page fill:#F8FAFC,stroke:#94A3B8,stroke-width:1px,color:#0F172A;
     classDef admin fill:#ECFDF5,stroke:#059669,stroke-width:1.5px,color:#064E3B;
 
-    Home["🏠 หน้าแรก (front-page.php)<br/>Hero, Showcase, Flash Sale & Featured"]:::root
+    Home["หน้าแรก (front-page.php)<br/>Hero, Showcase, Flash Sale & Featured"]:::root
 
-    Home --> Shop["🛍️ ร้านค้า & สินค้า"]:::group
-    Home --> PreOrder["📦 ระบบ Pre-Order"]:::group
-    Home --> Auth["🔐 สมาชิก & ความปลอดภัย"]:::group
-    Home --> Blog["📰 บทความ / ข่าวสาร"]:::group
-    Home --> Admin["⚙️ หลังบ้าน & Mini POS"]:::admin
+    Home --> Shop["ร้านค้า & สินค้า"]:::group
+    Home --> PreOrder["ระบบ Pre-Order"]:::group
+    Home --> Auth["สมาชิก & ความปลอดภัย"]:::group
+    Home --> Blog["บทความ / ข่าวสาร"]:::group
+    Home --> Admin["หลังบ้าน & Mini POS"]:::admin
 
     Shop --> ArchiveProd["หน้ารวมสินค้า (archive-product.php)<br/>Filter / Category / Search"]:::page
     Shop --> SingleProd["หน้ารายละเอียดสินค้า (single-product.php)<br/>Variations / Add to Cart"]:::page
@@ -56,21 +56,21 @@ flowchart TD
     classDef decision fill:#FEF3C7,stroke:#D97706,stroke-width:1.5px,color:#78350F;
     classDef success fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#14532D;
 
-    Start(["👤 ลูกค้าเข้าเว็บไซต์ RAKA GADGET"]):::start
+    Start(["ลูกค้าเข้าเว็บไซต์ RAKA GADGET"]):::start
     Start --> NeedAuth{"มีบัญชีหรือยัง?"}:::decision
 
-    NeedAuth -->|ยังไม่มี| Register["📝 สมัครสมาชิก (page-register.php)<br/>ยืนยัน Captcha + ผูก Passkey"]:::step
-    NeedAuth -->|มีแล้ว| Login["🔑 เข้าสู่ระบบ (page-login.php)<br/>เลือก Passkey / Social / รหัสผ่าน"]:::step
+    NeedAuth -->|ยังไม่มี| Register["สมัครสมาชิก (page-register.php)<br/>ยืนยัน Captcha + ผูก Passkey"]:::step
+    NeedAuth -->|มีแล้ว| Login["เข้าสู่ระบบ (page-login.php)<br/>เลือก Passkey / Social / รหัสผ่าน"]:::step
 
     Register --> Browse
-    Login --> Browse["🛒 เลือกดูสินค้า (Shop / Pre-Order)"]:::step
+    Login --> Browse["เลือกดูสินค้า (Shop / Pre-Order)"]:::step
 
     Browse --> OrderType{"ประเภทสินค้า"}:::decision
-    OrderType -->|สินค้าพร้อมส่ง| WCCart["🛍️ WooCommerce Cart & Checkout<br/>ใช้แต้ม Loyalty แลกส่วนลด/ของรางวัลได้"]:::step
-    OrderType -->|สินค้า Pre-Order| PreOrderFlow["📦 Pre-Order App (preorder-raka)<br/>ค้นหาสถานะ / ติดตามรอบนำเข้า"]:::step
+    OrderType -->|สินค้าพร้อมส่ง| WCCart["WooCommerce Cart & Checkout<br/>ใช้แต้ม Loyalty แลกส่วนลด/ของรางวัลได้"]:::step
+    OrderType -->|สินค้า Pre-Order| PreOrderFlow["Pre-Order App (preorder-raka)<br/>ค้นหาสถานะ / ติดตามรอบนำเข้า"]:::step
 
-    WCCart --> EarnPoints["⭐ คำสั่งซื้อสำเร็จ → ได้รับแต้มสะสม<br/>ดูประวัติได้ที่ My Account"]:::success
-    PreOrderFlow --> TrackStatus["📍 อัปเดตสถานะสินค้า & เลขพัสดุ"]:::success
+    WCCart --> EarnPoints["คำสั่งซื้อสำเร็จ -> ได้รับแต้มสะสม<br/>ดูประวัติได้ที่ My Account"]:::success
+    PreOrderFlow --> TrackStatus["อัปเดตสถานะสินค้า & เลขพัสดุ"]:::success
 ```
 
 ---
@@ -83,15 +83,15 @@ flowchart LR
     classDef process fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,color:#0F172A;
     classDef calc fill:#ECFDF5,stroke:#059669,stroke-width:1.5px,color:#064E3B;
 
-    Cust["👥 ค้นหา/สร้างลูกค้า<br/>(CPT: customer)"]:::source
-    Prod["📦 ค้นหาสินค้า WooCommerce<br/>(Simple & Variations + สต็อก/ราคาสด)"]:::source
+    Cust["ค้นหา/สร้างลูกค้า<br/>(CPT: customer)"]:::source
+    Prod["ค้นหาสินค้า WooCommerce<br/>(Simple & Variations + สต็อก/ราคาสด)"]:::source
 
-    Cust --> POS["🖥️ Mini POS (wsr-pos)<br/>ปรับราคาขาย / ราคาต่อรอง / จำนวน"]:::process
+    Cust --> POS["Mini POS (wsr-pos)<br/>ปรับราคาขาย / ราคาต่อรอง / จำนวน"]:::process
     Prod --> POS
 
-    POS --> Record["🧾 บันทึกรายการขาย<br/>(CPT: sales_record)"]:::process
-    Record --> Cost["💰 ดึงต้นทุนสินค้า<br/>(class-wsr-wc-cost-profit.php)"]:::calc
-    Cost --> Analytics["📊 Dashboard & Graph Analysis<br/>• ยอดขายรายเดือน<br/>• กำไรสุทธิหลังหักต้นทุน<br/>• Top Products / Heatmap"]:::calc
+    POS --> Record["บันทึกรายการขาย<br/>(CPT: sales_record)"]:::process
+    Record --> Cost["ดึงต้นทุนสินค้า<br/>(class-wsr-wc-cost-profit.php)"]:::calc
+    Cost --> Analytics["Dashboard & Graph Analysis<br/>• ยอดขายรายเดือน<br/>• กำไรสุทธิหลังหักต้นทุน<br/>• Top Products / Heatmap"]:::calc
 ```
 
 ---
@@ -100,9 +100,9 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    Dev["💻 Local Development<br/>(dev branch)"] -->|Commit & Push| GH["🐙 GitHub Repository"]
-    GH -->|Trigger: .github/workflows/deploy.yml| Detect["🔍 Detect Changed Components<br/>Theme / preorder-raka / passkeys / sales-record"]
-    Detect -->|Changed Only| LFTP["🚀 lftp Sync to Production<br/>(raka-preorder-theme & plugins)"]
+    Dev["Local Development<br/>(dev branch)"] -->|Commit & Push| GH["GitHub Repository"]
+    GH -->|Trigger: .github/workflows/deploy.yml| Detect["Detect Changed Components<br/>Theme / preorder-raka / passkeys / sales-record"]
+    Detect -->|Changed Only| LFTP["lftp Sync to Production<br/>(raka-preorder-theme & plugins)"]
 ```
 
 ---
